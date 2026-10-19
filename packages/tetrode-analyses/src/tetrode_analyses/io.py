@@ -496,7 +496,8 @@ def attach_tetrode_probegroup(
         probegroup = build_tetrode_probegroup(
             len(order), inter_tetrode_um=inter_tetrode_um
         )
-        grouped = ordered.set_probegroup(probegroup, group_mode="by_probe")
+        ordered.set_probegroup(probegroup, group_mode="by_probe")
+        grouped = ordered
     else:
         groups = np.repeat(np.arange(len(order)), 4)
         ordered.set_property("group", groups)

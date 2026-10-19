@@ -22,7 +22,7 @@ import sys
 import numpy as np
 import pytest
 
-_SORTING_DIR = (pathlib.Path(__file__).resolve().parents[1]
+_SORTING_DIR = (pathlib.Path(__file__).resolve().parents[3]
                 / "analyses" / "tetrode_preprocessing_and_sorting" / "sorting")
 sys.path.insert(0, str(_SORTING_DIR))
 

@@ -218,3 +218,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Workspace
+*.zarr/
+.claude/settings.local.json

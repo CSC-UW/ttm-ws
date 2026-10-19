@@ -1,93 +1,52 @@
 [project]
-name = "tetrode-analyses"
+name = "ttm-ws"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-authors = [
-    { name = "Graham Findlay", email = "graham.b.findlay@gmail.com" }
-]
-requires-python = ">=3.13"
+description = "Tetrode (TTM) electrophysiology workspace: shared library, per-subject analyses, method investigations."
+requires-python = ">=3.14"
 dependencies = [
-    "open-ephys-python-tools>=1.0.1",
-    "dask",
-    "numpy",
-    "pandas",
-    "xarray",
-    "probeinterface",
-    "spikeinterface",
-    "zarr",
+    "tetrode-analyses[analysis,sorting,curation,viz,advisory,lossy_compression]",
 ]
 
-[project.optional-dependencies]
-lossy_compression = [
-    "wavpack-numcodecs",
+[tool.uv]
+package = false
+override-dependencies = [
+    # spikeinterface requires zarr>=3 on Python 3.14 but refuses to WRITE zarr
+    # with it; zarr 2 installs fine on 3.14 and keeps the Zarr converters working.
+    "zarr>=2.18,<3",
+    "numcodecs<0.16",
+]
+constraint-dependencies = [
+    # Only 1.12.0 ships a cp314 wheel (kilosort -> faiss-cpu).
+    "faiss-cpu==1.12.0",
+    # Forces a CUDA-12 torch build; CUDA-13 wheels drop sm_70 (Tesla V100).
+    "torch==2.9.1",
 ]
 
-# Needed by tetrode_analyses.spikeinterface (get_recording / convert_recording)
-# and the MountainSort5 / Kilosort4 sorting pipelines. spikeinterface pulls
-# numcodecs, zarr, scipy, and probeinterface transitively; wavpack-numcodecs,
-# mountainsort5, and kilosort are third-party PyPI packages. kilosort pulls torch
-# (the GPU template-matcher), faiss-cpu, and numba transitively; the CUDA build of
-# torch is selected only in gfys_workspace/pyproject.toml (a [tool.uv] index pin),
-# so an external clone of this package still resolves plain PyPI torch.
-sorting = [
-    "mountainsort5",
-    "kilosort>=4.1.7",
-]
-# Needed by tetrode_analyses.power (instantaneous + STFT bandpower) and
-# tetrode_analyses.plotting (SWA timetraces). ecephys supplies the signal
-# processing (xrsig/npsig: bandpass, Hilbert, decimation, STFT) and pulls scipy +
-# ssqueezepy transitively. ecephys is a sibling workspace package, declared as a
-# direct git URL per the workspace dual-use install pattern (only gfys_workspace
-# overrides it to a local editable path). zarr backs the on-disk xarray products.
-analysis = [
-    "ecephys @ git+https://github.com/CSC-UW/ecephys.git@develop",
-    "matplotlib",
-    "seaborn",
-]
-# Needed by tetrode_analyses' curation/launch_curation.py to run the
-# spikeinterface-gui app (Qt desktop + Panel web backends). Points at the `dev`
-# integration branch of the grahamfindlay fork rather than the PyPI release (latest
-# is 0.13.1). dev = upstream main -- which carries the int32 scrollbar fix that
-# enables curation of long (>2**31-sample) recordings (commit e1b5e7a, PR #263,
-# not yet in any PyPI release) -- plus local sigui CLI `--recording` fixes (correct
-# args.recording_base_folder attribute + fail-loud exception handling). Direct git
-# URL per the workspace dual-use install pattern; gfys_workspace pins the same
-# fork via override-dependencies (currently the dev branch).
-curation = [
-    "spikeinterface-gui[desktop,web] @ git+https://github.com/grahamfindlay/spikeinterface-gui.git@dev",
-]
-# Needed by the local loupe viewer in
-# analyses/tetrode_preprocessing_and_sorting/visualization/launch_loupe.py. The
-# viewer is deliberately SpikeInterface-free: it reads a pre-built "viz bundle"
-# (plain-xarray zarrs + a spikes parquet, produced on the server by
-# visualization/build_bundle.py) rather than SI sortings/recordings, so the only
-# extra it needs is loupe. loupe pulls polars, xarray, zarr, and numpy
-# transitively; base tetrode_analyses supplies the rest (and its viz palette via
-# tetrode_analyses.viz, which imports no SI). loupe is a sibling workspace
-# package, declared as a direct git URL per the workspace dual-use install
-# pattern (gfys_workspace pins the same CSC-UW/loupe@main via override-dependencies).
-viz = [
-    "loupe @ git+https://github.com/CSC-UW/loupe.git@main",
-]
-# Needed by tetrode_analyses.unitrefine_advisory (advisory noise/neural ranking for tetrode
-# sortings, retrained from UnitRefine's published training data -- see sorting scripts 47-50).
-# scikit-learn and joblib already arrive transitively via spikeinterface's quality-metrics stack;
-# huggingface_hub is the only genuine addition, used once to download + cache the training CSVs (the
-# fitted model and CSVs are cached locally thereafter, so reuse on future datasets needs only
-# scikit-learn + joblib, offline). All three are plain PyPI packages.
-advisory = [
-    "scikit-learn",
-    "huggingface-hub",
-    "joblib",
-]
+[tool.uv.workspace]
+members = ["packages/*", "subjects/*", "investigations/*"]
 
-[build-system]
-requires = ["uv_build>=0.9.2,<0.10.0"]
-build-backend = "uv_build"
+[tool.uv.sources]
+tetrode-analyses = { workspace = true }
+# Pinned by commit over HTTPS so a fresh clone resolves without credentials or
+# sibling checkouts. To bump: edit rev, `uv lock --upgrade-package NAME`.
+# To hack on one locally for a session: `uv pip install -e ../NAME`.
+ecephys            = { git = "https://github.com/CSC-UW/ecephys.git",                 rev = "88e410e16d7762425c0f73870a0e4db0a6d8549c" }
+loupe              = { git = "https://github.com/CSC-UW/loupe.git",                   rev = "bc33e3b150bcc508786ba7141861d257416abd62" }
+mountainsort5      = { git = "https://github.com/grahamfindlay/mountainsort5.git",    rev = "b18f35ac5156e7ed9ab477ce34209ae5f8507f25" }
+kilosort           = { git = "https://github.com/grahamfindlay/Kilosort.git",         rev = "d0123d6d965a3a429d8251aa122728ce3553ff4f" }
+spikeinterface-gui = { git = "https://github.com/grahamfindlay/spikeinterface-gui.git", rev = "743370941689a2c41e3599ab68ccd9747b4bd221" }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff",
+    "ipykernel",
+    "nbconvert",
+]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Explicit so collection never sweeps analyses/ (standalone drivers, not tests).
+testpaths = ["packages/tetrode-analyses/tests"]
 markers = [
     "requires_nfs: marks tests that require mounted production NFS data",
 ]

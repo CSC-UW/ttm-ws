@@ -1,59 +1,64 @@
-# tetrode_analyses
+# ttm-ws
 
-Loading helpers for Open Ephys tetrode acquisitions.
+Tetrode (TTM) electrophysiology workspace: multi-day Open Ephys tetrode
+recordings converted to sort-ready Zarr, LFP and band-power products, spike
+sorting by tetrode group, cross-chunk unit tracking, and curation/visualization
+hand-offs between the server and a laptop.
 
-## Public API (`tetrode_analyses` / `ta`)
+## Getting started
 
-| Function | Purpose |
-| --- | --- |
-| `print_session_tree(acq_dir)` | Print record nodes, experiments, recordings, and continuous streams (with channel/sample counts) for an acquisition. |
-| `open_tetrode_dataarray(acq_dir, ...)` | Load one continuous stream as a tetrode-shaped lazy `xarray.DataArray` (`2d_flat_index`, `2d_multi_index`, or `3d` layout). |
-| `load_channel_map(source, *, block_index=None)` | Load the tetrode channel map (`oe_indices`, `enabled`, `tt2ch_ixs`) from a `settings.xml` path, an acquisition / record-node directory, **or a SpikeInterface `OpenEphysBinaryRecordingExtractor`**. |
-| `build_tetrode_probegroup(n_tetrodes, ...)` | Build a `probeinterface.ProbeGroup` of generic tetrodes (identity-wired). |
-| `attach_tetrode_probegroup(recording, ...)` | Return a SpikeInterface recording reordered into channel-map order and grouped by tetrode (`group` + `tetrode` properties, plus a `ProbeGroup` when `geometry=True`). |
-
-The channel map / tetrode grouping is an **experiment-level** property (read from
-`settings.xml`'s `Channel Map` processor), while channel *names* are a
-**per-recording** property (each recording's `structure.oebin`).
-
-### Give a SpikeInterface extractor the tetrode grouping
-
-A raw `OpenEphysBinaryRecordingExtractor` is a flat list of channels with no probe
-and no grouping. `attach_tetrode_probegroup` applies the same channel map
-`open_tetrode_dataarray` uses, so the recording can be split / preprocessed / sorted
-per tetrode (cf. SpikeInterface's *Work with tetrodes* and *Process a recording by
-channel group* how-tos):
-
-```python
-import tetrode_analyses as ta
-from spikeinterface.extractors.extractor_classes import (
-    OpenEphysBinaryRecordingExtractor,
-)
-
-extractor = OpenEphysBinaryRecordingExtractor(ACQ_DIR, stream_id="0")
-grouped = ta.attach_tetrode_probegroup(extractor)
-
-grouped.get_channel_groups()      # [0, 0, 0, 0, 1, 1, 1, 1, ...]
-by_tetrode = grouped.split_by("group")   # one recording per tetrode
-by_tetrode[0].get_channel_ids()   # ['CH40', 'CH38', 'CH36', 'CH34'] == TT1
+```bash
+git clone https://github.com/CSC-UW/ttm-ws.git
+cd ttm-ws
+claude
+> set up the workspace
 ```
 
-`attach_tetrode_probegroup` / `build_tetrode_probegroup` require `probeinterface`,
-declared in the optional `si` extra (`pip install -e '.[si]'` / `uv sync --extra si`).
-The SpikeInterface extractor is supplied by the caller, so `spikeinterface` itself is
-not a dependency of this package.
+The agent follows [`docs/SETUP.md`](docs/SETUP.md); that page has the same
+steps for doing it by hand.
 
-## Analysis library modules
+## Layout
 
-Heavier submodules are imported directly (not re-exported from `__init__`, to keep
-`import tetrode_analyses` light). They require the optional `analysis` extra
-(`uv sync --extra analysis`: `ecephys`, `matplotlib`, `seaborn`, `zarr`).
+| Path | What it is |
+|---|---|
+| `packages/tetrode-analyses/` | The shared library (`import tetrode_analyses`). Subject-agnostic: Open Ephys loading and channel maps, SpikeInterface recording assembly and Zarr conversion, LFP, band power, MountainSort5/Kilosort4 drivers, unit tracking, the UnitRefine advisory, SWA plotting. Its own README documents the API. |
+| `analyses/` | Transitional. The per-session studies and drivers as they stood before the restructure. They move to `subjects/` and `investigations/` in a later phase (see the plan below); until then their READMEs still say to run through `gfys_workspace`, which no longer applies: run them from this workspace's environment. |
+| `subjects/<id>/` | One subject's analysis: manifests, notebooks, committed result summaries. Not yet populated. |
+| `investigations/` | Method bake-offs whose product was a decision baked into the library. Not yet populated. |
+| `docs/` | Setup, developer notes, reports, plans, acceptance baselines. |
 
-| Module | Key functions |
-| --- | --- |
-| `tetrode_analyses.lfp` | `make_lfp`, `open_lfps_dataarray` — produce / load the 625 Hz LFP Zarr (`sorting` extra). |
-| `tetrode_analyses.experiment` | `ExperimentParams`, `load`/`save_experiment_params`, `read_session_t0_unix`, `dt2t`/`t2dt`, `get_light_dark_periods`, `get_deprivation_period` — WNE-style `experiment_params.json` and wall-clock↔session-time mapping. |
-| `tetrode_analyses.power` | `extract_instantaneous_bandpower` (bandpass + Hilbert), `compute_stft_bandpowers` (4 s DPSS STFT), both averaged per tetrode; `save`/`open` helpers; `replace_outliers` / `replace_outliers_per_tetrode` (histogram-gap artifact removal). `BANDS` defines the frequency bands. |
-| `tetrode_analyses.plotting` | `plot_swa_timetrace`, `plot_lights_overlay`, `plot_deprivation_overlay`, `plot_swa_overview`, `plot_swa_small_multiples` — SWA timetraces with light/dark + deprivation overlays. |
+## Environment
 
-See `analyses/swa/` for the end-to-end SWA (delta power) pipeline built on these.
+```bash
+uv sync --all-packages --group dev
+uv run pytest -q
+```
+
+Always pass `--all-packages`: a plain `uv sync` installs only the root and
+uninstalls workspace members. External packages (`ecephys`, `loupe`, the
+`mountainsort5`, `kilosort` and `spikeinterface-gui` forks) are pinned by
+commit in `pyproject.toml` and resolve without credentials or sibling
+checkouts. Python 3.14 or newer is required.
+
+## Data
+
+Production data live on the server `tononi-2`: raw Open Ephys acquisitions
+under `/Volumes/neuropixel_archive/tetrode_data/<session>/`, derived products
+under `/nvme/neuropixels/tetrode_data/<session>/` and
+`/nvme/neuropixels/tetrode_data/<subject>/<experiment>/`. Until the
+per-machine config lands (plan, Phase 2), those paths are literal in the
+scripts under `analyses/`.
+
+`/nvme` is a shared volume. The materialised 48 h preprocessing cache that
+sorting needs is about 1.3 TB; check free space before a sort.
+
+### Repository size
+
+No single file over 5 MB is committed, and the repository does not grow past
+200 MB, without first discussing git LFS. `git count-objects -vH` reports the
+current size.
+
+## Design
+
+[`docs/plans/2026-10-16_ttm-ws-restructure.md`](docs/plans/2026-10-16_ttm-ws-restructure.md)
+holds the restructure plan and its phase status.
