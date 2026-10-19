@@ -108,7 +108,7 @@ then `investigations/README.md`.
 | `ecephys` | `CSC-UW/ecephys` `develop` | Lab signal-processing library; not on PyPI. Supplies bandpass, Hilbert, decimation, STFT for `tetrode_analyses.power`. |
 | `loupe` | `CSC-UW/loupe` `main` | The local viewer used by the visualization bundle. Not on PyPI. |
 | `mountainsort5` | PyPI `>=0.5.9` | The lab's deterministic-PCA fork was merged upstream (flatironinstitute/mountainsort5 PR 65) and released in 0.5.9, so repeat sorts are bit-identical with the stock package. The `whitening_seed` half of that fix is spikeinterface PR 4600, in 0.105.0. |
-| `kilosort` | `grahamfindlay/Kilosort` `perf/clustering_chunk_size` | Adds `clustering_chunk_size`, which lets 48 h tetrode clustering fit in 32 GB of GPU memory. Stock 4.1.7 rejects the key. Upstream PR MouseLand/Kilosort#1037 (opened 2026-06-20) is still open. |
+| `kilosort` | `grahamfindlay/Kilosort` `perf/clustering_chunk_size` | Adds `clustering_chunk_size`, which lets 48 h tetrode clustering fit in 32 GB of GPU memory. Stock 4.1.7 rejects the key. Rebased onto upstream main (4.1.7 plus the swarmsplitter CCG fix from PR #1043) on 2026-10-19; upstream PR MouseLand/Kilosort#1037 (opened 2026-06-20) is still open. |
 | `spikeinterface-gui` | PyPI `>=0.14.0` | The lab's fork is retired: its eleven commits (the `--recording` CLI fixes and the desktop performance work) were merged upstream in PRs 274 and 275, and 0.14.0 also carries the int32 scrollbar fix for recordings longer than 2^31 samples. |
 | `torch` | `==2.9.1` (constraint) | The CUDA 12 build; CUDA 13 wheels are compiled for sm_75 and newer and fail on the V100. |
 | `faiss-cpu` | `==1.12.0` (constraint) | The only release with a Python 3.14 wheel. |

@@ -1814,8 +1814,8 @@ dependencies = [
 
 [[package]]
 name = "kilosort"
-version = "4.1.8.dev2+gd0123d6d9"
-source = { git = "https://github.com/grahamfindlay/Kilosort.git?rev=d0123d6d965a3a429d8251aa122728ce3553ff4f#d0123d6d965a3a429d8251aa122728ce3553ff4f" }
+version = "4.1.8.dev6+gc5e98f3e1"
+source = { git = "https://github.com/grahamfindlay/Kilosort.git?rev=c5e98f3e1fa079ef35569c64bac0f64af661dcfc#c5e98f3e1fa079ef35569c64bac0f64af661dcfc" }
 dependencies = [
     { name = "faiss-cpu" },
     { name = "matplotlib" },
@@ -4616,7 +4616,7 @@ requires-dist = [
     { name = "ecephys", marker = "extra == 'analysis'", git = "https://github.com/CSC-UW/ecephys.git?rev=88e410e16d7762425c0f73870a0e4db0a6d8549c" },
     { name = "huggingface-hub", marker = "extra == 'advisory'" },
     { name = "joblib", marker = "extra == 'advisory'" },
-    { name = "kilosort", marker = "extra == 'sorting'", git = "https://github.com/grahamfindlay/Kilosort.git?rev=d0123d6d965a3a429d8251aa122728ce3553ff4f" },
+    { name = "kilosort", marker = "extra == 'sorting'", git = "https://github.com/grahamfindlay/Kilosort.git?rev=c5e98f3e1fa079ef35569c64bac0f64af661dcfc" },
     { name = "loupe", marker = "extra == 'viz'", git = "https://github.com/CSC-UW/loupe.git?rev=bc33e3b150bcc508786ba7141861d257416abd62" },
     { name = "matplotlib", marker = "extra == 'analysis'" },
     { name = "mountainsort5", marker = "extra == 'sorting'", specifier = ">=0.5.9" },
