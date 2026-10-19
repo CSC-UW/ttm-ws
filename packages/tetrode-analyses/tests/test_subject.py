@@ -26,7 +26,7 @@ def _write_subject(root: pathlib.Path, sid="TTM-009", exp="EXP", **extra) -> pat
     d = root / sid.lower()
     (d / "experiments").mkdir(parents=True)
     (d / "subject.toml").write_text(f'id = "{sid}"\ntimezone = "America/Chicago"\n')
-    body = 'session = "2026-01-01_00-00-00"\nlightsOn = ["2026-01-01T09:00:00"]\nlightsOff = ["2026-01-01T21:00:00"]\n'
+    body = 'session = "2026-01-01_00-00-00"\nacquisition = "TTM9/2026-01-01_00-00-00"\nlightsOn = ["2026-01-01T09:00:00"]\nlightsOff = ["2026-01-01T21:00:00"]\n'
     for k, v in extra.items():
         body += f"{k} = {json.dumps(v)}\n"
     (d / "experiments" / f"{exp}.toml").write_text(body)
@@ -45,18 +45,14 @@ def test_committed_manifests_load() -> None:
     assert nod.acquisition == "TTM1/2026-05-27_09-07-52"
     assert nod.acquisition_dir == pathlib.Path(config.get().remote("archive")) / "TTM1" / "2026-05-27_09-07-52"
     sd = sj.find_subject("TTM-002").experiment("TTM-002-SD")
-    assert sd.acquisition == "2026-09-24_09-03-22/2026-09-24_09-03-22"
-    assert sd.archive_remote == "neuropixel_archive"
-    with pytest.raises(config.ConfigError, match="neuropixel_archive"):
-        _ = sd.acquisition_dir
+    assert sd.acquisition == "TTM2/2026-09-24_09-03-22"
 
 
 def test_manifest_defaults_and_validation(tmp_path: pathlib.Path) -> None:
     path = _write_subject(tmp_path / "subjects")
     exp = sj.Experiment.from_toml(path)
     assert (exp.subject, exp.experiment, exp.timezone) == ("TTM-009", "EXP", "America/Chicago")
-    assert exp.acquisition == exp.session and exp.oe_stream_index == 0
-    assert exp.archive_remote == "archive"
+    assert exp.acquisition == "TTM9/2026-01-01_00-00-00" and exp.oe_stream_index == 0
     assert exp.novel_objects_start is None and exp.badChannels == []
 
     bad = _write_subject(tmp_path / "s2", sid="TTM-010", bogus=1)

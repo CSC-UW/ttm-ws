@@ -1,8 +1,7 @@
 # Skeleton: the acquisition identity is verified against the archive; the
 # schedule below is NOT yet confirmed. Fill in before processing (see README).
 session = "2026-09-24_09-03-22"
-acquisition = "2026-09-24_09-03-22/2026-09-24_09-03-22"
-archive_remote = "neuropixel_archive"   # still on the old archive, not /Volumes/tetrode
+acquisition = "TTM2/2026-09-24_09-03-22"
 oe_stream_index = 0
 
 # lightsOn = ["2026-09-24T09:00:00", "2026-09-25T09:00:00", "2026-09-26T09:00:00"]

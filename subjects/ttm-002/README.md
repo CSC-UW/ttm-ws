@@ -7,13 +7,11 @@ status: needs_verification
 # TTM-002
 
 Skeleton. `experiments/TTM-002-SD.toml` carries only what is verifiable from
-the archive: the session `2026-09-24_09-03-22`, whose Open Ephys directory is
-nested one level deeper than TTM-001's
-(`/Volumes/neuropixel_archive/tetrode_data/2026-09-24_09-03-22/2026-09-24_09-03-22/Record Node 102`,
-the `neuropixel_archive` remote; TTM2's October sessions are on
-`/Volumes/tetrode/TTM2/`), with
-the 64-channel acquisition-board stream at index 0 (streams 1 and 2 are
-memory usage and an IMU). The light schedule, deprivation window and bad
+the archive: the session `2026-09-24_09-03-22` at
+`/Volumes/tetrode/TTM2/2026-09-24_09-03-22/Record Node 102` (moved there on
+2026-10-19 from the old share, where it sat one directory deeper, next to
+TTM2's October sessions), with the 64-channel acquisition-board stream at
+index 0 (streams 1 and 2 are memory usage and an IMU). The light schedule, deprivation window and bad
 channels are commented out until confirmed; `ttm-experiment-params` will
 write an empty schedule until then.
 

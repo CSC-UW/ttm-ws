@@ -61,15 +61,15 @@ data_root = "/nvme/neuropixels/tetrode_data"
 
 [remotes]
 archive = "/Volumes/tetrode"
-neuropixel_archive = "/Volumes/neuropixel_archive/tetrode_data"
 ```
 
 `data_root` holds `<session>/` (Zarr stores, LFPs, sortings, bundles) and
 `<subject>/<experiment>/` (`experiment_params.json`, band powers, EMG).
 `remotes.archive` is where raw Open Ephys acquisitions are mounted, laid out
-as `<SUBJECT>/<session>/Record Node */`; a manifest whose raw session sits
-on another mount names it with `archive_remote`. Remotes are needed only to
-convert. The values above are the server, `tononi-2`.
+as `<SUBJECT>/<session>/Record Node */` (`TTM1`, `TTM2`, `TTM3`, and
+`Unknown` for sessions not yet attributed to a subject); each manifest's
+`acquisition` is a path under it. Remotes are needed only to convert. The
+values above are the server, `tononi-2`.
 
 A laptop that receives server-built bundles instead sets `data_root` to the
 external drive and names the server as an rclone remote:

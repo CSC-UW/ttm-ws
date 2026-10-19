@@ -69,10 +69,9 @@ class Experiment:
     """One experiment of one subject, as declared in its manifest.
 
     ``session`` names the derived-products directory ``<data_root>/<session>/``.
-    ``acquisition`` is the Open Ephys session directory relative to the remote
-    named by ``archive_remote`` (default ``archive``); it defaults to
-    ``session``. Datetime fields are naive ISO-8601 strings in ``timezone``,
-    the encoding WNE uses.
+    ``acquisition`` is the Open Ephys session directory relative to the
+    ``archive`` remote (``<SUBJECT>/<session>``). Datetime fields are naive
+    ISO-8601 strings in ``timezone``, the encoding WNE uses.
     """
 
     subject: str
@@ -80,7 +79,6 @@ class Experiment:
     timezone: str
     session: str
     acquisition: str
-    archive_remote: str = "archive"
     oe_stream_index: int = 0
     lightsOn: list[str] = dataclasses.field(default_factory=list)
     lightsOff: list[str] = dataclasses.field(default_factory=list)
@@ -103,11 +101,10 @@ class Experiment:
         raw.setdefault("subject", subject.id)
         raw.setdefault("timezone", subject.timezone)
         raw.setdefault("experiment", path.stem)
-        raw.setdefault("acquisition", raw.get("session"))
         unknown = set(raw) - set(cls.manifest_fields())
         if unknown:
             raise ManifestError(f"{path}: unknown keys {sorted(unknown)}")
-        missing = {"session"} - set(raw)
+        missing = {"session", "acquisition"} - set(raw)
         if missing:
             raise ManifestError(f"{path}: missing keys {sorted(missing)}")
         if raw["subject"] != subject.id:
@@ -130,8 +127,8 @@ class Experiment:
 
     @property
     def acquisition_dir(self) -> pathlib.Path:
-        """Raw Open Ephys session directory on the ``archive_remote`` (a local mount)."""
-        return pathlib.Path(config.get().remote(self.archive_remote)) / self.acquisition
+        """Raw Open Ephys session directory on the ``archive`` remote (a local mount)."""
+        return pathlib.Path(config.get().remote("archive")) / self.acquisition
 
     @property
     def experiment_params_path(self) -> pathlib.Path:
