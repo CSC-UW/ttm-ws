@@ -10,14 +10,12 @@ Pipeline (lazy SpikeInterface preprocessing, per the MountainSort5 README):
 
 Common median reference (`preprocess_for_sorting(..., cmr=...)`):
 
-- "global" (default): median across all channels. Single SI pass; ~20x faster to
-  materialize than the cross-tetrode variants and benchmarked to change mean spike
-  waveforms by only ~0.25% of peak (`benchmark_cmr.py`). Recommended.
-- "cross_tetrode": exact median of OTHER tetrodes' channels per tetrode, via SI's
-  grouped `common_reference` with per-group complement `ref_channel_ids` (the
-  groupwise-cmr feature) — a single efficient pass. Requires that SI feature.
-- "local": same cross-tetrode result via an annulus (geometry-based) — exact but
-  slow (~64 per-channel medians). Kept for reference.
+- "global" (default): median across all channels. Benchmarked to change mean
+  spike waveforms by only ~0.25% of peak (`benchmark_cmr.py`); the production
+  TTM-001 sorts used it.
+- "cross_tetrode": per tetrode, the median of every channel on the OTHER
+  tetrodes, via `common_reference(groups=..., ref_channel_ids="out_of_group")`
+  (spikeinterface >= 0.105, PR #4601).
 
 All variants preserve the ProbeGroup and group/tetrode properties needed for
 split + sort.
@@ -42,21 +40,12 @@ from spikeinterface.core.baserecording import BaseRecording
 if not hasattr(BaseRecording, "_recording_segments"):
     BaseRecording._recording_segments = property(lambda self: self._segments)
 
-# Annulus radii (um) for the cross-tetrode local median reference. exclude is
-# between the max within-tetrode (20) and min between-tetrode (280) distance;
-# include is larger than the max between-tetrode distance (~4520).
-CMR_EXCLUDE_UM = 100.0
-CMR_INCLUDE_UM = 1.0e6
-
-
 def preprocess_for_sorting(
     recording,
     *,
     cmr: str = "global",
     freq_min: float = 300.0,
     freq_max: float = 6000.0,
-    cmr_exclude_um: float = CMR_EXCLUDE_UM,
-    cmr_include_um: float = CMR_INCLUDE_UM,
     dtype: str = "float32",
 ):
     """Bandpass + common median reference (full recording, lazy).
@@ -70,12 +59,8 @@ def preprocess_for_sorting(
       faster to materialize than the cross-tetrode variants; benchmarked to alter
       mean spike waveforms by ~0.25% of peak (the 4/64 self-inclusion is negligible
       for a robust median). Recommended.
-    - ``"cross_tetrode"``: median of all channels on OTHER tetrodes, per tetrode
-      (exact). Uses SpikeInterface's grouped ``common_reference`` with per-group
-      ``ref_channel_ids`` (the groupwise-cmr feature) for a single efficient pass.
-      Requires that SI feature in the active environment.
-    - ``"local"``: equivalent cross-tetrode result via an annulus (geometry-based);
-      exact but ~64 per-channel medians, i.e. slow. Kept for reference.
+    - ``"cross_tetrode"``: median of all channels on OTHER tetrodes, per tetrode,
+      from the ``group`` property (``ref_channel_ids="out_of_group"``).
     - ``"none"``: bandpass only.
     """
     rec_f = spre.bandpass_filter(
@@ -85,32 +70,15 @@ def preprocess_for_sorting(
         return rec_f
     if cmr == "global":
         return spre.common_reference(rec_f, reference="global", operator="median", dtype=dtype)
-    if cmr == "local":
-        return spre.common_reference(
-            rec_f, reference="local", operator="median",
-            local_radius=(cmr_exclude_um, cmr_include_um), dtype=dtype,
-        )
     if cmr == "cross_tetrode":
-        # Per-tetrode reference = median of channels on OTHER tetrodes. Uses SI's
-        # grouped global reference with per-group complement ref_channel_ids
-        # (single pass, one median per group). Needs the groupwise-cmr SI feature.
         groups = np.asarray(rec_f.get_property("group"))
         cids = np.asarray(rec_f.get_channel_ids())
-        uniq = sorted(set(groups.tolist()))
-        group_ids = [list(cids[groups == g]) for g in uniq]
-        complements = [list(cids[groups != g]) for g in uniq]
-        try:
-            return spre.common_reference(
-                rec_f, reference="global", operator="median",
-                groups=group_ids, ref_channel_ids=complements, dtype=dtype,
-            )
-        except (AssertionError, TypeError, IndexError) as e:
-            raise NotImplementedError(
-                "cmr='cross_tetrode' needs SpikeInterface's groupwise-cmr feature "
-                "(global reference + per-group ref_channel_ids). Use cmr='global' or "
-                "'local', or install the feature/groupwise-cmr SI build."
-            ) from e
-    raise ValueError(f"Unknown cmr={cmr!r}; use 'global', 'cross_tetrode', 'local', or 'none'.")
+        group_ids = [list(cids[groups == g]) for g in sorted(set(groups.tolist()))]
+        return spre.common_reference(
+            rec_f, reference="global", operator="median",
+            groups=group_ids, ref_channel_ids="out_of_group", dtype=dtype,
+        )
+    raise ValueError(f"Unknown cmr={cmr!r}; use 'global', 'cross_tetrode', or 'none'.")
 
 
 def materialize_preprocessed(
