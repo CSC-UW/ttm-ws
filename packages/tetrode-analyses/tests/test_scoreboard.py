@@ -10,7 +10,7 @@ import sys
 import numpy as np
 
 _SORTING_DIR = (pathlib.Path(__file__).resolve().parents[3]
-                / "analyses" / "tetrode_preprocessing_and_sorting" / "sorting")
+                / "investigations" / "spike-sorting")
 sys.path.insert(0, str(_SORTING_DIR))
 
 import spikeinterface as si  # noqa: E402

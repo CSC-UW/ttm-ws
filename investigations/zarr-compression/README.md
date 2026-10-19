@@ -172,7 +172,7 @@ read speed, and memory.
 
 > The full spike-sorting study that consumes these stores — lossless-vs-lossy
 > agreement, MountainSort5 determinism, block/training-duration sweeps — lives in
-> the sibling `../sorting/` folder (`SORTING_COMPARISON_FINDINGS.md`). This
+> the sibling `../spike-sorting/` folder (`SORTING_COMPARISON_FINDINGS.md`). This
 > section only documents how the store is made sort-ready.
 
 The store is sort-ready: `group`/`tetrode` properties and a generic-tetrode
@@ -223,12 +223,15 @@ The production conversion (`06_convert.py`, and `08_convert_session.py` which
 ran it on the full 2026-05-27_09-07-52 session) became the `ttm-convert`
 entry point on 2026-10-19.
 
-Downstream scripts that consume these stores moved to sibling folders during the
-2026-06-10 reorg: LFP generation (`09`, `13_make_subsampled_lfp`) → `../lfp/`;
-spike sorting (`10`–`24`) → `../sorting/`; the loupe viewer (build → download →
-launch) → `../visualization/`. See the parent `../README.md` for the full study
-index.
+Downstream of these stores: spike sorting (`10`–`24`) is `../spike-sorting/`;
+LFP generation and the loupe viewer became the `ttm-make-lfp`, `ttm-viz-bundle`
+and `ttm-loupe` entry points (`docs/pipeline.md`). `../README.md` indexes the
+investigations.
 
-Reproduce via the workspace env, e.g.
-`cd gfys_workspace && uv run python ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/compression/02_bench_matrix.py`.
-Scratch/experiment data live under `/nvme/neuropixels/tmp/cc_bench`.
+## As run
+
+Benchmarks ran on `tononi-2` in May and June 2026 from the `gfys_workspace`
+environment; scratch data lived under `/nvme/neuropixels/tmp/cc_bench` and the
+paths in the scripts are literal. This directory is a record; to re-run a
+benchmark, `uv run python investigations/zarr-compression/02_bench_matrix.py`
+from this workspace.

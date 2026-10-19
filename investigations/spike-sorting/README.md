@@ -5,9 +5,18 @@ updated: 2026-06-11
 
 # Spike sorting (MountainSort5)
 
-Downstream of the compressed Zarr stores (`../compression/`): spike sort the full
-48 h session by tetrode group with MountainSort5, then study what perturbs the
-sort. Part of the `tetrode_preprocessing_and_sorting` study (see `../README.md`).
+Downstream of the compressed Zarr stores (`../zarr-compression/`): spike sort the
+full 48 h session by tetrode group with MountainSort5, then study what perturbs
+the sort. One of the investigations indexed in `../README.md`; the UnitRefine
+scripts (46-50) that were in this directory are `../unitrefine-advisory/`.
+
+Paths in the scripts are literal `tononi-2` paths as run in May and June 2026;
+this directory is a record. `97_production_pipeline.py` and
+`98_build_analyzer_prod.py` produced the production matching-pursuit sort
+(registry entry `tetrode_analyses.mp_production_sorting`). The helpers
+`_track_eval.py`, `_wobble_eval.py`, `_assignment_eval.py`, `_scoreboard.py`
+and `_mp_common.py` are imported by sibling scripts and by three tests in
+`packages/tetrode-analyses/tests/`.
 
 A second sorter, **Kilosort4** (`30_`–`32_`), was attempted on the same lossless store
 with the same preprocessing (bandpass 300–6000 Hz + global CMR), no drift correction,
@@ -35,7 +44,7 @@ GPU). `refs/kilosort4.pdf` is the reference paper.
 
 A closely related upstream investigation (the SpikeInterface `frame_slice` /
 `BinaryFolderRecording` memory blow-up, root-caused while measuring
-`training_duration` footprint in `23_`) lives in `../si_frame_slice_memory/`.
+`training_duration` footprint in `23_`) lives in `../si-frame-slice-memory/`.
 
 ## Files
 

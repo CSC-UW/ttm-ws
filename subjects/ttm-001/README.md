@@ -14,9 +14,8 @@ consumes them is `docs/pipeline.md`.
 | `TTM-Test` | `2026-05-19_18-09-51` (three 60 s recordings) | `slice_table.csv`, `experiment_params.json` |
 
 Everything under `sortings_seed42_pcafix/` and the method findings are
-documented in `analyses/tetrode_preprocessing_and_sorting/` (moving to
-`investigations/` in Phase 3 of the restructure plan). `notebooks/subj01.ipynb`
-is the early exploration notebook.
+documented in `investigations/spike-sorting/` and `investigations/zarr-compression/`.
+`notebooks/subj01.ipynb` is the early exploration notebook.
 
 Products written before 2026-10-19 were made by the per-script drivers that
 the `ttm-*` entry points replaced; the entry points reproduce the same

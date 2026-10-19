@@ -300,6 +300,15 @@ can be processed (noted in `subjects/ttm-002/README.md`).
 
 ### Phase 3: investigations
 
+Status 2026-10-19: done. `investigations/{acquisition-noise, zarr-compression,
+spike-sorting, unitrefine-advisory, si-frame-slice-memory}`, moved with
+`git mv`; `investigations/README.md` carries the question/outcome/decision
+table. The tracking and matching-pursuit threads stay together in
+`spike-sorting/` because four matching-pursuit scripts import `_track_eval`
+alongside the tracking scripts; only the self-contained UnitRefine scripts
+(46-50) were split out. The 2026-05-30 noise report moved from
+`docs/reports/` into `acquisition-noise/`. `analyses/` and `5-19/` are gone.
+
 `git mv` the closed studies into `investigations/<question>/`, write
 `investigations/README.md` (question / outcome / decision table; the material
 is already in the findings docs), add the as-run note to each README.

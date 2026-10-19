@@ -68,7 +68,7 @@ check. On `tononi-2`, also report `df -h /nvme`.
 
 Point the user at, in this order: `README.md`, `CLAUDE.md`,
 `docs/pipeline.md`, `packages/tetrode-analyses/README.md`,
-`analyses/tetrode_preprocessing_and_sorting/README.md`. State the three
+`investigations/README.md`. State the three
 rules they will hit first: always `uv sync --all-packages`, every tool needs
 an experiment (`--subject ID --experiment NAME`), and commit small changes
 directly to `main`.

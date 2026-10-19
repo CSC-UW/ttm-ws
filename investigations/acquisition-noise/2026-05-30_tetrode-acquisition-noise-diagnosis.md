@@ -64,10 +64,10 @@ shorted/saline-input recording, and a DAC/audio-monitor-off recording.
 Source notebooks (both reuse the same helpers, so the comparison is
 apples-to-apples):
 
-- `analyses/investigate_spectrum_and_artifact/spectral_and_artifact.ipynb`
-  (reference session `2026-05-19_18-09-51`, 24 selected-tetrode channels)
-- `analyses/subj01/subj01.ipynb` (`subj01`, `2026-05-27_09-07-52`, all 64 ch,
-  first 60 s)
+- `spectral_and_artifact.ipynb` (reference session `2026-05-19_18-09-51`, 24
+  selected-tetrode channels)
+- `subj01-artifact-investigation.ipynb` (`subj01` = TTM-001, `2026-05-27_09-07-52`,
+  all 64 ch, first 60 s)
 
 All three signatures are **internal to the digitization chain** — common-mode
 and tied to acquisition sample order, not to the brain, the tetrodes, or
@@ -197,8 +197,8 @@ the most inferential step.
 
 ## References
 
-- Notebooks: `tetrode_analyses/analyses/investigate_spectrum_and_artifact/spectral_and_artifact.ipynb`,
-  `tetrode_analyses/analyses/subj01/subj01.ipynb`
+- Notebooks: `spectral_and_artifact.ipynb`, `subj01-artifact-investigation.ipynb`
+  (this directory)
 - Board: `acquisition-board/` (schematic sheets `kicad_converted/acquisition-board_SS_{1..7}.sch`;
   power tree `SS_4`, LEDs `SS_5`, headstage LDOs `SS_7`)
 - Open Ephys issue: <https://github.com/open-ephys/acquisition-board/issues/2> ("400Hz noise in DAC")

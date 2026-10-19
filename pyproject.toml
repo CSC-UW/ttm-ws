@@ -26,7 +26,7 @@ constraint-dependencies = [
 ]
 
 [tool.uv.workspace]
-members = ["packages/*", "subjects/*", "investigations/*"]
+members = ["packages/*", "subjects/*"]
 
 [tool.uv.sources]
 tetrode-analyses = { workspace = true }
@@ -47,7 +47,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-# Explicit so collection never sweeps analyses/ (standalone drivers, not tests).
+# Explicit so collection never sweeps investigations/ (standalone drivers, not tests).
 testpaths = ["packages/tetrode-analyses/tests"]
 markers = [
     "requires_nfs: marks tests that require mounted production NFS data",

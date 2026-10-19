@@ -22,9 +22,8 @@ steps for doing it by hand.
 | Path | What it is |
 |---|---|
 | `packages/tetrode-analyses/` | The shared library (`import tetrode_analyses`). Subject-agnostic: Open Ephys loading and channel maps, SpikeInterface recording assembly and Zarr conversion, LFP, band power, MountainSort5/Kilosort4 drivers, unit tracking, the UnitRefine advisory, SWA plotting. Its own README documents the API. |
-| `analyses/` | Transitional. The closed method studies (compression, sorting, the SpikeInterface memory bug, acquisition noise) as they stood before the restructure. They move to `investigations/` in Phase 3 of the plan; their READMEs still say to run through `gfys_workspace`, which no longer applies: run them from this workspace's environment. |
 | `subjects/<id>/` | One subject: `subject.toml`, `experiments/<NAME>.toml` manifests, notebooks, a README of what exists on the server. `ttm-001` (TTM-NOD, TTM-Test) and the `ttm-002` skeleton. |
-| `investigations/` | Method bake-offs whose product was a decision baked into the library. Not yet populated. |
+| `investigations/` | Closed method studies (acquisition noise, Zarr compression, spike sorting and tracking, the UnitRefine advisory, the SpikeInterface memory bug): the question, the scripts as run, the findings. Indexed in `investigations/README.md`. |
 | `docs/` | `SETUP.md`, `pipeline.md` (every `ttm-*` command), developer notes, reports, plans. |
 
 ## Environment
@@ -61,7 +60,7 @@ under `/Volumes/neuropixel_archive/tetrode_data/<session>/`, derived products
 under `/nvme/neuropixels/tetrode_data/<session>/` and
 `/nvme/neuropixels/tetrode_data/<subject>/<experiment>/`. Those two roots
 are the server's config; nothing tracked names them except the closed
-studies under `analyses/`, which are records of runs on that machine.
+studies under `investigations/`, which are records of runs on that machine.
 
 `/nvme` is a shared volume. The materialised 48 h preprocessing cache that
 sorting needs is about 1.3 TB; check free space before a sort.

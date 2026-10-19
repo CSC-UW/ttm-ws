@@ -18,7 +18,7 @@ environment. There is no default.
 | 3. LFP | `ttm-make-lfp [--subsample 125] [--check-plot]` | blosc-zstd store | `<session>.lfp.zarr` (625 Hz), `<session>.lfp.125hz.zarr` (tetrode leads) |
 | 4. SWA | `ttm-swa all` (or `inst`, `stft`, `plot`) | 625 Hz LFP, params | `delta.idelta.zarr`, `stft_bandpowers.zarr`, `figures/swa_*.png` |
 | 5. EMG | `ttm-emg --full` (default: 30 min window, plot only) | blosc-zstd store, `slice_table.csv`, `delta.idelta.zarr` | `synthetic_emg_methods.zarr`, `figures/emg_*.png` |
-| 6. Sort | `investigations/` scripts for now (the production matching-pursuit sort is `analyses/.../sorting/97_production_pipeline.py`) | store | `<session>/sortings_seed42_pcafix/<sorting>/` |
+| 6. Sort | `investigations/spike-sorting/97_production_pipeline.py` (the production matching-pursuit sort; not yet an entry point) | store | `<session>/sortings_seed42_pcafix/<sorting>/` |
 | 7. Curate | `ttm-curation-manifest`, `ttm-fetch-bundle curation`, `ttm-curate` | analyzer + the recording it was sorted from | `curation_bundles/<sorting>.manifest.json` |
 | 8. View | `ttm-viz-bundle`, `ttm-fetch-bundle viz`, `ttm-loupe` | EMG, 125 Hz LFP, sorting | `<session>/viz_bundle/` |
 
@@ -33,7 +33,7 @@ environment. There is no default.
 real per-sample sync clock, reorders channels to tetrode order, attaches the
 tetrode `ProbeGroup`, and annotates provenance; `convert_recording` writes a
 Zarr store chunked one tetrode per chunk. The chunking and compressor choice
-is the result of `analyses/tetrode_preprocessing_and_sorting/compression/`
+is the result of `investigations/zarr-compression/`
 (blosc-zstd lossless at 1.73x, WavPack bps 2.25 lossy at 7.1x; sorting was
 validated on both). Pass `--compressor` twice to write both stores.
 
@@ -88,7 +88,7 @@ curates without the raw-traces view. Only the blosc-zstd store is ever
 offered for traces: it is the exact data the sort was produced from.
 
 The analyzer's persisted unit properties (`tier`, `tier_level`, `n_chunks`,
-`track_hours` from `sorting/45_add_curation_unit_properties.py`;
+`track_hours` from `investigations/spike-sorting/45_add_curation_unit_properties.py`;
 `unitrefine_neural_prob`, `unitrefine_label` from
 `tetrode_analyses.unitrefine_advisory`) are sortable columns in the unit
 list. The UnitRefine columns are an advisory ranking: sort by

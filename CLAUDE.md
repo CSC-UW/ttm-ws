@@ -9,8 +9,9 @@
 - New per-subject processing is a `ttm-*` entry point in
   `tetrode_analyses.cli` that selects its experiment with
   `add_experiment_args` and takes paths from `Experiment` (`docs/pipeline.md`).
-- `analyses/` is transitional: the closed method studies as run. Move them
-  out per the plan; do not add new work there.
+- `investigations/<question>/` holds closed method studies as run: literal
+  server paths, no maintenance. New bake-offs get a new directory there and a
+  row in `investigations/README.md`; their outcome goes into the library.
 - Sync with `uv sync --all-packages --group dev`. Plain `uv sync` uninstalls
   the workspace members.
 - This workspace has its own environment. Do not run its code through

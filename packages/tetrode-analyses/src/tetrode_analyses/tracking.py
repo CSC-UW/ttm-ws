@@ -17,7 +17,7 @@ DREDge / Kilosort drift, Yuan-EMD spatial terms -- does not apply). Instead:
    overlap match bridges it -- an honest outcome if the electrode moved.
 
 The reusable pieces here are pure library functions; the numbered scripts in
-``analyses/tetrode_preprocessing_and_sorting/sorting/`` drive the experiments.
+``investigations/spike-sorting/`` drive the experiments.
 
 Key SpikeInterface facts this module relies on (SI 0.104.1):
 - ``BaseSorting.frame_slice(start, end)`` keeps spikes in ``[start, end)`` and

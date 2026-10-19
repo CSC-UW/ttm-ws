@@ -96,7 +96,7 @@ The subject to work on is never defaulted either: every tool takes
 
 `README.md`, then `CLAUDE.md`, then `docs/pipeline.md` (the per-subject
 pipeline and every `ttm-*` command), then `packages/tetrode-analyses/README.md`,
-then `analyses/tetrode_preprocessing_and_sorting/README.md`.
+then `investigations/README.md`.
 
 ## Pinned packages
 

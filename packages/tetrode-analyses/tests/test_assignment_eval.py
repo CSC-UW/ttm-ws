@@ -14,7 +14,7 @@ plan):
     temporal duplicate-vs-distinct test promoted verbatim from script 63 (regression parity).
   * ``_assignment_eval.assignment_purity_summary`` -- the >= 2-signal impurity flag + category.
 
-These modules live in the analyses script dir, not the installed package, so it is added to sys.path.
+These modules live in the investigations/spike-sorting script dir, not the installed package, so it is added to sys.path.
 """
 import pathlib
 import sys
@@ -23,7 +23,7 @@ import numpy as np
 import pytest
 
 _SORTING_DIR = (pathlib.Path(__file__).resolve().parents[3]
-                / "analyses" / "tetrode_preprocessing_and_sorting" / "sorting")
+                / "investigations" / "spike-sorting")
 sys.path.insert(0, str(_SORTING_DIR))
 
 import spikeinterface as si  # noqa: E402  (after sys.path setup)

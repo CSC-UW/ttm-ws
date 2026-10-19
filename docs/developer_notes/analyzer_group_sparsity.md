@@ -28,4 +28,4 @@ heuristic.
 - Both the recording and the sorting must carry the `group` property. `tetrode_analyses`
   recordings and aggregated sortings both do, values `0..15`.
 - Verified to give exactly 4 channels/unit on the 12 h-block sort. First used in
-  `analyses/tetrode_preprocessing_and_sorting/sorting/25_build_analyzer_12hblock_train1h.py`.
+  `investigations/spike-sorting/25_build_analyzer_12hblock_train1h.py`.
