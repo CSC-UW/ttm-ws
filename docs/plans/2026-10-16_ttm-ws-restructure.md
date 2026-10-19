@@ -229,6 +229,12 @@ and the `requires_zarr_write` test marker, and zarr v3 write support is the
 open PR SpikeInterface/spikeinterface#4260 (opened 2025-12-11, still under
 review 2026-10-19). `gfys_workspace` still pins the sigui fork for `sigui2`.
 
+2026-10-19: GitHub repo renamed to `CSC-UW/ttm-ws` by the user; local
+directory renamed `tetrode_analyses` -> `ttm-ws`; `gfys_workspace` paths
+follow (`../ttm-ws/packages/tetrode-analyses`, commit d2c1c6e). A uv venv
+does not survive a directory move (absolute shebangs and `pyvenv.cfg`), so
+`.venv` was recreated. Phase 1 complete.
+
 - Rename the GitHub repo; update the local checkout's directory name and
   `gfys_workspace` source/override paths.
 - Root `pyproject.toml` (members, sources, constraints, `testpaths`),
