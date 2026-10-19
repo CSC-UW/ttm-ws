@@ -80,7 +80,7 @@ then `analyses/tetrode_preprocessing_and_sorting/README.md`.
 | `loupe` | `CSC-UW/loupe` `main` | The local viewer used by the visualization bundle. Not on PyPI. |
 | `mountainsort5` | `grahamfindlay/mountainsort5` `feature/deterministic-pca` | Seeds the PCA solver so repeat sorts are bit-identical; upstream 0.5.8 is not deterministic. |
 | `kilosort` | `grahamfindlay/Kilosort` `perf/clustering_chunk_size` | Adds `clustering_chunk_size`, which lets 48 h tetrode clustering fit in 32 GB of GPU memory. Stock 4.1.7 rejects the key. |
-| `spikeinterface-gui` | `grahamfindlay/spikeinterface-gui` `dev` | Carries the int32 scrollbar fix for recordings longer than 2^31 samples and the `--recording` CLI fixes, none released on PyPI. |
+| `spikeinterface-gui` | PyPI `>=0.14.0` | The lab's fork is retired: its eleven commits (the `--recording` CLI fixes and the desktop performance work) were merged upstream in PRs 274 and 275, and 0.14.0 also carries the int32 scrollbar fix for recordings longer than 2^31 samples. |
 | `torch` | `==2.9.1` (constraint) | The CUDA 12 build; CUDA 13 wheels are compiled for sm_75 and newer and fail on the V100. |
 | `faiss-cpu` | `==1.12.0` (constraint) | The only release with a Python 3.14 wheel. |
 | `zarr` | `>=2.18,<3` (override) | spikeinterface 0.105 requires zarr 3 on Python 3.14 but raises `NotImplementedError` on every Zarr write with it. zarr 2 installs on 3.14; the override removes spikeinterface's marker-conditional requirement. `gfys_workspace` runs zarr 3 and therefore cannot run the converters. |

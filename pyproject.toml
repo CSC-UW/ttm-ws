@@ -34,7 +34,6 @@ ecephys            = { git = "https://github.com/CSC-UW/ecephys.git",           
 loupe              = { git = "https://github.com/CSC-UW/loupe.git",                   rev = "bc33e3b150bcc508786ba7141861d257416abd62" }
 mountainsort5      = { git = "https://github.com/grahamfindlay/mountainsort5.git",    rev = "b18f35ac5156e7ed9ab477ce34209ae5f8507f25" }
 kilosort           = { git = "https://github.com/grahamfindlay/Kilosort.git",         rev = "d0123d6d965a3a429d8251aa122728ce3553ff4f" }
-spikeinterface-gui = { git = "https://github.com/grahamfindlay/spikeinterface-gui.git", rev = "743370941689a2c41e3599ab68ccd9747b4bd221" }
 
 [dependency-groups]
 dev = [

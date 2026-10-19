@@ -218,6 +218,17 @@ included. Root `override-dependencies` now force `zarr<3` and
 `ruff check packages/` reports 42 findings, identical before and after the
 move; not addressed.
 
+2026-10-19: the `spikeinterface-gui` fork pin is dropped for PyPI 0.14.0.
+All eleven fork commits were merged upstream verbatim (PRs 274 and 275), and
+0.14.0 includes the int32 scrollbar fix (PR 263). Suite still 50/50; the
+curation launchers' `run_mainwindow` call signature is unchanged, but the
+`grahams_curation` layout/settings presets have not been exercised against
+0.14.0's new merge-focus and curation-panel views. The zarr override stays:
+upstream main (0.106.0, unreleased) carries the same marker-conditional pins
+and the `requires_zarr_write` test marker, and zarr v3 write support is the
+open PR SpikeInterface/spikeinterface#4260 (opened 2025-12-11, still under
+review 2026-10-19). `gfys_workspace` still pins the sigui fork for `sigui2`.
+
 - Rename the GitHub repo; update the local checkout's directory name and
   `gfys_workspace` source/override paths.
 - Root `pyproject.toml` (members, sources, constraints, `testpaths`),

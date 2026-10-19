@@ -7,7 +7,7 @@ updated: 2026-06-12
 
 Curate the chunk-tracked MountainSort5 sorting (`tracked_48h/analyzer_clustered.zarr`,
 scripts 36/37) in [spikeinterface-gui](https://github.com/SpikeInterface/spikeinterface-gui)
-(the `grahamfindlay/spikeinterface-gui@dev` fork, via the `curation` extra), two ways.
+(PyPI 0.14.0 or newer, via the `curation` extra; the former `grahamfindlay/spikeinterface-gui@dev` fork is merged upstream), two ways.
 Part of the `tetrode_preprocessing_and_sorting` study (see `../README.md`).
 
 ## Files

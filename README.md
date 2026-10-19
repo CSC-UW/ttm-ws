@@ -36,7 +36,7 @@ uv run pytest -q
 
 Always pass `--all-packages`: a plain `uv sync` installs only the root and
 uninstalls workspace members. External packages (`ecephys`, `loupe`, the
-`mountainsort5`, `kilosort` and `spikeinterface-gui` forks) are pinned by
+`mountainsort5` and `kilosort` forks) are pinned by
 commit in `pyproject.toml` and resolve without credentials or sibling
 checkouts. Python 3.14 or newer is required.
 

@@ -34,7 +34,7 @@ analysis = [
     "seaborn",
 ]
 curation = [
-    "spikeinterface-gui[desktop,web]",
+    "spikeinterface-gui[desktop,web]>=0.14.0",
 ]
 viz = [
     "loupe",
