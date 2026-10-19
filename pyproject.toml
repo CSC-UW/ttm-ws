@@ -20,6 +20,9 @@ constraint-dependencies = [
     "faiss-cpu==1.12.0",
     # Forces a CUDA-12 torch build; CUDA-13 wheels drop sm_70 (Tesla V100).
     "torch==2.9.1",
+    # xarray 2026.9 dropped zarr 2 (its zarr backend passes zarr_format=);
+    # 2026.7.0 is the newest release that reads and writes with the zarr override.
+    "xarray<2026.8",
 ]
 
 [tool.uv.workspace]

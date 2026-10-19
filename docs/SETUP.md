@@ -96,3 +96,4 @@ The next `uv sync --all-packages` restores the pin. To change the pin for
 everyone: edit `rev` in the root `pyproject.toml`, run
 `uv lock --upgrade-package NAME`, then `uv sync --all-packages`, and commit
 both files.
+| `xarray` | `<2026.8` (constraint) | 2026.9 dropped zarr 2 (its backend passes `zarr_format=`, which zarr 2 rejects); 2026.7.0 is the newest release that reads and writes with the zarr override. Every xarray store here (band powers, EMG, viz bundle) depends on it. |
