@@ -1,6 +1,6 @@
 ---
 title: Restructure tetrode_analyses into the ttm-ws machine-portable workspace
-updated: 2026-10-16
+updated: 2026-10-19
 ---
 
 # Restructure `tetrode_analyses` into `ttm-ws`
@@ -250,6 +250,38 @@ does not survive a directory move (absolute shebangs and `pyvenv.cfg`), so
 
 ### Phase 2: config and manifest
 
+Status 2026-10-19: built, uncommitted. `tetrode_analyses.config` and
+`tetrode_analyses.subject` as specified; `ExperimentParams` is now the
+manifest `Experiment` plus `t0_unix`, with `session`, `acquisition` and
+`oe_stream_index` in place of the absolute `openephys_session`/`lfp_zarr`
+(old files are rejected on load). Ten entry points under
+`tetrode_analyses.cli` (`ttm-convert`, `ttm-experiment-params`,
+`ttm-make-lfp`, `ttm-swa`, `ttm-emg`, `ttm-curation-manifest`, `ttm-curate`,
+`ttm-viz-bundle`, `ttm-loupe`, `ttm-fetch-bundle`) replace `swa/`, `emg/`,
+`lfp/`, `compression/06+08`, `curation/*.py` and `visualization/*.py`, which
+are deleted; the curation presets and loupe state definitions ship in
+`tetrode_analyses/assets/`. `subjects/ttm-001` (TTM-NOD, TTM-Test) and the
+`subjects/ttm-002` skeleton are workspace members. `docs/pipeline.md` is the
+operator document. The TTM-001 `slice_table.csv` had the pre-June column
+names (`experiment_name`, `software_time_s`); renamed in place to the
+current `oe_*` schema, which `read_session_t0_unix` now reads.
+
+Acceptance: `ttm-experiment-params` reproduces the TTM-001 light/dark
+periods and anchor; `ttm-curation-manifest` reproduces the June manifest
+except `created`; `ttm-viz-bundle` into a scratch directory reproduces the
+June bundle manifest (81,276,400 spikes, 232 units, same separator
+boundaries); `ttm-swa plot` and `ttm-emg --plot-only` regenerate the TTM-001
+figures. Seven `gfys_workspace` registry entries updated (producers,
+consumers, the `experiment_params` schema).
+
+Found on the way: xarray 2026.9 (locked in Phase 1) cannot open or write
+Zarr with zarr 2, so every xarray store was unreachable from this
+environment and no test covered it. `xarray<2026.8` is now a root
+constraint (2026.7.0 verified). TTM-002's archived `structure.oebin` names
+all 64 acquisition-board channels with a blank string and neo refuses to
+parse the session; `ttm-convert` needs a channel-name repair before TTM-002
+can be processed (noted in `subjects/ttm-002/README.md`).
+
 - `tetrode_analyses.config` (data_root, remotes, env overrides, error on
   missing). Delete `DEFAULT_DATA_ROOT`; `unitrefine_advisory` cache dir reads
   config with the `~/.cache` fallback kept (it is a cache, not data).
@@ -305,6 +337,8 @@ are rewritten once, not twice.
   `experiment_params.json`) were made outside this repo's tracked code and
   are superseded when we re-process. Disk is tight (see below), so decide
   when to delete them.
+- The zarr 2 environment also pins xarray (`<2026.8`); the two move together
+  until spikeinterface writes zarr 3.
 - `spikeinterface` pin: resolved in Phase 1. PyPI 0.105.2 passes the full
   suite, including the two `requires_nfs` tests on tononi-2, after the
   `set_probegroup` fix. Upstream main pins zarr the same way, so a git pin

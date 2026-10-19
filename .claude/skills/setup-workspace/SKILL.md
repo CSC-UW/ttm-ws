@@ -7,7 +7,8 @@ description: Set up this workspace on a new machine - check uv/git/Python, sync 
 
 Work through the steps in order. Report each result in one line before
 moving on. Ask the user only where a step says to. Do not clone other
-repositories, set environment variables, or edit tracked files. The external
+repositories or edit tracked files; the only file written is the per-machine
+config in step 5. The external
 packages are pinned in `pyproject.toml` and resolve on their own.
 
 ## 1. Prerequisites
@@ -51,16 +52,23 @@ Report the line. On `tononi-2` it must show a CUDA 12 build and `True`.
 Elsewhere a CPU build and `False` is normal; say that Kilosort4 needs the
 GPU and everything else does not.
 
-## 5. Data
+## 5. Per-machine config
 
-Tell the user where production data live (`docs/SETUP.md`, section 5) and,
-if on `tononi-2`, report `df -h /nvme`. There is no per-machine config to
-write yet; say so if asked.
+```bash
+uv run python -c "from tetrode_analyses import config; print(config.get())"
+```
+
+If this raises `ConfigError`, ask the user where the data are on this
+machine and write `~/.config/ttm/config.toml` as `docs/SETUP.md` section 5
+shows (server: `data_root` plus `remotes.archive`; laptop: `data_root` on the
+external drive plus `remotes.server` as an rclone `remote:path`). Re-run the
+check. On `tononi-2`, also report `df -h /nvme`.
 
 ## 6. Orientation
 
 Point the user at, in this order: `README.md`, `CLAUDE.md`,
-`packages/tetrode-analyses/README.md`,
-`analyses/tetrode_preprocessing_and_sorting/README.md`. State the two rules
-they will hit first: always `uv sync --all-packages`, and commit small
-changes directly to `main`.
+`docs/pipeline.md`, `packages/tetrode-analyses/README.md`,
+`analyses/tetrode_preprocessing_and_sorting/README.md`. State the three
+rules they will hit first: always `uv sync --all-packages`, every tool needs
+an experiment (`--subject ID --experiment NAME`), and commit small changes
+directly to `main`.

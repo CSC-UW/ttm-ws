@@ -1,6 +1,6 @@
 ---
 title: Setting up the workspace
-updated: 2026-10-16
+updated: 2026-10-19
 ---
 
 # Setting up the workspace
@@ -50,26 +50,52 @@ On `tononi-2` (Tesla V100) this must report a CUDA 12 build and `True`.
 On a laptop without CUDA it reports a CPU build and `False`; everything except
 Kilosort4 works there.
 
-## 5. Data
+## 5. Data and the per-machine config
 
-Production data are on `tononi-2`:
+Nothing in the library or the `ttm-*` tools names a data path. Each machine
+says where its data are in `~/.config/ttm/config.toml` (or the file named by
+`$TTM_CONFIG`):
 
-| What | Where |
-|---|---|
-| Raw Open Ephys acquisitions | `/Volumes/neuropixel_archive/tetrode_data/<session>/` |
-| Derived per-session products (Zarr stores, LFPs, sortings, bundles) | `/nvme/neuropixels/tetrode_data/<session>/` |
-| Per-experiment products (`experiment_params.json`, band powers, EMG) | `/nvme/neuropixels/tetrode_data/<subject>/<experiment>/` |
+```toml
+data_root = "/nvme/neuropixels/tetrode_data"
 
-A per-machine config file (`~/.config/ttm/config.toml`) replaces these
-literal paths in Phase 2 of the plan. Until then scripts under `analyses/`
-name them directly.
+[remotes]
+archive = "/Volumes/neuropixel_archive/tetrode_data"
+```
 
-Laptops get data as server-built bundles copied with `rclone`; see
-`analyses/tetrode_preprocessing_and_sorting/{visualization,curation}/README.md`.
+`data_root` holds `<session>/` (Zarr stores, LFPs, sortings, bundles) and
+`<subject>/<experiment>/` (`experiment_params.json`, band powers, EMG).
+`remotes.archive` is where raw Open Ephys acquisitions are mounted; it is
+needed only to convert. The values above are the server, `tononi-2`.
+
+A laptop that receives server-built bundles instead sets `data_root` to the
+external drive and names the server as an rclone remote:
+
+```toml
+data_root = "/Volumes/Drive/ttm"
+
+[remotes]
+server = "tononi-2:/nvme/neuropixels/tetrode_data"
+```
+
+Environment variables override the file: `TTM_DATA_ROOT`, `TTM_CACHE_DIR`,
+`TTM_REMOTE_ARCHIVE`, `TTM_REMOTE_SERVER`. There is no default; a tool run
+without a `data_root` stops with the template above.
+
+Check the config with:
+
+```bash
+uv run python -c "from tetrode_analyses import config; print(config.get())"
+```
+
+The subject to work on is never defaulted either: every tool takes
+`--manifest`, or `--subject` and `--experiment`, or `TTM_SUBJECT` and
+`TTM_EXPERIMENT`. Manifests live in `subjects/<id>/experiments/`.
 
 ## 6. Where to read next
 
-`README.md`, then `CLAUDE.md`, then `packages/tetrode-analyses/README.md`,
+`README.md`, then `CLAUDE.md`, then `docs/pipeline.md` (the per-subject
+pipeline and every `ttm-*` command), then `packages/tetrode-analyses/README.md`,
 then `analyses/tetrode_preprocessing_and_sorting/README.md`.
 
 ## Pinned packages
@@ -85,6 +111,7 @@ then `analyses/tetrode_preprocessing_and_sorting/README.md`.
 | `faiss-cpu` | `==1.12.0` (constraint) | The only release with a Python 3.14 wheel. |
 | `zarr` | `>=2.18,<3` (override) | spikeinterface 0.105 requires zarr 3 on Python 3.14 but raises `NotImplementedError` on every Zarr write with it. zarr 2 installs on 3.14; the override removes spikeinterface's marker-conditional requirement. `gfys_workspace` runs zarr 3 and therefore cannot run the converters. |
 | `numcodecs` | `<0.16` (override) | zarr 2 needs the pre-0.16 blosc API (`cbuffer_sizes`). |
+| `xarray` | `<2026.8` (constraint) | 2026.9 dropped zarr 2 (its backend passes `zarr_format=`, which zarr 2 rejects); 2026.7.0 is the newest release that reads and writes with the zarr override. Every xarray store here (band powers, EMG, viz bundle) depends on it. |
 
 To work on one of them for a session:
 
@@ -96,4 +123,3 @@ The next `uv sync --all-packages` restores the pin. To change the pin for
 everyone: edit `rev` in the root `pyproject.toml`, run
 `uv lock --upgrade-package NAME`, then `uv sync --all-packages`, and commit
 both files.
-| `xarray` | `<2026.8` (constraint) | 2026.9 dropped zarr 2 (its backend passes `zarr_format=`, which zarr 2 rejects); 2026.7.0 is the newest release that reads and writes with the zarr override. Every xarray store here (band powers, EMG, viz bundle) depends on it. |

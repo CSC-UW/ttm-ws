@@ -188,3 +188,41 @@ def plot_swa_small_multiples(
         fig.suptitle(title)
     fig.tight_layout()
     return fig
+
+
+def plot_decimation_check(
+    parent: np.ndarray,
+    parent_fs: float,
+    child: np.ndarray,
+    child_fs: float,
+    *,
+    title: str = "",
+    trace_seconds: float = 2.0,
+) -> plt.Figure:
+    """Overlay a decimated trace on its parent and compare their Welch PSDs.
+
+    ``parent`` and ``child`` are 1-D samples of the same window (child at the
+    lower rate). Row 1 overlays the first ``trace_seconds``; row 2 shows both
+    PSDs up to the parent Nyquist with the child Nyquist marked; row 3 the
+    child's PSD alone.
+    """
+    from scipy import signal
+
+    fig, axs = plt.subplots(3, 1, figsize=(12, 10))
+    n_p, n_c = int(trace_seconds * parent_fs), int(trace_seconds * child_fs)
+    axs[0].plot(np.arange(n_p) / parent_fs, parent[:n_p], lw=0.4, alpha=0.5, label=f"{parent_fs:.0f} Hz")
+    axs[0].plot(np.arange(n_c) / child_fs, child[:n_c], lw=1.2, color="C3", label=f"{child_fs:.1f} Hz")
+    axs[0].set(xlabel="s", ylabel="uV", title=f"{title}: first {trace_seconds:g} s")
+    axs[0].legend()
+    fp, pp = signal.welch(parent, parent_fs, nperseg=min(16384, parent.size))
+    fc, pc = signal.welch(child, child_fs, nperseg=min(4096, child.size))
+    nyq = child_fs / 2
+    axs[1].semilogy(fp, pp, lw=0.5, alpha=0.7, label=f"{parent_fs:.0f} Hz")
+    axs[1].semilogy(fc, pc, lw=1.0, color="C3", label=f"{child_fs:.1f} Hz")
+    axs[1].axvline(nyq, color="k", ls="--", lw=0.8, label=f"child Nyquist {nyq:.1f} Hz")
+    axs[1].set(xlim=(0, min(parent_fs / 2, 4 * nyq)), xlabel="Hz", ylabel="PSD", title="anti-alias rolloff")
+    axs[1].legend()
+    axs[2].semilogy(fc, pc, color="C3")
+    axs[2].set(xlim=(0, nyq), xlabel="Hz", ylabel="PSD", title=f"child band detail (0-{nyq:.1f} Hz)")
+    fig.tight_layout()
+    return fig

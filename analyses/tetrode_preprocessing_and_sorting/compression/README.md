@@ -23,8 +23,9 @@ this recording (3×60 s drawn from 10/50/85 % through the file).
 | Compressor (traces) | **`WavPack(bps=2.25)`** (lossy, default) *or* **`blosc-zstd-l5-bitshuffle`** (lossless) | 7.1× (error ~5× below the spike-band noise floor; matches lab NPX practice) vs 1.73× bit-exact; user-selectable via `--compressor` to compare sorting outcomes |
 | Timestamps | **real OE sync clock**, `load_sync_timestamps=True` → Delta-compressed lossless `times_seg0` | SI's default `t_start`+constant-rate is wrong for this rig; the per-sample sync clock is needed for cross-stream alignment |
 
-Run `06_convert.py` (see its docstring) once per compressor to get both stores.
-`--bps 0` gives bit-exact lossless WavPack instead.
+`ttm-convert --compressor blosc-zstd --compressor wavpack` (formerly
+`06_convert.py`) writes both stores; `--bps 0` gives bit-exact lossless
+WavPack instead.
 
 ## Recording facts
 
@@ -106,7 +107,7 @@ this **raw wideband** data (lower than AP-band figures — wideband includes LFP
 blosc-zstd-l5-bitshuffle is the right pick if you re-read raw traces often and
 want maximum decode speed at the SI default.
 
-**Two selectable stores.** `06_convert.py --compressor {wavpack,blosc-zstd}`
+**Two selectable stores.** `ttm-convert --compressor {wavpack,blosc-zstd}`
 emits either codec on identical chunking/probe/timestamp handling. The intended
 workflow is to convert the same recording **both** ways and spike sort each, to
 directly measure whether `bps=2.25` lossy compression changes sorting outcomes
@@ -217,8 +218,10 @@ and `read_zarr(...).has_time_vector()` is `True`; if you need the time vector
 | `05_bench_inband_error.py` | 300–6000 Hz error vs noise floor |
 | `07_bench_chunk_shapes.py` / `results_chunk_shapes.jsonl` | channel chunk 1/4/64, size-matched; closes the chunk-size & c1 gaps |
 | `17_bench_bps_extended.py` / `results_bps_ext.json` | extended `bps` sweep (0–8.0): ratio + in-band err + noise floor + max abs err; regenerates the `bps` table above |
-| `06_convert.py` | **production conversion script** (`--compressor {wavpack,blosc-zstd}`) |
-| `08_convert_session.py` | convert the full 2026-05-27_09-07-52 session (both experiments) to both stores |
+
+The production conversion (`06_convert.py`, and `08_convert_session.py` which
+ran it on the full 2026-05-27_09-07-52 session) became the `ttm-convert`
+entry point on 2026-10-19.
 
 Downstream scripts that consume these stores moved to sibling folders during the
 2026-06-10 reorg: LFP generation (`09`, `13_make_subsampled_lfp`) → `../lfp/`;

@@ -52,8 +52,12 @@ Heavier submodules are imported directly (not re-exported from `__init__`, to ke
 | Module | Key functions |
 | --- | --- |
 | `tetrode_analyses.lfp` | `make_lfp`, `open_lfps_dataarray` — produce / load the 625 Hz LFP Zarr (`sorting` extra). |
-| `tetrode_analyses.experiment` | `ExperimentParams`, `load`/`save_experiment_params`, `read_session_t0_unix`, `dt2t`/`t2dt`, `get_light_dark_periods`, `get_deprivation_period` — WNE-style `experiment_params.json` and wall-clock↔session-time mapping. |
+| `tetrode_analyses.config` | `get()` — the per-machine `~/.config/ttm/config.toml` (`data_root`, `remotes`, `cache_dir`; env overrides; no default). |
+| `tetrode_analyses.subject` | `Subject`, `Experiment`, `resolve_experiment` — the `subjects/<id>/` manifests and every derived path (`session_dir`, `store_path`, `lfp_path`, `experiment_dir`, ...). |
+| `tetrode_analyses.experiment` | `ExperimentParams` (an `Experiment` plus `t0_unix`), `load`/`save_experiment_params`, `read_session_t0_unix`, `dt2t`/`t2dt`, `get_light_dark_periods`, `get_deprivation_period` — the `experiment_params.json` data product and wall-clock↔session-time mapping. |
+| `tetrode_analyses.emg` | `synthetic_emg_from_store` — both `ecephys.xrsig.synthetic_emg` estimators per Open Ephys experiment. |
+| `tetrode_analyses.cli` | The `ttm-*` entry points (`docs/pipeline.md`): `convert`, `experiment_params`, `make_lfp`, `swa`, `emg`, `curation`, `viz`, `fetch`. |
 | `tetrode_analyses.power` | `extract_instantaneous_bandpower` (bandpass + Hilbert), `compute_stft_bandpowers` (4 s DPSS STFT), both averaged per tetrode; `save`/`open` helpers; `replace_outliers` / `replace_outliers_per_tetrode` (histogram-gap artifact removal). `BANDS` defines the frequency bands. |
 | `tetrode_analyses.plotting` | `plot_swa_timetrace`, `plot_lights_overlay`, `plot_deprivation_overlay`, `plot_swa_overview`, `plot_swa_small_multiples` — SWA timetraces with light/dark + deprivation overlays. |
 
-See `analyses/swa/` for the end-to-end SWA (delta power) pipeline built on these.
+`ttm-swa` is the end-to-end SWA (delta power) pipeline built on these; `docs/pipeline.md` lists every command.

@@ -22,10 +22,10 @@ steps for doing it by hand.
 | Path | What it is |
 |---|---|
 | `packages/tetrode-analyses/` | The shared library (`import tetrode_analyses`). Subject-agnostic: Open Ephys loading and channel maps, SpikeInterface recording assembly and Zarr conversion, LFP, band power, MountainSort5/Kilosort4 drivers, unit tracking, the UnitRefine advisory, SWA plotting. Its own README documents the API. |
-| `analyses/` | Transitional. The per-session studies and drivers as they stood before the restructure. They move to `subjects/` and `investigations/` in a later phase (see the plan below); until then their READMEs still say to run through `gfys_workspace`, which no longer applies: run them from this workspace's environment. |
-| `subjects/<id>/` | One subject's analysis: manifests, notebooks, committed result summaries. Not yet populated. |
+| `analyses/` | Transitional. The closed method studies (compression, sorting, the SpikeInterface memory bug, acquisition noise) as they stood before the restructure. They move to `investigations/` in Phase 3 of the plan; their READMEs still say to run through `gfys_workspace`, which no longer applies: run them from this workspace's environment. |
+| `subjects/<id>/` | One subject: `subject.toml`, `experiments/<NAME>.toml` manifests, notebooks, a README of what exists on the server. `ttm-001` (TTM-NOD, TTM-Test) and the `ttm-002` skeleton. |
 | `investigations/` | Method bake-offs whose product was a decision baked into the library. Not yet populated. |
-| `docs/` | Setup, developer notes, reports, plans, acceptance baselines. |
+| `docs/` | `SETUP.md`, `pipeline.md` (every `ttm-*` command), developer notes, reports, plans. |
 
 ## Environment
 
@@ -40,14 +40,28 @@ uninstalls workspace members. External packages (`ecephys`, `loupe`, the
 commit in `pyproject.toml` and resolve without credentials or sibling
 checkouts. Python 3.14 or newer is required.
 
+## Running the pipeline
+
+```bash
+uv run ttm-convert --subject TTM-001 --experiment TTM-NOD
+uv run ttm-experiment-params --subject TTM-001 --experiment TTM-NOD
+uv run ttm-make-lfp --subject TTM-001 --experiment TTM-NOD
+uv run ttm-swa all --subject TTM-001 --experiment TTM-NOD
+```
+
+Every tool takes its experiment from a manifest under `subjects/` and every
+path from the per-machine config `~/.config/ttm/config.toml`. The full list,
+including the curation and visualization hand-offs to a laptop, is
+[`docs/pipeline.md`](docs/pipeline.md).
+
 ## Data
 
 Production data live on the server `tononi-2`: raw Open Ephys acquisitions
 under `/Volumes/neuropixel_archive/tetrode_data/<session>/`, derived products
 under `/nvme/neuropixels/tetrode_data/<session>/` and
-`/nvme/neuropixels/tetrode_data/<subject>/<experiment>/`. Until the
-per-machine config lands (plan, Phase 2), those paths are literal in the
-scripts under `analyses/`.
+`/nvme/neuropixels/tetrode_data/<subject>/<experiment>/`. Those two roots
+are the server's config; nothing tracked names them except the closed
+studies under `analyses/`, which are records of runs on that machine.
 
 `/nvme` is a shared volume. The materialised 48 h preprocessing cache that
 sorting needs is about 1.3 TB; check free space before a sort.

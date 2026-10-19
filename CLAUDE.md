@@ -2,10 +2,15 @@
 
 ## Structure
 - `packages/tetrode-analyses` is subject-agnostic. Subject- and
-  session-specific facts belong in `subjects/<id>/` manifests (Phase 2 of the
-  plan), never in library code. The library never imports a subject package.
-- `analyses/` is transitional: pre-restructure studies and drivers. Move
-  things out of it per the plan; do not add new work there.
+  session-specific facts belong in `subjects/<id>/` manifests, machine facts
+  in `~/.config/ttm/config.toml`, never in library code. The library never
+  imports a subject package, and `grep -rn '"/nvme\|"/Volumes' packages
+  subjects` must stay empty.
+- New per-subject processing is a `ttm-*` entry point in
+  `tetrode_analyses.cli` that selects its experiment with
+  `add_experiment_args` and takes paths from `Experiment` (`docs/pipeline.md`).
+- `analyses/` is transitional: the closed method studies as run. Move them
+  out per the plan; do not add new work there.
 - Sync with `uv sync --all-packages --group dev`. Plain `uv sync` uninstalls
   the workspace members.
 - This workspace has its own environment. Do not run its code through
@@ -26,6 +31,8 @@
   of them without reading `docs/SETUP.md`, "Pinned packages".
 - `spikeinterface` comes from PyPI (0.105.2), not the editable upstream clone
   `gfys_workspace` uses. `set_probegroup` is in place and returns `None` there.
+- Every Zarr write goes through zarr 2 here: spikeinterface stores, and the
+  xarray stores (`to_zarr`/`open_zarr`) that depend on the xarray pin.
 
 ## Git
 - Commit directly to `main` in small, self-contained commits. No feature
@@ -34,8 +41,11 @@
 
 ## Data
 - Production data are on `tononi-2` (`/nvme/neuropixels/tetrode_data`,
-  `/Volumes/neuropixel_archive/tetrode_data`). `/nvme` is shared and often
-  near full; the sorting cache is ~1.3 TB. Check `df -h /nvme` first.
+  `/Volumes/neuropixel_archive/tetrode_data`), which is what that machine's
+  `~/.config/ttm/config.toml` says. `/nvme` is shared and often near full;
+  the sorting cache is ~1.3 TB. Check `df -h /nvme` first.
+- `experiment_params.json` on the data volume is written from the manifest by
+  `ttm-experiment-params`; edit the manifest, then rewrite it.
 - Bulk products never enter git. Results that are committed are small
   summaries (JSON, CSV, Markdown) next to the code that produced them.
 
