@@ -11,7 +11,8 @@ findings document that holds the answer. The decision each one produced lives
 in the library or the workspace pins; the directory is not maintained as
 runnable code. Paths inside the scripts and notebooks are literal `tononi-2`
 paths as they were run (`/nvme/neuropixels/tetrode_data`,
-`/Volumes/neuropixel_archive/tetrode_data`, `/nvme/neuropixels/tmp`), and the
+`/Volumes/neuropixel_archive/tetrode_data`, `/nvme/neuropixels/tmp`; the TTM1
+raw sessions moved to `/Volumes/tetrode/TTM1/` on 2026-10-19), and the
 READMEs' `cd gfys_workspace && uv run ...` instructions describe the
 environment of the time; run anything from this workspace's environment
 instead.

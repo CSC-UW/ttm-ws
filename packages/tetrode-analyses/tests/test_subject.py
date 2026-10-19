@@ -38,14 +38,17 @@ def test_committed_manifests_load() -> None:
     assert {s.id for s in subjects} >= {"TTM-001", "TTM-002"}
     nod = sj.find_subject("ttm-001").experiment("TTM-NOD")
     assert nod.session == "2026-05-27_09-07-52"
-    assert nod.acquisition == nod.session
     assert len(nod.lightsOn) == 3 and len(nod.lightsOff) == 2
     assert nod.experiment_dir.parts[-2:] == ("TTM-001", "TTM-NOD")
     assert nod.lfp_path.name == "2026-05-27_09-07-52.lfp.zarr"
     assert nod.store_path("wavpack", 2.25).name == "2026-05-27_09-07-52.wavpack-bps2.25.zarr"
-    assert nod.acquisition_dir.name == "2026-05-27_09-07-52"
+    assert nod.acquisition == "TTM1/2026-05-27_09-07-52"
+    assert nod.acquisition_dir == pathlib.Path(config.get().remote("archive")) / "TTM1" / "2026-05-27_09-07-52"
     sd = sj.find_subject("TTM-002").experiment("TTM-002-SD")
     assert sd.acquisition == "2026-09-24_09-03-22/2026-09-24_09-03-22"
+    assert sd.archive_remote == "neuropixel_archive"
+    with pytest.raises(config.ConfigError, match="neuropixel_archive"):
+        _ = sd.acquisition_dir
 
 
 def test_manifest_defaults_and_validation(tmp_path: pathlib.Path) -> None:
@@ -53,6 +56,7 @@ def test_manifest_defaults_and_validation(tmp_path: pathlib.Path) -> None:
     exp = sj.Experiment.from_toml(path)
     assert (exp.subject, exp.experiment, exp.timezone) == ("TTM-009", "EXP", "America/Chicago")
     assert exp.acquisition == exp.session and exp.oe_stream_index == 0
+    assert exp.archive_remote == "archive"
     assert exp.novel_objects_start is None and exp.badChannels == []
 
     bad = _write_subject(tmp_path / "s2", sid="TTM-010", bogus=1)

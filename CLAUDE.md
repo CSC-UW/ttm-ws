@@ -41,9 +41,11 @@
 - Leave edits unstaged for the user to commit unless told otherwise.
 
 ## Data
-- Production data are on `tononi-2` (`/nvme/neuropixels/tetrode_data`,
-  `/Volumes/neuropixel_archive/tetrode_data`), which is what that machine's
-  `~/.config/ttm/config.toml` says. `/nvme` is shared and often near full;
+- Production data are on `tononi-2` (`/nvme/neuropixels/tetrode_data`; raw
+  acquisitions on `/Volumes/tetrode/<SUBJECT>/`), which is what that
+  machine's `~/.config/ttm/config.toml` says. Writing to `/Volumes/tetrode`
+  needs the `paxilline` group (`sg paxilline -c '...'` in a shell that
+  predates the membership). `/nvme` is shared and often near full;
   the sorting cache is ~1.3 TB. Check `df -h /nvme` first.
 - `experiment_params.json` on the data volume is written from the manifest by
   `ttm-experiment-params`; edit the manifest, then rewrite it.

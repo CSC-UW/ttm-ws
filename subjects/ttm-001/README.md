@@ -8,6 +8,10 @@ updated: 2026-10-19
 16-tetrode Open Ephys subject. Manifests in `experiments/`; the pipeline that
 consumes them is `docs/pipeline.md`.
 
+Raw acquisitions: `/Volumes/tetrode/TTM1/<session>/` (moved from
+`/Volumes/neuropixel_archive/tetrode_data/<session>/` on 2026-10-19; the
+investigations' scripts and notebooks still name the old location).
+
 | Experiment | Session | What exists on the server |
 |---|---|---|
 | `TTM-NOD` | `2026-05-27_09-07-52` (48.3 h, two Open Ephys experiments with a 58 s gap) | blosc-zstd and WavPack stores, 625 Hz and 125 Hz LFPs, `experiment_params.json`, SWA stores and figures, EMG store and figures, the MountainSort5 and Kilosort4 sortings and the matching-pursuit production sort under `sortings_seed42_pcafix/`, viz bundle, curation manifests |

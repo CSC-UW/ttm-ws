@@ -1,6 +1,6 @@
 # Keys are the fields of tetrode_analyses.subject.Experiment.
 session = "2026-05-27_09-07-52"
-acquisition = "2026-05-27_09-07-52"
+acquisition = "TTM1/2026-05-27_09-07-52"
 oe_stream_index = 0
 
 lightsOn = ["2026-05-27T09:05:00", "2026-05-28T09:05:00", "2026-05-29T09:05:00"]

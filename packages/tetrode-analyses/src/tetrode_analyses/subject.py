@@ -69,9 +69,10 @@ class Experiment:
     """One experiment of one subject, as declared in its manifest.
 
     ``session`` names the derived-products directory ``<data_root>/<session>/``.
-    ``acquisition`` is the Open Ephys session directory relative to the
-    ``archive`` remote (defaults to ``session``). Datetime fields are naive
-    ISO-8601 strings in ``timezone``, the encoding WNE uses.
+    ``acquisition`` is the Open Ephys session directory relative to the remote
+    named by ``archive_remote`` (default ``archive``); it defaults to
+    ``session``. Datetime fields are naive ISO-8601 strings in ``timezone``,
+    the encoding WNE uses.
     """
 
     subject: str
@@ -79,6 +80,7 @@ class Experiment:
     timezone: str
     session: str
     acquisition: str
+    archive_remote: str = "archive"
     oe_stream_index: int = 0
     lightsOn: list[str] = dataclasses.field(default_factory=list)
     lightsOff: list[str] = dataclasses.field(default_factory=list)
@@ -128,8 +130,8 @@ class Experiment:
 
     @property
     def acquisition_dir(self) -> pathlib.Path:
-        """Raw Open Ephys session directory, on the ``archive`` remote (a local mount)."""
-        return pathlib.Path(config.get().remote("archive")) / self.acquisition
+        """Raw Open Ephys session directory on the ``archive_remote`` (a local mount)."""
+        return pathlib.Path(config.get().remote(self.archive_remote)) / self.acquisition
 
     @property
     def experiment_params_path(self) -> pathlib.Path:

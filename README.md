@@ -56,9 +56,10 @@ including the curation and visualization hand-offs to a laptop, is
 ## Data
 
 Production data live on the server `tononi-2`: raw Open Ephys acquisitions
-under `/Volumes/neuropixel_archive/tetrode_data/<session>/`, derived products
+under `/Volumes/tetrode/<SUBJECT>/<session>/` (TTM1 moved there from
+`/Volumes/neuropixel_archive/tetrode_data/` on 2026-10-19), derived products
 under `/nvme/neuropixels/tetrode_data/<session>/` and
-`/nvme/neuropixels/tetrode_data/<subject>/<experiment>/`. Those two roots
+`/nvme/neuropixels/tetrode_data/<subject>/<experiment>/`. Those roots
 are the server's config; nothing tracked names them except the closed
 studies under `investigations/`, which are records of runs on that machine.
 
