@@ -123,13 +123,14 @@ def test_make_subsampled_lfp_rejects_indivisible_rate(tmp_path: pathlib.Path) ->
 
 # --- End-to-end against the production sub-LFP store (requires NFS) ------------
 
-SUB_LFP = pathlib.Path(
-    "/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/2026-05-27_09-07-52.lfp.125hz.zarr"
-)
-
-
 @pytest.mark.requires_nfs
 def test_production_sub_lfp_shape() -> None:
+    from tetrode_analyses import config, subject
+
+    try:
+        SUB_LFP = subject.find_subject("TTM-001").experiment("TTM-NOD").subsampled_lfp_path(125)
+    except (config.ConfigError, subject.ManifestError) as e:
+        pytest.skip(str(e))
     if not SUB_LFP.exists():
         pytest.skip(f"sub-LFP store not built: {SUB_LFP}")
     da = open_lfps_dataarray(SUB_LFP)

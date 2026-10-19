@@ -1,0 +1,12 @@
+# Keys are the fields of tetrode_analyses.subject.Experiment.
+session = "2026-05-27_09-07-52"
+acquisition = "2026-05-27_09-07-52"
+oe_stream_index = 0
+
+lightsOn = ["2026-05-27T09:05:00", "2026-05-28T09:05:00", "2026-05-29T09:05:00"]
+lightsOff = ["2026-05-27T21:05:00", "2026-05-28T21:05:00"]
+novel_objects_start = "2026-05-28T09:05:00"
+novel_objects_end = "2026-05-28T14:05:00"
+
+badChannels = []
+badTetrodes = []

@@ -10,14 +10,16 @@ resolution-markers = [
 [manifest]
 members = [
     "tetrode-analyses",
+    "ttm-001",
+    "ttm-002",
     "ttm-ws",
 ]
 constraints = [
     { name = "faiss-cpu", specifier = "==1.12.0" },
     { name = "torch", specifier = "==2.9.1" },
+    { name = "xarray", specifier = "<2026.8" },
 ]
 overrides = [
-    { name = "xarray", specifier = "<2026.8" },
     { name = "numcodecs", specifier = "<0.16" },
     { name = "zarr", specifier = ">=2.18,<3" },
 ]
@@ -4777,6 +4779,28 @@ sdist = { url = "https://files.pythonhosted.org/packages/ee/9f/c5201d42a484c061e
 wheels = [
     { url = "https://files.pythonhosted.org/packages/51/e9/3a7820be2bb0fe53b6bc9c3be26d3d1158004e4c3ab953aa6840b955b1e9/truststore-0.10.5-py3-none-any.whl", hash = "sha256:9aaaedaefaf06d8b206278cf8b5012bc897f485a874503501e12d776df78951c", size = 19017, upload-time = "2026-10-12T22:27:30.377Z" },
 ]
+
+[[package]]
+name = "ttm-001"
+version = "0.1.0"
+source = { editable = "subjects/ttm-001" }
+dependencies = [
+    { name = "tetrode-analyses" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "tetrode-analyses", editable = "packages/tetrode-analyses" }]
+
+[[package]]
+name = "ttm-002"
+version = "0.1.0"
+source = { editable = "subjects/ttm-002" }
+dependencies = [
+    { name = "tetrode-analyses" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "tetrode-analyses", editable = "packages/tetrode-analyses" }]
 
 [[package]]
 name = "ttm-ws"

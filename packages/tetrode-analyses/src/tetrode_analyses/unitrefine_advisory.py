@@ -27,8 +27,9 @@ Feature lineage (see scripts 47/48/49 for the measurements behind each drop):
 * drop firing_range -- state/length-confounded over a 48 h sleep-dep recording.
 -> 23 features (``RECOMMENDED_FEATURES``); in-distribution CV ~0.91, ~free vs the full 37.
 
-The trained model + a copy of the training CSVs are cached under ``cache_dir`` (default
-``$TETRODE_MODELS_DIR`` or ``~/.cache/tetrode_analyses/unitrefine_advisory``). Robust by design:
+The trained model + a copy of the training CSVs are cached under ``cache_dir`` (default: the
+per-machine config's ``cache_dir`` if set, else ``~/.cache/tetrode_analyses``, plus
+``unitrefine_advisory/``). Robust by design:
 loading a cached fitted model under a different sklearn version auto-retrains from the cached CSVs,
 so it never breaks the way the original pickled skops model did. Only ``huggingface_hub`` (a one-
 time download of the training CSVs) is an extra dependency; everything else is sklearn + joblib.
@@ -36,7 +37,6 @@ time download of the training CSVs) is an extra dependency; everything else is s
 from __future__ import annotations
 
 import json
-import os
 import pathlib
 import warnings
 
@@ -84,8 +84,13 @@ _TEMPLATE_RENAMES = {  # current_name -> training_name (+ optional sign flip)
 
 
 def _default_cache_dir() -> pathlib.Path:
-    env = os.environ.get("TETRODE_MODELS_DIR")
-    base = pathlib.Path(env) if env else pathlib.Path.home() / ".cache" / "tetrode_analyses"
+    from tetrode_analyses import config
+
+    try:
+        base = config.get().cache_dir
+    except config.ConfigError:
+        base = None
+    base = base or pathlib.Path.home() / ".cache" / "tetrode_analyses"
     return base / "unitrefine_advisory"
 
 
@@ -127,7 +132,7 @@ def train_model(cache_dir=None, features=RECOMMENDED_FEATURES, *, save=True):
     pipe = _build_pipeline().fit(td[list(features)], y)
     meta = {"repo": REPO, "n_features": len(features), "features": list(features),
             "label_conversion": LABEL_CONVERSION, "rf_params": {k: v for k, v in RF_PARAMS.items()},
-            "seed": SEED, "n_train": int(len(y)),
+            "seed": SEED, "n_train": len(y),
             "advisory_only": True,
             "note": "Advisory ranking for tetrodes (out-of-distribution; probabilities uncalibrated). "
                     "Rank by P(neural); do NOT hard-threshold at 0.5."}

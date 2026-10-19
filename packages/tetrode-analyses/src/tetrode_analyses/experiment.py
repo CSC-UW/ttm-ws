@@ -1,11 +1,13 @@
-"""Subject/experiment metadata and session-time mapping for tetrode recordings.
+"""Experiment parameters and session-time mapping for tetrode recordings.
 
 This module gives tetrode sessions the same WNE-style metadata contract that
 SpikeGLX subjects get from ``ecephys.wne`` / ``wisc_ecephys_tools``, but
 self-contained (no ``SGLXSubject`` dependency). An ``experiment_params.json``
-file records the light/dark cycle, sleep-deprivation window, and the session
-anchor; helpers map wall-clock datetimes to the session-relative seconds used by
-the LFP ``time`` coordinate, and derive light/dark intervals for plotting.
+file on the data volume records the manifest fields of
+:class:`tetrode_analyses.subject.Experiment` plus the session anchor; helpers
+map wall-clock datetimes to the session-relative seconds used by the LFP
+``time`` coordinate, and derive light/dark intervals for plotting. Paths are
+never stored: they derive from ``session`` and the per-machine config.
 
 The session anchor (``t0_unix``) is the Open Ephys "Software Time" of the first
 recorded sample (see :func:`read_session_t0_unix`). Session ``time=0`` (the LFP
@@ -27,33 +29,25 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-#: Local NVME staging root where tetrode subject data currently lives.
-DEFAULT_DATA_ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data")
+from tetrode_analyses.subject import EXPERIMENT_PARAMS_FILENAME, Experiment
 
-#: Filename WNE uses for per-experiment-subject parameters; reused here.
-EXPERIMENT_PARAMS_FILENAME = "experiment_params.json"
+__all__ = ["EXPERIMENT_PARAMS_FILENAME", "ExperimentParams"]
 
 
-@dataclasses.dataclass
-class ExperimentParams:
-    """Light/dark cycle, deprivation window, and session anchor for one subject.
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class ExperimentParams(Experiment):
+    """An :class:`Experiment` manifest plus the session anchor ``t0_unix``.
 
-    Datetime fields are naive ISO-8601 strings interpreted in ``timezone`` (the
-    same encoding WNE uses). ``t0_unix`` anchors session-relative time.
+    ``t0_unix`` is the Open Ephys "Software Time" of the first recorded sample
+    (see :func:`read_session_t0_unix`); session ``time=0`` corresponds to it.
     """
 
-    subject: str
-    experiment: str
-    timezone: str
-    openephys_session: str
-    lfp_zarr: str
     t0_unix: float
-    lightsOn: list[str]
-    lightsOff: list[str]
-    novel_objects_start: str | None = None
-    novel_objects_end: str | None = None
-    badChannels: list[str] = dataclasses.field(default_factory=list)
-    badTetrodes: list[str] = dataclasses.field(default_factory=list)
+
+    @classmethod
+    def from_experiment(cls, experiment: Experiment, t0_unix: float) -> ExperimentParams:
+        fields = {k: getattr(experiment, k) for k in Experiment.manifest_fields()}
+        return cls(**fields, t0_unix=t0_unix)
 
     @property
     def t0_datetime(self) -> dt.datetime:
@@ -61,8 +55,8 @@ class ExperimentParams:
         return dt.datetime.fromtimestamp(self.t0_unix, tz=ZoneInfo(self.timezone))
 
     def to_dict(self) -> dict:
-        d = dataclasses.asdict(self)
-        # Provenance convenience: a human-readable anchor alongside t0_unix.
+        d = {k: getattr(self, k) for k in Experiment.manifest_fields()}
+        d["t0_unix"] = self.t0_unix
         d["t0_datetime"] = self.t0_datetime.isoformat()
         return d
 
@@ -80,22 +74,30 @@ def save_experiment_params(
 def load_experiment_params(path: str | pathlib.Path) -> ExperimentParams:
     """Load an ``experiment_params.json`` into an :class:`ExperimentParams`."""
     raw = json.loads(pathlib.Path(path).read_text())
-    fields = {f.name for f in dataclasses.fields(ExperimentParams)}
+    fields = set(Experiment.manifest_fields()) | {"t0_unix"}
+    unknown = set(raw) - fields - {"t0_datetime"}
+    if unknown:
+        raise ValueError(
+            f"{path}: unknown keys {sorted(unknown)}; rewrite it with "
+            "`ttm-experiment-params` (schema changed 2026-10-19)."
+        )
     return ExperimentParams(**{k: v for k, v in raw.items() if k in fields})
 
 
-def experiment_dir(
-    subject: str, experiment: str, root: str | pathlib.Path = DEFAULT_DATA_ROOT
-) -> pathlib.Path:
-    """Return ``<root>/<subject>/<experiment>`` (WNE-style experiment-subject dir)."""
-    return pathlib.Path(root) / subject / experiment
+def _trailing_int(path: pathlib.Path) -> int:
+    m = re.search(r"(\d+)$", path.name)
+    return int(m.group(1)) if m else -1
 
 
-def experiment_params_path(
-    subject: str, experiment: str, root: str | pathlib.Path = DEFAULT_DATA_ROOT
-) -> pathlib.Path:
-    """Return the ``experiment_params.json`` path for a subject/experiment."""
-    return experiment_dir(subject, experiment, root) / EXPERIMENT_PARAMS_FILENAME
+def first_recording_dir(oe_session_dir: str | pathlib.Path) -> pathlib.Path:
+    """The chronologically first ``Record Node */experiment*/recording*`` directory."""
+    oe_session_dir = pathlib.Path(oe_session_dir)
+    nodes = sorted(oe_session_dir.glob("Record Node *"), key=_trailing_int)
+    if not nodes:
+        raise FileNotFoundError(f"No 'Record Node *' under {oe_session_dir}")
+    experiments = sorted(nodes[0].glob("experiment*"), key=_trailing_int)
+    recordings = sorted(experiments[0].glob("recording*"), key=_trailing_int)
+    return recordings[0]
 
 
 def read_session_t0_unix(source: str | pathlib.Path) -> float:
@@ -104,14 +106,18 @@ def read_session_t0_unix(source: str | pathlib.Path) -> float:
     ``source`` may be:
 
     - a ``slice_table.csv`` written by ``tetrode_analyses.spikeinterface`` (uses
-      the first segment's ``software_time_s``), or
-    - an Open Ephys recording directory containing ``sync_messages.txt`` (parses
-      the "Software Time (milliseconds since ... 1970 UTC)" line, matching
+      the first segment's ``oe_software_time_s``),
+    - an Open Ephys session directory (uses its first recording, see
+      :func:`first_recording_dir`), or
+    - a recording directory or ``sync_messages.txt`` (parses the "Software Time
+      (milliseconds since ... 1970 UTC)" line, matching
       :func:`tetrode_analyses.spikeinterface._read_software_time_s`).
     """
     source = pathlib.Path(source)
     if source.is_file() and source.suffix == ".csv":
-        return float(pd.read_csv(source)["software_time_s"].iloc[0])
+        return float(pd.read_csv(source)["oe_software_time_s"].iloc[0])
+    if source.is_dir() and not (source / "sync_messages.txt").exists():
+        source = first_recording_dir(source)
     sync = source / "sync_messages.txt" if source.is_dir() else source
     m = re.search(r"Software Time[^:]*:\s*(\d+)", sync.read_text())
     if not m:

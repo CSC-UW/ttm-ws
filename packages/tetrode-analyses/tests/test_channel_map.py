@@ -173,16 +173,22 @@ def test_attach_requires_channel_map_or_extractor(tmp_path: pathlib.Path) -> Non
 
 # --- End-to-end against the mounted acquisition (requires NFS) -----------------
 
-ACQ_DIR = pathlib.Path(
-    "/Volumes/neuropixel_archive/tetrode_data/2026-05-19_18-09-51"
-)
+def _ttm_test_acquisition() -> pathlib.Path:
+    from tetrode_analyses import config, subject
+
+    try:
+        acq = subject.find_subject("TTM-001").experiment("TTM-Test").acquisition_dir
+    except (config.ConfigError, subject.ManifestError) as e:
+        pytest.skip(str(e))
+    if not acq.exists():
+        pytest.skip(f"acquisition not mounted: {acq}")
+    return acq
 
 
 @pytest.mark.requires_nfs
 def test_extractor_grouping_matches_dataarray() -> None:
     pytest.importorskip("probeinterface")
-    if not ACQ_DIR.exists():
-        pytest.skip(f"acquisition not mounted: {ACQ_DIR}")
+    ACQ_DIR = _ttm_test_acquisition()
     from spikeinterface.extractors.extractor_classes import (
         OpenEphysBinaryRecordingExtractor,
     )
