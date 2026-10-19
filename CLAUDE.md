@@ -26,10 +26,12 @@
   bump: edit `rev`, run `uv lock --upgrade-package NAME`, commit both files.
 - Never edit a pinned package from this workspace. For a session of local
   hacking, `uv pip install -e ../NAME`; the next sync restores the pin.
-- `torch==2.9.1` and `faiss-cpu==1.12.0` are constraints for the server GPU
-  (Tesla V100) and Python 3.14 wheels; `zarr<3` and `numcodecs<0.16` are
-  overrides that keep spikeinterface able to write Zarr. Do not loosen any
-  of them without reading `docs/SETUP.md`, "Pinned packages".
+- `torch==2.9.1`, `faiss-cpu==1.12.0` and `xarray<2026.8` are constraints
+  for the server GPU (Tesla V100), Python 3.14 wheels and zarr 2; `zarr<3`
+  and `numcodecs<0.16` are overrides that keep spikeinterface able to write
+  Zarr. Do not loosen any of them without reading `docs/SETUP.md`, "Pinned
+  packages". Before adding a fork pin, check whether the change is already
+  upstream: the spikeinterface-gui and mountainsort5 forks both were.
 - `spikeinterface` comes from PyPI (0.105.2), not the editable upstream clone
   `gfys_workspace` uses. `set_probegroup` is in place and returns `None` there.
 - Every Zarr write goes through zarr 2 here: spikeinterface stores, and the

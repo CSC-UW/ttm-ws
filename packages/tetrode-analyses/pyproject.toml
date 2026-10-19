@@ -25,7 +25,7 @@ lossy_compression = [
     "wavpack-numcodecs",
 ]
 sorting = [
-    "mountainsort5",
+    "mountainsort5>=0.5.9",
     "kilosort>=4.1.7",
 ]
 analysis = [

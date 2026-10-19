@@ -32,7 +32,7 @@ import spikeinterface.preprocessing as spre
 import spikeinterface.sorters as ss
 from spikeinterface.core.baserecording import BaseRecording
 
-# Compatibility shim: MountainSort5 0.5.8's scheme-3 block wrapper
+# Compatibility shim: MountainSort5's scheme-3 block wrapper (through 0.5.9)
 # (mountainsort5/core/get_block_recording_for_scheme3.py) reads the old private
 # attribute `recording._recording_segments`, which current SpikeInterface
 # renamed to `_segments` (exposed as `.segments`). Alias it read-only so scheme 3

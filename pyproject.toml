@@ -35,7 +35,6 @@ tetrode-analyses = { workspace = true }
 # To hack on one locally for a session: `uv pip install -e ../NAME`.
 ecephys            = { git = "https://github.com/CSC-UW/ecephys.git",                 rev = "88e410e16d7762425c0f73870a0e4db0a6d8549c" }
 loupe              = { git = "https://github.com/CSC-UW/loupe.git",                   rev = "bc33e3b150bcc508786ba7141861d257416abd62" }
-mountainsort5      = { git = "https://github.com/grahamfindlay/mountainsort5.git",    rev = "b18f35ac5156e7ed9ab477ce34209ae5f8507f25" }
 kilosort           = { git = "https://github.com/grahamfindlay/Kilosort.git",         rev = "d0123d6d965a3a429d8251aa122728ce3553ff4f" }
 
 [dependency-groups]

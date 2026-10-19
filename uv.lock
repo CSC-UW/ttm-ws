@@ -2276,13 +2276,17 @@ wheels = [
 
 [[package]]
 name = "mountainsort5"
-version = "0.5.8"
-source = { git = "https://github.com/grahamfindlay/mountainsort5.git?rev=b18f35ac5156e7ed9ab477ce34209ae5f8507f25#b18f35ac5156e7ed9ab477ce34209ae5f8507f25" }
+version = "0.5.9"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "isosplit6" },
     { name = "packaging" },
     { name = "scikit-learn" },
     { name = "spikeinterface" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cc/36/bf6fd36b01ef43c5c7e2b3a6126743a6efe6fabeb30d2af0025d960c1e12/mountainsort5-0.5.9.tar.gz", hash = "sha256:8c04d53046d773fdf94cdac639c2e5a8eb156d2af4395f5bf51b99f3f9d33423", size = 33350, upload-time = "2026-06-03T19:26:59.922Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c7/52/d66b70399194384b5bfd5b73030b50837fb0a927d113a4ad35b149a57aeb/mountainsort5-0.5.9-py3-none-any.whl", hash = "sha256:cba04c35a6788438fbce0bb91a625ea81b5d7675b1bdc4d81038efcb191ccad1", size = 36744, upload-time = "2026-06-03T19:26:58.92Z" },
 ]
 
 [[package]]
@@ -4615,7 +4619,7 @@ requires-dist = [
     { name = "kilosort", marker = "extra == 'sorting'", git = "https://github.com/grahamfindlay/Kilosort.git?rev=d0123d6d965a3a429d8251aa122728ce3553ff4f" },
     { name = "loupe", marker = "extra == 'viz'", git = "https://github.com/CSC-UW/loupe.git?rev=bc33e3b150bcc508786ba7141861d257416abd62" },
     { name = "matplotlib", marker = "extra == 'analysis'" },
-    { name = "mountainsort5", marker = "extra == 'sorting'", git = "https://github.com/grahamfindlay/mountainsort5.git?rev=b18f35ac5156e7ed9ab477ce34209ae5f8507f25" },
+    { name = "mountainsort5", marker = "extra == 'sorting'", specifier = ">=0.5.9" },
     { name = "numpy" },
     { name = "open-ephys-python-tools", specifier = ">=1.0.1" },
     { name = "pandas" },
