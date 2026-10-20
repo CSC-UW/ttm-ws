@@ -121,3 +121,9 @@ the bundled state definitions.
 config, an rclone `remote:path` pointing at the server's data root (for
 example `tononi-2:/nvme/neuropixels/tetrode_data`). `--no-check-dest` is the
 default for a first one-way copy; `--check` checksums for resumable re-runs.
+
+## Checking a re-run
+
+`scripts/snapshot_derived.py snapshot` summarises an experiment's derived
+products into a JSON file and `compare` diffs two summaries. Baselines for
+TTM-001 and what they showed are in `docs/baselines/README.md`.

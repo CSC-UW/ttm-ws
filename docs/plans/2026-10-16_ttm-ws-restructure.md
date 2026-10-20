@@ -338,6 +338,13 @@ of `delta.idelta.zarr` and `stft_bandpowers.zarr`; snapshot before Phase 2,
 compare after Phase 2 and after re-running the SWA entry points on TTM-001.
 `docs/baselines/README.md` states what was re-run and what was only moved.
 
+Status 2026-10-20: done, with one deviation. No snapshot existed before
+Phase 2, so the baseline is the untouched May/June products after the
+restructure (`docs/baselines/TTM-001_TTM-NOD_pre-rerun.json`); the
+post-rerun snapshot follows `ttm-swa all`. Params, sorting, STFT and EMG
+are identical; `delta.idelta.zarr` is equivalent to float32 rounding
+(`compare --rtol 1e-5` passes). Details in `docs/baselines/README.md`.
+
 ### Phase 6 (first follow-up): rename the import to `ttm`
 
 `tetrode_analyses` -> `ttm` (dist `ttm`, directory `packages/ttm/`). One
