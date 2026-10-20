@@ -48,9 +48,9 @@ Result of `compare pre post`:
   float32 rounding of the dask bandpass/Hilbert overlap computation, not a
   change in the method; `compare --rtol 1e-5` passes.
 
-The pre-rerun stores are kept at
-`/nvme/neuropixels/tmp/ttm_baseline_2026-10-20/` on `tononi-2` for an
-elementwise comparison.
+The pre-rerun stores were kept at
+`/nvme/neuropixels/tmp/ttm_baseline_2026-10-20/` on `tononi-2` for the
+elementwise comparison above and deleted on 2026-10-20.
 
 Not re-run: `ttm-convert`, `ttm-make-lfp`, `ttm-emg --full`, the sorting
 pipeline. Those products are the May/June outputs, moved unchanged.
