@@ -143,7 +143,8 @@ What moves where, by current directory:
    changing a boundary. Renaming to `ttm` is Phase 6, the first follow-up
    once the layout has settled.
 3. Per-machine config. `~/.config/ttm/config.toml` (or `$TTM_CONFIG`) with
-   `data_root` and `[remotes] archive = "/Volumes/neuropixel_archive/tetrode_data"`
+   `data_root` and `[remotes] archive = "/Volumes/tetrode"` (the raw sessions moved
+   there from `/Volumes/neuropixel_archive/tetrode_data` on 2026-10-19)
    (plus `scratch`, `tmp` as needed); env overrides `TTM_DATA_ROOT`,
    `TTM_REMOTE_<NAME>`; no default. `experiment.DEFAULT_DATA_ROOT` is deleted.
    On tononi-2 `data_root = /nvme/neuropixels/tetrode_data`.

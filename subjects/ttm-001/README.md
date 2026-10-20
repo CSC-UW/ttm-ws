@@ -9,8 +9,9 @@ updated: 2026-10-19
 consumes them is `docs/pipeline.md`.
 
 Raw acquisitions: `/Volumes/tetrode/TTM1/<session>/` (moved from
-`/Volumes/neuropixel_archive/tetrode_data/<session>/` on 2026-10-19; the
-investigations' scripts and notebooks still name the old location).
+`/Volumes/neuropixel_archive/tetrode_data/<session>/` on 2026-10-19 and the old
+location emptied on 2026-10-20; the investigations' scripts and notebooks still
+name it).
 
 | Experiment | Session | What exists on the server |
 |---|---|---|

@@ -12,7 +12,8 @@ in the library or the workspace pins; the directory is not maintained as
 runnable code. Paths inside the scripts and notebooks are literal `tononi-2`
 paths as they were run (`/nvme/neuropixels/tetrode_data`,
 `/Volumes/neuropixel_archive/tetrode_data`, `/nvme/neuropixels/tmp`; the raw
-sessions moved to `/Volumes/tetrode/<SUBJECT>/` on 2026-10-19), and the
+sessions moved to `/Volumes/tetrode/<SUBJECT>/` on 2026-10-19 and the old
+location was emptied the next day), and the
 READMEs' `cd gfys_workspace && uv run ...` instructions describe the
 environment of the time; run anything from this workspace's environment
 instead.

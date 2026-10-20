@@ -7,7 +7,8 @@ confirmed_by_user: true
 # Chunking & compression for tetrode recordings → Zarr
 
 Goal: convert ~667 GB of Open Ephys flat-binary continuous tetrode recordings
-(e.g. `/Volumes/neuropixel_archive/tetrode_data/2026-05-27_09-07-52`) to a
+(e.g. `/Volumes/neuropixel_archive/tetrode_data/2026-05-27_09-07-52`, now
+`/Volumes/tetrode/TTM1/2026-05-27_09-07-52`) to a
 chunked + compressed format that is efficient to **spike sort by tetrode
 group**. Every choice below is backed by a benchmark on a 180 s real sample of
 this recording (3×60 s drawn from 10/50/85 % through the file).
