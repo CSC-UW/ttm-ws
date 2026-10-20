@@ -25,7 +25,7 @@ environment. There is no default.
 `<session>` is `<data_root>/<session>/`, `<subject>/<experiment>` is
 `<data_root>/<subject>/<experiment>/`. Steps 1 to 6 run on the server; 7 and
 8 are hand-offs to a laptop. The library functions behind each step are in
-`packages/tetrode-analyses/README.md`.
+`packages/ttm/README.md`.
 
 ## Conversion (step 1)
 
@@ -70,7 +70,7 @@ default, or `--analyzer PATH`) in spikeinterface-gui. `--mode web` (default)
 serves on `localhost:8000` without opening a browser; tunnel with
 `ssh -N -L 8000:localhost:8000 <you>@tononi-2`. `--mode desktop` needs a
 display. `--style grahams_curation` applies the layout, per-view settings and
-unit-list columns shipped in `tetrode_analyses/assets/`.
+unit-list columns shipped in `ttm/assets/`.
 
 For a laptop, curation data are too large to stage: the analyzer is ~2.5 GB
 and the recording it was sorted from ~352 GB. `ttm-curation-manifest` writes
@@ -90,7 +90,7 @@ offered for traces: it is the exact data the sort was produced from.
 The analyzer's persisted unit properties (`tier`, `tier_level`, `n_chunks`,
 `track_hours` from `investigations/spike-sorting/45_add_curation_unit_properties.py`;
 `unitrefine_neural_prob`, `unitrefine_label` from
-`tetrode_analyses.unitrefine_advisory`) are sortable columns in the unit
+`ttm.unitrefine_advisory`) are sortable columns in the unit
 list. The UnitRefine columns are an advisory ranking: sort by
 `unitrefine_neural_prob`, do not threshold at the 0.5 label.
 

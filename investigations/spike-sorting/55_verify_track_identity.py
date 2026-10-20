@@ -8,7 +8,7 @@ smooth high cosine = stable identity (drift is gradual); a sudden drop between a
 possible swap. Coarse (5 points) but cheap -- a gross sanity check on the headline.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/55_verify_track_identity.py
+    uv run --extra tetrodes python ../ttm/.../sorting/55_verify_track_identity.py
 """
 import argparse
 import pathlib
@@ -18,7 +18,7 @@ import spikeinterface as si
 from spikeinterface.core.template_tools import get_dense_templates_array
 
 from _mp_common import build_templates_object
-from tetrode_analyses.tracking import cosine_from_templates
+from ttm.tracking import cosine_from_templates
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/track_eval/mp_long_s2000_d170000")
 FS = 30000.0

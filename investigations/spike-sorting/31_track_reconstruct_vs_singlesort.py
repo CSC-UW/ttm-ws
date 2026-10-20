@@ -25,7 +25,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 import _track_eval as ev  # noqa: E402
-from tetrode_analyses import tracking as tk  # noqa: E402
+from ttm import tracking as tk  # noqa: E402
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52")
 BLOSC = ROOT / "2026-05-27_09-07-52.blosc-zstd.zarr"

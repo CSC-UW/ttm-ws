@@ -109,7 +109,7 @@ Paths to a KS4 result on this hardware, **not pursued** (user chose to stop & do
   ≤ 24 h window or on a larger GPU.
 - `31_build_analyzer_ks4.py`, `32_compare_ks4_vs_ms5.py` — downstream analyzer + KS4-vs-MS5
   agreement, staged and linted; ready to run if/when a completed KS4 sort exists.
-- `tetrode_analyses.sorting`: `sort_store_ks4` (by-group or together; the
+- `ttm.sorting`: `sort_store_ks4` (by-group or together; the
   `templates_from_data`/`clear_cache` knobs and the per-tetrode `.dat` rewrite parallelism
   live here), `materialize_preprocessed` (shared with MS5's `sort_store`),
   `assign_tetrode_groups` (per-unit tetrode from KS4's own `get_best_channels`, for the

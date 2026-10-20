@@ -12,7 +12,7 @@ Two tests on the merge-first sorting in a window:
      on an equal sample of clean spikes (should cluster tightly).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/96_residual_nature.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/96_residual_nature.py \
         [--sorting assembled_mergefirst] [--window-h 26] [--tau 0.8] [--hi 0.9]
 """
 import argparse

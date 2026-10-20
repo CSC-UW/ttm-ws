@@ -16,7 +16,7 @@ analyzer/sorting data untouched (purely additive metadata). Run AFTER
 37_build_analyzer_tracked.py (and re-run after any rebuild).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/45_add_curation_unit_properties.py
+    uv run --extra tetrodes python ../ttm/.../sorting/45_add_curation_unit_properties.py
 """
 import json
 import pathlib

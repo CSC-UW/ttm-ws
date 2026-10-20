@@ -23,7 +23,7 @@ The promising-cadence read: genuine yield (low birth_cos, clean, present) should
 borderline/twin count CLIMBS as cadence gets finer. The knee is the cadence to adopt.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/61_reseed_cadence_sweep.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/61_reseed_cadence_sweep.py \
         --start-s 2000 --dur-s 170000 --dedup-cosine 0.95 --cadences 12,6,3
     # smoke: --max-windows 6 --cadences 4,2   (first 6 windows on the cached binary)
 """
@@ -39,7 +39,7 @@ from _mp_common import (
     materialize_span,
     windowed_carry_forward_reseed,
 )
-from tetrode_analyses.tracking import cosine_from_templates, sort_chunk, to_int_numpy_sorting
+from ttm.tracking import cosine_from_templates, sort_chunk, to_int_numpy_sorting
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/track_eval")
 FS = 30000.0

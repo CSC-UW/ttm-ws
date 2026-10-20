@@ -15,7 +15,7 @@ a and r. Reuses per_spike_fit + the 72 snippet/overlay style.
 
     cd gfys_workspace
     uv run --project /Users/gfindlay@ad.wisc.edu/projects/ece/gfys_workspace --extra tetrodes python \
-        ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/80_wobble_primary_gate_gallery.py \
+        ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/80_wobble_primary_gate_gallery.py \
         [--windows-h 26 40] [--units 3] [--r-gate 0.60] [--matched-factor 0.55] [--knee-factor 0.68]
 """
 import argparse
@@ -31,7 +31,7 @@ from spikeinterface.core import get_noise_levels
 
 from _mp_common import (_unit_groups_from_mask, build_templates_object, materialize_span,
                         per_spike_fit, run_matching, tsq_median, wobble_method_kwargs)
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/"
                    "track_eval/mp_long_s2000_d170000")

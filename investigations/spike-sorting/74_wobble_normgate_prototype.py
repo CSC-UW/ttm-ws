@@ -17,7 +17,7 @@ per window (so the post-filter, not wobble's own threshold, is the binding const
 
     cd gfys_workspace
     uv run --project /Users/gfindlay@ad.wisc.edu/projects/ece/gfys_workspace --extra tetrodes \
-        python ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/74_wobble_normgate_prototype.py
+        python ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/74_wobble_normgate_prototype.py
 """
 import json
 import pathlib
@@ -35,7 +35,7 @@ from spikeinterface.metrics.quality.misc_metrics import (_compute_rp_contaminati
 from _mp_common import (_unit_groups_from_mask, build_templates_object, materialize_span,
                         run_matching, wobble_method_kwargs)
 from _wobble_eval import _within_tol, detect_window_peaks, tsq_median
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/"
                    "track_eval/mp_long_s2000_d170000")

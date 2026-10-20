@@ -18,7 +18,7 @@ from spikeinterface.core import ChannelSparsity
 
 from ecephys.wne import siutils
 
-from tetrode_analyses import tracking as tk
+from ttm import tracking as tk
 
 TIERS = ("permissive", "moderate", "conservative")
 

@@ -8,7 +8,7 @@ signal: if fixed fades over time while reestimate stays flat, template-matching 
 (geometry-free) where chunk+match would fragment. Cleanliness (ISI<1ms) guards against noise tracks.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/54_match_pursuit_long_drift.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/54_match_pursuit_long_drift.py \
         [--start-s 56000] [--dur-s 36000] [--window-s 1800] [--seed-window-s 1800] [--n-jobs 16]
 """
 import argparse
@@ -18,7 +18,7 @@ import shutil
 import numpy as np
 
 from _mp_common import build_templates_object, dedup_sorting, materialize_span, windowed_carry_forward
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/track_eval")
 FS = 30000.0

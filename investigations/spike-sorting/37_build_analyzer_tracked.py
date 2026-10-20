@@ -41,7 +41,7 @@ import numpy as np
 import spikeinterface as si
 from spikeinterface.core.sparsity import ChannelSparsity
 
-from tetrode_analyses.sorting import preprocess_for_sorting
+from ttm.sorting import preprocess_for_sorting
 
 from _track_eval import TIERS, isolation_tier_mask
 

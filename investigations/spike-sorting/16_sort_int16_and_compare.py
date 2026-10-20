@@ -23,7 +23,7 @@ import pathlib
 import numpy as np
 import spikeinterface as si
 import spikeinterface.comparison as sc
-from tetrode_analyses.sorting import sort_store
+from ttm.sorting import sort_store
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52")
 SEED = 42

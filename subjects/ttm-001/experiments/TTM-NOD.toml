@@ -1,4 +1,4 @@
-# Keys are the fields of tetrode_analyses.subject.Experiment.
+# Keys are the fields of ttm.subject.Experiment.
 session = "2026-05-27_09-07-52"
 acquisition = "TTM1/2026-05-27_09-07-52"
 oe_stream_index = 0

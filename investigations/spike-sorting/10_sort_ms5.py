@@ -5,13 +5,13 @@ tetrode (scheme 3, ms5 per-group whitening) in parallel via
 run_sorter_by_property -> aggregate. Saves the aggregated sorting + a summary.
 
     cd gfys_workspace
-    uv run python ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/10_sort_ms5.py
+    uv run python ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/10_sort_ms5.py
 """
 import json
 import time
 import pathlib
 import numpy as np
-from tetrode_analyses.sorting import sort_store
+from ttm.sorting import sort_store
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52")
 STORES = {

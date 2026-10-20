@@ -20,7 +20,7 @@ DROPPED (not applicable on fictional tetrode geometry / not computable here):
 
     cd gfys_workspace
     uv run --with skops --with huggingface_hub --extra tetrodes python \
-      ../tetrode_analyses/.../sorting/47_unitrefine_reduced_feature_retrain.py
+      ../ttm/.../sorting/47_unitrefine_reduced_feature_retrain.py
 """
 import pathlib
 

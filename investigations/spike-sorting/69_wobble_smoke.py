@@ -14,7 +14,7 @@ This script:
 and writes wobble_vs_circus/smoke_w26h.json. No scoring yet (that is 70/71).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/69_wobble_smoke.py
+    uv run --extra tetrodes python ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/69_wobble_smoke.py
 """
 import json
 import pathlib
@@ -24,7 +24,7 @@ import time
 import numpy as np
 
 from _mp_common import build_templates_object, materialize_span, run_matching, wobble_method_kwargs
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/"
                    "track_eval/mp_long_s2000_d170000")

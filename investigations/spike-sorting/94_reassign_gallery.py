@@ -12,7 +12,7 @@ Row label = u{from}->u{to}, verdict. This lets the fix/churn/ambiguous call be j
 "compare, don't assert; show pictures".
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/94_reassign_gallery.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/94_reassign_gallery.py \
         [--sorting assembled_mergefirst] [--window-h 26] [--use-tight] [--per-verdict 2] [--n-ex 3]
 """
 import argparse

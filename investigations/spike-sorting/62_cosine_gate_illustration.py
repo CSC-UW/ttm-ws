@@ -22,7 +22,7 @@ Three deliverables, all from data already on disk (no expensive re-run):
    metric is and is not sensitive to.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/62_cosine_gate_illustration.py
+    uv run --extra tetrodes python ../ttm/.../sorting/62_cosine_gate_illustration.py
 """
 import pathlib
 
@@ -34,7 +34,7 @@ import numpy as np
 import spikeinterface as si
 
 from _mp_common import build_templates_object, materialize_span
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/track_eval")
 OUT = ROOT / "mp_long_s2000_d170000"

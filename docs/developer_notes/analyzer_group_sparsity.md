@@ -25,7 +25,7 @@ heuristic.
 ## Notes
 
 - Pass the sparsity explicitly; the `sparse` flag is then ignored (no conflict).
-- Both the recording and the sorting must carry the `group` property. `tetrode_analyses`
+- Both the recording and the sorting must carry the `group` property. `ttm`
   recordings and aggregated sortings both do, values `0..15`.
 - Verified to give exactly 4 channels/unit on the 12 h-block sort. First used in
   `investigations/spike-sorting/25_build_analyzer_12hblock_train1h.py`.

@@ -9,7 +9,7 @@ by a same-tetrode neighbour (the IDENTITY-SWAP root-cause fix; see MATCHING_PURS
 tracks units that first appear after the seed window.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/58_match_pursuit_reseed.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/58_match_pursuit_reseed.py \
         --start-s 2000 --dur-s 170000 --dedup-cosine 0.95 --reseed-every-windows 12 --tag _reseed
     # smoke: add --max-windows 5 --reseed-every-windows 2  (first 5 windows on the cached binary)
     # wobble primary (cosine-gate arm): --method wobble --wobble-factor 0.45 --shape-gate-r 0.6 --tag _wobble
@@ -26,7 +26,7 @@ from _mp_common import (
     materialize_span,
     windowed_carry_forward_reseed,
 )
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/track_eval")
 FS = 30000.0

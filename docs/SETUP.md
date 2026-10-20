@@ -88,7 +88,7 @@ without a `data_root` stops with the template above.
 Check the config with:
 
 ```bash
-uv run python -c "from tetrode_analyses import config; print(config.get())"
+uv run python -c "from ttm import config; print(config.get())"
 ```
 
 The subject to work on is never defaulted either: every tool takes
@@ -98,14 +98,14 @@ The subject to work on is never defaulted either: every tool takes
 ## 6. Where to read next
 
 `README.md`, then `CLAUDE.md`, then `docs/pipeline.md` (the per-subject
-pipeline and every `ttm-*` command), then `packages/tetrode-analyses/README.md`,
+pipeline and every `ttm-*` command), then `packages/ttm/README.md`,
 then `investigations/README.md`.
 
 ## Pinned packages
 
 | Package | Pin | Why this and not PyPI |
 |---|---|---|
-| `ecephys` | `CSC-UW/ecephys` `develop` | Lab signal-processing library; not on PyPI. Supplies bandpass, Hilbert, decimation, STFT for `tetrode_analyses.power`. |
+| `ecephys` | `CSC-UW/ecephys` `develop` | Lab signal-processing library; not on PyPI. Supplies bandpass, Hilbert, decimation, STFT for `ttm.power`. |
 | `loupe` | `CSC-UW/loupe` `main` | The local viewer used by the visualization bundle. Not on PyPI. |
 | `mountainsort5` | PyPI `>=0.5.9` | The lab's deterministic-PCA fork was merged upstream (flatironinstitute/mountainsort5 PR 65) and released in 0.5.9, so repeat sorts are bit-identical with the stock package. The `whitening_seed` half of that fix is spikeinterface PR 4600, in 0.105.0. |
 | `kilosort` | `grahamfindlay/Kilosort` `perf/clustering_chunk_size` | Adds `clustering_chunk_size`, which lets 48 h tetrode clustering fit in 32 GB of GPU memory. Stock 4.1.7 rejects the key. Rebased onto upstream main (4.1.7 plus the swarmsplitter CCG fix from PR #1043) on 2026-10-19; upstream PR MouseLand/Kilosort#1037 (opened 2026-06-20) is still open. |

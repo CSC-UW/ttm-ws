@@ -55,7 +55,7 @@ GPU and everything else does not.
 ## 5. Per-machine config
 
 ```bash
-uv run python -c "from tetrode_analyses import config; print(config.get())"
+uv run python -c "from ttm import config; print(config.get())"
 ```
 
 If this raises `ConfigError`, ask the user where the data are on this
@@ -67,7 +67,7 @@ check. On `tononi-2`, also report `df -h /nvme`.
 ## 6. Orientation
 
 Point the user at, in this order: `README.md`, `CLAUDE.md`,
-`docs/pipeline.md`, `packages/tetrode-analyses/README.md`,
+`docs/pipeline.md`, `packages/ttm/README.md`,
 `investigations/README.md`. State the three
 rules they will hit first: always `uv sync --all-packages`, every tool needs
 an experiment (`--subject ID --experiment NAME`), and commit small changes

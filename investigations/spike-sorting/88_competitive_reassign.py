@@ -13,7 +13,7 @@ Post-hoc re-labeling MEASUREMENT only -- NOT a change to the matcher. Folding co
 carry-forward loops is justified only if moves are predominantly to DISTINCT neighbours (real fixes).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/88_competitive_reassign.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/88_competitive_reassign.py \
         [--variant assembled_reestimate] [--windows-h 5 26 40] [--margin 0.0] [--min-pair 20]
 """
 import argparse

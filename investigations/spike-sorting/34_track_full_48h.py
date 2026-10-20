@@ -26,7 +26,7 @@ import time
 import numpy as np
 import spikeinterface as si
 
-from tetrode_analyses import tracking as tk
+from ttm import tracking as tk
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52")
 BLOSC = ROOT / "2026-05-27_09-07-52.blosc-zstd.zarr"

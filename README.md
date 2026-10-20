@@ -21,7 +21,7 @@ steps for doing it by hand.
 
 | Path | What it is |
 |---|---|
-| `packages/tetrode-analyses/` | The shared library (`import tetrode_analyses`). Subject-agnostic: Open Ephys loading and channel maps, SpikeInterface recording assembly and Zarr conversion, LFP, band power, MountainSort5/Kilosort4 drivers, unit tracking, the UnitRefine advisory, SWA plotting. Its own README documents the API. |
+| `packages/ttm/` | The shared library (`import ttm`). Subject-agnostic: Open Ephys loading and channel maps, SpikeInterface recording assembly and Zarr conversion, LFP, band power, MountainSort5/Kilosort4 drivers, unit tracking, the UnitRefine advisory, SWA plotting. Its own README documents the API. |
 | `subjects/<id>/` | One subject: `subject.toml`, `experiments/<NAME>.toml` manifests, notebooks, a README of what exists on the server. `ttm-001` (TTM-NOD, TTM-Test) and the `ttm-002` skeleton. |
 | `investigations/` | Closed method studies (acquisition noise, Zarr compression, spike sorting and tracking, the UnitRefine advisory, the SpikeInterface memory bug): the question, the scripts as run, the findings. Indexed in `investigations/README.md`. |
 | `docs/` | `SETUP.md`, `pipeline.md` (every `ttm-*` command), developer notes, reports, plans. |

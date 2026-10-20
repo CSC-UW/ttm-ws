@@ -19,7 +19,7 @@ the processed windows, and the per-unit contamination cost -- the evidence to de
 worth wiring into the windowed pass.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/87_sua_residual_capture_e2.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/87_sua_residual_capture_e2.py \
         [--windows-h 5 15 26 35 44] [--mad-floor 10] [--tau-cos 0.8]
 """
 import argparse

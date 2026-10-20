@@ -26,7 +26,7 @@ import pathlib
 import psutil
 import spikeinterface as si
 import spikeinterface.sorters as ss
-from tetrode_analyses.sorting import preprocess_for_sorting  # also applies the ms5 _segments patch
+from ttm.sorting import preprocess_for_sorting  # also applies the ms5 _segments patch
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52")
 SR = ROOT / "sortings_seed42_pcafix"

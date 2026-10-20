@@ -24,7 +24,7 @@ default)). Pass --persist to write those two columns into analyzer_clustered.zar
 
     cd gfys_workspace
     uv run --with skops --with huggingface_hub --extra tetrodes python \
-      ../tetrode_analyses/.../sorting/46_apply_unitrefine_noise_classifier.py [--persist]
+      ../ttm/.../sorting/46_apply_unitrefine_noise_classifier.py [--persist]
 """
 import argparse
 import pathlib

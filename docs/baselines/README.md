@@ -28,7 +28,7 @@ rewritten by `ttm-experiment-params` on 2026-10-19 from the manifest,
 and the sorting, `delta.idelta.zarr`, `stft_bandpowers.zarr` and
 `synthetic_emg_methods.zarr` as produced by the pre-restructure code in
 May and June 2026 and only moved since. The sorting is the registry's
-`tetrode_analyses.mp_production_sorting` (87 units, 71 SUA + 16 MUA,
+`ttm.mp_production_sorting` (87 units, 71 SUA + 16 MUA,
 91,707,740 spikes). No snapshot was taken before Phase 2, so the
 pre-restructure state is represented by these untouched products.
 

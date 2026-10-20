@@ -7,7 +7,7 @@ spike-weighted full/tight purity and the across-variant ranking move -- the de-r
 production floor.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/93_template_floor_sweep.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/93_template_floor_sweep.py \
         [--windows-h 5 26 40] [--floors 50 100 200]
 """
 import argparse

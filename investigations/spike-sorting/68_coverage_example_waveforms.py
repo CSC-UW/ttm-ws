@@ -6,7 +6,7 @@ no unit within +/-0.5 ms) and CLAIMED (blue). Lets you eyeball whether low-MAD u
 noise/MUA hash (expected) and whether high-MAD unclaimed events are real spikes the MP bank dropped.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/68_coverage_example_waveforms.py
+    uv run --extra tetrodes python ../ttm/.../sorting/68_coverage_example_waveforms.py
 """
 import pathlib
 

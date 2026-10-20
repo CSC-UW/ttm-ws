@@ -22,7 +22,7 @@ amplitude gate drops (the dropout), which the scale-invariant cosine gate keeps.
 
     cd gfys_workspace
     uv run --project /Users/gfindlay@ad.wisc.edu/projects/ece/gfys_workspace --extra tetrodes python \
-        ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/82_wobble_admit_gallery.py \
+        ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/82_wobble_admit_gallery.py \
         [--window-h 26] [--units 2] [--levels 0.25 0.35 0.45 0.55 0.65] [--pool-factor 0.15]
 """
 import argparse
@@ -38,7 +38,7 @@ from spikeinterface.core import get_noise_levels
 
 from _mp_common import (_unit_groups_from_mask, build_templates_object, materialize_span,
                         per_spike_fit, run_matching, tsq_median, wobble_method_kwargs)
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/"
                    "track_eval/mp_long_s2000_d170000")

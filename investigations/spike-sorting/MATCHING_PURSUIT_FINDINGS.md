@@ -93,7 +93,7 @@ base. Curation analyzers: `analyzer_prod.zarr` / `analyzer_prod_sua.zarr` / `ana
 (script 98 -- group-sparse, geometry-free, `is_mua` carried through). Note: axis C is not reported for the
 `+mua` variant -- a pooled MUA unit is CCG-"duplicate" against every SUA unit on its tetrode by
 construction, so the metric is meaningless there; the deliverable's identity number is `prod_sua`'s 23.
-Registered as `tetrode_analyses.mp_production_sorting` in `docs/artifacts/registry.yaml`.
+Registered as `ttm.mp_production_sorting` in `docs/artifacts/registry.yaml`.
 
 ## Stage 0 — fidelity PoC (3 min drift-stable span, [36000,36180) s)
 

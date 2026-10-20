@@ -190,8 +190,8 @@ outputs consistent.
 
 ## How it plugs into our pipeline
 
-We invoke KS4 via SpikeInterface from `tetrode_analyses.sorting.sort_store_ks4`
-(`tetrode_analyses/src/tetrode_analyses/sorting.py`) and the driver
+We invoke KS4 via SpikeInterface from `ttm.sorting.sort_store_ks4`
+(`ttm/src/ttm/sorting.py`) and the driver
 `.../sorting/30_sort_ks4.py`. Expose the new behavior as a KS4 setting (e.g.
 `clustering_chunk_size` for A or `max_cluster_spikes` for B) so it flows through the SI
 wrapper as an ordinary sorter param. Install the modified fork into the workspace

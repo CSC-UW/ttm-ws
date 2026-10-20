@@ -19,7 +19,7 @@ import psutil
 import spikeinterface.sorters as ss
 from spikeinterface.core import BinaryRecordingExtractor
 from probeinterface import generate_linear_probe
-from tetrode_analyses.sorting import sort_store  # noqa: F401  (ms5 _segments patch)
+from ttm.sorting import sort_store  # noqa: F401  (ms5 _segments patch)
 
 FS = 30000
 NCH = 64

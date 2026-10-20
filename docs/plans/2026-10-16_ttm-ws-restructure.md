@@ -353,6 +353,14 @@ packages, investigations and docs, registry and workspace-doc references,
 then the Phase 5 snapshot compare. Done after Phases 2 to 5 so that scripts
 are rewritten once, not twice.
 
+Status 2026-10-20: done. `git mv packages/tetrode-analyses packages/ttm`
+and `src/tetrode_analyses` to `src/ttm`, then one substitution over every
+tracked file except this plan (investigations included, so their imports
+resolve). Registry ids in `gfys_workspace` became `ttm.*`. The UnitRefine
+cache fallback moved with it (`~/.cache/ttm`; the server's directory was
+renamed). 61 tests pass, ruff findings unchanged, all ten entry points
+load, and the Phase 5 snapshot matches `post-rerun` exactly.
+
 ## Risks and open items
 
 - A standalone clone with unpushed edits to `experiment.py`/`io.py` exists

@@ -8,7 +8,7 @@ Produces (figures/ under the run dir):
     STABLE and SUSPECT units (from identity_check.npz) -- shows drift vs possible swaps.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/57_plot_carry_forward.py
+    uv run --extra tetrodes python ../ttm/.../sorting/57_plot_carry_forward.py
 """
 # ruff: noqa: E702  (compact one-line matplotlib plotting style, intentional in this figure script)
 import argparse

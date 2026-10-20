@@ -17,7 +17,7 @@ Writes wobble_vs_circus/threshold_calib_w{h}h.json + threshold_calib_w{h}h.png. 
 (busiest/most stringent task-1 window). Pass an hour as argv[1] to calibrate another window.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/70_wobble_threshold_calib.py [26]
+    uv run --extra tetrodes python ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/70_wobble_threshold_calib.py [26]
 """
 import json
 import pathlib
@@ -35,7 +35,7 @@ from _mp_common import (_unit_groups_from_mask, build_templates_object, dedup_so
                         materialize_span, run_matching, wobble_method_kwargs)
 from _wobble_eval import (coverage_by_band, detect_window_peaks, over_detection, precision_summary,
                           quality_df, spurious_fraction, tsq_median)
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/"
                    "track_eval/mp_long_s2000_d170000")

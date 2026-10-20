@@ -21,7 +21,7 @@ Resolves (a) which `is_reseeded` units on the 6 h deliverable to merge vs keep, 
 cadence's extra units are real neurons or twins -- the question cosine left open.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/63_reseed_twin_adjudication.py
+    uv run --extra tetrodes python ../ttm/.../sorting/63_reseed_twin_adjudication.py
 """
 import pathlib
 
@@ -34,7 +34,7 @@ import spikeinterface as si
 
 from _assignment_eval import MAXLAG_MS, REFR_MS, adjudicate, ccg_lags, co_restrict, verdict_of
 from _mp_common import build_templates_object, materialize_span
-from tetrode_analyses.tracking import cosine_from_templates
+from ttm.tracking import cosine_from_templates
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/track_eval")
 OUT = ROOT / "mp_long_s2000_d170000"

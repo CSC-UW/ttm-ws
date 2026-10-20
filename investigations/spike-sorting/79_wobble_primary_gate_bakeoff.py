@@ -17,7 +17,7 @@ effect on rp/coverage is the signal; dedup is an orthogonal downstream step appl
 
     cd gfys_workspace
     uv run --project /Users/gfindlay@ad.wisc.edu/projects/ece/gfys_workspace --extra tetrodes python \
-        ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/79_wobble_primary_gate_bakeoff.py \
+        ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/79_wobble_primary_gate_bakeoff.py \
         [--windows-h 3 11 19 27 35 43] [--abs-factors 0.45 0.55 0.68 0.80] [--r-gates 0.5 0.6 0.7 0.8]
 """
 import argparse
@@ -34,7 +34,7 @@ import numpy as np
 from _mp_common import (_unit_groups_from_mask, build_templates_object, materialize_span,
                         per_spike_cosine, run_matching, tsq_median, wobble_method_kwargs)
 from _wobble_eval import detect_window_peaks, score_kept_spikes
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/"
                    "track_eval/mp_long_s2000_d170000")

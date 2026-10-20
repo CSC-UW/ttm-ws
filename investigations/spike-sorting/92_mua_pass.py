@@ -13,7 +13,7 @@ here the SUA base is the merge-first candidate, and events with best-cos >= SUA_
 (NOT put in MUA). State (ON/OFF, sleep) is NOT used -- it validates the MUA product downstream only (E5).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/92_mua_pass.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/92_mua_pass.py \
         [--sua assembled_mergefirst] [--theta 0.5] [--mad-floor 7] [--windows-h 5 26 40]
 """
 import argparse

@@ -12,7 +12,7 @@ units survive -- so its coverage is expected to be LOWER than the un-curated MP 
 comparison is curated-chunk+match vs all-MP-bank; read accordingly.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/66_coverage_chunkmatch.py
+    uv run --extra tetrodes python ../ttm/.../sorting/66_coverage_chunkmatch.py
 """
 import pathlib
 

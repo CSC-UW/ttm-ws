@@ -19,7 +19,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import spikeinterface as si
-from tetrode_analyses.sorting import preprocess_for_sorting
+from ttm.sorting import preprocess_for_sorting
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52")
 BLOSC = ROOT / "2026-05-27_09-07-52.blosc-zstd.zarr"

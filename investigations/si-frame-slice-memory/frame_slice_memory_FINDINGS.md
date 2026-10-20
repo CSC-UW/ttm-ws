@@ -142,6 +142,6 @@ never the cause (`get_traces` returns mmap views). Minimal repro:
 core) + make `shift_times` out-of-place.
 
 ## Scripts
-`tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/si_frame_slice_memory/`:
+`ttm/analyses/tetrode_preprocessing_and_sorting/si_frame_slice_memory/`:
 `diag_framesize5_instrumented.py` (localization), `diag_framesize6_joblib.py`
 (before/after harness), `si_timevector_memory_minimal_repro.py` (filing repro).

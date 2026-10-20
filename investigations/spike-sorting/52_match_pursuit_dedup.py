@@ -7,7 +7,7 @@ units (template cosine >= threshold) before matching, and re-measures agreement 
 reference. Expectation: agreement climbs toward the ~0.96 detection-recall ceiling.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/52_match_pursuit_dedup.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/52_match_pursuit_dedup.py \
         [--start-s 36000] [--dur-s 180] [--n-jobs 16]
 """
 import argparse

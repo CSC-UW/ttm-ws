@@ -47,7 +47,7 @@ def summarize(csv_path, label):
 
 
 def run(duration_s):
-    from tetrode_analyses.sorting import sort_store
+    from ttm.sorting import sort_store
     log = PROBE / f"solver_{int(duration_s)}s.csv"
     if log.exists():
         log.unlink()

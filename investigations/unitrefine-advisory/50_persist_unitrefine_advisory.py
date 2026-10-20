@@ -1,6 +1,6 @@
 """Persist the final advisory UnitRefine noise/neural labels onto the tracked analyzer.
 
-Uses the reusable `tetrode_analyses.unitrefine_advisory` model (23 geometry-free, duration-robust
+Uses the reusable `ttm.unitrefine_advisory` model (23 geometry-free, duration-robust
 features; see scripts 47-49 for the lineage). Writes two sortable unit properties onto
 analyzer_clustered.zarr:
   * ``unitrefine_neural_prob`` (float32, P(neural) in [0,1]) -- the ADVISORY RANKING score.
@@ -9,12 +9,12 @@ ADVISORY ONLY: probabilities are uncalibrated on tetrode data (~0.55); rank by n
 hard-threshold to cut units.
 
 The first run downloads + caches UnitRefine's training CSVs and fits/caches the model under
-$TETRODE_MODELS_DIR (or ~/.cache/tetrode_analyses/unitrefine_advisory); later runs / other datasets
+$TETRODE_MODELS_DIR (or ~/.cache/ttm/unitrefine_advisory); later runs / other datasets
 load the cached model. Idempotent (overwrites the two columns).
 
     cd gfys_workspace
     uv run --with huggingface_hub --extra tetrodes python \
-      ../tetrode_analyses/.../sorting/50_persist_unitrefine_advisory.py
+      ../ttm/.../sorting/50_persist_unitrefine_advisory.py
 """
 import pathlib
 
@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 import spikeinterface as si
 
-from tetrode_analyses import unitrefine_advisory as ura
+from ttm import unitrefine_advisory as ura
 
 ANALYZER = pathlib.Path(
     "/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/"

@@ -15,7 +15,7 @@ units' presence_ratio distribution); (c) the 24-feature model applied to our uni
 
     cd gfys_workspace
     uv run --with skops --with huggingface_hub --extra tetrodes python \
-      ../tetrode_analyses/.../sorting/48_unitrefine_drop_duration_confounded.py
+      ../ttm/.../sorting/48_unitrefine_drop_duration_confounded.py
 """
 import pathlib
 

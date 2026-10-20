@@ -11,7 +11,7 @@ gives them their own tracks -> fewer. Metric: per-SEED-unit early[1,13]h <-> lat
 self-cosine (low = identity changed); same seed ids in both arms.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/59_ab_reseed_swap.py [--max-windows 60]
+    uv run --extra tetrodes python ../ttm/.../sorting/59_ab_reseed_swap.py [--max-windows 60]
 """
 # ruff: noqa: E702  (compact one-line frame_slice setup, intentional)
 import argparse
@@ -28,7 +28,7 @@ from _mp_common import (
     windowed_carry_forward,
     windowed_carry_forward_reseed,
 )
-from tetrode_analyses.tracking import cosine_from_templates, sort_chunk, to_int_numpy_sorting
+from ttm.tracking import cosine_from_templates, sort_chunk, to_int_numpy_sorting
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/track_eval")
 FS = 30000.0

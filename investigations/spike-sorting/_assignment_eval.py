@@ -322,7 +322,7 @@ def ccg_guarded_merge(sorting, recording, *, propose_cos=0.90, fallback_cos=0.95
     duplicates CCG cannot evaluate. Returns (merged NumpySorting [int ids, 'group' preserved, coincident
     spikes < coincidence_ms collapsed], list of accepted-merge records (a, b, verdict, cosine)).
     """
-    from tetrode_analyses.tracking import _UnionFind, cosine_from_templates
+    from ttm.tracking import _UnionFind, cosine_from_templates
     templates, _ = build_templates_object(sorting, recording, with_snr=False, n_jobs=n_jobs)
     dense = np.asarray(templates.get_dense_templates(), dtype=np.float32)
     mask = templates.sparsity.mask

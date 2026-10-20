@@ -7,7 +7,7 @@ updated: 2026-10-19
 
 Scripts 46-50, run in June 2026 against the chunk-tracked TTM-001 analyzer
 (`sortings_seed42_pcafix/tracked_48h/analyzer_clustered.zarr`). The outcome
-is the `tetrode_analyses.unitrefine_advisory` module and its two persisted
+is the `ttm.unitrefine_advisory` module and its two persisted
 unit properties; its docstring states what the ranking is and is not.
 
 | Script | Step |

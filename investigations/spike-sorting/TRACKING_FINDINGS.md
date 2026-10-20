@@ -105,7 +105,7 @@ deferred.
 
 ### Implementation
 
-- Library: `tetrode_analyses/src/tetrode_analyses/tracking.py`
+- Library: `ttm/src/ttm/tracking.py`
   (`plan_chunks`, `materialize_chunk`, `sort_chunk`, `build_chunk_analyzer`,
   `match_overlap`, `template_cosines`, `chain_matches`,
   `assemble_global_sorting`, `track_span`).

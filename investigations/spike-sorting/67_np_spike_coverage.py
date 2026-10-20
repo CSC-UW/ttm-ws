@@ -14,7 +14,7 @@ CNPIX12-Santiago imec0 uses the SortingAnalyzer (run separately, see header in t
 imec1 and CNPIX10-Charles imec0 store an older WaveformExtractor postpro, loaded via the WNE extractor.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/67_np_spike_coverage.py
+    uv run --extra tetrodes python ../ttm/.../sorting/67_np_spike_coverage.py
 """
 import pathlib
 

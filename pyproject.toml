@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Tetrode (TTM) electrophysiology workspace: shared library, per-subject analyses, method investigations."
 requires-python = ">=3.14"
 dependencies = [
-    "tetrode-analyses[analysis,sorting,curation,viz,advisory,lossy_compression]",
+    "ttm[analysis,sorting,curation,viz,advisory,lossy_compression]",
 ]
 
 [tool.uv]
@@ -29,7 +29,7 @@ constraint-dependencies = [
 members = ["packages/*", "subjects/*"]
 
 [tool.uv.sources]
-tetrode-analyses = { workspace = true }
+ttm = { workspace = true }
 # Pinned by commit over HTTPS so a fresh clone resolves without credentials or
 # sibling checkouts. To bump: edit rev, `uv lock --upgrade-package NAME`.
 # To hack on one locally for a session: `uv pip install -e ../NAME`.
@@ -47,7 +47,7 @@ dev = [
 
 [tool.pytest.ini_options]
 # Explicit so collection never sweeps investigations/ (standalone drivers, not tests).
-testpaths = ["packages/tetrode-analyses/tests"]
+testpaths = ["packages/ttm/tests"]
 markers = [
     "requires_nfs: marks tests that require mounted production NFS data",
 ]

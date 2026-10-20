@@ -16,7 +16,7 @@ negatives. We report the claimed fraction in amplitude bins and as a curve, for 
 (bank = seed + reseeds) and the no-reseed deliverable (delta = coverage re-seeding actually adds).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/64_spike_coverage.py
+    uv run --extra tetrodes python ../ttm/.../sorting/64_spike_coverage.py
 """
 import pathlib
 

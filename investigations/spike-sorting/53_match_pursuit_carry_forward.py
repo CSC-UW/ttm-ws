@@ -9,7 +9,7 @@ fixed templates fade -- demonstrating template-matching tracks drift without geo
 per-chunk dropout that fragments chunk+match.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/53_match_pursuit_carry_forward.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/53_match_pursuit_carry_forward.py \
         [--start-s 36000] [--dur-s 1800] [--window-s 600] [--n-jobs 16]
 """
 import argparse

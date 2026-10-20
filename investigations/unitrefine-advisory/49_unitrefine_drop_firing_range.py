@@ -9,7 +9,7 @@ and shows the ours-vs-training firing_range distribution shift as evidence.
 
     cd gfys_workspace
     uv run --with skops --with huggingface_hub --extra tetrodes python \
-      ../tetrode_analyses/.../sorting/49_unitrefine_drop_firing_range.py
+      ../ttm/.../sorting/49_unitrefine_drop_firing_range.py
 """
 import pathlib
 

@@ -10,7 +10,7 @@ Competitive reassignment + residual SUA capture + the per-tetrode MUA bucket (Pa
 base (scripts 91/92).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/90_merge_first_candidate.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/90_merge_first_candidate.py \
         [--base assembled_reseed_c12] [--propose-cos 0.90] [--fallback-cos 0.95] [--windows-h 5 26 40]
 """
 import argparse

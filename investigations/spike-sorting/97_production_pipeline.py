@@ -25,9 +25,9 @@ it already exists (``--force`` rebuilds), so a crash resumes from the last compl
 
     cd gfys_workspace
     # smoke (2 windows, throwaway tag) then the real run:
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/97_production_pipeline.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/97_production_pipeline.py \
         --tag _smoke --max-windows 2
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/97_production_pipeline.py
+    uv run --extra tetrodes python ../ttm/.../sorting/97_production_pipeline.py
 """
 import argparse
 import json

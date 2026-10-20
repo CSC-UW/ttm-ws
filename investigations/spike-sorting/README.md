@@ -13,10 +13,10 @@ scripts (46-50) that were in this directory are `../unitrefine-advisory/`.
 Paths in the scripts are literal `tononi-2` paths as run in May and June 2026;
 this directory is a record. `97_production_pipeline.py` and
 `98_build_analyzer_prod.py` produced the production matching-pursuit sort
-(registry entry `tetrode_analyses.mp_production_sorting`). The helpers
+(registry entry `ttm.mp_production_sorting`). The helpers
 `_track_eval.py`, `_wobble_eval.py`, `_assignment_eval.py`, `_scoreboard.py`
 and `_mp_common.py` are imported by sibling scripts and by three tests in
-`packages/tetrode-analyses/tests/`.
+`packages/ttm/tests/`.
 
 A second sorter, **Kilosort4** (`30_`–`32_`), was attempted on the same lossless store
 with the same preprocessing (bandpass 300–6000 Hz + global CMR), no drift correction,

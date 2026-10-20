@@ -23,7 +23,7 @@ from spikeinterface.core import ChannelSparsity, Templates, get_noise_levels
 from spikeinterface.core.template_tools import get_dense_templates_array
 from spikeinterface.sortingcomponents.matching import find_spikes_from_templates
 
-from tetrode_analyses.tracking import (
+from ttm.tracking import (
     Chunk,
     _UnionFind,
     cosine_from_templates,

@@ -18,7 +18,7 @@ the 2D grid + B_w lock costs the same as a 1D admit sweep. Uses the analyzer-fre
 
     cd gfys_workspace
     uv run --project /Users/gfindlay@ad.wisc.edu/projects/ece/gfys_workspace --extra tetrodes python \
-        ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/81_wobble_primary_admit_r_grid.py \
+        ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/81_wobble_primary_admit_r_grid.py \
         [--windows-h 11 19 27 40] [--admit-factors 0.25 0.35 0.45 0.55 0.65] [--r-gates 0.50 0.55 0.60 0.65 0.70 0.75]
 """
 import argparse
@@ -36,7 +36,7 @@ import numpy as np
 from _mp_common import (_unit_groups_from_mask, build_templates_object, materialize_span,
                         per_spike_cosine, run_matching, tsq_median, wobble_method_kwargs)
 from _wobble_eval import detect_window_peaks, score_kept_spikes
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/"
                    "track_eval/mp_long_s2000_d170000")

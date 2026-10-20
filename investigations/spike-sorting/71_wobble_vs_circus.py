@@ -12,7 +12,7 @@ Also checks GENERALIZATION: did wobble's precision at T_h stay <= circus-omp's i
 point was chosen on h=26)? Writes wobble_vs_circus/headtohead.json + coverage_bands.png + precision_agreement.png.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/71_wobble_vs_circus.py
+    uv run --extra tetrodes python ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/71_wobble_vs_circus.py
 """
 import json
 import pathlib
@@ -30,7 +30,7 @@ from _mp_common import (_unit_groups_from_mask, build_templates_object, dedup_so
 from _track_eval import score_reconstruction
 from _wobble_eval import (AMP_BINS, coverage_by_band, detect_window_peaks, over_detection,
                           precision_summary, quality_df, spurious_fraction, tsq_median)
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/"
                    "track_eval/mp_long_s2000_d170000")

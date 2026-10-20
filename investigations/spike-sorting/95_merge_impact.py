@@ -8,7 +8,7 @@ template, in a window. Reports (a) the cosine-shift distribution (post - pre) an
 risky ones.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/95_merge_impact.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/95_merge_impact.py \
         [--base assembled_reseed_c12] [--merged assembled_mergefirst] [--window-h 26]
 """
 import argparse

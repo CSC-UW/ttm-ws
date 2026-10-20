@@ -13,7 +13,7 @@ its tracked_48h recording). Axis A: MP variants -> coverage_by_band on the share
 chunk+match axis C (2204 units) is SKIPPED by default (O(units/tetrode^2) CCG); --chunkmatch-ccg forces it.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/89_scoreboard.py [--windows-h 5 26 40]
+    uv run --extra tetrodes python ../ttm/.../sorting/89_scoreboard.py [--windows-h 5 26 40]
 """
 import argparse
 import json

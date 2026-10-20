@@ -18,7 +18,7 @@ neighbor-wins dropped spikes with u's template (gray dashed) and the winning nei
 
     cd gfys_workspace
     uv run --project /Users/gfindlay@ad.wisc.edu/projects/ece/gfys_workspace --extra tetrodes python \
-        ../tetrode_analyses/analyses/tetrode_preprocessing_and_sorting/sorting/85_tight_cosine_reassignment.py \
+        ../ttm/analyses/tetrode_preprocessing_and_sorting/sorting/85_tight_cosine_reassignment.py \
         [--window-h 27] [--units 2] [--rp-target 0.01]
 """
 import argparse
@@ -35,7 +35,7 @@ from _mp_common import (_unit_groups_from_mask, all_template_cosines, asym_windo
                         build_templates_object, materialize_span, run_matching, tsq_median,
                         wobble_method_kwargs)
 from _wobble_eval import detect_window_peaks, score_kept_spikes
-from tetrode_analyses.tracking import sort_chunk, to_int_numpy_sorting
+from ttm.tracking import sort_chunk, to_int_numpy_sorting
 
 OUT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52/sortings_seed42_pcafix/"
                    "track_eval/mp_long_s2000_d170000")

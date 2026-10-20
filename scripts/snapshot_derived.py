@@ -27,8 +27,8 @@ from typing import Any
 
 import numpy as np
 import xarray as xr
-from tetrode_analyses.cli._common import add_experiment_args, experiment_from_args
-from tetrode_analyses.subject import Experiment
+from ttm.cli._common import add_experiment_args, experiment_from_args
+from ttm.subject import Experiment
 
 DEFAULT_SORTING = "track_eval/mp_long_s2000_d170000/assembled_prod"
 

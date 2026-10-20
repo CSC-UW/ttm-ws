@@ -18,7 +18,7 @@ kept below only as labeled contrasts; their on-disk outputs are gone.
 
 ## Canonical run: post-fix determinism baseline (`whitening_seed=42` + deterministic PCA)
 Script: `15_determinism_baseline.py` (three full-session sorts: blosc twice for
-the determinism ceiling, wavpack once for lossless-vs-lossy), `tetrode_analyses.sorting`
+the determinism ceiling, wavpack once for lossless-vs-lossy), `ttm.sorting`
 (pipeline). Outputs in `sortings_seed42_pcafix/`. Same pipeline as the seeded run
 below, but the active MountainSort5 is the editable checkout carrying the
 deterministic-PCA fix (Sources 2 + 2b). The deterministic bandpass+global-CMR
@@ -298,7 +298,7 @@ approaches 2³¹.
 ## Prior run (contrast): seeded, global CMR (`whitening_seed=42`, no PCA fix)
 Scripts: `12_sort_seeded_and_compare.py` (both stores; produced blosc),
 `13_sort_wavpack_and_compare.py` (wavpack-only resume after a shared-disk abort,
-reusing the saved blosc sorting), `tetrode_analyses.sorting` (pipeline).
+reusing the saved blosc sorting), `ttm.sorting` (pipeline).
 Outputs in `sortings_seed42/`.
 
 Pipeline (per store): bandpass 300–6000 Hz (float32) → **global common median

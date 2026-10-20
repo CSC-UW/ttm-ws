@@ -14,7 +14,7 @@ to sorting/properties/ are ignored, see TRACKING_FINDINGS gotcha):
   reseed_birth_h    : hour a re-seeded unit was added (NaN for seed units; reseed npz only)
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/60_persist_mp_curation_columns.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/60_persist_mp_curation_columns.py \
         --analyzer analyzer_tracks_rs.zarr --npz reseed_rs.npz --identity identity_check_rs.npz
 """
 import argparse

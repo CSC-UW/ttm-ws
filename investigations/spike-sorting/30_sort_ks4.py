@@ -53,7 +53,7 @@ import numpy as np
 import psutil
 import torch
 import kilosort
-from tetrode_analyses.sorting import materialize_preprocessed, sort_store_ks4
+from ttm.sorting import materialize_preprocessed, sort_store_ks4
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52")
 SR = ROOT / "sortings_seed42_pcafix"

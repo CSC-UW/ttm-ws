@@ -6,7 +6,7 @@ in spikeinterface-gui / phy exactly like the chunk-tracked analyzer_clustered.za
 NO unit_locations/spike_locations/drift (tetrode geometry is fictional), per-tetrode (group) sparsity.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/56_build_carry_forward_analyzer.py
+    uv run --extra tetrodes python ../ttm/.../sorting/56_build_carry_forward_analyzer.py
 """
 import argparse
 import pathlib

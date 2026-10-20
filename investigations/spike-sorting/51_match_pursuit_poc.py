@@ -17,7 +17,7 @@ and is worth scaling to the dropout-recovery test (stage 1, a longer fragmenting
 re-estimated templates). Low => debug sparsity/geometry before investing further.
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/51_match_pursuit_poc.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/51_match_pursuit_poc.py \
         [--start-s 36000] [--dur-s 1200] [--n-jobs 16]
 """
 import argparse
@@ -32,7 +32,7 @@ from spikeinterface.core import ChannelSparsity, Templates
 from spikeinterface.core.template_tools import get_dense_templates_array
 from spikeinterface.sortingcomponents.matching import find_spikes_from_templates
 
-from tetrode_analyses.tracking import Chunk, materialize_chunk, sort_chunk, to_int_numpy_sorting
+from ttm.tracking import Chunk, materialize_chunk, sort_chunk, to_int_numpy_sorting
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52")
 ZARR = ROOT / "2026-05-27_09-07-52.blosc-zstd.zarr"

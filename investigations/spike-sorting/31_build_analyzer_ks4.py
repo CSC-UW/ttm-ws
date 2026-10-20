@@ -27,7 +27,7 @@ import time
 import pathlib
 import spikeinterface as si
 from spikeinterface.core.sparsity import ChannelSparsity
-from tetrode_analyses.sorting import preprocess_for_sorting
+from ttm.sorting import preprocess_for_sorting
 
 ROOT = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-05-27_09-07-52")
 BLOSC = ROOT / "2026-05-27_09-07-52.blosc-zstd.zarr"

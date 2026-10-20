@@ -11,7 +11,7 @@ theta is picked at a low noise false-positive rate; we report the neural false-n
 the threshold-derivation policy: narrow derivation (this window), broad application (flagged provisional).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/91_neural_noise_calibration.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/91_neural_noise_calibration.py \
         [--bank assembled_mergefirst] [--window-h 26] [--n-ref 20000]
 """
 import argparse

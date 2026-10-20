@@ -1,13 +1,13 @@
 # Conventions
 
 ## Structure
-- `packages/tetrode-analyses` is subject-agnostic. Subject- and
+- `packages/ttm` is subject-agnostic. Subject- and
   session-specific facts belong in `subjects/<id>/` manifests, machine facts
   in `~/.config/ttm/config.toml`, never in library code. The library never
   imports a subject package, and `grep -rn '"/nvme\|"/Volumes' packages
   subjects` must stay empty.
 - New per-subject processing is a `ttm-*` entry point in
-  `tetrode_analyses.cli` that selects its experiment with
+  `ttm.cli` that selects its experiment with
   `add_experiment_args` and takes paths from `Experiment` (`docs/pipeline.md`).
 - `investigations/<question>/` holds closed method studies as run: literal
   server paths, no maintenance. New bake-offs get a new directory there and a

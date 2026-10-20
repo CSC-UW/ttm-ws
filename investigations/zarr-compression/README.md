@@ -43,7 +43,7 @@ WavPack instead.
   order, so channels are reordered to `[TT1×4, TT2×4, …]` before chunking —
   otherwise `channel_chunk_size=4` would group unrelated channels. This (plus
   `group`/`tetrode` properties and a tetrode `ProbeGroup`) is done by
-  `tetrode_analyses.io.attach_tetrode_probegroup()`, the same helper used in
+  `ttm.io.attach_tetrode_probegroup()`, the same helper used in
   `5-19.ipynb`.
 - Source read throughput from the archive ≈ 75–109 MB/s ⇒ full conversion is
   **read-bound** (~2 h just to read 667 GB); any codec faster than that per

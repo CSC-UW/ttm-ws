@@ -67,4 +67,4 @@ TODO on return:
 
 See `MATCHING_PURSUIT_FINDINGS.md` for the current pipeline and the metrics these
 observations critique. The production deliverable as of parking: `assembled_prod`
-(`tetrode_analyses.mp_production_sorting` in the artifact registry).
+(`ttm.mp_production_sorting` in the artifact registry).

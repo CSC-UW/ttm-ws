@@ -13,9 +13,9 @@ units); ``--light`` skips it + the amplitude/PCA-based quality metrics for a fas
 Everything else is subsampled (waveforms/PCA on <=500 spikes/unit) or binned (correlograms/ISI).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/98_build_analyzer_prod.py
+    uv run --extra tetrodes python ../ttm/.../sorting/98_build_analyzer_prod.py
     # fast shape-only build (no per-spike amplitudes / PCA-metrics):
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/98_build_analyzer_prod.py --light
+    uv run --extra tetrodes python ../ttm/.../sorting/98_build_analyzer_prod.py --light
 """
 import argparse
 import pathlib

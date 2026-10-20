@@ -15,7 +15,7 @@ pairs + unit-count parsimony. Held-out agreement (signal 3) is the expensive thi
 default (pass --heldout to add it).
 
     cd gfys_workspace
-    uv run --extra tetrodes python ../tetrode_analyses/.../sorting/86_rescore_axis_b_c.py \
+    uv run --extra tetrodes python ../ttm/.../sorting/86_rescore_axis_b_c.py \
         [--variants assembled_reestimate assembled_reseed_c12 ...] [--windows-h 5 26 40] [--heldout]
 """
 import argparse
