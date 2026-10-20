@@ -321,6 +321,14 @@ developer notes/reports, and the memory topic files that cite
 `tetrode_analyses/analyses/...` paths. Then decide whether `gfys_workspace`
 keeps a dependency at all (recommendation: no).
 
+Status 2026-10-20: done. `gfys_workspace` dropped the `tetrodes` extra, the
+`tetrode_analyses` editable source and the mountainsort5, kilosort and
+spikeinterface-gui fork overrides (gfys commit 6b1cf92); torch, faiss and
+the CUDA wheels left its environment, and sigui2 resolves upstream
+spikeinterface-gui 0.14.0. AGENTS.md names `ttm-ws` as a separate
+workspace. Registry entries and developer notes were repointed earlier
+(gfys a764031 through 33a184b).
+
 ### Phase 5: acceptance baseline
 
 A small `scripts/snapshot_derived.py` that hashes, for TTM-001: the

@@ -16,7 +16,7 @@
   the workspace members.
 - This workspace has its own environment. Do not run its code through
   `gfys_workspace` (`uv run --project ../gfys_workspace`); that workspace
-  only keeps an editable pointer to the library during the transition.
+  no longer depends on this one.
 - When this directory is opened from inside `projects/ece/`, the
   `gfys_workspace/AGENTS.md` rules also load. Where they disagree on commands
   or environment, this file wins for work under this directory.
