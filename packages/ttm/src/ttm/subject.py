@@ -79,7 +79,7 @@ class Experiment:
     timezone: str
     session: str
     acquisition: str
-    oe_stream_index: int = 0
+    oe_stream: str = "acquisition_board"
     lightsOn: list[str] = dataclasses.field(default_factory=list)
     lightsOff: list[str] = dataclasses.field(default_factory=list)
     novel_objects_start: str | None = None

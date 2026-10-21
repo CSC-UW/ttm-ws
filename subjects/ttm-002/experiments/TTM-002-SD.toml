@@ -2,7 +2,6 @@
 # schedule below is NOT yet confirmed. Fill in before processing (see README).
 session = "2026-09-24_09-03-22"
 acquisition = "TTM2/2026-09-24_09-03-22"
-oe_stream_index = 1
 
 # lightsOn = ["2026-09-24T09:00:00", "2026-09-25T09:00:00", "2026-09-26T09:00:00"]
 # lightsOff = ["2026-09-24T21:00:00", "2026-09-25T21:00:00"]

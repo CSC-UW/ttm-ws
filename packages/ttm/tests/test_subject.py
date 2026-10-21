@@ -52,7 +52,7 @@ def test_manifest_defaults_and_validation(tmp_path: pathlib.Path) -> None:
     path = _write_subject(tmp_path / "subjects")
     exp = sj.Experiment.from_toml(path)
     assert (exp.subject, exp.experiment, exp.timezone) == ("TTM-009", "EXP", "America/Chicago")
-    assert exp.acquisition == "TTM9/2026-01-01_00-00-00" and exp.oe_stream_index == 0
+    assert exp.acquisition == "TTM9/2026-01-01_00-00-00" and exp.oe_stream == "acquisition_board"
     assert exp.novel_objects_start is None and exp.badChannels == []
 
     bad = _write_subject(tmp_path / "s2", sid="TTM-010", bogus=1)
@@ -112,3 +112,9 @@ def test_read_t0_from_slice_table_and_sync_messages(tmp_path: pathlib.Path) -> N
     )
     assert ep.first_recording_dir(tmp_path / "acq") == rec
     assert ep.read_session_t0_unix(tmp_path / "acq") == pytest.approx(1779232191.976)
+
+
+def test_stream_index_key_is_rejected(tmp_path: pathlib.Path) -> None:
+    path = _write_subject(tmp_path / "subjects", oe_stream_index=1)
+    with pytest.raises(sj.ManifestError, match="oe_stream_index"):
+        sj.Experiment.from_toml(path)

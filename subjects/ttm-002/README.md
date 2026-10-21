@@ -10,9 +10,9 @@ Skeleton. `experiments/TTM-002-SD.toml` carries only what is verifiable from
 the archive: the session `2026-09-24_09-03-22` at
 `/Volumes/tetrode/TTM2/2026-09-24_09-03-22/Record Node 102` (moved there on
 2026-10-19 from the old share, where it sat one directory deeper, next to
-TTM2's October sessions), with the 64-channel acquisition-board stream at
-index 1 (neo orders streams by name: 0 is the IMU, 2 is memory usage; see
-`docs/developer_notes/openephys_blank_channel_names.md`). The light schedule, deprivation window and bad
+TTM2's October sessions). The session carries three streams (IMU, the
+64-channel `acquisition_board`, memory usage); `get_recording` picks the
+headstage stream by name. The light schedule, deprivation window and bad
 channels are commented out until confirmed; `ttm-experiment-params` will
 write an empty schedule until then.
 

@@ -72,6 +72,31 @@ def _read_software_time_s(recording_dir: pathlib.Path) -> float:
     return int(m.group(1)) / 1000.0
 
 
+DEFAULT_STREAM = "acquisition_board"
+
+
+def match_stream(names: list[str], ids: list[str], oe_stream: str) -> str:
+    """Return the neo ``stream_id`` whose name is ``oe_stream`` or ends in it.
+
+    neo names a stream ``<Record Node>#<Processor>.<stream_name>``; the node
+    and processor parts differ between rigs, so the Open Ephys ``stream_name``
+    alone (e.g. ``acquisition_board``) is matched as a suffix. The full neo name
+    is accepted for the rare session with several streams of the same name.
+    Exactly one stream must match.
+    """
+    hits = [i for n, i in zip(names, ids, strict=True) if n == oe_stream or n.endswith(("." + oe_stream, "#" + oe_stream))]
+    if len(hits) != 1:
+        listing = ", ".join(f"{i}: {n}" for i, n in zip(ids, names, strict=True))
+        raise ValueError(f"oe_stream={oe_stream!r} matches {len(hits)} streams, need exactly 1 (streams: {listing})")
+    return hits[0]
+
+
+def resolve_stream_id(oe_session_dir: str | pathlib.Path, oe_stream: str = DEFAULT_STREAM) -> str:
+    """neo ``stream_id`` of the stream named ``oe_stream`` in an Open Ephys session."""
+    names, ids = se.get_neo_streams("openephysbinary", str(oe_session_dir))
+    return match_stream(list(names), list(ids), oe_stream)
+
+
 def _num_blocks(oe_session_dir: pathlib.Path, stream_id: str) -> int:
     """Number of Open Ephys experiments (neo blocks) for this stream."""
     # A throwaway extractor on block 0 exposes the full block list via neo.
@@ -195,7 +220,7 @@ def _build_slice_table(times: list[np.ndarray], meta: list[dict]) -> pd.DataFram
 def make_oe_slice_table(
     oe_session_dir: str | pathlib.Path,
     oe_experiment_index: int | None = None,
-    oe_stream_index: int = 0,
+    oe_stream: str = DEFAULT_STREAM,
 ) -> pd.DataFrame:
     """Build a slice table for an Open Ephys session (one row per segment).
 
@@ -207,7 +232,7 @@ def make_oe_slice_table(
     """
     oe_session_dir = pathlib.Path(oe_session_dir)
     _, times, meta = _segment_records(
-        oe_session_dir, f"{oe_stream_index}", oe_experiment_index
+        oe_session_dir, resolve_stream_id(oe_session_dir, oe_stream), oe_experiment_index
     )
     return _build_slice_table(times, meta)
 
@@ -228,7 +253,7 @@ def _check_settings_match(slice_table: pd.DataFrame) -> None:
 def get_recording(
     oe_session_dir: str | pathlib.Path,
     oe_experiment_index: int | None = None,
-    oe_stream_index: int = 0,
+    oe_stream: str = DEFAULT_STREAM,
     inter_tetrode_um: float = 300.0,
     *,
     selected_tetrodes: list[int] | None = None,
@@ -244,8 +269,10 @@ def get_recording(
         concatenates every experiment (and every recording within them) into one
         continuous recording, like
         ``ecephys.wne.sglx.spikeinterface.get_recording``.
-    oe_stream_index
-        Open Ephys stream index; SI ``stream_id = f"{oe_stream_index}"``.
+    oe_stream
+        Open Ephys stream name (the oebin ``stream_name``, matched as a suffix
+        of neo's ``<node>#<processor>.<stream_name>``; see
+        :func:`match_stream`). Exactly one stream must match.
     inter_tetrode_um
         Spacing between successive tetrode probes in the attached ProbeGroup.
     selected_tetrodes
@@ -262,7 +289,7 @@ def get_recording(
         ``openephys_settings`` (each experiment's settings XML).
     """
     oe_session_dir = pathlib.Path(oe_session_dir)
-    stream_id = f"{oe_stream_index}"
+    stream_id = resolve_stream_id(oe_session_dir, oe_stream)
 
     recs, times, meta = _segment_records(
         oe_session_dir, stream_id, oe_experiment_index

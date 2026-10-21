@@ -114,10 +114,13 @@ needed again once the rig is fixed.
 After the repair spikeinterface reads TTM2 2026-09-24 as 64 channels
 `CH1`..`CH64`, 30 kHz, one segment, 48.23 h, gain 0.195.
 
-## Stream index on the IMU rig
+## Stream selection on the IMU rig
 
 neo orders streams by name, so a session with the IMU stream has
 `0 = IMU_port_A`, `1 = acquisition_board`, `2 = memory_usage`, whereas the
-TTM1 sessions have `0 = acquisition_board`. The TTM-002-SD manifest therefore
-needs `oe_stream_index = 1`. Selecting the stream by name instead of index in
-`get_recording` would remove this trap.
+TTM1 sessions have `0 = acquisition_board`. A manifest written with the
+positional `oe_stream_index = 0` therefore pointed TTM-002 at the IMU. Since
+2026-10-21 `get_recording` selects the stream by its Open Ephys name
+(`Experiment.oe_stream`, default `acquisition_board`, matched as a suffix of
+neo's `<node>#<processor>.<stream_name>`; exactly one match required), and
+the manifests no longer carry a stream index.

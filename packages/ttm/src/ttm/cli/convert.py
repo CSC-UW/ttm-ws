@@ -40,12 +40,12 @@ def main(argv: list[str] | None = None) -> None:
     exp = experiment_from_args(a)
     compressors = a.compressor or ["blosc-zstd"]
 
-    print(f"[{time.strftime('%T')}] get_recording({exp.acquisition_dir}, stream {exp.oe_stream_index})")
+    print(f"[{time.strftime('%T')}] get_recording({exp.acquisition_dir}, stream {exp.oe_stream!r})")
     t0 = time.perf_counter()
     rec, slice_table = get_recording(
         exp.acquisition_dir,
         oe_experiment_index=a.oe_experiment,
-        oe_stream_index=exp.oe_stream_index,
+        oe_stream=exp.oe_stream,
         inter_tetrode_um=a.inter_tetrode_um,
     )
     n_samples = rec.get_num_frames()
