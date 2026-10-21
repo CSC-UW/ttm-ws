@@ -198,6 +198,49 @@ show this are `figures/galleries/{channels,tetrodes,units}_asis.pdf` and
 `figures/galleries/TT6_traces_asis.pdf` (`opto_pulse_gallery.py`); grey
 ticks are unclaimed crossings at 4.5 MAD.
 
+### 5b. TT6 re-sorted at a lower threshold (2026-10-21, later)
+
+`opto_tt_resort.py` sorts TT6 alone from the same preprocessed recording
+with MountainSort5 scheme 2 at thresholds 4.0 and 3.5 (the default is
+5.5; MountainSort5 applies it to the whitened signal). It yields 8 to 10
+clusters per session. One cluster per sort reproduces 97 to 99 % of the
+TT6 cell's spikes and has a fingerprint cosine of 0.998 to 0.999 to its
+template; the sorter does not split the small in-pulse events off, it
+folds them into that cluster, which grows from 13 Hz to 36 Hz (OPTO1) and
+46 Hz (OPTO2) at threshold 3.5 and now fires 141 and 126 per second
+through the 9.8 mW pulse (340 per second in the first bins, decaying to
+about 70), then nothing for 100 ms after offset. The merged cluster's
+trough amplitude outside the trains is a single continuous distribution
+from -50 to -160 uV; inside the pulse it is -46 to -72 uV.
+`results/resort_<experiment>_TT6.csv`, `figures/opto_TT6_resort_thr*.png`.
+
+`opto_tt_amplitude_split.py` then asks whether the large (<= -85 uV) and
+small (>= -70 uV) spikes of that cluster are one cell, using their
+cross-correlogram outside the trains:
+
+| | OPTO1 | OPTO2 |
+|---|---|---|
+| large / small spikes outside trains | 18,229 / 12,450 | 10,903 / 10,621 |
+| small spikes within 0.75 ms of a large one, observed / expected if independent | 35 / 316 | 31 / 303 |
+| small spikes 2 to 3 ms after a large one, ratio to independence | 1.6 | 1.5 |
+| ISI floor of in-pulse small spikes (5th percentile) | 3.3 ms | 3.5 ms |
+
+The two populations avoid each other at zero lag (one tenth of the
+independent expectation) and the small spikes follow the large ones at
+2 to 3 ms. That is one cell whose spike amplitude falls within a burst,
+and the in-pulse train is the same cell firing at 100 to 300 per second
+with every spike shrunk. The experimenter's suspicion holds: the main sort
+kept the first one or two full-size spikes of each pulse and dropped the
+rest. A second CH49-dominant cell (re-sort cluster 9, -180 uV, 3.4 Hz)
+shares the wire but is silenced by the light and never activated.
+`results/ampsplit_*.json`, `figures/opto_TT6_ampsplit_thr3.5_c*.png`.
+
+For tagging on these tetrodes, the practical consequence is that the
+sort must run at a lower threshold on the tetrodes of interest, or the
+in-pulse spikes must be assigned afterwards by template matching with
+amplitude-scaled templates (the matching-pursuit production sort does the
+latter for the 48 h data).
+
 ## 6. Figures
 
 On the data volume under `<data_root>/TTM-003/<experiment>/figures/`:

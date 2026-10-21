@@ -1,0 +1,54 @@
+{
+ "experiment": "TTM-003-OPTO2",
+ "tetrode": "TT6",
+ "threshold": 3.5,
+ "cluster": 8,
+ "ccg_large_small_within_0.75ms": {
+  "observed": 31,
+  "expected_if_independent": 302.9,
+  "ratio": 0.102
+ },
+ "ccg_large_small_peak_2_3ms_ratio": 1.5,
+ "dominant_wire": "CH49",
+ "n_spikes": 56880,
+ "amp_uV_quantiles_outside": [
+  -160.4,
+  -107.7,
+  -76.8,
+  -61.6,
+  -49.3
+ ],
+ "amp_uV_quantiles_in_pulse": [
+  -71.8,
+  -61.0,
+  -55.3,
+  -50.7,
+  -45.4
+ ],
+ "n_large_outside": 10903,
+ "n_small_outside": 10621,
+ "seconds_outside": 573.5,
+ "ccg_large_small_within_1.5ms": {
+  "observed": 341,
+  "expected_if_independent": 706.7,
+  "ratio": 0.483
+ },
+ "ccg_large_small_5_20ms_ratio": 1.156,
+ "isi_small_outside_ms_pct_1_5_50": [
+  1.33,
+  3.17,
+  29.1
+ ],
+ "isi_large_outside_ms_pct_1_5_50": [
+  1.5,
+  3.47,
+  32.63
+ ],
+ "isi_small_in_pulse_ms_pct_1_5_50": [
+  3.3,
+  3.53,
+  6.43
+ ],
+ "frac_small_isi_lt_2ms_outside": 0.0231,
+ "frac_large_isi_lt_2ms_outside": 0.0212
+}
