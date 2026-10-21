@@ -1,0 +1,648 @@
+{
+ "experiment": "TTM-003-OPTO2",
+ "variant": "asis",
+ "candidates": [
+  {
+   "unit": 35,
+   "group": 9,
+   "tetrode": "TT10",
+   "n_spikes": 12278,
+   "n_spikes_outside_trains": 6285,
+   "isi_lt2ms_fraction_outside": 0.03819223424570337,
+   "ccg": [
+    {
+     "other": 0,
+     "other_group": 0,
+     "other_tetrode": "TT1",
+     "n_ref": 6285,
+     "n_other": 1296,
+     "baseline_per_bin": 18.85,
+     "post_1_5ms_z": 1.3133168166927407,
+     "pre_1_5ms_z": 0.07725393039368997,
+     "zero_bin_z": -0.4261044317270131
+    },
+    {
+     "other": 1,
+     "other_group": 1,
+     "other_tetrode": "TT2",
+     "n_ref": 6285,
+     "n_other": 631,
+     "baseline_per_bin": 8.183333333333334,
+     "post_1_5ms_z": 0.3256931612762298,
+     "pre_1_5ms_z": 0.9510240309265926,
+     "zero_bin_z": 1.33419439270627
+    },
+    {
+     "other": 2,
+     "other_group": 2,
+     "other_tetrode": "TT3",
+     "n_ref": 6285,
+     "n_other": 681,
+     "baseline_per_bin": 10.183333333333334,
+     "post_1_5ms_z": 2.39410190881864,
+     "pre_1_5ms_z": 1.5532466042579471,
+     "zero_bin_z": 0.8826539606121965
+    },
+    {
+     "other": 3,
+     "other_group": 3,
+     "other_tetrode": "TT4",
+     "n_ref": 6285,
+     "n_other": 3322,
+     "baseline_per_bin": 45.65,
+     "post_1_5ms_z": 2.0353529313885974,
+     "pre_1_5ms_z": -0.08273792404018691,
+     "zero_bin_z": -1.872277139407248
+    },
+    {
+     "other": 4,
+     "other_group": 3,
+     "other_tetrode": "TT4",
+     "n_ref": 6285,
+     "n_other": 1711,
+     "baseline_per_bin": 18.816666666666666,
+     "post_1_5ms_z": 0.5068908102097059,
+     "pre_1_5ms_z": -0.4209771135639926,
+     "zero_bin_z": 0.2727945895753155
+    },
+    {
+     "other": 5,
+     "other_group": 3,
+     "other_tetrode": "TT4",
+     "n_ref": 6285,
+     "n_other": 2959,
+     "baseline_per_bin": 39.61666666666667,
+     "post_1_5ms_z": 0.13618291377690472,
+     "pre_1_5ms_z": -0.2901288163073203,
+     "zero_bin_z": -0.2568511521754587
+    },
+    {
+     "other": 6,
+     "other_group": 4,
+     "other_tetrode": "TT5",
+     "n_ref": 6285,
+     "n_other": 2462,
+     "baseline_per_bin": 31.35,
+     "post_1_5ms_z": 0.49920191489429483,
+     "pre_1_5ms_z": -1.2579888255336238,
+     "zero_bin_z": 1.187689378838617
+    },
+    {
+     "other": 7,
+     "other_group": 4,
+     "other_tetrode": "TT5",
+     "n_ref": 6285,
+     "n_other": 1669,
+     "baseline_per_bin": 21.016666666666666,
+     "post_1_5ms_z": 0.08942202879275697,
+     "pre_1_5ms_z": 0.38207594120541644,
+     "zero_bin_z": 0.21449582488956961
+    },
+    {
+     "other": 8,
+     "other_group": 4,
+     "other_tetrode": "TT5",
+     "n_ref": 6285,
+     "n_other": 2423,
+     "baseline_per_bin": 28.183333333333334,
+     "post_1_5ms_z": 0.17550018631109718,
+     "pre_1_5ms_z": 1.5233416171803194,
+     "zero_bin_z": 0.34219926228358744
+    },
+    {
+     "other": 9,
+     "other_group": 4,
+     "other_tetrode": "TT5",
+     "n_ref": 6285,
+     "n_other": 1878,
+     "baseline_per_bin": 23.133333333333333,
+     "post_1_5ms_z": -0.43391300916162073,
+     "pre_1_5ms_z": -0.06198757273737415,
+     "zero_bin_z": 0.18019095432127646
+    },
+    {
+     "other": 10,
+     "other_group": 4,
+     "other_tetrode": "TT5",
+     "n_ref": 6285,
+     "n_other": 3360,
+     "baseline_per_bin": 44.88333333333333,
+     "post_1_5ms_z": 1.3072512402648184,
+     "pre_1_5ms_z": -0.42833338510804647,
+     "zero_bin_z": 0.9130031214837598
+    },
+    {
+     "other": 11,
+     "other_group": 4,
+     "other_tetrode": "TT5",
+     "n_ref": 6285,
+     "n_other": 4892,
+     "baseline_per_bin": 57.483333333333334,
+     "post_1_5ms_z": 1.50904140215451,
+     "pre_1_5ms_z": -0.4374745432956074,
+     "zero_bin_z": 0.0681458591781442
+    },
+    {
+     "other": 12,
+     "other_group": 4,
+     "other_tetrode": "TT5",
+     "n_ref": 6285,
+     "n_other": 2215,
+     "baseline_per_bin": 30.783333333333335,
+     "post_1_5ms_z": 2.8278607828375533,
+     "pre_1_5ms_z": -0.7993240692581217,
+     "zero_bin_z": 0.7599962480554047
+    },
+    {
+     "other": 13,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 6393,
+     "baseline_per_bin": 70.46666666666667,
+     "post_1_5ms_z": 1.6337654452572672,
+     "pre_1_5ms_z": 0.9944659232000771,
+     "zero_bin_z": 0.6591662595119424
+    },
+    {
+     "other": 14,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 4558,
+     "baseline_per_bin": 55.016666666666666,
+     "post_1_5ms_z": -0.36678323356186104,
+     "pre_1_5ms_z": -0.3064900992777188,
+     "zero_bin_z": -0.27188608611899107
+    },
+    {
+     "other": 15,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 734,
+     "baseline_per_bin": 10.416666666666666,
+     "post_1_5ms_z": 0.6812733176437591,
+     "pre_1_5ms_z": 2.4826061575153915,
+     "zero_bin_z": 0.18073922282301297
+    },
+    {
+     "other": 16,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 1463,
+     "baseline_per_bin": 14.766666666666667,
+     "post_1_5ms_z": 0.13577523142596143,
+     "pre_1_5ms_z": 0.4849115408070061,
+     "zero_bin_z": -0.1995103109706282
+    },
+    {
+     "other": 17,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 1504,
+     "baseline_per_bin": 18.366666666666667,
+     "post_1_5ms_z": -1.8609399234443564,
+     "pre_1_5ms_z": 0.4347990475337275,
+     "zero_bin_z": 1.3144687866844058
+    },
+    {
+     "other": 18,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 1101,
+     "baseline_per_bin": 13.8,
+     "post_1_5ms_z": -1.0834726777719232,
+     "pre_1_5ms_z": -0.9630868246861546,
+     "zero_bin_z": 0.05383819020581636
+    },
+    {
+     "other": 19,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 1854,
+     "baseline_per_bin": 22.433333333333334,
+     "post_1_5ms_z": -0.6766830502314434,
+     "pre_1_5ms_z": -0.20457859658159924,
+     "zero_bin_z": -1.1471479805810425
+    },
+    {
+     "other": 20,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 4201,
+     "baseline_per_bin": 49.93333333333333,
+     "post_1_5ms_z": 1.223563342911433,
+     "pre_1_5ms_z": -1.8142490946617775,
+     "zero_bin_z": 0.00943438210181719
+    },
+    {
+     "other": 21,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 3448,
+     "baseline_per_bin": 38.63333333333333,
+     "post_1_5ms_z": 2.9379793650563117,
+     "pre_1_5ms_z": 2.2904247294928806,
+     "zero_bin_z": 0.3807641077141132
+    },
+    {
+     "other": 22,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 9912,
+     "baseline_per_bin": 119.13333333333334,
+     "post_1_5ms_z": 1.2838224030969108,
+     "pre_1_5ms_z": -0.027315370278659042,
+     "zero_bin_z": 0.07940273220575213
+    },
+    {
+     "other": 23,
+     "other_group": 5,
+     "other_tetrode": "TT6",
+     "n_ref": 6285,
+     "n_other": 1649,
+     "baseline_per_bin": 20.383333333333333,
+     "post_1_5ms_z": 0.7016411863053501,
+     "pre_1_5ms_z": -0.09080062411010417,
+     "zero_bin_z": -0.5278945565649573
+    },
+    {
+     "other": 24,
+     "other_group": 6,
+     "other_tetrode": "TT7",
+     "n_ref": 6285,
+     "n_other": 2711,
+     "baseline_per_bin": 33.78333333333333,
+     "post_1_5ms_z": -0.4552404577393887,
+     "pre_1_5ms_z": -1.3785450480840677,
+     "zero_bin_z": 1.4136582099701533
+    },
+    {
+     "other": 25,
+     "other_group": 6,
+     "other_tetrode": "TT7",
+     "n_ref": 6285,
+     "n_other": 1161,
+     "baseline_per_bin": 19.683333333333334,
+     "post_1_5ms_z": 0.7644090506567396,
+     "pre_1_5ms_z": -0.7476088517412077,
+     "zero_bin_z": -1.05561546937925
+    },
+    {
+     "other": 26,
+     "other_group": 6,
+     "other_tetrode": "TT7",
+     "n_ref": 6285,
+     "n_other": 1071,
+     "baseline_per_bin": 14.666666666666666,
+     "post_1_5ms_z": 1.1288234690342096,
+     "pre_1_5ms_z": 0.31139957766460913,
+     "zero_bin_z": 0.3481553119113958
+    },
+    {
+     "other": 27,
+     "other_group": 6,
+     "other_tetrode": "TT7",
+     "n_ref": 6285,
+     "n_other": 1746,
+     "baseline_per_bin": 20.166666666666668,
+     "post_1_5ms_z": 1.311214607360852,
+     "pre_1_5ms_z": 0.9128709291752762,
+     "zero_bin_z": 0.1855674047563011
+    },
+    {
+     "other": 28,
+     "other_group": 6,
+     "other_tetrode": "TT7",
+     "n_ref": 6285,
+     "n_other": 1101,
+     "baseline_per_bin": 21.566666666666666,
+     "post_1_5ms_z": 0.016049896438378144,
+     "pre_1_5ms_z": -0.6580457539734713,
+     "zero_bin_z": -0.12202144219134788
+    },
+    {
+     "other": 29,
+     "other_group": 7,
+     "other_tetrode": "TT8",
+     "n_ref": 6285,
+     "n_other": 796,
+     "baseline_per_bin": 10.45,
+     "post_1_5ms_z": -0.8646430798325934,
+     "pre_1_5ms_z": -1.5563575436986679,
+     "zero_bin_z": -0.1392048506001926
+    },
+    {
+     "other": 30,
+     "other_group": 7,
+     "other_tetrode": "TT8",
+     "n_ref": 6285,
+     "n_other": 4367,
+     "baseline_per_bin": 62.2,
+     "post_1_5ms_z": 0.0,
+     "pre_1_5ms_z": 1.2475055496722316,
+     "zero_bin_z": 1.3693944492206287
+    },
+    {
+     "other": 31,
+     "other_group": 7,
+     "other_tetrode": "TT8",
+     "n_ref": 6285,
+     "n_other": 9179,
+     "baseline_per_bin": 107.5,
+     "post_1_5ms_z": 1.2724267238005746,
+     "pre_1_5ms_z": 2.8252186579300855,
+     "zero_bin_z": 1.3985041842941952
+    },
+    {
+     "other": 32,
+     "other_group": 8,
+     "other_tetrode": "TT9",
+     "n_ref": 6285,
+     "n_other": 52,
+     "baseline_per_bin": 1.0166666666666666,
+     "post_1_5ms_z": -1.8110921138387035,
+     "pre_1_5ms_z": -0.03696106354772851,
+     "zero_bin_z": -0.016529490122682098
+    },
+    {
+     "other": 33,
+     "other_group": 9,
+     "other_tetrode": "TT10",
+     "n_ref": 6285,
+     "n_other": 2687,
+     "baseline_per_bin": 44.03333333333333,
+     "post_1_5ms_z": 1.3366568469959852,
+     "pre_1_5ms_z": 1.9432070128597083,
+     "zero_bin_z": -6.635761699558938
+    },
+    {
+     "other": 34,
+     "other_group": 9,
+     "other_tetrode": "TT10",
+     "n_ref": 6285,
+     "n_other": 2232,
+     "baseline_per_bin": 45.083333333333336,
+     "post_1_5ms_z": 10.56244670258932,
+     "pre_1_5ms_z": 9.629976368361783,
+     "zero_bin_z": -6.2676122764228355
+    },
+    {
+     "other": 36,
+     "other_group": 9,
+     "other_tetrode": "TT10",
+     "n_ref": 6285,
+     "n_other": 6604,
+     "baseline_per_bin": 105.83333333333333,
+     "post_1_5ms_z": 12.947235945759646,
+     "pre_1_5ms_z": 16.598834668010827,
+     "zero_bin_z": -10.287532908007309
+    },
+    {
+     "other": 37,
+     "other_group": 10,
+     "other_tetrode": "TT11",
+     "n_ref": 6285,
+     "n_other": 5713,
+     "baseline_per_bin": 90.46666666666667,
+     "post_1_5ms_z": 4.3570670647839815,
+     "pre_1_5ms_z": 0.4545141902112796,
+     "zero_bin_z": 1.5279915067520695
+    },
+    {
+     "other": 38,
+     "other_group": 10,
+     "other_tetrode": "TT11",
+     "n_ref": 6285,
+     "n_other": 362,
+     "baseline_per_bin": 6.183333333333334,
+     "post_1_5ms_z": 0.37468165583136237,
+     "pre_1_5ms_z": -1.603637486958233,
+     "zero_bin_z": -1.2801792608077731
+    },
+    {
+     "other": 39,
+     "other_group": 10,
+     "other_tetrode": "TT11",
+     "n_ref": 6285,
+     "n_other": 476,
+     "baseline_per_bin": 7.116666666666666,
+     "post_1_5ms_z": -0.26542940920787833,
+     "pre_1_5ms_z": 0.06984984452838958,
+     "zero_bin_z": 0.7059742826363793
+    },
+    {
+     "other": 40,
+     "other_group": 10,
+     "other_tetrode": "TT11",
+     "n_ref": 6285,
+     "n_other": 611,
+     "baseline_per_bin": 11.783333333333333,
+     "post_1_5ms_z": 0.6622614948796203,
+     "pre_1_5ms_z": -0.7708289530566067,
+     "zero_bin_z": -0.22819836363042145
+    },
+    {
+     "other": 41,
+     "other_group": 10,
+     "other_tetrode": "TT11",
+     "n_ref": 6285,
+     "n_other": 4127,
+     "baseline_per_bin": 59.18333333333333,
+     "post_1_5ms_z": 2.9114444807708284,
+     "pre_1_5ms_z": 3.143972492546202,
+     "zero_bin_z": 0.7560916912912922
+    },
+    {
+     "other": 42,
+     "other_group": 10,
+     "other_tetrode": "TT11",
+     "n_ref": 6285,
+     "n_other": 714,
+     "baseline_per_bin": 12.583333333333334,
+     "post_1_5ms_z": 1.0190784912372681,
+     "pre_1_5ms_z": -0.7459234317303722,
+     "zero_bin_z": 0.11746024643373472
+    },
+    {
+     "other": 43,
+     "other_group": 10,
+     "other_tetrode": "TT11",
+     "n_ref": 6285,
+     "n_other": 2138,
+     "baseline_per_bin": 34.15,
+     "post_1_5ms_z": 3.0802468954683606,
+     "pre_1_5ms_z": 0.32524346101218743,
+     "zero_bin_z": 1.0010609306245255
+    },
+    {
+     "other": 44,
+     "other_group": 10,
+     "other_tetrode": "TT11",
+     "n_ref": 6285,
+     "n_other": 684,
+     "baseline_per_bin": 10.7,
+     "post_1_5ms_z": 0.47851014891726507,
+     "pre_1_5ms_z": 0.3417929635123317,
+     "zero_bin_z": 2.8430929583982056
+    },
+    {
+     "other": 45,
+     "other_group": 10,
+     "other_tetrode": "TT11",
+     "n_ref": 6285,
+     "n_other": 5411,
+     "baseline_per_bin": 79.68333333333334,
+     "post_1_5ms_z": 3.5361722804844997,
+     "pre_1_5ms_z": 1.081308879156417,
+     "zero_bin_z": 1.9399053935506574
+    },
+    {
+     "other": 46,
+     "other_group": 11,
+     "other_tetrode": "TT12",
+     "n_ref": 6285,
+     "n_other": 1644,
+     "baseline_per_bin": 24.05,
+     "post_1_5ms_z": 0.15958626340564264,
+     "pre_1_5ms_z": 0.7067391665107078,
+     "zero_bin_z": 0.8054517979076081
+    },
+    {
+     "other": 47,
+     "other_group": 11,
+     "other_tetrode": "TT12",
+     "n_ref": 6285,
+     "n_other": 7312,
+     "baseline_per_bin": 96.03333333333333,
+     "post_1_5ms_z": 3.095616514674236,
+     "pre_1_5ms_z": 1.863454658710537,
+     "zero_bin_z": 1.629308251302482
+    },
+    {
+     "other": 48,
+     "other_group": 11,
+     "other_tetrode": "TT12",
+     "n_ref": 6285,
+     "n_other": 1906,
+     "baseline_per_bin": 22.266666666666666,
+     "post_1_5ms_z": -0.5054592188852506,
+     "pre_1_5ms_z": 1.2952392483934554,
+     "zero_bin_z": 1.2150092612774688
+    },
+    {
+     "other": 49,
+     "other_group": 11,
+     "other_tetrode": "TT12",
+     "n_ref": 6285,
+     "n_other": 8284,
+     "baseline_per_bin": 112.83333333333333,
+     "post_1_5ms_z": 5.255655086568276,
+     "pre_1_5ms_z": 2.3927615280637946,
+     "zero_bin_z": 1.4278133319455104
+    },
+    {
+     "other": 50,
+     "other_group": 11,
+     "other_tetrode": "TT12",
+     "n_ref": 6285,
+     "n_other": 2809,
+     "baseline_per_bin": 43.31666666666667,
+     "post_1_5ms_z": 0.43601051438538746,
+     "pre_1_5ms_z": 2.1347527782245623,
+     "zero_bin_z": 1.3193467705601731
+    },
+    {
+     "other": 51,
+     "other_group": 12,
+     "other_tetrode": "TT13",
+     "n_ref": 6285,
+     "n_other": 337,
+     "baseline_per_bin": 5.133333333333334,
+     "post_1_5ms_z": 0.46056618647183756,
+     "pre_1_5ms_z": -0.1315903389919542,
+     "zero_bin_z": -0.5002164033860249
+    },
+    {
+     "other": 52,
+     "other_group": 13,
+     "other_tetrode": "TT14",
+     "n_ref": 6285,
+     "n_other": 432,
+     "baseline_per_bin": 6.783333333333333,
+     "post_1_5ms_z": -0.15740004693383938,
+     "pre_1_5ms_z": 0.7011456636143744,
+     "zero_bin_z": 0.4671431988403216
+    },
+    {
+     "other": 53,
+     "other_group": 14,
+     "other_tetrode": "TT15",
+     "n_ref": 6285,
+     "n_other": 1431,
+     "baseline_per_bin": 12.066666666666666,
+     "post_1_5ms_z": 1.2445091187263364,
+     "pre_1_5ms_z": -0.1716564301691492,
+     "zero_bin_z": -0.5949449422814053
+    },
+    {
+     "other": 54,
+     "other_group": 14,
+     "other_tetrode": "TT15",
+     "n_ref": 6285,
+     "n_other": 525,
+     "baseline_per_bin": 8.15,
+     "post_1_5ms_z": 1.1357276524825377,
+     "pre_1_5ms_z": 0.6657713824897634,
+     "zero_bin_z": 0.2977420137442248
+    },
+    {
+     "other": 55,
+     "other_group": 15,
+     "other_tetrode": "TT16",
+     "n_ref": 6285,
+     "n_other": 1100,
+     "baseline_per_bin": 16.433333333333334,
+     "post_1_5ms_z": 1.0848081187455592,
+     "pre_1_5ms_z": -0.12870604798676188,
+     "zero_bin_z": 0.6331500393102464
+    }
+   ],
+   "spike_lfp_home_lead": "CH17",
+   "phase_locking_outside_trains": {
+    "delta": {
+     "n": 6275,
+     "mrl": 0.17071034018679712,
+     "mean_phase_deg": -154.75799343933417,
+     "rayleigh_p": -1.2140807580826272e-80
+    },
+    "theta": {
+     "n": 6275,
+     "mrl": 0.06394295533673232,
+     "mean_phase_deg": 163.98456453564538,
+     "rayleigh_p": 7.028270146470413e-12
+    },
+    "sigma": {
+     "n": 6275,
+     "mrl": 0.04116759280513834,
+     "mean_phase_deg": 169.42217502302972,
+     "rayleigh_p": 2.3978540156578936e-05
+    },
+    "gamma": {
+     "n": 6275,
+     "mrl": 0.12946057758994234,
+     "mean_phase_deg": 173.70328593198784,
+     "rayleigh_p": 1.2014494180292842e-46
+    }
+   }
+  }
+ ]
+}
