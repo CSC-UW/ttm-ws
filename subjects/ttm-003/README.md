@@ -41,6 +41,8 @@ environment, in this order:
 | `opto_sort.py ... --variant asis [--blank-ms PRE POST]` | `<session>/sortings_opto/<variant>/{preprocessed,by_group,sorting,analyzer}`, `results/units_<E>_<variant>.csv` |
 | `opto_tag.py ... --variant asis` | `results/optotag_<E>_<variant>.csv`, `..._candidates.json`, `figures/optotag_*.png` |
 | `opto_population.py ...` | `results/opto_population_<E>_<variant>.json`, `figures/opto_population_<variant>.png` |
+| `opto_pulse_gallery.py ... [--pulses first,middle,last\|all]` | `figures/galleries/{channels,tetrodes,units,<TT>_traces}_<variant>.pdf`, `<session>/sortings_opto/<variant>/crossings_*.npz` |
+| `opto_tt6_inpulse.py ... --unit U [--tetrode TT6]` | `results/tt_inpulse_<E>_<TT>.json`, `figures/opto_<TT>_inpulse_<variant>.png` |
 
 `results/unit_metrics_<E>_asis.csv` (template and quality metrics per
 unit) was written from the analyzers by hand on 2026-10-21.

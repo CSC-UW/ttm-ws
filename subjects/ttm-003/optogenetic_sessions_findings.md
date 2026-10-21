@@ -155,6 +155,49 @@ cells, as more than one unit the sorter has merged; a sort with a lower
 detection threshold, or Kilosort4, on TT4 and TT10 alone, followed by
 manual curation, is the next step for isolating them.
 
+### 5a. Does the TT6 cell keep firing through the pulse? (added later on 2026-10-21)
+
+Graham Findlay suspected the TT6 cluster keeps only the first one or two
+spikes of a train that continues through the pulse. `opto_tt6_inpulse.py`
+detects every crossing above 3.5 MAD on the four TT6 wires around the
+9.8 mW pulses, labels each as claimed by a cluster or not, and compares
+its four-wire amplitude vector with the cell's template (cosine; a
+fingerprint independent of overall amplitude). `results/tt6_event_rates_asis.csv`
+and `results/tt_inpulse_<experiment>_TT6.json` hold the numbers.
+
+| TT6, 9.8 mW pulses | baseline | onset 0 to 10 ms | in pulse (10 ms to 64 ms) | 0 to 100 ms after |
+|---|---|---|---|---|
+| all crossings (/s), OPTO1 / OPTO2 | 126 / 171 | 266 / 319 | 156 / 200 | 26 / 37 |
+| claimed by any TT6 cluster (/s) | 38 / 48 | 54 / 61 | 2.5 / 2.0 | 9.5 / 13 |
+| unclaimed, cosine to the cell's fingerprint > 0.95 (/s) | 20 / 26 | 126 / 139 | 133 / 160 | 3 / 4 |
+| amplitude of those, 10th / 50th / 90th pct (uV) | -142 / -68 / -52 | -92 / -69 / -55 | -71 / -58 / -50 | -148 / -82 / -52 |
+| the cell's own spikes (uV) | -156 / -111 / -80 | | | |
+
+So the sorter is not dropping full-size spikes: during the pulse there
+are only 2 to 2.5 claimed events per second on the whole tetrode and
+nothing unclaimed above about -75 uV. What the sorter drops is a train of
+small events, 130 to 160 per second, with the cell's wire dominance (CH49
+largest), its spike width (trough-to-peak 0.60 vs 0.63 ms) and a dominant-
+wire shape correlation of 0.99 with its template, at half its amplitude.
+The train is regular (ISI median 4.5 ms, 5th percentile 3.2 ms, CV 0.6 to
+0.7, so a refractory floor exists) and decays from about 210 per second in
+the first 10 ms of the pulse to about 70 per second in its last 15 ms,
+with the amplitude settling at -55 uV. The wire ratio is not identical:
+in-pulse events are more CH49-dominant (CH49:CH53 of 3.3) than the
+template (2.4) or than baseline look-alikes (2.3). *Conjecture:* the
+simplest reading is that this is the same cell firing at 200 Hz with
+spikes shrunk by sustained depolarisation, which changes the spatial
+pattern as well as the amplitude; the alternative is a second, smaller
+cell near CH49 that the light drives. A sort of TT6 with a lower threshold
+that lets the small events form their own cluster, then a comparison of
+that cluster's waveform against the cell outside the trains, is the test;
+MountainSort5 at 5.5 MAD can never recover them.
+
+The per-pulse galleries (first, middle and last pulse of each train) that
+show this are `figures/galleries/{channels,tetrodes,units}_asis.pdf` and
+`figures/galleries/TT6_traces_asis.pdf` (`opto_pulse_gallery.py`); grey
+ticks are unclaimed crossings at 4.5 MAD.
+
 ## 6. Figures
 
 On the data volume under `<data_root>/TTM-003/<experiment>/figures/`:
@@ -162,7 +205,9 @@ On the data volume under `<data_root>/TTM-003/<experiment>/figures/`:
 MUA PSTH), `opto_onset_zoom_*.png` and `opto_onset_single_trials_*.png`
 (artifact check), `opto_session_mua.png`, `optotag_asis_population_{A,B}.png`
 (z-scored PSTH of every unit), `optotag_asis_unit*_{summary,ccgs,lfp}.png`
-(candidates), `opto_population_asis.png` (pooled suppression per train).
+(candidates), `opto_population_asis.png` (pooled suppression per train),
+`opto_TT6_inpulse_asis.png` (section 5a), `galleries/*.pdf` (per-pulse
+rasters).
 
 ## 7. What would help next
 
