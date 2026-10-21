@@ -12,6 +12,7 @@ members = [
     "ttm",
     "ttm-001",
     "ttm-002",
+    "ttm-003",
     "ttm-ws",
 ]
 constraints = [
@@ -4799,6 +4800,17 @@ requires-dist = [{ name = "ttm", editable = "packages/ttm" }]
 name = "ttm-002"
 version = "0.1.0"
 source = { editable = "subjects/ttm-002" }
+dependencies = [
+    { name = "ttm" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "ttm", editable = "packages/ttm" }]
+
+[[package]]
+name = "ttm-003"
+version = "0.1.0"
+source = { editable = "subjects/ttm-003" }
 dependencies = [
     { name = "ttm" },
 ]

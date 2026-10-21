@@ -1,0 +1,8 @@
+# Keys are the fields of ttm.subject.Experiment.
+# Optogenetic stimulation session (32 min, seven laser trains). Train-by-train
+# details: ../stimulation_log.toml, ../optogenetic_stimulation.md.
+session = "2026-10-16_14-06-44"
+acquisition = "TTM3/2026-10-16_14-06-44"
+
+badChannels = ["CH2", "CH10", "CH12", "CH14", "CH16"]
+badTetrodes = ["TT14"]
