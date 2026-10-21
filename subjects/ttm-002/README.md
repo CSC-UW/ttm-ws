@@ -1,6 +1,6 @@
 ---
 title: Subject TTM-002
-updated: 2026-10-19
+updated: 2026-10-21
 status: needs_verification
 ---
 
@@ -11,15 +11,16 @@ the archive: the session `2026-09-24_09-03-22` at
 `/Volumes/tetrode/TTM2/2026-09-24_09-03-22/Record Node 102` (moved there on
 2026-10-19 from the old share, where it sat one directory deeper, next to
 TTM2's October sessions), with the 64-channel acquisition-board stream at
-index 0 (streams 1 and 2 are memory usage and an IMU). The light schedule, deprivation window and bad
+index 1 (neo orders streams by name: 0 is the IMU, 2 is memory usage; see
+`docs/developer_notes/openephys_blank_channel_names.md`). The light schedule, deprivation window and bad
 channels are commented out until confirmed; `ttm-experiment-params` will
 write an empty schedule until then.
 
-Known blocker for re-processing: the archived `structure.oebin` names all 64
-acquisition-board channels with a single blank string, and neo refuses to
-parse the session (`signal_channels do not have unique ids`). `get_recording`
-needs a channel-name repair (for example a patched copy of the oebin) before
-`ttm-convert` can run. The products currently under
+The archived `structure.oebin` originally named all 64 acquisition-board
+channels with a blank string (an Acquisition Board plugin bug, documented
+in `docs/developer_notes/openephys_blank_channel_names.md`); it was repaired
+in place on 2026-10-21 with the original kept as `structure.oebin.orig`, and
+spikeinterface now reads the session. The products currently under
 `<data_root>/2026-09-24_09-03-22/` and `<data_root>/TTM-002/TTM-002-SD/` were
 made outside this repository from a renamed mirror and are not inputs to
 anything here; they will be superseded when the session is re-processed.
