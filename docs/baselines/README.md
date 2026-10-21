@@ -54,3 +54,8 @@ elementwise comparison above and deleted on 2026-10-20.
 
 Not re-run: `ttm-convert`, `ttm-make-lfp`, `ttm-emg --full`, the sorting
 pipeline. Those products are the May/June outputs, moved unchanged.
+
+Since these snapshots, `experiment_params.json` changed schema
+(`oe_stream_index` became `oe_stream`, 2026-10-21) and was rewritten with the
+corrected `TTM1/<session>` acquisition path, so a fresh snapshot differs from
+both files in `experiment_params` only.
