@@ -93,9 +93,12 @@ trains do not differ in these measures.
 The suppression is spatial: every unit on TT5 to TT8 and TT10 to TT12 is
 suppressed, two of three on TT4, none on TT1 to TT3, TT9, TT13, TT15 or
 TT16 (those tetrodes hold few, low-rate units). Multi-unit threshold
-crossings per tetrode (`opto_explore`) show the same split, with the
-pulse-period rate of TT5 to TT12 at 0.5 to 0.8 of baseline and TT1 to
-TT3, TT13, TT15, TT16 at about 1.0. *Conjecture:* the suppressed
+crossings per tetrode (`opto_explore`, 5 MAD on each wire) show the same
+split, with the pulse-period rate of TT5 to TT12 at 0.5 to 0.8 of
+baseline and TT1 to TT3, TT13, TT15, TT16 at about 1.0; the crossing
+counts sit on a floor of noise events (TT14, which has no spikes, still
+gives 15 crossings/s), which is why they understate the suppression the
+sorted units show. *Conjecture:* the suppressed
 tetrodes are the ones within reach of the fibre, and the complete,
 saturating silence even at 0.5 mW means the lowest power used was
 already far above threshold.
