@@ -23,6 +23,8 @@ import numpy as np
 import pandas as pd
 import spikeinterface as si
 import spikeinterface.extractors as se
+import zarr
+from spikeinterface.core.core_tools import check_json
 from numcodecs import Blosc, Delta
 from wavpack_numcodecs import WavPack
 
@@ -368,13 +370,40 @@ def convert_recording(
         f"{dur_h:.2f} h, traces={traces_comp}, channel_chunk=4, "
         f"chunk={time_chunk_s}s -> {out_zarr}"
     )
-    return recording.save(
-        format="zarr",
-        folder=str(out_zarr),
-        compressor_by_dataset={"traces": traces_comp},
-        filters_by_dataset={"times": [Delta(dtype="float64")]},
-        channel_chunk_size=4,
-        chunk_duration=f"{time_chunk_s}s",
-        n_jobs=n_jobs,
-        progress_bar=True,
-    )
+    # spikeinterface 0.105.2 writes the full time vector into the JSON
+    # provenance (see write_provenance); save without provenance, then add it.
+    serializability = recording._serializability.copy()
+    recording._serializability["json"] = False
+    try:
+        saved = recording.save(
+            format="zarr",
+            folder=str(out_zarr),
+            compressor_by_dataset={"traces": traces_comp},
+            filters_by_dataset={"times": [Delta(dtype="float64")]},
+            channel_chunk_size=4,
+            chunk_duration=f"{time_chunk_s}s",
+            n_jobs=n_jobs,
+            progress_bar=True,
+        )
+    finally:
+        recording._serializability.update(serializability)
+    if serializability["json"]:
+        write_provenance(recording, out_zarr)
+        saved = si.read_zarr(str(out_zarr))
+    return saved
+
+
+def _without_times_kwargs(obj):
+    if isinstance(obj, dict):
+        return {k: _without_times_kwargs(v) for k, v in obj.items() if k != "times_kwargs"}
+    if isinstance(obj, list):
+        return [_without_times_kwargs(v) for v in obj]
+    return obj
+
+
+def write_provenance(recording, out_zarr: str | pathlib.Path) -> None:
+    """Write ``recording``'s JSON provenance into an existing store, minus the
+    ``times_kwargs`` (time vectors) that spikeinterface 0.105.2 adds at every
+    nesting level of a recording whose times were set in memory."""
+    provenance = _without_times_kwargs(recording.to_dict(recursive=True, include_extra_metadata=False))
+    zarr.open_group(str(out_zarr), mode="r+").attrs["provenance"] = check_json(provenance)
