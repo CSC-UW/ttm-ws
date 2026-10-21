@@ -1,20 +1,18 @@
 ---
 title: Subject TTM-002
 updated: 2026-10-21
-status: needs_verification
 ---
 
 # TTM-002
 
-Skeleton. `experiments/TTM-002-SD.toml` carries only what is verifiable from
-the archive: the session `2026-09-24_09-03-22` at
+`experiments/TTM-002-SD.toml` describes the session `2026-09-24_09-03-22` at
 `/Volumes/tetrode/TTM2/2026-09-24_09-03-22/Record Node 102` (moved there on
 2026-10-19 from the old share, where it sat one directory deeper, next to
 TTM2's October sessions). The session carries three streams (IMU, the
 64-channel `acquisition_board`, memory usage); `get_recording` picks the
-headstage stream by name. The light schedule, deprivation window and bad
-channels are commented out until confirmed; `ttm-experiment-params` will
-write an empty schedule until then.
+headstage stream by name. The light schedule (09:00 on, 21:00 off), the
+novel-objects window (day two, 09:00 to 14:00) and the bad channel CH22 were
+confirmed by Graham Findlay on 2026-10-21.
 
 The archived `structure.oebin` originally named all 64 acquisition-board
 channels with a blank string (an Acquisition Board plugin bug, documented
