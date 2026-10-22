@@ -44,7 +44,7 @@ from spikeinterface.core import ChannelSparsity
 
 # Importing sorting also applies its MountainSort5 `_recording_segments` shim and
 # gives us the shared, deterministic preprocessing.
-from ttm.sorting import preprocess_for_sorting
+from ttm.sorting import create_group_sparse_analyzer, preprocess_for_sorting
 
 __all__ = [
     "Chunk",
@@ -308,10 +308,7 @@ def build_chunk_analyzer(sorting, recording, *, n_jobs: int = 5, ms_before: floa
     its own tetrode's 4 channels. Used by ``template_cosines`` for the geometry-free
     corroboration; nothing positional is computed.
     """
-    sparsity = ChannelSparsity.from_property(sorting, recording, by_property="group")
-    analyzer = si.create_sorting_analyzer(
-        sorting, recording, format="memory", sparsity=sparsity, return_in_uV=True
-    )
+    analyzer = create_group_sparse_analyzer(sorting, recording, format="memory", return_in_uV=True)
     analyzer.compute(
         {"random_spikes": {}, "waveforms": {"ms_before": ms_before, "ms_after": ms_after}, "templates": {}},
         n_jobs=n_jobs,

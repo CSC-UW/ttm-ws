@@ -397,3 +397,72 @@ def assign_tetrode_groups(sorting, recording, sorter_output_dir):
     )
     sorting.set_property("group", unit_groups)
     return sorting
+
+
+# --------------------------------------------------------------------------- #
+# Group-sparse analyzers
+# --------------------------------------------------------------------------- #
+
+def group_main_channel_indices(
+    recording,
+    sorting,
+    sparsity_mask: np.ndarray,
+    *,
+    peak_sign: str = "neg",
+    num_spikes: int = 100,
+    ms_before: float = 1.0,
+    ms_after: float = 2.5,
+    seed: int = 0,
+    **job_kwargs,
+) -> np.ndarray:
+    """Each unit's extremum channel restricted to the channels its sparsity mask allows.
+
+    SpikeInterface 0.105 estimates a unit's main channel over every channel
+    of the recording and refuses an external sparsity that does not contain
+    it. With per-tetrode sparsity a unit whose template extremum leaks onto
+    another tetrode (small units, noisy wires) trips that check, so the
+    extremum is taken within the mask here. Templates come from up to
+    ``num_spikes`` random spikes per unit, as SpikeInterface's own estimate
+    does. A unit with no usable spikes gets its first allowed channel.
+    """
+    from spikeinterface.core.sorting_tools import random_spikes_selection
+    from spikeinterface.core.waveform_tools import estimate_templates_with_accumulator
+
+    fs = recording.sampling_frequency
+    nbefore = int(round(ms_before * fs / 1000))
+    nafter = int(round(ms_after * fs / 1000))
+    num_samples = [recording.get_num_samples(i) for i in range(recording.get_num_segments())]
+    idx = random_spikes_selection(sorting, num_samples, method="uniform", max_spikes_per_unit=num_spikes,
+                                  margin_size=max(nbefore, nafter), seed=seed)
+    spikes = sorting.to_spike_vector()[idx]
+    templates = estimate_templates_with_accumulator(
+        recording, spikes, sorting.unit_ids, nbefore, nafter, return_in_uV=False,
+        job_name="estimate_templates", progress_bar=False, **job_kwargs,
+    )
+    if peak_sign == "neg":
+        score = -templates.min(axis=1)
+    elif peak_sign == "pos":
+        score = templates.max(axis=1)
+    else:
+        score = np.abs(templates).max(axis=1)
+    score = np.where(sparsity_mask, np.nan_to_num(score, nan=-np.inf), -np.inf)
+    main = score.argmax(axis=1)
+    empty = ~np.isfinite(score.max(axis=1))
+    if empty.any():
+        main[empty] = sparsity_mask[empty].argmax(axis=1)
+    return main
+
+
+def create_group_sparse_analyzer(sorting, recording, *, n_jobs: int = 1, seed: int = 0, **kwargs):
+    """``si.create_sorting_analyzer`` with every unit sparse to its tetrode's channels.
+
+    Sparsity comes from the ``group`` property shared by the sorting and the
+    recording; the main channels are estimated within each unit's tetrode
+    (:func:`group_main_channel_indices`). ``kwargs`` go to
+    ``create_sorting_analyzer`` (``format``, ``folder``, ``return_in_uV``, ...).
+    """
+    from spikeinterface.core import ChannelSparsity
+
+    sparsity = ChannelSparsity.from_property(sorting, recording, by_property="group")
+    main = group_main_channel_indices(recording, sorting, sparsity.mask, seed=seed, n_jobs=n_jobs)
+    return si.create_sorting_analyzer(sorting, recording, sparsity=sparsity, main_channel_indices=main, **kwargs)

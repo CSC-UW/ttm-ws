@@ -23,6 +23,7 @@ from spikeinterface.core import ChannelSparsity, Templates, get_noise_levels
 from spikeinterface.core.template_tools import get_dense_templates_array
 from spikeinterface.sortingcomponents.matching import find_spikes_from_templates
 
+from ttm.sorting import create_group_sparse_analyzer
 from ttm.tracking import (
     Chunk,
     _UnionFind,
@@ -82,8 +83,7 @@ def build_templates_object(sorting, recording, *, ms_before=1.0, ms_after=2.0, n
     merge decisions -- are REPRODUCIBLE run-to-run (otherwise unseeded sampling jitters the dedup'd
     seed-bank size, e.g. 73-77 units across nominally identical runs).
     """
-    sparsity = ChannelSparsity.from_property(sorting, recording, by_property="group")
-    az = si.create_sorting_analyzer(sorting, recording, format="memory", sparsity=sparsity, return_in_uV=False)
+    az = create_group_sparse_analyzer(sorting, recording, format="memory", return_in_uV=False, seed=seed)
     az.compute({"random_spikes": {"seed": seed}, "waveforms": {"ms_before": ms_before, "ms_after": ms_after},
                 "templates": {}, "noise_levels": {}}, n_jobs=n_jobs)
     if with_snr:

@@ -19,6 +19,7 @@ from spikeinterface.metrics.quality.misc_metrics import (_compute_rp_contaminati
                                                          _compute_rp_violations_numba)
 from spikeinterface.sortingcomponents.peak_detection import detect_peaks
 
+from ttm.sorting import create_group_sparse_analyzer
 from _mp_common import tsq_median  # noqa: F401  (re-export: now lives in _mp_common for production use)
 from _track_eval import QM_METRICS, TIERS, isolation_tier_mask
 
@@ -35,9 +36,10 @@ def detect_window_peaks(win, *, detect_thresh=DETECT_THRESH, n_jobs=16):
     """(peak_s, peak_g, amp_mad) for a window: locally-exclusive neg peaks at 5.5 MAD (script-64 recipe)."""
     rec_groups = np.asarray(win.get_property("group"))
     noise = get_noise_levels(win, return_in_uV=False)
-    peaks = detect_peaks(win, method="locally_exclusive", peak_sign="neg",
-                         detect_threshold=detect_thresh, radius_um=40.0, noise_levels=noise,
-                         n_jobs=n_jobs, chunk_duration="1s", progress_bar=False)
+    peaks = detect_peaks(win, method="locally_exclusive",
+                         method_kwargs={"peak_sign": "neg", "detect_threshold": detect_thresh, "radius_um": 40.0,
+                                        "noise_levels": noise},
+                         job_kwargs={"n_jobs": n_jobs, "chunk_duration": "1s", "progress_bar": False})
     peak_s = peaks["sample_index"].astype(np.int64)
     peak_ch = peaks["channel_index"].astype(np.int64)
     peak_g = rec_groups[peak_ch].astype(np.int64)
@@ -131,8 +133,7 @@ def quality_df(sorting, recording, *, n_jobs=16, with_amplitude_cutoff=False):
     rp_contamination's false-positive: as the matcher threshold drops and low-amplitude spikes are
     recovered, amplitude_cutoff should fall while rp_contamination rises -> a two-sided knee.
     """
-    sparsity = ChannelSparsity.from_property(sorting, recording, by_property="group")
-    az = si.create_sorting_analyzer(sorting, recording, format="memory", sparsity=sparsity, return_in_uV=False)
+    az = create_group_sparse_analyzer(sorting, recording, format="memory", return_in_uV=False)
     az.compute({"random_spikes": {"seed": 0}, "noise_levels": {}, "waveforms": {}, "templates": {}}, n_jobs=n_jobs)
     metric_names = list(QM_METRICS)
     if with_amplitude_cutoff:
