@@ -300,6 +300,7 @@ left free, at a detection threshold near 3.5 MAD, with the refractory
 period of the candidate used to reject the hash; MountainSort5's
 threshold and PCA clustering only reach it by chance.
 
+
 ## 6. Figures
 
 On the data volume under `<data_root>/TTM-003/<experiment>/figures/`:
@@ -322,3 +323,135 @@ evoked potential; a shape-based, amplitude-free assignment pass on TT4,
 TT6 and TT10 (section 5c); and
 sleep scoring for the drowsy trains, which the `state` column of the hand
 log only approximates.
+
+## 8. Shape-based capture from the main sort's templates (2026-10-22)
+
+`opto_capture.py` runs `ttm.capture` (`docs/developer_notes/shape_capture.md`)
+on both sessions: per tetrode, every trough below 3.5 times a per-wire noise
+estimate with spikes excised, assigned by the full-window (-1 to +2 ms)
+four-wire cosine to the best template of the main 5.5 sort with the
+amplitude left free, accepted at cosine 0.6, with accepted templates peeled
+off the traces over three passes and each unit's 1.5 ms refractory period
+enforced afterwards. Numbers below are from
+`results/capture_<experiment>_capture_tt.json` (TT6 and TT10 with the
+wobble arm and the noise check), `capture_<experiment>_capture_tt10seed.json`
+(TT10 seeded from OPTO2's threshold-4.0 re-sort) and
+`capture_<experiment>_capture.json` (all tetrodes). Pulse rates are over the
+9.8 mW pattern-B pulses as in section 5a (onset 1 to 10 ms, in pulse 10 ms
+to offset, post 0 to 50 ms after offset).
+
+### 8a. Noise estimate against firing rate (open concern 2)
+
+Per 10 s block on TT6 and TT10, the plain MAD noise estimate of each wire
+and the estimate with spikes excised, against that wire's crossing rate
+above 7 MAD (spikes only, fixed session-wide threshold):
+
+| | plain MAD, r with rate | excised MAD, r with rate | plain range over blocks (uV) | excised range (uV) |
+|---|---|---|---|---|
+| OPTO1 TT6 | 0.90 to 0.94 | 0.82 to 0.89 | 8.3 to 16.8 | 7.6 to 13.3 |
+| OPTO1 TT10 | 0.83 to 0.90 | 0.71 to 0.80 | 8.3 to 16.9 | 6.5 to 14.7 |
+| OPTO2 TT6 | 0.85 to 0.93 | 0.73 to 0.85 | 8.7 to 16.8 | 7.3 to 13.3 |
+| OPTO2 TT10 | 0.76 to 0.84 | 0.62 to 0.73 | 8.4 to 17.3 | 6.2 to 14.7 |
+
+The plain estimate doubles between the quietest and the busiest block of
+the same wire and tracks the spike rate at r about 0.9. Excising the
+samples within 1 ms of every crossing below 4 MAD lowers it by 20 % and
+weakens the dependence but does not remove it (r 0.6 to 0.9). The concern
+is confirmed: a MAD threshold on a busy wire is a higher threshold.
+*Conjecture:* the remaining dependence is the unresolved background of
+distant spikes, which rises with local activity and is noise for the
+purpose of detection, so the excised estimate is the one to use; the
+figures are `figures/capture/capture_tt_<TT>_noise_vs_rate.png`.
+
+### 8b. TT6: the in-pulse train is captured
+
+OPTO1 unit 21 and OPTO2 unit 22 (the same cell, section 5), rates per
+second around the 9.8 mW pulses, main sort against the capture:
+
+| | main sort base / onset / in pulse / post | capture base / onset / in pulse / post | capture spikes (main sort) | main-sort spikes reproduced | amplitude-split zero-lag ratio | refractory conflict ratio |
+|---|---|---|---|---|---|---|
+| OPTO1 unit 21 | 15.0 / 43.5 / 2.5 / 2.5 | 18.3 / 114.6 / 144.1 / 2.8 | 55,060 (24,916) | 0.80 | 0.04 (2 to 3 ms peak 0.41) | 0.07 |
+| OPTO2 unit 22 | 15.4 / 39.1 / 2.0 / 2.0 | 18.0 / 110.1 / 131.4 / 2.3 | 33,615 (16,588) | 0.73 | 0.06 | 0.08 |
+
+The in-pulse rate matches the threshold-3.5 re-sort of section 5b (141
+and 126 per second) and the large-versus-small cross-correlogram of the
+captured cluster has the same zero-lag hollow (0.04 and 0.06 of
+independence, 2 to 3 ms peak) as the re-sort's merged cluster, so the
+captured train is one cell burst-attenuated, as before. The cell's
+neighbours on the tetrode get six distinct, four ambiguous and no
+duplicate verdicts from the cross-correlogram arbiter (OPTO1). The
+silenced CH49 neighbour (OPTO1 unit 22, OPTO2 unit 23, -185 and -168 uV)
+gains 1.1 and 2.1 in-pulse spikes per second against zero in the main
+sort, under 2 % of the cell's train. Three small-template units on the
+tetrode (OPTO1 units 16, 17, 20, troughs -84 to -124 uV; OPTO2 units 17,
+18, 21) take 4 to 7 in-pulse events per second each, events of 4 to 5 MAD
+whose cosine to their own template is 0.64 to 0.67 and to the cell's
+0.51 to 0.64; their base rates grow five to ten times over the main sort's
+and every one of their neighbour verdicts is ambiguous (OPTO1 units 17 and
+20). *Conjecture:* they are the hash collectors of the tetrode, and the
+leaked events are the smallest of the cell's attenuated spikes and noise
+troughs, which no shape criterion separates at that amplitude.
+
+Gates compared on OPTO1 TT6 (same events, same templates):
+
+| gate | cell in-pulse per second | cell base per second | main-sort spikes reproduced | pool (events unassigned) |
+|---|---|---|---|---|
+| raw cosine 0.6, three peeling passes (adopted) | 144 | 18.3 | 0.80 | 54 % |
+| raw cosine 0.7 | 62 | 12.0 | 0.65 | 72 % |
+| raw cosine 0.5 and noise-corrected cosine 0.8 | 179 | 13.9 | 0.59 | 60 % |
+| raw cosine 0.6, no peeling | 143 | 16.0 | 0.72 | 60 % |
+
+A stricter raw gate or the noise-corrected gate discards the cell's own
+large spikes (a 3 ms snippet on this tetrode holds other events), so 0.6
+stays. Without peeling every neighbour pair on the tetrode reads as a
+duplicate, because a spike 1 to 2 ms from a bigger one fails the gate and
+the pair is lost; with it the second and third passes recover 13 % of the
+accepted events.
+
+### 8c. Wobble as detector-plus-assigner, head to head
+
+SpikeInterface's wobble matcher on the same four wires with the same
+templates, the objective threshold at 0.1 of the median template energy
+(at 0.35, the June admit, it found 11,802 spikes for OPTO1 unit 21 and none in the pulses), gated by the same
+cosine 0.6:
+
+| | wobble spikes | capture spikes | agreement | wobble base / onset / in pulse | capture base / onset / in pulse |
+|---|---|---|---|---|---|
+| OPTO1 TT6 unit 21 | 26,501 | 55,060 | 0.41 | 14.9 / 56.5 / 15.8 | 18.3 / 114.6 / 144.1 |
+| OPTO2 TT6 unit 22 | 16,842 | 33,615 | 0.41 | 14.5 / 59.5 / 17.3 | 18.0 / 110.1 / 131.4 |
+| OPTO1 TT10 unit 34 | 43,032 | 37,889 | 0.85 | 18.1 / 67.1 / 66.3 | 16.1 / 69.8 / 61.5 |
+| OPTO2 TT10 unit 35 | 18,479 | 14,290 | 0.80 | 13.7 / 35.3 / 39.7 | 10.4 / 30.6 / 28.4 |
+
+Wobble finds about an eighth of the TT6 cell's in-pulse train (its
+amplitude scaling is bounded by the energy threshold, which weighs against
+a small template) and on TT10 agrees with the capture within 20 %. Its
+cross-correlograms with the same-tetrode units are hollow at the centre
+(six of ten neighbours read as duplicates for the TT6 cell), so it is not
+the better arbiter either. The detect-and-assign version is the one carried
+forward; wobble took 15 to 22 s per tetrode against 37 to 55 s for the
+three-pass capture.
+
+### 8d. TT10: separated with a template that exists
+
+With the main sort's three TT10 templates the driven cell's in-pulse
+spikes split between two of them (OPTO1 units 33 and 34: onset 42 and 70,
+in pulse 22 and 62 per second; OPTO2 units 33 and 35: onset 68 and 31,
+in pulse 59 and 28). With the templates of OPTO2's threshold-4.0 re-sort
+(section 5c; cluster 4 the driven cell, cluster 3 the silenced CH19
+neighbour) the capture gives, per second:
+
+| | driven cell (cluster 4) base / onset / in pulse / post | silenced neighbour (cluster 3) base / onset / in pulse / post | driven cell amplitude-split ratio |
+|---|---|---|---|
+| OPTO2, own templates | 9.7 / 97.7 / 95.4 / 3.3 | 7.5 / 3.3 / 2.2 / 3.3 | 0.10 |
+| OPTO1, OPTO2's templates | 10.3 / 89.0 / 111.3 / 2.8 | 6.8 / 3.4 / 1.0 / 2.3 | 0.13 |
+
+So the driven cell is separated from the silenced neighbour in both
+sessions once a template for it exists, including in OPTO1, where no
+re-sort at any threshold had split it out and the templates come from the
+other session 40 min earlier. The pair's cross-correlogram verdict is
+ambiguous in both sessions (ratios 0.44 and 0.47). TT10 remains a
+multi-unit tetrode: 82 % of its events go to the pool at any gate, the
+templates have mutual cosines above 0.9, and only 14 to 43 % of each
+re-sort cluster's spikes land on the same template in the capture.
+
+### 8e. Every unit, both sessions, and the two sessions against each other
