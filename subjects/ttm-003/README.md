@@ -49,11 +49,32 @@ log, so the block times and measured parameters come from the TTL,
 runs of 3 to 5 with one 483 ms pulse and one 164 s high interval, during
 which the laser was not connected to the animal (`delivered` is False for
 them); trains 24 to 44 (60 pulses each) start at 8.12 h and then every
-2.000 h from 8.15 h to 46.15 h, the 21 trains that match the plan. The
-experimenter places the fifth delivered train at about 17:11 (train 25);
-whether train 24 at 17:09:28 reached the animal is to be settled from the
-neural response. The plan for it is
+2.000 h from 8.15 h to 46.15 h, the 21 trains that match the plan. Train
+24 at 17:09:28 did not reach the animal either: in `opto_blocks.py` its
+evoked spike-band response is 8 uV against 50 to 80 for every delivered
+block, its slow potential a fifth of block 25's, and TT6, TT8 and TT12
+show no suppression; the experimenter's fifth train is train 25 at 17:11.
+So 24 trains were delivered: four of 58 pulses in the first 6 h and
+twenty of 60 pulses every 2 h from 8.15 h to 46.15 h. The plan for it is
 `docs/plans/2026-10-22_ttm003_48h_sorting_plan.md`.
+
+Per-block checks before any sort (`opto_blocks.py --include-undelivered`,
+`results/opto_blocks_TTM-003-48H.{csv,json}`, `figures/blocks/`,
+`figures/opto_blocks_summary.png`, 2026-10-22): the light-edge amplitude
+of the 300 to 6000 Hz pulse-triggered average is 3 to 20 uV in the median
+channel and 7 to 27 uV in the largest, against a noise floor of 1.4 to
+11 uV that follows the animal's state, the same proportions as on October
+16, so no spike-band artifact was found. The evoked volley at 1 to 6 ms
+is present at every delivered block (34 to 80 uV in the largest channel,
+peaking on TT4) and the slow evoked potential as well. By 5 MAD crossings
+the in-pulse rate on TT6, TT8 and TT12 falls to 0 to 0.3 of the 50 ms
+baseline in the blocks with a low noise floor and only to 0.5 to 1.0 in
+the noisy ones (blocks 1, 2, 27 to 30, 41, 44), where the crossings are
+dominated by noise; the sorted units will give the cleaner per-block
+measure. TT4 and TT11 show in-pulse rates above baseline in many blocks
+(up to 7 and 2 times), consistent with the driven candidates of the
+findings' section 8e. The quiet tetrodes (TT1 to TT3, TT13 to TT16) have
+no spikes, and their crossings are noise.
 
 The stimulation protocol, the experimenter's train-by-train log and what
 the laser TTL actually recorded are in `optogenetic_stimulation.md`
