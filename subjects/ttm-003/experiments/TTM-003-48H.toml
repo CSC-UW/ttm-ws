@@ -4,10 +4,15 @@
 # the first 6 h and a block of manual tests near 8 h; see
 # results/stimulation_blocks_2026-10-20_09-02-12.csv. The experiment name,
 # the light/dark schedule and any deprivation are not yet confirmed by the
-# experimenter; the bad-channel lists are carried over from the October 16
-# sessions pending the channel QC of this recording.
+# experimenter. Bad channels from scripts/channel_qc.py on this recording
+# (results/channel_qc_TTM-003-48H_summary.csv, 2026-10-22): CH22 on TT15
+# carries the 400 Hz comb at 80 to 260 times its flanks with 150 to 200
+# threshold crossings per second in most windows; CH18 and CH20 carry it
+# weakly (ratios 5 to 50) and are kept. TT14 and CH2, bad on October 16,
+# have ordinary noise here (std 100 to 170 uV, no comb) and no visible
+# spikes, like TT13, so they are not listed.
 session = "2026-10-20_09-02-12"
 acquisition = "TTM3/2026-10-20_09-02-12"
 
-badChannels = ["CH2", "CH10", "CH12", "CH14", "CH16"]
-badTetrodes = ["TT14"]
+badChannels = ["CH22"]
+badTetrodes = []

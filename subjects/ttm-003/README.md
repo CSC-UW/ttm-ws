@@ -33,8 +33,12 @@ in place yet. On 2026-10-22 it was converted (blosc-zstd) from a symlink
 mirror with a repaired copy of the oebin (`docs/SETUP.md`, tononi-2); the
 session directory lives on `/ssd-raid0` behind a symlink under
 `data_root`. The manifest `TTM-003-48H` carries no light schedule and
-no deprivation, and its bad-channel lists are the October 16 ones until
-`channel_qc.py` says otherwise. The planned protocol (`stimulation_log.toml`)
+no deprivation; its bad channel is CH22 (TT15, the 400 Hz comb at 80 to
+260 times its flanks), from `channel_qc.py` on this recording, which also
+found TT14 and CH2, bad on October 16, to be ordinary quiet channels
+here, and the spike-band noise of every channel two and a half times
+higher at 7.4 h, 25.8 h and from 37 h to the end than in the quiet
+windows (`figures/channel_qc.png`). The planned protocol (`stimulation_log.toml`)
 was pattern A (200 ms on, 1 pulse/s) at laser level 4.5 (9.8 mW), 60
 pulses per train, one train every 2 h; there is no train-by-train hand
 log, so the block times and measured parameters come from the TTL,
