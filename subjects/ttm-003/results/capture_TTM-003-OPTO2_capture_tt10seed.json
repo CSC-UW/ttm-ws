@@ -1,0 +1,438 @@
+{
+ "experiment": "TTM-003-OPTO2",
+ "variant": "asis",
+ "out": "capture_tt10seed",
+ "params": {
+  "manifest": "/Users/gfindlay@ad.wisc.edu/projects/ttm-ws/subjects/ttm-003/experiments/TTM-003-OPTO2.toml",
+  "subject": "TTM-003",
+  "experiment": "TTM-003-OPTO2",
+  "variant": "asis",
+  "out": "capture_tt10seed",
+  "tetrodes": [
+   "TT10"
+  ],
+  "thresh_mad": 3.5,
+  "gate_r": 0.6,
+  "gate_rc": null,
+  "n_pass": 3,
+  "margin": 0.0,
+  "refr_ms": 1.5,
+  "seed": [
+   "TT10=resort_TT10_thr4"
+  ],
+  "templates_from": null,
+  "wobble": false,
+  "noise_check": false,
+  "block_s": 10.0,
+  "analyzer": false,
+  "n_jobs": 16,
+  "no_figures": false,
+  "overwrite": true
+ },
+ "seconds": 1235.0151666666666,
+ "tetrodes": {
+  "TT10": {
+   "wires": [
+    "CH17",
+    "CH19",
+    "CH21",
+    "CH23"
+   ],
+   "seed": "resort_TT10_thr4",
+   "noise_plain_uV": [
+    10.548999786376953,
+    10.809000015258789,
+    11.107999801635742,
+    11.052000045776367
+   ],
+   "noise_excised_uV": [
+    8.286999702453613,
+    8.164999961853027,
+    8.543999671936035,
+    8.809000015258789
+   ],
+   "excised_fraction": 0.4402,
+   "n_events": 487073,
+   "events_per_s": 394.4,
+   "n_accepted": 88199,
+   "n_pool": 398874,
+   "n_refractory_rejected": 905,
+   "accepted_by_pass": [
+    83418,
+    5384,
+    302
+   ],
+   "seconds": {
+    "load": 3.0,
+    "capture": 48.3
+   },
+   "units": {
+    "1001": {
+     "template_trough_uV": -63.3,
+     "template_wire_profile_uV": [
+      -63.29999923706055,
+      -39.900001525878906,
+      -21.5,
+      -34.0
+     ],
+     "n_seed": 16405,
+     "n_capture": 28618,
+     "seed_matched_by_capture": 0.426,
+     "seed_matched_by_any_event": 0.998,
+     "capture_in_seed": 0.244,
+     "seed_response": {
+      "A": {
+       "base_hz": 14.23728813559322,
+       "onset_1_10ms_hz": 19.303201506591336,
+       "in_pulse_hz": 1.440815596248156,
+       "post_0_50ms_hz": 5.338983050847458,
+       "post_50_200ms_hz": 22.93785310734463
+      },
+      "B": {
+       "base_hz": 17.145539906103288,
+       "onset_1_10ms_hz": 13.667188315075638,
+       "in_pulse_hz": 1.4614274492599753,
+       "post_0_50ms_hz": 0.7323943661971831,
+       "post_50_200ms_hz": 17.070422535211264
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 25.338983050847457,
+       "onset_1_10ms_hz": 43.78531073446327,
+       "in_pulse_hz": 11.096430562149976,
+       "post_0_50ms_hz": 5.847457627118644,
+       "post_50_200ms_hz": 33.220338983050844
+      },
+      "B": {
+       "base_hz": 27.004694835680752,
+       "onset_1_10ms_hz": 36.41105894627021,
+       "in_pulse_hz": 16.475854695823767,
+       "post_0_50ms_hz": 1.0140845070422535,
+       "post_50_200ms_hz": 24.488262910798117
+      }
+     },
+     "purity": {
+      "n_spikes": 28618,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.1663797515237264,
+      "ampsplit_ratio": 0.13541798411412875,
+      "ampsplit_burst_ratio": 1.2228654323033445,
+      "neighbours": {
+       "1002": "ambiguous",
+       "1003": "ambiguous",
+       "1004": "ambiguous",
+       "1005": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "1002": 0.337,
+       "1003": 0.517,
+       "1004": 0.359,
+       "1005": 0.453
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      34.5,
+      44.4,
+      56.4,
+      72.9,
+      100.7
+     ]
+    },
+    "1002": {
+     "template_trough_uV": -50.4,
+     "template_wire_profile_uV": [
+      -50.0,
+      -25.0,
+      -32.70000076293945,
+      -50.400001525878906
+     ],
+     "n_seed": 12604,
+     "n_capture": 6961,
+     "seed_matched_by_capture": 0.135,
+     "seed_matched_by_any_event": 0.996,
+     "capture_in_seed": 0.244,
+     "seed_response": {
+      "A": {
+       "base_hz": 10.59322033898305,
+       "onset_1_10ms_hz": 5.649717514124293,
+       "in_pulse_hz": 0.3655800766599799,
+       "post_0_50ms_hz": 3.4745762711864403,
+       "post_50_200ms_hz": 12.937853107344631
+      },
+      "B": {
+       "base_hz": 13.87793427230047,
+       "onset_1_10ms_hz": 7.4074074074074066,
+       "in_pulse_hz": 0.9916829119978403,
+       "post_0_50ms_hz": 2.028169014084507,
+       "post_50_200ms_hz": 9.364632237871673
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.508474576271186,
+       "onset_1_10ms_hz": 9.416195856873822,
+       "in_pulse_hz": 10.773859906273524,
+       "post_0_50ms_hz": 1.694915254237288,
+       "post_50_200ms_hz": 5.7627118644067785
+      },
+      "B": {
+       "base_hz": 6.15962441314554,
+       "onset_1_10ms_hz": 5.320813771517996,
+       "in_pulse_hz": 5.288975530655148,
+       "post_0_50ms_hz": 0.7323943661971831,
+       "post_50_200ms_hz": 4.6071987480438175
+      }
+     },
+     "purity": {
+      "n_spikes": 6961,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.14442976018724013,
+      "ampsplit_ratio": 0.1386340700624038,
+      "ampsplit_burst_ratio": 0.5545362802496152,
+      "neighbours": {
+       "1001": "ambiguous",
+       "1003": "ambiguous",
+       "1004": "ambiguous",
+       "1005": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "1001": 0.337,
+       "1003": 0.558,
+       "1004": 0.363,
+       "1005": 0.601
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      37.3,
+      49.3,
+      61.5,
+      77.9,
+      109.1
+     ]
+    },
+    "1003": {
+     "template_trough_uV": -67.2,
+     "template_wire_profile_uV": [
+      -35.5,
+      -67.19999694824219,
+      -26.200000762939453,
+      -33.599998474121094
+     ],
+     "n_seed": 20446,
+     "n_capture": 7501,
+     "seed_matched_by_capture": 0.141,
+     "seed_matched_by_any_event": 0.998,
+     "capture_in_seed": 0.385,
+     "seed_response": {
+      "A": {
+       "base_hz": 15.508474576271185,
+       "onset_1_10ms_hz": 11.770244821092279,
+       "in_pulse_hz": 3.2902206899398188,
+       "post_0_50ms_hz": 10.084745762711863,
+       "post_50_200ms_hz": 17.796610169491522
+      },
+      "B": {
+       "base_hz": 18.535211267605632,
+       "onset_1_10ms_hz": 15.232133541992695,
+       "in_pulse_hz": 4.105915214587549,
+       "post_0_50ms_hz": 6.084507042253521,
+       "post_50_200ms_hz": 16.84507042253521
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.59322033898305,
+       "onset_1_10ms_hz": 3.295668549905838,
+       "in_pulse_hz": 1.3117873338975747,
+       "post_0_50ms_hz": 3.1355932203389827,
+       "post_50_200ms_hz": 6.101694915254236
+      },
+      "B": {
+       "base_hz": 6.76056338028169,
+       "onset_1_10ms_hz": 3.442879499217527,
+       "in_pulse_hz": 1.0264788036468873,
+       "post_0_50ms_hz": 2.3098591549295775,
+       "post_50_200ms_hz": 5.9405320813771505
+      }
+     },
+     "purity": {
+      "n_spikes": 7501,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.5780159153566096,
+      "ampsplit_ratio": 0.05969824895665499,
+      "ampsplit_burst_ratio": 0.9551719833064797,
+      "neighbours": {
+       "1001": "ambiguous",
+       "1002": "ambiguous",
+       "1004": "ambiguous",
+       "1005": "distinct"
+      },
+      "neighbour_ratios": {
+       "1001": 0.518,
+       "1002": 0.557,
+       "1004": 0.444,
+       "1005": 0.849
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      44.5,
+      59.8,
+      74.3,
+      94.0,
+      129.8
+     ]
+    },
+    "1004": {
+     "template_trough_uV": -59.1,
+     "template_wire_profile_uV": [
+      -22.399999618530273,
+      -59.099998474121094,
+      -14.399999618530273,
+      -23.5
+     ],
+     "n_seed": 26133,
+     "n_capture": 22115,
+     "seed_matched_by_capture": 0.425,
+     "seed_matched_by_any_event": 0.998,
+     "capture_in_seed": 0.502,
+     "seed_response": {
+      "A": {
+       "base_hz": 8.050847457627118,
+       "onset_1_10ms_hz": 188.79472693032014,
+       "in_pulse_hz": 74.90090629451234,
+       "post_0_50ms_hz": 6.779661016949152,
+       "post_50_200ms_hz": 14.632768361581919
+      },
+      "B": {
+       "base_hz": 13.314553990610328,
+       "onset_1_10ms_hz": 173.60459050599894,
+       "in_pulse_hz": 113.5737903424895,
+       "post_0_50ms_hz": 2.272300469483568,
+       "post_50_200ms_hz": 11.054773082942095
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 7.796610169491525,
+       "onset_1_10ms_hz": 91.80790960451976,
+       "in_pulse_hz": 76.83633022977106,
+       "post_0_50ms_hz": 4.406779661016949,
+       "post_50_200ms_hz": 11.15819209039548
+      },
+      "B": {
+       "base_hz": 10.347417840375586,
+       "onset_1_10ms_hz": 88.99321857068335,
+       "in_pulse_hz": 111.31205738530144,
+       "post_0_50ms_hz": 2.7981220657276995,
+       "post_50_200ms_hz": 8.306729264475742
+      }
+     },
+     "purity": {
+      "n_spikes": 22115,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.08080688803467688,
+      "ampsplit_ratio": 0.13056378025863533,
+      "ampsplit_burst_ratio": 1.9378413701544823,
+      "neighbours": {
+       "1001": "ambiguous",
+       "1002": "ambiguous",
+       "1003": "ambiguous",
+       "1005": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "1001": 0.359,
+       "1002": 0.363,
+       "1003": 0.444,
+       "1005": 0.457
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      36.9,
+      47.5,
+      56.7,
+      68.8,
+      93.8
+     ]
+    },
+    "1005": {
+     "template_trough_uV": -74.7,
+     "template_wire_profile_uV": [
+      -22.799999237060547,
+      -32.5,
+      -74.69999694824219,
+      -40.5
+     ],
+     "n_seed": 42812,
+     "n_capture": 23004,
+     "seed_matched_by_capture": 0.272,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.507,
+     "seed_response": {
+      "A": {
+       "base_hz": 35.0,
+       "onset_1_10ms_hz": 40.48964218455744,
+       "in_pulse_hz": 8.601884156705408,
+       "post_0_50ms_hz": 17.796610169491526,
+       "post_50_200ms_hz": 46.89265536723163
+      },
+      "B": {
+       "base_hz": 40.7887323943662,
+       "onset_1_10ms_hz": 48.09598330725091,
+       "in_pulse_hz": 8.890350316331515,
+       "post_0_50ms_hz": 7.286384976525822,
+       "post_50_200ms_hz": 40.131455399061025
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 21.101694915254235,
+       "onset_1_10ms_hz": 11.299435028248586,
+       "in_pulse_hz": 10.75235519588176,
+       "post_0_50ms_hz": 6.186440677966101,
+       "post_50_200ms_hz": 20.762711864406775
+      },
+      "B": {
+       "base_hz": 20.88262910798122,
+       "onset_1_10ms_hz": 14.397496087636931,
+       "in_pulse_hz": 7.133157788054641,
+       "post_0_50ms_hz": 3.8497652582159625,
+       "post_50_200ms_hz": 17.496087636932703
+      }
+     },
+     "purity": {
+      "n_spikes": 23004,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.29717185919101696,
+      "ampsplit_ratio": 0.13969027897295386,
+      "ampsplit_burst_ratio": 0.9270354877296029,
+      "neighbours": {
+       "1001": "ambiguous",
+       "1002": "ambiguous",
+       "1003": "distinct",
+       "1004": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "1001": 0.453,
+       "1002": 0.601,
+       "1003": 0.849,
+       "1004": 0.457
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      44.3,
+      59.5,
+      72.5,
+      90.7,
+      124.5
+     ]
+    }
+   }
+  }
+ }
+}
