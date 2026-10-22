@@ -95,11 +95,29 @@ The subject to work on is never defaulted either: every tool takes
 `--manifest`, or `--subject` and `--experiment`, or `TTM_SUBJECT` and
 `TTM_EXPERIMENT`. Manifests live in `subjects/<id>/experiments/`.
 
+### tononi-2
+
+The server's facts, dated 2026-10-22, for anyone sharing it:
+
+| Volume | Size | Free | Use |
+|---|---|---|---|
+| `/nvme` | 5.8 TB | 2.1 TB | `data_root`. TTM-001's session directory alone is 2.2 TB (store plus 1.3 TB sorting cache). Often near full; `df -h /nvme` before writing. |
+| `/ssd-raid0` | 7.0 TB | 6.0 TB | Allowed for stores and sorting caches. Slower than `/nvme`, much faster than spinning disk. |
+| `/Volumes/tetrode` | CIFS | | `remotes.archive`. Writing needs the `paxilline` group (`sg paxilline -c '...'` in a shell that predates the membership) and `rsync --inplace`. |
+
+Other machines use it at the same time: never kill processes by pattern
+(`pkill -f` matches the shell that runs it), find PIDs with
+`pgrep -f "pat[t]ern"`, walk the parent chain, and kill by PID only when
+the owner is known. Use absolute paths and `git -C` in every command; a
+shell's working directory does not persist between agent calls. The GPU is
+one Tesla V100 with 32 GB (section 4).
+
 ## 6. Where to read next
 
 `README.md`, then `CLAUDE.md`, then `docs/pipeline.md` (the per-subject
 pipeline and every `ttm-*` command), then `packages/ttm/README.md`,
-then `investigations/README.md`.
+then `investigations/README.md`. Tool limits that shaped the pipeline:
+`docs/developer_notes/sorting_tool_limits.md`.
 
 ## Pinned packages
 

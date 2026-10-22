@@ -1,18 +1,39 @@
 ---
 title: Subject TTM-003
-updated: 2026-10-21
+updated: 2026-10-22
 ---
 
 # TTM-003
 
 16-tetrode Open Ephys subject with an optic fibre for optogenetic
-stimulation. No 48 h recording yet. Raw acquisitions:
-`/Volumes/tetrode/TTM3/<session>/`.
+stimulation. Raw acquisitions: `/Volumes/tetrode/TTM3/<session>/`.
 
 | Experiment | Session | What it is |
 |---|---|---|
 | `TTM-003-OPTO1` | `2026-10-16_14-06-44` | 32 min, seven laser trains |
 | `TTM-003-OPTO2` | `2026-10-16_14-44-22` | 20.6 min, five laser trains |
+| (no manifest yet) | `2026-10-20_09-02-12` | 48 h, optotagging pulses every 2 h |
+
+## The 48 h recording
+
+`/Volumes/tetrode/TTM3/2026-10-20_09-02-12/Record Node 102/experiment1/recording1/`,
+one experiment and one recording, 671 GB, finished the morning of
+2026-10-22. `continuous.dat` is 663,292,502,656 bytes, which is 47.98 h at
+64 channels, 30 kHz, int16. Software Time 1792504932633 ms is 2026-10-20
+14:02:12 UTC, 09:02:12 America/Chicago. Streams: `acquisition_board`
+(64 channels, 0.195 uV per bit), `memory_usage` (1 channel, 100 Hz),
+`IMU_port_A` (18 channels, 100 Hz). Events: `acquisition_board/TTL` and
+`MessageCenter`.
+
+Its `structure.oebin` has all 64 headstage channel names blank, the
+Acquisition Board plugin bug in
+`docs/developer_notes/openephys_blank_channel_names.md`; the two October
+16 sessions were repaired on 2026-10-21 and this one was not. Repair it
+as that note describes before `ttm-convert`. It has not been converted,
+has no manifest and no `experiment_params.json`; the pulse pattern,
+power and block times are not logged here and must come from the TTL and
+the experimenter. The plan for it is
+`docs/plans/2026-10-22_ttm003_48h_sorting_plan.md`.
 
 The stimulation protocol, the experimenter's train-by-train log and what
 the laser TTL actually recorded are in `optogenetic_stimulation.md`

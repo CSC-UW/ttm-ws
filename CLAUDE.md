@@ -14,12 +14,9 @@
   row in `investigations/README.md`; their outcome goes into the library.
 - Sync with `uv sync --all-packages --group dev`. Plain `uv sync` uninstalls
   the workspace members.
-- This workspace has its own environment. Do not run its code through
-  `gfys_workspace` (`uv run --project ../gfys_workspace`); that workspace
-  no longer depends on this one.
-- When this directory is opened from inside `projects/ece/`, the
-  `gfys_workspace/AGENTS.md` rules also load. Where they disagree on commands
-  or environment, this file wins for work under this directory.
+- This workspace has its own environment and is standalone. Do not run its
+  code through the lab's `gfys_workspace` environment; nothing there depends
+  on this workspace. The rules in this file are complete for work here.
 
 ## Dependencies
 - External packages are pinned by commit in the root `pyproject.toml`. To
@@ -41,6 +38,12 @@
 - Commit directly to `main` in small, self-contained commits. No feature
   branches: several people and agents work this repo concurrently.
 - Leave edits unstaged for the user to commit unless told otherwise.
+- Never push, and never open or edit a pull request, unless the user asks
+  for it in that conversation.
+- Review a commit message as a hostile reader before proposing it: tense
+  (present for behaviour that persists, past for what is removed,
+  imperative for the fix), "so" only for causation, no vague time words,
+  no "every" where a partial case exists. Body lines under 72 characters.
 
 ## Data
 - Production data are on `tononi-2` (`/nvme/neuropixels/tetrode_data`; raw
@@ -62,6 +65,34 @@
   confirmation; flag unconfirmed text as conjecture.
 - Avoid narrative comments in code; put the story in commit messages or
   `docs/developer_notes/`.
+- Everything written into the repo must read as the user's own writing:
+  no bold-label sentence openers or bold list labels, no rhetorical
+  italics, no em-dashes, no "[CONFIRM]" blocks, no closing offers.
+- Code behaviour and environment facts go in `docs/developer_notes/`,
+  completed investigations in `investigations/` or `docs/reports/`,
+  future work in `docs/plans/`. Machine facts go in `docs/SETUP.md` or
+  the per-machine config, never in this file or the library.
+
+## Analysis practice
+- Compare, don't assert. When two methods compete, run them head to head
+  on the data and show what each admits or produces, not only summary
+  metrics. Before calling something an open problem, check whether an
+  earlier script in `investigations/` already prototyped the answer.
+- An approximation (a windowed preview, a subsample, a cached proxy) is
+  adopted only after its agreement with the exact result is measured.
+- Measure before diagnosing slowness and before claiming a speed-up;
+  report the before and after numbers together.
+- Anything tied to a sorting (curation, re-attached traces, metrics) uses
+  only the recording store the sort was produced from, never a lossy or
+  alternative variant of the same session.
+- When a data source's validity is uncertain, build around it so it can be
+  swapped, and label results derived from it as provisional.
+- Compute added to an existing analysis gets an opt-out toggle, and
+  repeated random draws are capped at the number of distinct outcomes.
+- A window inside a stimulus is never a "baseline" or "quiet"; name it by
+  its position relative to onset and offset and say what it may contain.
+- Destructive actions (deleting data, killing processes, overwriting
+  stores) need the user's explicit confirmation; look at the target first.
 
 ## Repository size
 - No single file over 5 MB; repository under 200 MB without first discussing
