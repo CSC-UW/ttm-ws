@@ -1,6 +1,6 @@
 ---
 title: Setting up the workspace
-updated: 2026-10-19
+updated: 2026-10-22
 ---
 
 # Setting up the workspace
@@ -39,6 +39,12 @@ uv run pytest -q
 
 Two tests are marked `requires_nfs` and skip themselves when the production
 paths are not mounted. On `tononi-2` they run.
+
+After the checkout is moved (as `~/projects/ece/ttm-ws` became
+`~/projects/ttm-ws` in October 2026) the console scripts in `.venv/bin` keep
+the old interpreter path in their shebang and `uv run pytest` fails with
+"Failed to spawn"; `uv run python -m pytest` works, and the next
+`uv sync --all-packages --group dev` rewrites the scripts.
 
 ## 4. GPU
 
@@ -102,8 +108,16 @@ The server's facts, dated 2026-10-22, for anyone sharing it:
 | Volume | Size | Free | Use |
 |---|---|---|---|
 | `/nvme` | 5.8 TB | 2.1 TB | `data_root`. TTM-001's session directory alone is 2.2 TB (store plus 1.3 TB sorting cache). Often near full; `df -h /nvme` before writing. |
-| `/ssd-raid0` | 7.0 TB | 6.0 TB | Allowed for stores and sorting caches. Slower than `/nvme`, much faster than spinning disk. |
+| `/ssd-raid0` | 7.0 TB | 6.0 TB | Allowed for stores and sorting caches. Slower than `/nvme`, much faster than spinning disk. The TTM-003 48 h session directory `2026-10-20_09-02-12` lives at `/ssd-raid0/neuropixels/tetrode_data/` and is reached through a symlink of the same name under `data_root`, so no tool needs a second root. |
 | `/Volumes/tetrode` | CIFS | | `remotes.archive`. Writing needs the `paxilline` group (`sg paxilline -c '...'` in a shell that predates the membership) and `rsync --inplace`. |
+
+Until the 48 h session's `structure.oebin` on `/Volumes/tetrode` is repaired in
+place (`docs/developer_notes/openephys_blank_channel_names.md`), its store was
+converted from `<session>/oe_mirror/`, a symlink mirror of the acquisition with
+a repaired copy of the oebin, selected with
+`TTM_REMOTE_ARCHIVE=/ssd-raid0/neuropixels/tetrode_data/2026-10-20_09-02-12/oe_mirror`;
+the store's provenance records the mirror's `settings.xml` path. The mirror can
+go once the in-place repair is done.
 
 Other machines use it at the same time: never kill processes by pattern
 (`pkill -f` matches the shell that runs it), find PIDs with
