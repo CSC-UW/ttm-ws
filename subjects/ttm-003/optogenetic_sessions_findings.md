@@ -455,3 +455,96 @@ templates have mutual cosines above 0.9, and only 14 to 43 % of each
 re-sort cluster's spikes land on the same template in the capture.
 
 ### 8e. Every unit, both sessions, and the two sessions against each other
+
+`opto_capture.py --tetrodes all --analyzer` on both sessions (variant
+`capture`, 3.5 MAD, gate 0.6, three passes), then `opto_tag.py` and
+`opto_population.py` on that variant exactly as on `asis`
+(`results/optotag_<experiment>_capture.csv`,
+`opto_population_<experiment>_capture.json`), and
+`opto_capture_compare.py` across the two sessions
+(`results/capture_xsession_TTM-003-OPTO1_TTM-003-OPTO2_capture.csv`).
+
+| | OPTO1 (32 min) | OPTO2 (20.6 min) |
+|---|---|---|
+| events at 3.5 excised MAD, all 16 tetrodes | 5.52 M | 3.67 M |
+| accepted by a template | 1.52 M (28 %) | 0.83 M (23 %) |
+| main-sort spikes | 0.35 M | 0.22 M |
+| wall clock, one process, 16 tetrodes in turn | 80 s load, 579 s capture | 51 s, 378 s |
+
+So an 1800 s window of one session costs about 10 min in one process;
+the tetrodes are independent and would run in parallel on the 48 h
+store. The quiet tetrodes (TT1 to TT3, TT9, TT13, TT16: one unit each,
+troughs -24 to -53 uV) assign 3 to 9 % of their events and the capture
+there is the sorter's unit plus noise troughs that match its small
+template; TT14 (bad, no spikes) still gets 53 k to 96 k events assigned
+to its one cluster, and TT15's unit 53 grows from 2.8 k to 104 k spikes
+in OPTO2. Bad tetrodes and templates under about 40 uV should not be
+captured at all; that is a driver change still to make.
+
+The population picture, pattern B at 9.8 mW, `opto_tag.py` classes:
+
+| | OPTO1 asis | OPTO1 capture | OPTO2 asis | OPTO2 capture | OPTO2 capture at 4.5 MAD |
+|---|---|---|---|---|---|
+| suppressed | 40 | 18 | 44 | 17 | 23 |
+| activated or weakly activated | 2 | 8 | 1 | 8 | |
+| unaffected | 14 | 30 | 11 | 31 | |
+| asis-suppressed units still suppressed | | 17 of 40 | | 16 of 44 | 23 of 44 |
+| median in-pulse gain of asis-suppressed units, per second | | 4.6 | | 3.4 | 1.8 |
+| median in-pulse rate of asis-suppressed units, fraction of baseline | 0.027 | 0.33 | 0.029 | 0.31 | |
+
+The pooled suppression of the units still classed suppressed is as
+before (silence within 7.5 ms, in-pulse 7 to 13 % of baseline, recovery
+50 to 105 ms after offset, rebound 1.2 to 1.7). What changes is that
+most small-template units (-75 to -100 uV) gain 2 to 10 in-pulse events
+per second that the main sort did not have, which lifts their pulse
+ratio above the 0.5 bar: at 3.5 excised MAD the threshold is 2.8 plain
+MAD and noise troughs pass it, and the attenuated spikes of the driven
+cells land on whichever small template is nearest. Raising detection to
+4.5 excised MAD halves that gain (1.8 per second) and keeps 23 of 44
+suppressed, at the cost of 8 % of the TT6 cell's in-pulse train (121
+against 131 per second) and 20 to 35 % of the TT4 and TT11 trains below.
+The large-template units (every TT6 unit above -150 uV, TT8, TT12) stay
+suppressed at either threshold with in-pulse rates under 0.3 per second,
+so the suppression result of section 4 stands for the units the sorter
+isolated well; the capture's extra events are small, and for small
+units the shape gate cannot tell a 4 MAD spike of the template's own
+shape from one of a neighbour's.
+
+Three units are activated in the capture in both sessions, with
+matching templates across the sessions (cosine 0.987 to 0.998). The
+main sort had the TT4 and TT11 units' onset spikes (9 to 20 per second)
+and nothing in the pulse, the TT6 pattern again, and classed them
+suppressed:
+
+| | main sort base / onset / in pulse | capture base / onset / in pulse (OPTO1) | capture (OPTO2) | amplitude-split ratio, 2 to 3 ms peak |
+|---|---|---|---|---|
+| TT4 unit 3 (-95 and -97 uV) | 9.7 / 15.2 / 1.1 and 6.2 / 10.2 / 0.4 | 12.1 / 66.5 / 37.8 | 12.9 / 68.3 / 38.3 | 0.12 and 0.08; 2.1 to 2.3 |
+| TT11 OPTO1 unit 36, OPTO2 unit 39 (-84 and -90 uV) | 2.8 / 20.2 / 0.1 and 1.7 / 8.7 / 0.0 | 17.6 / 87.9 / 86.6 | 9.8 / 103.6 / 67.4 | 0.12; 1.7 and 2.3 |
+| TT10 OPTO1 unit 34, OPTO2 unit 35 (section 5) | 9.0 / 55.9 / 12.9 and 10.3 / 50.2 / 12.0 | 16.1 / 69.8 / 61.5 | 10.4 / 30.6 / 28.4 | 0.09 and 0.12; 1.1 |
+
+Their captured spikes span 4 to 38 MAD, the in-pulse ones sit at 4 to
+10 MAD, and their cross-correlograms with the other units of their
+tetrode have peaks at plus and minus 2 to 3 ms around a central dip
+(`figures/capture/capture_TT4_purity.pdf` page 1,
+`capture_TT11_purity.pdf` page 3 in OPTO2). *Conjecture:* these are
+burst cells whose later, smaller burst spikes the main sort either
+dropped or gave to a neighbour, and TT4's volley at 2.7 ms (section 1)
+is unit 3's; whether they are directly driven or disynaptic is for the
+user to judge from the pages, with the 2 to 3 ms peaks and the TT6 cell
+as the comparison. TT5 units 8 to 12 are weakly activated in the
+capture for the same reason at 20 to 26 per second in the pulse.
+
+Across the sessions, 52 of the 56 OPTO1 units match an OPTO2 unit on the
+same tetrode at template cosine 0.97 or above (greedy, best pair first),
+and the pulse signatures of the matched pairs agree: the TT6 cell
+(144 and 131 in pulse), TT4 unit 3 (38 and 38), the TT11 cell (87 and
+67), every large TT6, TT8 and TT12 unit silent in both (under 0.3 per
+second), and the small-template units with the same 2 to 9 per second
+gain in both. The exceptions are the two TT10 multi-unit templates,
+which split the driven cell differently in the two sessions (onset 70
+and 31, 42 and 68), the pairing of near-identical templates on TT5 and
+TT11 (cosines above 0.99 between several units of one tetrode, so the
+greedy match is not unique), and four units without a partner. The
+suppression profile is therefore stable enough across 40 min to serve as
+the weaker identity check the plan asks about, for units the sorter
+isolated well; for hash collectors it is the hash's profile.

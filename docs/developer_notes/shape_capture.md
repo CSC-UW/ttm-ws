@@ -92,6 +92,15 @@ collectors.
   cosine there, so small-template units collect hash. The refractory
   conflict ratio, the amplitude-split test and the neighbour verdicts are
   what show it.
-- Runtime on tononi-2, one tetrode of a 32 min session (546 k events):
-  load 6 s, noise 15 s, detection 8 s, three scoring passes 25 s, purity
-  3 s; wobble on the same tetrode is reported in the findings table.
+- Bad tetrodes and templates under about 40 uV are not skipped yet; on
+  TT14 (no spikes) and the quiet tetrodes the capture assigns noise
+  troughs to the one small template, and on a busy tetrode a small
+  template collects hash. The findings' section 8e has the counts.
+- Detection at 3.5 excised MAD is 2.8 plain MAD and admits noise troughs
+  that lift small units' in-pulse rates; 4.5 halves that at the cost of
+  8 % of the TT6 cell's in-pulse train (`--thresh-mad`).
+- Runtime on tononi-2, one process: a 32 min session, all 16 tetrodes in
+  turn, 80 s to load and 579 s to capture (5.5 M events), so about
+  10 min per 1800 s window; the tetrodes are independent. One tetrode
+  (546 k events): noise about 10 s, detection 8 s, three scoring passes
+  25 s, purity 3 s; wobble on the same tetrode 15 to 22 s.

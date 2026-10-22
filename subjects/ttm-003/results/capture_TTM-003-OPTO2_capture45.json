@@ -1,0 +1,4848 @@
+{
+ "experiment": "TTM-003-OPTO2",
+ "variant": "asis",
+ "out": "capture45",
+ "params": {
+  "manifest": "/Users/gfindlay@ad.wisc.edu/projects/ttm-ws/subjects/ttm-003/experiments/TTM-003-OPTO2.toml",
+  "subject": "TTM-003",
+  "experiment": "TTM-003-OPTO2",
+  "variant": "asis",
+  "out": "capture45",
+  "tetrodes": [
+   "all"
+  ],
+  "thresh_mad": 4.5,
+  "gate_r": 0.6,
+  "gate_rc": null,
+  "n_pass": 3,
+  "margin": 0.0,
+  "refr_ms": 1.5,
+  "seed": [],
+  "templates_from": null,
+  "wobble": false,
+  "wobble_factor": 0.35,
+  "noise_check": false,
+  "block_s": 10.0,
+  "analyzer": true,
+  "n_jobs": 16,
+  "no_figures": true,
+  "overwrite": true
+ },
+ "seconds": 1235.0151666666666,
+ "tetrodes": {
+  "TT1": {
+   "wires": [
+    "CH40",
+    "CH38",
+    "CH36",
+    "CH34"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    4.683000087738037,
+    3.5789999961853027,
+    4.035999774932861,
+    3.6989998817443848
+   ],
+   "noise_excised_uV": [
+    4.579999923706055,
+    3.4860000610351562,
+    3.9619998931884766,
+    3.6029999256134033
+   ],
+   "excised_fraction": 0.0858,
+   "n_events": 28143,
+   "events_per_s": 22.8,
+   "n_accepted": 3933,
+   "n_pool": 24210,
+   "n_refractory_rejected": 151,
+   "accepted_by_pass": [
+    3852,
+    221,
+    11
+   ],
+   "seconds": {
+    "load": 2.7,
+    "capture": 15.7
+   },
+   "units": {
+    "0": {
+     "template_trough_uV": -27.9,
+     "template_wire_profile_uV": [
+      -17.200000762939453,
+      -23.200000762939453,
+      -22.100000381469727,
+      -27.899999618530273
+     ],
+     "n_seed": 2338,
+     "n_capture": 3933,
+     "seed_matched_by_capture": 0.545,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.324,
+     "seed_response": {
+      "A": {
+       "base_hz": 5.0,
+       "onset_1_10ms_hz": 3.295668549905838,
+       "in_pulse_hz": 1.9999380664340074,
+       "post_0_50ms_hz": 2.2881355932203387,
+       "post_50_200ms_hz": 2.7683615819209035
+      },
+      "B": {
+       "base_hz": 1.3145539906103287,
+       "onset_1_10ms_hz": 1.6692749087115282,
+       "in_pulse_hz": 1.0612746952959344,
+       "post_0_50ms_hz": 0.7699530516431925,
+       "post_50_200ms_hz": 1.1017214397496087
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 6.016949152542373,
+       "onset_1_10ms_hz": 6.591337099811676,
+       "in_pulse_hz": 3.634296056208035,
+       "post_0_50ms_hz": 4.1525423728813555,
+       "post_50_200ms_hz": 4.576271186440677
+      },
+      "B": {
+       "base_hz": 2.103286384976526,
+       "onset_1_10ms_hz": 3.2342201356285862,
+       "in_pulse_hz": 1.7223966366278278,
+       "post_0_50ms_hz": 1.7464788732394365,
+       "post_50_200ms_hz": 2.0281690140845066
+      }
+     },
+     "purity": {
+      "n_spikes": 3933,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 4.01864914249579,
+      "ampsplit_ratio": 1.30266998359992,
+      "ampsplit_burst_ratio": 11.28980652453264,
+      "neighbours": {},
+      "neighbour_ratios": {}
+     },
+     "capture_amp_uV_quantiles": [
+      21.7,
+      25.2,
+      29.7,
+      36.4,
+      50.3
+     ]
+    }
+   }
+  },
+  "TT2": {
+   "wires": [
+    "CH48",
+    "CH46",
+    "CH44",
+    "CH42"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    4.0879998207092285,
+    3.8519999980926514,
+    3.556999921798706,
+    3.561000108718872
+   ],
+   "noise_excised_uV": [
+    4.0279998779296875,
+    3.806999921798706,
+    3.447000026702881,
+    3.4609999656677246
+   ],
+   "excised_fraction": 0.0724,
+   "n_events": 20040,
+   "events_per_s": 16.2,
+   "n_accepted": 3593,
+   "n_pool": 16447,
+   "n_refractory_rejected": 157,
+   "accepted_by_pass": [
+    3532,
+    204,
+    14
+   ],
+   "seconds": {
+    "load": 2.6,
+    "capture": 17.7
+   },
+   "units": {
+    "1": {
+     "template_trough_uV": -23.7,
+     "template_wire_profile_uV": [
+      -18.799999237060547,
+      -18.0,
+      -23.700000762939453,
+      -22.399999618530273
+     ],
+     "n_seed": 1231,
+     "n_capture": 3593,
+     "seed_matched_by_capture": 0.527,
+     "seed_matched_by_any_event": 0.987,
+     "capture_in_seed": 0.181,
+     "seed_response": {
+      "A": {
+       "base_hz": 2.4576271186440675,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 1.440815596248156,
+       "post_0_50ms_hz": 1.6101694915254237,
+       "post_50_200ms_hz": 1.4689265536723162
+      },
+      "B": {
+       "base_hz": 0.7136150234741784,
+       "onset_1_10ms_hz": 1.043296817944705,
+       "in_pulse_hz": 0.5567342663847524,
+       "post_0_50ms_hz": 0.3755868544600939,
+       "post_50_200ms_hz": 0.569640062597809
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.677966101694915,
+       "onset_1_10ms_hz": 3.295668549905838,
+       "in_pulse_hz": 3.2472112691562915,
+       "post_0_50ms_hz": 3.4745762711864403,
+       "post_50_200ms_hz": 3.9830508474576263
+      },
+      "B": {
+       "base_hz": 2.4225352112676055,
+       "onset_1_10ms_hz": 2.399582681272822,
+       "in_pulse_hz": 1.4788253950844987,
+       "post_0_50ms_hz": 1.3145539906103287,
+       "post_50_200ms_hz": 2.12206572769953
+      }
+     },
+     "purity": {
+      "n_spikes": 3593,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 5.006523445284135,
+      "ampsplit_ratio": 1.3006479429022213,
+      "ampsplit_burst_ratio": 11.445701897539546,
+      "neighbours": {},
+      "neighbour_ratios": {}
+     },
+     "capture_amp_uV_quantiles": [
+      18.5,
+      20.2,
+      22.9,
+      27.3,
+      39.7
+     ]
+    }
+   }
+  },
+  "TT3": {
+   "wires": [
+    "CH56",
+    "CH54",
+    "CH52",
+    "CH50"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    4.083000183105469,
+    6.2220001220703125,
+    4.182000160217285,
+    3.799999952316284
+   ],
+   "noise_excised_uV": [
+    4.000999927520752,
+    6.168000221252441,
+    4.11899995803833,
+    3.7130000591278076
+   ],
+   "excised_fraction": 0.0579,
+   "n_events": 16875,
+   "events_per_s": 13.7,
+   "n_accepted": 2511,
+   "n_pool": 14364,
+   "n_refractory_rejected": 57,
+   "accepted_by_pass": [
+    2479,
+    87,
+    2
+   ],
+   "seconds": {
+    "load": 2.6,
+    "capture": 14.1
+   },
+   "units": {
+    "2": {
+     "template_trough_uV": -28.8,
+     "template_wire_profile_uV": [
+      -28.799999237060547,
+      -17.299999237060547,
+      -19.399999618530273,
+      -24.299999237060547
+     ],
+     "n_seed": 1176,
+     "n_capture": 2511,
+     "seed_matched_by_capture": 0.578,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.271,
+     "seed_response": {
+      "A": {
+       "base_hz": 2.11864406779661,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 0.7741695741034867,
+       "post_0_50ms_hz": 0.7627118644067796,
+       "post_50_200ms_hz": 1.5819209039548021
+      },
+      "B": {
+       "base_hz": 0.7323943661971831,
+       "onset_1_10ms_hz": 1.1476264997391756,
+       "in_pulse_hz": 0.5045404289111819,
+       "post_0_50ms_hz": 0.22535211267605634,
+       "post_50_200ms_hz": 0.6071987480438183
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 4.23728813559322,
+       "onset_1_10ms_hz": 5.178907721280602,
+       "in_pulse_hz": 2.4945464054445683,
+       "post_0_50ms_hz": 1.8644067796610169,
+       "post_50_200ms_hz": 2.9943502824858754
+      },
+      "B": {
+       "base_hz": 1.2582159624413145,
+       "onset_1_10ms_hz": 1.8779342723004693,
+       "in_pulse_hz": 1.078672641120458,
+       "post_0_50ms_hz": 0.8450704225352113,
+       "post_50_200ms_hz": 1.3458528951486695
+      }
+     },
+     "purity": {
+      "n_spikes": 2511,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 3.7216237668819785,
+      "ampsplit_ratio": 0.0,
+      "ampsplit_burst_ratio": 12.787467055635583,
+      "neighbours": {},
+      "neighbour_ratios": {}
+     },
+     "capture_amp_uV_quantiles": [
+      29.1,
+      33.2,
+      37.9,
+      45.0,
+      59.3
+     ]
+    }
+   }
+  },
+  "TT4": {
+   "wires": [
+    "CH58",
+    "CH64",
+    "CH62",
+    "CH60"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    12.050000190734863,
+    17.402000427246094,
+    13.930999755859375,
+    11.196000099182129
+   ],
+   "noise_excised_uV": [
+    10.91100025177002,
+    16.34600067138672,
+    12.838000297546387,
+    10.100000381469727
+   ],
+   "excised_fraction": 0.2199,
+   "n_events": 107596,
+   "events_per_s": 87.1,
+   "n_accepted": 38645,
+   "n_pool": 68951,
+   "n_refractory_rejected": 297,
+   "accepted_by_pass": [
+    37517,
+    1370,
+    55
+   ],
+   "seconds": {
+    "load": 2.6,
+    "capture": 13.5
+   },
+   "units": {
+    "3": {
+     "template_trough_uV": -97.2,
+     "template_wire_profile_uV": [
+      -97.19999694824219,
+      -48.099998474121094,
+      -42.900001525878906,
+      -52.0
+     ],
+     "n_seed": 5519,
+     "n_capture": 13258,
+     "seed_matched_by_capture": 0.495,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.206,
+     "seed_response": {
+      "A": {
+       "base_hz": 4.745762711864407,
+       "onset_1_10ms_hz": 12.241054613935969,
+       "in_pulse_hz": 0.4085894974435069,
+       "post_0_50ms_hz": 0.847457627118644,
+       "post_50_200ms_hz": 2.6271186440677963
+      },
+      "B": {
+       "base_hz": 6.215962441314554,
+       "onset_1_10ms_hz": 10.22430881585811,
+       "in_pulse_hz": 0.3827548081395173,
+       "post_0_50ms_hz": 0.5633802816901409,
+       "post_50_200ms_hz": 3.9499217527386534
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 8.559322033898304,
+       "onset_1_10ms_hz": 74.3879472693032,
+       "in_pulse_hz": 13.031854497408693,
+       "post_0_50ms_hz": 0.5932203389830508,
+       "post_50_200ms_hz": 5.564971751412428
+      },
+      "B": {
+       "base_hz": 11.549295774647888,
+       "onset_1_10ms_hz": 64.99739175795513,
+       "in_pulse_hz": 25.24441939138362,
+       "post_0_50ms_hz": 1.1455399061032865,
+       "post_50_200ms_hz": 7.7996870109546155
+      }
+     },
+     "purity": {
+      "n_spikes": 13258,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.24825663942796386,
+      "ampsplit_ratio": 0.05736359090120887,
+      "ampsplit_burst_ratio": 3.403573060138393,
+      "neighbours": {
+       "4": "ambiguous",
+       "5": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "4": 0.321,
+       "5": 0.572
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      76.5,
+      87.8,
+      104.8,
+      129.3,
+      178.4
+     ]
+    },
+    "4": {
+     "template_trough_uV": -107.1,
+     "template_wire_profile_uV": [
+      -20.899999618530273,
+      -107.0999984741211,
+      -40.0,
+      -13.399999618530273
+     ],
+     "n_seed": 3186,
+     "n_capture": 9163,
+     "seed_matched_by_capture": 0.723,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.251,
+     "seed_response": {
+      "A": {
+       "base_hz": 3.3050847457627115,
+       "onset_1_10ms_hz": 2.8248587570621466,
+       "in_pulse_hz": 2.6235746677951495,
+       "post_0_50ms_hz": 2.2881355932203387,
+       "post_50_200ms_hz": 2.7118644067796605
+      },
+      "B": {
+       "base_hz": 2.6291079812206575,
+       "onset_1_10ms_hz": 3.2342201356285862,
+       "in_pulse_hz": 2.122549390591869,
+       "post_0_50ms_hz": 2.1220657276995305,
+       "post_50_200ms_hz": 2.2910798122065725
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 7.881355932203389,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 6.386898986353765,
+       "post_0_50ms_hz": 10.508474576271185,
+       "post_50_200ms_hz": 9.039548022598868
+      },
+      "B": {
+       "base_hz": 7.117370892018779,
+       "onset_1_10ms_hz": 1.9822639540949398,
+       "in_pulse_hz": 5.497750880549431,
+       "post_0_50ms_hz": 10.215962441314554,
+       "post_50_200ms_hz": 7.943661971830984
+      }
+     },
+     "purity": {
+      "n_spikes": 9163,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.0,
+      "ampsplit_ratio": 0.040027006932452015,
+      "ampsplit_burst_ratio": 0.08005401386490402,
+      "neighbours": {
+       "3": "ambiguous",
+       "5": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "3": 0.322,
+       "5": 0.348
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      75.3,
+      81.5,
+      89.5,
+      99.1,
+      114.5
+     ]
+    },
+    "5": {
+     "template_trough_uV": -85.7,
+     "template_wire_profile_uV": [
+      -48.5,
+      -39.79999923706055,
+      -85.69999694824219,
+      -82.9000015258789
+     ],
+     "n_seed": 5081,
+     "n_capture": 16224,
+     "seed_matched_by_capture": 0.622,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.195,
+     "seed_response": {
+      "A": {
+       "base_hz": 4.491525423728813,
+       "onset_1_10ms_hz": 24.482109227871938,
+       "in_pulse_hz": 0.1075235519588176,
+       "post_0_50ms_hz": 0.5084745762711864,
+       "post_50_200ms_hz": 1.8926553672316382
+      },
+      "B": {
+       "base_hz": 5.126760563380282,
+       "onset_1_10ms_hz": 10.01564945226917,
+       "in_pulse_hz": 0.1217856207716646,
+       "post_0_50ms_hz": 0.8262910798122066,
+       "post_50_200ms_hz": 4.269170579029733
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 11.779661016949152,
+       "onset_1_10ms_hz": 40.018832391713744,
+       "in_pulse_hz": 3.4407536626821633,
+       "post_0_50ms_hz": 1.1016949152542372,
+       "post_50_200ms_hz": 7.4011299435028235
+      },
+      "B": {
+       "base_hz": 16.450704225352112,
+       "onset_1_10ms_hz": 44.34011476264997,
+       "in_pulse_hz": 5.845709797039901,
+       "post_0_50ms_hz": 1.84037558685446,
+       "post_50_200ms_hz": 11.680751173708918
+      }
+     },
+     "purity": {
+      "n_spikes": 16224,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2987229078908458,
+      "ampsplit_ratio": 0.19146903919576838,
+      "ampsplit_burst_ratio": 2.6295081382885526,
+      "neighbours": {
+       "3": "ambiguous",
+       "4": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "3": 0.572,
+       "4": 0.348
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      77.4,
+      91.0,
+      107.3,
+      129.9,
+      173.0
+     ]
+    }
+   }
+  },
+  "TT5": {
+   "wires": [
+    "CH63",
+    "CH61",
+    "CH59",
+    "CH57"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    11.027000427246094,
+    10.095999717712402,
+    11.102999687194824,
+    10.885000228881836
+   ],
+   "noise_excised_uV": [
+    9.29800033569336,
+    8.461999893188477,
+    9.345000267028809,
+    9.26200008392334
+   ],
+   "excised_fraction": 0.3054,
+   "n_events": 184035,
+   "events_per_s": 149.0,
+   "n_accepted": 80453,
+   "n_pool": 103582,
+   "n_refractory_rejected": 1041,
+   "accepted_by_pass": [
+    74177,
+    6833,
+    484
+   ],
+   "seconds": {
+    "load": 3.1,
+    "capture": 20.4
+   },
+   "units": {
+    "6": {
+     "template_trough_uV": -103.3,
+     "template_wire_profile_uV": [
+      -103.30000305175781,
+      -50.5,
+      -48.0,
+      -24.200000762939453
+     ],
+     "n_seed": 4662,
+     "n_capture": 6629,
+     "seed_matched_by_capture": 0.381,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.268,
+     "seed_response": {
+      "A": {
+       "base_hz": 4.576271186440677,
+       "onset_1_10ms_hz": 3.766478342749529,
+       "in_pulse_hz": 0.06451413117529056,
+       "post_0_50ms_hz": 0.3389830508474576,
+       "post_50_200ms_hz": 2.429378531073446
+      },
+      "B": {
+       "base_hz": 6.122065727699531,
+       "onset_1_10ms_hz": 2.08659363588941,
+       "in_pulse_hz": 0.03479589164904703,
+       "post_0_50ms_hz": 0.3380281690140845,
+       "post_50_200ms_hz": 4.143974960876369
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 6.016949152542373,
+       "onset_1_10ms_hz": 0.4708097928436911,
+       "in_pulse_hz": 0.7526648637117233,
+       "post_0_50ms_hz": 0.5084745762711864,
+       "post_50_200ms_hz": 2.6271186440677963
+      },
+      "B": {
+       "base_hz": 8.56338028169014,
+       "onset_1_10ms_hz": 3.5472091810119974,
+       "in_pulse_hz": 0.8698972912261758,
+       "post_0_50ms_hz": 0.39436619718309857,
+       "post_50_200ms_hz": 5.089201877934271
+      }
+     },
+     "purity": {
+      "n_spikes": 6629,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.46840875363766765,
+      "ampsplit_ratio": 0.38242393934139246,
+      "ampsplit_burst_ratio": 1.9886044845752406,
+      "neighbours": {
+       "7": "ambiguous",
+       "8": "distinct",
+       "9": "ambiguous",
+       "10": "distinct",
+       "11": "ambiguous",
+       "12": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "7": 0.482,
+       "8": 0.75,
+       "9": 0.622,
+       "10": 0.718,
+       "11": 0.545,
+       "12": 0.679
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      46.0,
+      57.7,
+      74.0,
+      101.4,
+      162.9
+     ]
+    },
+    "7": {
+     "template_trough_uV": -120.6,
+     "template_wire_profile_uV": [
+      -120.5999984741211,
+      -94.30000305175781,
+      -40.79999923706055,
+      -34.79999923706055
+     ],
+     "n_seed": 3514,
+     "n_capture": 5390,
+     "seed_matched_by_capture": 0.743,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.484,
+     "seed_response": {
+      "A": {
+       "base_hz": 4.576271186440677,
+       "onset_1_10ms_hz": 0.4708097928436911,
+       "in_pulse_hz": 0.3870847870517434,
+       "post_0_50ms_hz": 0.6779661016949152,
+       "post_50_200ms_hz": 2.8813559322033893
+      },
+      "B": {
+       "base_hz": 4.676056338028169,
+       "onset_1_10ms_hz": 2.608242044861763,
+       "in_pulse_hz": 0.5567342663847524,
+       "post_0_50ms_hz": 0.5258215962441315,
+       "post_50_200ms_hz": 2.8169014084507036
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.423728813559322,
+       "onset_1_10ms_hz": 2.3540489642184554,
+       "in_pulse_hz": 1.2687779131140478,
+       "post_0_50ms_hz": 1.1864406779661016,
+       "post_50_200ms_hz": 3.644067796610169
+      },
+      "B": {
+       "base_hz": 6.516431924882629,
+       "onset_1_10ms_hz": 3.9645279081898797,
+       "in_pulse_hz": 1.4788253950844987,
+       "post_0_50ms_hz": 0.6572769953051644,
+       "post_50_200ms_hz": 4.2879499217527375
+      }
+     },
+     "purity": {
+      "n_spikes": 5390,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2975725047988499,
+      "ampsplit_ratio": 0.3468394514405923,
+      "ampsplit_burst_ratio": 3.2371682134455284,
+      "neighbours": {
+       "6": "ambiguous",
+       "8": "distinct",
+       "9": "ambiguous",
+       "10": "ambiguous",
+       "11": "distinct",
+       "12": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "6": 0.482,
+       "8": 0.747,
+       "9": 0.569,
+       "10": 0.472,
+       "11": 0.713,
+       "12": 0.671
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      47.2,
+      65.7,
+      96.3,
+      126.9,
+      158.2
+     ]
+    },
+    "8": {
+     "template_trough_uV": -101.0,
+     "template_wire_profile_uV": [
+      -101.0,
+      -34.400001525878906,
+      -80.19999694824219,
+      -27.399999618530273
+     ],
+     "n_seed": 4502,
+     "n_capture": 6650,
+     "seed_matched_by_capture": 0.611,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.413,
+     "seed_response": {
+      "A": {
+       "base_hz": 3.7288135593220337,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 0.02150471039176352,
+       "post_0_50ms_hz": 0.5932203389830508,
+       "post_50_200ms_hz": 1.9774011299435026
+      },
+      "B": {
+       "base_hz": 6.103286384976526,
+       "onset_1_10ms_hz": 1.9822639540949398,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.11267605633802817,
+       "post_50_200ms_hz": 3.999999999999999
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 7.627118644067796,
+       "onset_1_10ms_hz": 3.766478342749529,
+       "in_pulse_hz": 0.6881507325364327,
+       "post_0_50ms_hz": 0.423728813559322,
+       "post_50_200ms_hz": 3.7005649717514117
+      },
+      "B": {
+       "base_hz": 7.906103286384977,
+       "onset_1_10ms_hz": 5.007824726134585,
+       "in_pulse_hz": 0.6611219413318935,
+       "post_0_50ms_hz": 0.3755868544600939,
+       "post_50_200ms_hz": 5.327073552425664
+      }
+     },
+     "purity": {
+      "n_spikes": 6650,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.5678551654826288,
+      "ampsplit_ratio": 0.22788006730159852,
+      "ampsplit_burst_ratio": 2.278800673015985,
+      "neighbours": {
+       "6": "distinct",
+       "7": "distinct",
+       "9": "distinct",
+       "10": "ambiguous",
+       "11": "ambiguous",
+       "12": "distinct"
+      },
+      "neighbour_ratios": {
+       "6": 0.751,
+       "7": 0.746,
+       "9": 0.808,
+       "10": 0.622,
+       "11": 0.61,
+       "12": 0.719
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      45.7,
+      59.4,
+      80.3,
+      102.9,
+      135.0
+     ]
+    },
+    "9": {
+     "template_trough_uV": -91.2,
+     "template_wire_profile_uV": [
+      -53.5,
+      -91.19999694824219,
+      -34.79999923706055,
+      -65.30000305175781
+     ],
+     "n_seed": 4014,
+     "n_capture": 5906,
+     "seed_matched_by_capture": 0.517,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.352,
+     "seed_response": {
+      "A": {
+       "base_hz": 4.661016949152542,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.423728813559322,
+       "post_50_200ms_hz": 3.0225988700564965
+      },
+      "B": {
+       "base_hz": 5.652582159624413,
+       "onset_1_10ms_hz": 2.08659363588941,
+       "in_pulse_hz": 0.017397945824523513,
+       "post_0_50ms_hz": 0.07511737089201878,
+       "post_50_200ms_hz": 4.018779342723004
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 4.23728813559322,
+       "onset_1_10ms_hz": 7.532956685499058,
+       "in_pulse_hz": 4.967588100497373,
+       "post_0_50ms_hz": 0.2542372881355932,
+       "post_50_200ms_hz": 2.9378531073446323
+      },
+      "B": {
+       "base_hz": 6.666666666666667,
+       "onset_1_10ms_hz": 10.537297861241523,
+       "in_pulse_hz": 6.611219413318936,
+       "post_0_50ms_hz": 0.3004694835680751,
+       "post_50_200ms_hz": 4.444444444444444
+      }
+     },
+     "purity": {
+      "n_spikes": 5906,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.21244017775262036,
+      "ampsplit_ratio": 0.2890622226684882,
+      "ampsplit_burst_ratio": 1.1562488906739528,
+      "neighbours": {
+       "6": "ambiguous",
+       "7": "ambiguous",
+       "8": "distinct",
+       "10": "ambiguous",
+       "11": "ambiguous",
+       "12": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "6": 0.623,
+       "7": 0.568,
+       "8": 0.808,
+       "10": 0.495,
+       "11": 0.614,
+       "12": 0.57
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      44.1,
+      54.5,
+      72.6,
+      98.5,
+      137.4
+     ]
+    },
+    "10": {
+     "template_trough_uV": -75.5,
+     "template_wire_profile_uV": [
+      -44.400001525878906,
+      -75.5,
+      -22.5,
+      -31.799999237060547
+     ],
+     "n_seed": 6747,
+     "n_capture": 7988,
+     "seed_matched_by_capture": 0.507,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.429,
+     "seed_response": {
+      "A": {
+       "base_hz": 5.338983050847458,
+       "onset_1_10ms_hz": 1.8832391713747645,
+       "in_pulse_hz": 0.04300942078352704,
+       "post_0_50ms_hz": 0.2542372881355932,
+       "post_50_200ms_hz": 4.209039548022599
+      },
+      "B": {
+       "base_hz": 10.328638497652582,
+       "onset_1_10ms_hz": 3.025560772039645,
+       "in_pulse_hz": 0.1391835665961881,
+       "post_0_50ms_hz": 0.09389671361502347,
+       "post_50_200ms_hz": 6.553990610328637
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 4.406779661016949,
+       "onset_1_10ms_hz": 21.1864406779661,
+       "in_pulse_hz": 10.429784540005308,
+       "post_0_50ms_hz": 0.3389830508474576,
+       "post_50_200ms_hz": 3.841807909604519
+      },
+      "B": {
+       "base_hz": 9.690140845070422,
+       "onset_1_10ms_hz": 15.545122587376108,
+       "in_pulse_hz": 11.204277110993143,
+       "post_0_50ms_hz": 0.431924882629108,
+       "post_50_200ms_hz": 5.840375586854459
+      }
+     },
+     "purity": {
+      "n_spikes": 7988,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.12258251426686573,
+      "ampsplit_ratio": 0.15797848943548345,
+      "ampsplit_burst_ratio": 2.632974823924725,
+      "neighbours": {
+       "6": "distinct",
+       "7": "ambiguous",
+       "8": "ambiguous",
+       "9": "ambiguous",
+       "11": "ambiguous",
+       "12": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "6": 0.718,
+       "7": 0.472,
+       "8": 0.622,
+       "9": 0.495,
+       "11": 0.477,
+       "12": 0.475
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      44.0,
+      54.8,
+      72.1,
+      88.6,
+      122.5
+     ]
+    },
+    "11": {
+     "template_trough_uV": -91.6,
+     "template_wire_profile_uV": [
+      -48.20000076293945,
+      -41.0,
+      -91.5999984741211,
+      -56.400001525878906
+     ],
+     "n_seed": 8677,
+     "n_capture": 27434,
+     "seed_matched_by_capture": 0.633,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.2,
+     "seed_response": {
+      "A": {
+       "base_hz": 7.203389830508474,
+       "onset_1_10ms_hz": 5.178907721280602,
+       "in_pulse_hz": 0.12902826235058112,
+       "post_0_50ms_hz": 0.2542372881355932,
+       "post_50_200ms_hz": 4.265536723163841
+      },
+      "B": {
+       "base_hz": 11.68075117370892,
+       "onset_1_10ms_hz": 6.05112154407929,
+       "in_pulse_hz": 0.1217856207716646,
+       "post_0_50ms_hz": 0.26291079812206575,
+       "post_50_200ms_hz": 7.117370892018778
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 22.457627118644066,
+       "onset_1_10ms_hz": 28.71939736346516,
+       "in_pulse_hz": 5.849281226559678,
+       "post_0_50ms_hz": 1.5254237288135593,
+       "post_50_200ms_hz": 11.977401129943502
+      },
+      "B": {
+       "base_hz": 29.164319248826292,
+       "onset_1_10ms_hz": 31.92488262910798,
+       "in_pulse_hz": 6.819994763213217,
+       "post_0_50ms_hz": 0.9389671361502347,
+       "post_50_200ms_hz": 17.452269170579026
+      }
+     },
+     "purity": {
+      "n_spikes": 27434,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.3347527780512062,
+      "ampsplit_ratio": 0.15627722013255,
+      "ampsplit_burst_ratio": 2.8040598355211825,
+      "neighbours": {
+       "6": "ambiguous",
+       "7": "distinct",
+       "8": "ambiguous",
+       "9": "ambiguous",
+       "10": "ambiguous",
+       "12": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "6": 0.545,
+       "7": 0.714,
+       "8": 0.611,
+       "9": 0.614,
+       "10": 0.477,
+       "12": 0.483
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      45.1,
+      55.9,
+      68.3,
+      83.7,
+      113.3
+     ]
+    },
+    "12": {
+     "template_trough_uV": -88.0,
+     "template_wire_profile_uV": [
+      -38.29999923706055,
+      -63.29999923706055,
+      -55.5,
+      -88.0
+     ],
+     "n_seed": 3916,
+     "n_capture": 20456,
+     "seed_matched_by_capture": 0.6,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.115,
+     "seed_response": {
+      "A": {
+       "base_hz": 2.711864406779661,
+       "onset_1_10ms_hz": 3.766478342749529,
+       "in_pulse_hz": 0.02150471039176352,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 1.9209039548022595
+      },
+      "B": {
+       "base_hz": 5.539906103286385,
+       "onset_1_10ms_hz": 3.442879499217527,
+       "in_pulse_hz": 0.06959178329809405,
+       "post_0_50ms_hz": 0.13145539906103287,
+       "post_50_200ms_hz": 3.4679186228481997
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 15.169491525423728,
+       "onset_1_10ms_hz": 33.89830508474576,
+       "in_pulse_hz": 10.064204463345328,
+       "post_0_50ms_hz": 1.8644067796610169,
+       "post_50_200ms_hz": 8.079096045197739
+      },
+      "B": {
+       "base_hz": 18.140845070422536,
+       "onset_1_10ms_hz": 41.31455399061033,
+       "in_pulse_hz": 12.665704560253118,
+       "post_0_50ms_hz": 1.051643192488263,
+       "post_50_200ms_hz": 12.694835680751172
+      }
+     },
+     "purity": {
+      "n_spikes": 20456,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2557896420781432,
+      "ampsplit_ratio": 0.14454314394057613,
+      "ampsplit_burst_ratio": 1.5257331860394148,
+      "neighbours": {
+       "6": "ambiguous",
+       "7": "ambiguous",
+       "8": "distinct",
+       "9": "ambiguous",
+       "10": "ambiguous",
+       "11": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "6": 0.679,
+       "7": 0.67,
+       "8": 0.72,
+       "9": 0.571,
+       "10": 0.475,
+       "11": 0.483
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      44.8,
+      55.0,
+      65.4,
+      79.8,
+      111.1
+     ]
+    }
+   }
+  },
+  "TT6": {
+   "wires": [
+    "CH55",
+    "CH53",
+    "CH51",
+    "CH49"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    11.854000091552734,
+    10.67300033569336,
+    11.835000038146973,
+    12.022000312805176
+   ],
+   "noise_excised_uV": [
+    9.53600025177002,
+    8.331000328063965,
+    9.467000007629395,
+    9.49899959564209
+   ],
+   "excised_fraction": 0.3932,
+   "n_events": 240813,
+   "events_per_s": 195.0,
+   "n_accepted": 140033,
+   "n_pool": 100780,
+   "n_refractory_rejected": 839,
+   "accepted_by_pass": [
+    124192,
+    15457,
+    1223
+   ],
+   "seconds": {
+    "load": 2.6,
+    "capture": 20.7
+   },
+   "units": {
+    "13": {
+     "template_trough_uV": -106.6,
+     "template_wire_profile_uV": [
+      -106.5999984741211,
+      -51.20000076293945,
+      -48.20000076293945,
+      -25.200000762939453
+     ],
+     "n_seed": 11772,
+     "n_capture": 16298,
+     "seed_matched_by_capture": 0.496,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.358,
+     "seed_response": {
+      "A": {
+       "base_hz": 11.610169491525424,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.5932203389830508,
+       "post_50_200ms_hz": 10.112994350282484
+      },
+      "B": {
+       "base_hz": 15.154929577464788,
+       "onset_1_10ms_hz": 4.06885758998435,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.18779342723004694,
+       "post_50_200ms_hz": 11.505477308294207
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 17.457627118644066,
+       "onset_1_10ms_hz": 5.649717514124293,
+       "in_pulse_hz": 0.02150471039176352,
+       "post_0_50ms_hz": 0.7627118644067796,
+       "post_50_200ms_hz": 12.033898305084744
+      },
+      "B": {
+       "base_hz": 17.558685446009388,
+       "onset_1_10ms_hz": 3.1298904538341157,
+       "in_pulse_hz": 0.017397945824523513,
+       "post_0_50ms_hz": 0.28169014084507044,
+       "post_50_200ms_hz": 11.154929577464786
+      }
+     },
+     "purity": {
+      "n_spikes": 16298,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.26037044843648466,
+      "ampsplit_ratio": 0.12652956139580152,
+      "ampsplit_burst_ratio": 1.5689665613079387,
+      "neighbours": {
+       "14": "distinct",
+       "15": "ambiguous",
+       "16": "distinct",
+       "17": "ambiguous",
+       "18": "ambiguous",
+       "19": "distinct",
+       "20": "distinct",
+       "21": "ambiguous",
+       "22": "distinct",
+       "23": "distinct"
+      },
+      "neighbour_ratios": {
+       "14": 0.834,
+       "15": 0.364,
+       "16": 0.858,
+       "17": 0.621,
+       "18": 0.596,
+       "19": 0.911,
+       "20": 1.022,
+       "21": 0.603,
+       "22": 1.012,
+       "23": 1.108
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      52.2,
+      71.9,
+      89.0,
+      106.7,
+      201.2
+     ]
+    },
+    "14": {
+     "template_trough_uV": -230.8,
+     "template_wire_profile_uV": [
+      -230.8000030517578,
+      -89.5999984741211,
+      -123.69999694824219,
+      -60.099998474121094
+     ],
+     "n_seed": 7039,
+     "n_capture": 8427,
+     "seed_matched_by_capture": 0.748,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.625,
+     "seed_response": {
+      "A": {
+       "base_hz": 6.271186440677965,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.423728813559322,
+       "post_50_200ms_hz": 5.451977401129943
+      },
+      "B": {
+       "base_hz": 5.333333333333333,
+       "onset_1_10ms_hz": 1.9822639540949398,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.28169014084507044,
+       "post_50_200ms_hz": 5.6588419405320805
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 8.220338983050848,
+       "onset_1_10ms_hz": 1.8832391713747645,
+       "in_pulse_hz": 0.02150471039176352,
+       "post_0_50ms_hz": 0.5932203389830508,
+       "post_50_200ms_hz": 7.4293785310734455
+      },
+      "B": {
+       "base_hz": 8.018779342723004,
+       "onset_1_10ms_hz": 2.816901408450704,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.28169014084507044,
+       "post_50_200ms_hz": 7.0860719874804365
+      }
+     },
+     "purity": {
+      "n_spikes": 8427,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.33622735334004056,
+      "ampsplit_ratio": 0.18921998148680136,
+      "ampsplit_burst_ratio": 1.4191498611510103,
+      "neighbours": {
+       "13": "distinct",
+       "15": "ambiguous",
+       "16": "ambiguous",
+       "17": "ambiguous",
+       "18": "distinct",
+       "19": "distinct",
+       "20": "distinct",
+       "21": "distinct",
+       "22": "distinct",
+       "23": "distinct"
+      },
+      "neighbour_ratios": {
+       "13": 0.834,
+       "15": 0.384,
+       "16": 0.68,
+       "17": 0.517,
+       "18": 1.069,
+       "19": 1.238,
+       "20": 0.945,
+       "21": 0.785,
+       "22": 1.044,
+       "23": 1.117
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      62.7,
+      100.4,
+      208.9,
+      245.2,
+      276.2
+     ]
+    },
+    "15": {
+     "template_trough_uV": -175.1,
+     "template_wire_profile_uV": [
+      -175.10000610351562,
+      -63.599998474121094,
+      -91.0999984741211,
+      -28.899999618530273
+     ],
+     "n_seed": 1657,
+     "n_capture": 8276,
+     "seed_matched_by_capture": 0.823,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.165,
+     "seed_response": {
+      "A": {
+       "base_hz": 1.3559322033898304,
+       "onset_1_10ms_hz": 0.0,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.3389830508474576,
+       "post_50_200ms_hz": 2.1468926553672314
+      },
+      "B": {
+       "base_hz": 2.403755868544601,
+       "onset_1_10ms_hz": 1.1476264997391756,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 2.3787167449139277
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 6.525423728813559,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 0.02150471039176352,
+       "post_0_50ms_hz": 0.6779661016949152,
+       "post_50_200ms_hz": 5.875706214689265
+      },
+      "B": {
+       "base_hz": 8.826291079812206,
+       "onset_1_10ms_hz": 2.9212310902451746,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.03755868544600939,
+       "post_50_200ms_hz": 7.192488262910797
+      }
+     },
+     "purity": {
+      "n_spikes": 8276,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.1021783754947102,
+      "ampsplit_ratio": 0.14715509404365992,
+      "ampsplit_burst_ratio": 1.5696543364657056,
+      "neighbours": {
+       "13": "ambiguous",
+       "14": "ambiguous",
+       "16": "ambiguous",
+       "17": "ambiguous",
+       "18": "ambiguous",
+       "19": "ambiguous",
+       "20": "distinct",
+       "21": "ambiguous",
+       "22": "distinct",
+       "23": "distinct"
+      },
+      "neighbour_ratios": {
+       "13": 0.363,
+       "14": 0.384,
+       "16": 0.497,
+       "17": 0.443,
+       "18": 0.5,
+       "19": 0.65,
+       "20": 0.732,
+       "21": 0.519,
+       "22": 0.773,
+       "23": 0.83
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      47.3,
+      60.9,
+      76.2,
+      107.3,
+      192.4
+     ]
+    },
+    "16": {
+     "template_trough_uV": -226.1,
+     "template_wire_profile_uV": [
+      -226.10000610351562,
+      -162.5,
+      -153.60000610351562,
+      -87.0999984741211
+     ],
+     "n_seed": 2387,
+     "n_capture": 6822,
+     "seed_matched_by_capture": 0.829,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.29,
+     "seed_response": {
+      "A": {
+       "base_hz": 1.6101694915254237,
+       "onset_1_10ms_hz": 0.0,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.3389830508474576,
+       "post_50_200ms_hz": 1.7796610169491522
+      },
+      "B": {
+       "base_hz": 2.15962441314554,
+       "onset_1_10ms_hz": 0.41731872717788204,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.056338028169014086,
+       "post_50_200ms_hz": 2.522691705790297
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.169491525423728,
+       "onset_1_10ms_hz": 0.4708097928436911,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.3389830508474576,
+       "post_50_200ms_hz": 5.59322033898305
+      },
+      "B": {
+       "base_hz": 7.436619718309859,
+       "onset_1_10ms_hz": 2.2952529994783513,
+       "in_pulse_hz": 0.03479589164904703,
+       "post_0_50ms_hz": 0.09389671361502347,
+       "post_50_200ms_hz": 6.253521126760562
+      }
+     },
+     "purity": {
+      "n_spikes": 6822,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2919050080643722,
+      "ampsplit_ratio": 0.14438177845614947,
+      "ampsplit_burst_ratio": 0.7219088922807474,
+      "neighbours": {
+       "13": "distinct",
+       "14": "ambiguous",
+       "15": "ambiguous",
+       "17": "ambiguous",
+       "18": "distinct",
+       "19": "distinct",
+       "20": "distinct",
+       "21": "ambiguous",
+       "22": "ambiguous",
+       "23": "distinct"
+      },
+      "neighbour_ratios": {
+       "13": 0.858,
+       "14": 0.679,
+       "15": 0.497,
+       "17": 0.306,
+       "18": 0.841,
+       "19": 0.87,
+       "20": 0.878,
+       "21": 0.541,
+       "22": 0.686,
+       "23": 0.711
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      50.1,
+      72.7,
+      101.9,
+      216.3,
+      256.1
+     ]
+    },
+    "17": {
+     "template_trough_uV": -78.2,
+     "template_wire_profile_uV": [
+      -40.0,
+      -78.19999694824219,
+      -36.900001525878906,
+      -40.400001525878906
+     ],
+     "n_seed": 2719,
+     "n_capture": 13523,
+     "seed_matched_by_capture": 0.519,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.104,
+     "seed_response": {
+      "A": {
+       "base_hz": 2.6271186440677963,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.7627118644067796,
+       "post_50_200ms_hz": 2.31638418079096
+      },
+      "B": {
+       "base_hz": 2.723004694835681,
+       "onset_1_10ms_hz": 0.9389671361502346,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.03755868544600939,
+       "post_50_200ms_hz": 2.384976525821596
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 13.220338983050846,
+       "onset_1_10ms_hz": 13.653483992467043,
+       "in_pulse_hz": 2.4945464054445683,
+       "post_0_50ms_hz": 1.1016949152542372,
+       "post_50_200ms_hz": 10.395480225988699
+      },
+      "B": {
+       "base_hz": 14.065727699530516,
+       "onset_1_10ms_hz": 6.572769953051643,
+       "in_pulse_hz": 2.470508307082339,
+       "post_0_50ms_hz": 0.22535211267605634,
+       "post_50_200ms_hz": 10.247261345852893
+      }
+     },
+     "purity": {
+      "n_spikes": 13523,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.0810414944362389,
+      "ampsplit_ratio": 0.18377144378710628,
+      "ampsplit_burst_ratio": 2.2787659029601177,
+      "neighbours": {
+       "13": "ambiguous",
+       "14": "ambiguous",
+       "15": "ambiguous",
+       "16": "ambiguous",
+       "18": "ambiguous",
+       "19": "ambiguous",
+       "20": "ambiguous",
+       "21": "ambiguous",
+       "22": "ambiguous",
+       "23": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "13": 0.621,
+       "14": 0.517,
+       "15": 0.443,
+       "16": 0.306,
+       "18": 0.426,
+       "19": 0.477,
+       "20": 0.632,
+       "21": 0.373,
+       "22": 0.387,
+       "23": 0.43
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      46.2,
+      57.2,
+      69.2,
+      84.4,
+      129.3
+     ]
+    },
+    "18": {
+     "template_trough_uV": -110.1,
+     "template_wire_profile_uV": [
+      -53.70000076293945,
+      -110.0999984741211,
+      -64.0,
+      -106.0999984741211
+     ],
+     "n_seed": 2138,
+     "n_capture": 12561,
+     "seed_matched_by_capture": 0.644,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.11,
+     "seed_response": {
+      "A": {
+       "base_hz": 1.8644067796610169,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0847457627118644,
+       "post_50_200ms_hz": 1.101694915254237
+      },
+      "B": {
+       "base_hz": 3.4741784037558685,
+       "onset_1_10ms_hz": 1.5649452269170578,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.018779342723004695,
+       "post_50_200ms_hz": 2.234741784037558
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 11.271186440677965,
+       "onset_1_10ms_hz": 17.890772128060263,
+       "in_pulse_hz": 4.322446788744467,
+       "post_0_50ms_hz": 0.7627118644067796,
+       "post_50_200ms_hz": 8.050847457627118
+      },
+      "B": {
+       "base_hz": 14.553990610328638,
+       "onset_1_10ms_hz": 12.936880542514345,
+       "in_pulse_hz": 4.523465914376113,
+       "post_0_50ms_hz": 0.13145539906103287,
+       "post_50_200ms_hz": 9.333333333333332
+      }
+     },
+     "purity": {
+      "n_spikes": 12561,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.12002188319312222,
+      "ampsplit_ratio": 0.1277583679970632,
+      "ampsplit_burst_ratio": 1.746031029293197,
+      "neighbours": {
+       "13": "ambiguous",
+       "14": "distinct",
+       "15": "ambiguous",
+       "16": "distinct",
+       "17": "ambiguous",
+       "19": "distinct",
+       "20": "ambiguous",
+       "21": "ambiguous",
+       "22": "ambiguous",
+       "23": "distinct"
+      },
+      "neighbour_ratios": {
+       "13": 0.595,
+       "14": 1.069,
+       "15": 0.5,
+       "16": 0.841,
+       "17": 0.426,
+       "19": 0.776,
+       "20": 0.63,
+       "21": 0.453,
+       "22": 0.408,
+       "23": 0.712
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      47.0,
+      58.3,
+      70.6,
+      88.3,
+      145.9
+     ]
+    },
+    "19": {
+     "template_trough_uV": -157.4,
+     "template_wire_profile_uV": [
+      -124.5999984741211,
+      -157.39999389648438,
+      -110.19999694824219,
+      -83.0
+     ],
+     "n_seed": 3350,
+     "n_capture": 5584,
+     "seed_matched_by_capture": 0.867,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.52,
+     "seed_response": {
+      "A": {
+       "base_hz": 2.966101694915254,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 3.644067796610169
+      },
+      "B": {
+       "base_hz": 3.9812206572769955,
+       "onset_1_10ms_hz": 1.5649452269170578,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.018779342723004695,
+       "post_50_200ms_hz": 3.4366197183098586
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.762711864406779,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.17203768313410817,
+       "post_0_50ms_hz": 0.5084745762711864,
+       "post_50_200ms_hz": 5.2542372881355925
+      },
+      "B": {
+       "base_hz": 6.497652582159624,
+       "onset_1_10ms_hz": 1.7736045905059987,
+       "in_pulse_hz": 0.03479589164904703,
+       "post_0_50ms_hz": 0.03755868544600939,
+       "post_50_200ms_hz": 4.957746478873238
+      }
+     },
+     "purity": {
+      "n_spikes": 5584,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.35647081676771947,
+      "ampsplit_ratio": 0.3231311063288876,
+      "ampsplit_burst_ratio": 1.9387866379733254,
+      "neighbours": {
+       "13": "distinct",
+       "14": "distinct",
+       "15": "ambiguous",
+       "16": "distinct",
+       "17": "ambiguous",
+       "18": "distinct",
+       "20": "distinct",
+       "21": "ambiguous",
+       "22": "distinct",
+       "23": "distinct"
+      },
+      "neighbour_ratios": {
+       "13": 0.911,
+       "14": 1.238,
+       "15": 0.65,
+       "16": 0.869,
+       "17": 0.477,
+       "18": 0.776,
+       "20": 1.041,
+       "21": 0.692,
+       "22": 0.962,
+       "23": 0.978
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      51.1,
+      70.8,
+      153.9,
+      182.9,
+      209.0
+     ]
+    },
+    "20": {
+     "template_trough_uV": -186.8,
+     "template_wire_profile_uV": [
+      -117.4000015258789,
+      -128.3000030517578,
+      -186.8000030517578,
+      -99.5
+     ],
+     "n_seed": 6140,
+     "n_capture": 8360,
+     "seed_matched_by_capture": 0.92,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.676,
+     "seed_response": {
+      "A": {
+       "base_hz": 5.0,
+       "onset_1_10ms_hz": 0.0,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 4.096045197740112
+      },
+      "B": {
+       "base_hz": 5.427230046948357,
+       "onset_1_10ms_hz": 1.7736045905059987,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.09389671361502347,
+       "post_50_200ms_hz": 3.931142410015649
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 7.966101694915253,
+       "onset_1_10ms_hz": 0.4708097928436911,
+       "in_pulse_hz": 0.08601884156705408,
+       "post_0_50ms_hz": 0.1694915254237288,
+       "post_50_200ms_hz": 5.508474576271186
+      },
+      "B": {
+       "base_hz": 8.262910798122066,
+       "onset_1_10ms_hz": 3.025560772039645,
+       "in_pulse_hz": 0.03479589164904703,
+       "post_0_50ms_hz": 0.11267605633802817,
+       "post_50_200ms_hz": 5.758998435054772
+      }
+     },
+     "purity": {
+      "n_spikes": 8360,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.18259974858761374,
+      "ampsplit_ratio": 0.19233679903896111,
+      "ampsplit_burst_ratio": 1.538694392311689,
+      "neighbours": {
+       "13": "distinct",
+       "14": "distinct",
+       "15": "distinct",
+       "16": "distinct",
+       "17": "ambiguous",
+       "18": "ambiguous",
+       "19": "distinct",
+       "21": "ambiguous",
+       "22": "distinct",
+       "23": "distinct"
+      },
+      "neighbour_ratios": {
+       "13": 1.023,
+       "14": 0.947,
+       "15": 0.731,
+       "16": 0.878,
+       "17": 0.632,
+       "18": 0.63,
+       "19": 1.041,
+       "21": 0.644,
+       "22": 0.839,
+       "23": 0.931
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      53.4,
+      84.2,
+      177.5,
+      197.4,
+      222.0
+     ]
+    },
+    "21": {
+     "template_trough_uV": -95.1,
+     "template_wire_profile_uV": [
+      -49.29999923706055,
+      -41.400001525878906,
+      -95.0999984741211,
+      -44.20000076293945
+     ],
+     "n_seed": 6228,
+     "n_capture": 19672,
+     "seed_matched_by_capture": 0.764,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.242,
+     "seed_response": {
+      "A": {
+       "base_hz": 5.084745762711864,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.2542372881355932,
+       "post_50_200ms_hz": 5.084745762711863
+      },
+      "B": {
+       "base_hz": 7.624413145539906,
+       "onset_1_10ms_hz": 3.651538862806468,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.13145539906103287,
+       "post_50_200ms_hz": 5.9968701095461645
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 15.508474576271185,
+       "onset_1_10ms_hz": 9.887005649717514,
+       "in_pulse_hz": 1.9999380664340074,
+       "post_0_50ms_hz": 0.5084745762711864,
+       "post_50_200ms_hz": 11.242937853107343
+      },
+      "B": {
+       "base_hz": 19.868544600938968,
+       "onset_1_10ms_hz": 14.606155451225872,
+       "in_pulse_hz": 2.9924466818180444,
+       "post_0_50ms_hz": 0.28169014084507044,
+       "post_50_200ms_hz": 13.909233176838809
+      }
+     },
+     "purity": {
+      "n_spikes": 19672,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.17765215333397133,
+      "ampsplit_ratio": 0.18237379770398882,
+      "ampsplit_burst_ratio": 2.396912769823853,
+      "neighbours": {
+       "13": "ambiguous",
+       "14": "distinct",
+       "15": "ambiguous",
+       "16": "ambiguous",
+       "17": "ambiguous",
+       "18": "ambiguous",
+       "19": "ambiguous",
+       "20": "ambiguous",
+       "22": "ambiguous",
+       "23": "distinct"
+      },
+      "neighbour_ratios": {
+       "13": 0.604,
+       "14": 0.785,
+       "15": 0.519,
+       "16": 0.541,
+       "17": 0.373,
+       "18": 0.453,
+       "19": 0.692,
+       "20": 0.644,
+       "22": 0.59,
+       "23": 0.753
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      46.2,
+      57.8,
+      71.6,
+      88.1,
+      120.7
+     ]
+    },
+    "22": {
+     "template_trough_uV": -112.1,
+     "template_wire_profile_uV": [
+      -19.299999237060547,
+      -43.79999923706055,
+      -43.099998474121094,
+      -112.0999984741211
+     ],
+     "n_seed": 16588,
+     "n_capture": 31779,
+     "seed_matched_by_capture": 0.727,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.379,
+     "seed_response": {
+      "A": {
+       "base_hz": 13.813559322033898,
+       "onset_1_10ms_hz": 43.314500941619585,
+       "in_pulse_hz": 0.6881507325364327,
+       "post_0_50ms_hz": 0.5084745762711864,
+       "post_50_200ms_hz": 12.259887005649716
+      },
+      "B": {
+       "base_hz": 15.39906103286385,
+       "onset_1_10ms_hz": 39.123630672926446,
+       "in_pulse_hz": 2.000763769820204,
+       "post_0_50ms_hz": 0.09389671361502347,
+       "post_50_200ms_hz": 12.269170579029732
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 18.64406779661017,
+       "onset_1_10ms_hz": 101.69491525423729,
+       "in_pulse_hz": 75.1589628192135,
+       "post_0_50ms_hz": 1.8644067796610169,
+       "post_50_200ms_hz": 12.71186440677966
+      },
+      "B": {
+       "base_hz": 17.690140845070424,
+       "onset_1_10ms_hz": 109.6504955659885,
+       "in_pulse_hz": 121.24628445110437,
+       "post_0_50ms_hz": 1.9342723004694835,
+       "post_50_200ms_hz": 11.668231611893582
+      }
+     },
+     "purity": {
+      "n_spikes": 31779,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.0770428582389576,
+      "ampsplit_ratio": 0.05323866350714885,
+      "ampsplit_burst_ratio": 0.35270614573486114,
+      "neighbours": {
+       "13": "distinct",
+       "14": "distinct",
+       "15": "distinct",
+       "16": "ambiguous",
+       "17": "ambiguous",
+       "18": "ambiguous",
+       "19": "distinct",
+       "20": "distinct",
+       "21": "ambiguous",
+       "23": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "13": 1.011,
+       "14": 1.042,
+       "15": 0.772,
+       "16": 0.687,
+       "17": 0.387,
+       "18": 0.408,
+       "19": 0.961,
+       "20": 0.839,
+       "21": 0.59,
+       "23": 0.625
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      46.1,
+      54.8,
+      69.2,
+      105.0,
+      145.2
+     ]
+    },
+    "23": {
+     "template_trough_uV": -167.7,
+     "template_wire_profile_uV": [
+      -85.4000015258789,
+      -116.0,
+      -124.19999694824219,
+      -167.6999969482422
+     ],
+     "n_seed": 3080,
+     "n_capture": 8731,
+     "seed_matched_by_capture": 0.755,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.266,
+     "seed_response": {
+      "A": {
+       "base_hz": 2.3728813559322033,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0847457627118644,
+       "post_50_200ms_hz": 2.9378531073446323
+      },
+      "B": {
+       "base_hz": 3.4741784037558685,
+       "onset_1_10ms_hz": 1.8779342723004693,
+       "in_pulse_hz": 0.017397945824523513,
+       "post_0_50ms_hz": 0.03755868544600939,
+       "post_50_200ms_hz": 3.8685446009389666
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 6.525423728813559,
+       "onset_1_10ms_hz": 7.532956685499058,
+       "in_pulse_hz": 1.1827590715469936,
+       "post_0_50ms_hz": 0.423728813559322,
+       "post_50_200ms_hz": 6.779661016949151
+      },
+      "B": {
+       "base_hz": 9.896713615023474,
+       "onset_1_10ms_hz": 7.094418362023995,
+       "in_pulse_hz": 1.826784311574969,
+       "post_0_50ms_hz": 0.056338028169014086,
+       "post_50_200ms_hz": 8.16901408450704
+      }
+     },
+     "purity": {
+      "n_spikes": 8731,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.36182440994722415,
+      "ampsplit_ratio": 0.1322408375535667,
+      "ampsplit_burst_ratio": 0.8816055836904446,
+      "neighbours": {
+       "13": "distinct",
+       "14": "distinct",
+       "15": "distinct",
+       "16": "distinct",
+       "17": "ambiguous",
+       "18": "distinct",
+       "19": "distinct",
+       "20": "distinct",
+       "21": "distinct",
+       "22": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "13": 1.108,
+       "14": 1.118,
+       "15": 0.83,
+       "16": 0.711,
+       "17": 0.429,
+       "18": 0.712,
+       "19": 0.977,
+       "20": 0.93,
+       "21": 0.752,
+       "22": 0.625
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      47.9,
+      60.8,
+      77.9,
+      151.7,
+      194.3
+     ]
+    }
+   }
+  },
+  "TT7": {
+   "wires": [
+    "CH47",
+    "CH45",
+    "CH43",
+    "CH41"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    9.942999839782715,
+    9.984000205993652,
+    11.36400032043457,
+    11.208999633789062
+   ],
+   "noise_excised_uV": [
+    9.088000297546387,
+    9.177000045776367,
+    10.60200023651123,
+    10.4350004196167
+   ],
+   "excised_fraction": 0.1854,
+   "n_events": 81967,
+   "events_per_s": 66.4,
+   "n_accepted": 47665,
+   "n_pool": 34302,
+   "n_refractory_rejected": 313,
+   "accepted_by_pass": [
+    45922,
+    1997,
+    59
+   ],
+   "seconds": {
+    "load": 2.6,
+    "capture": 11.9
+   },
+   "units": {
+    "24": {
+     "template_trough_uV": -79.4,
+     "template_wire_profile_uV": [
+      -79.4000015258789,
+      -41.900001525878906,
+      -41.20000076293945,
+      -41.29999923706055
+     ],
+     "n_seed": 4779,
+     "n_capture": 14860,
+     "seed_matched_by_capture": 0.79,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.254,
+     "seed_response": {
+      "A": {
+       "base_hz": 4.915254237288135,
+       "onset_1_10ms_hz": 1.8832391713747645,
+       "in_pulse_hz": 0.1075235519588176,
+       "post_0_50ms_hz": 0.423728813559322,
+       "post_50_200ms_hz": 4.491525423728813
+      },
+      "B": {
+       "base_hz": 4.863849765258216,
+       "onset_1_10ms_hz": 3.1298904538341157,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 3.8059467918622842
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 13.813559322033898,
+       "onset_1_10ms_hz": 18.832391713747644,
+       "in_pulse_hz": 2.4300322742692777,
+       "post_0_50ms_hz": 0.847457627118644,
+       "post_50_200ms_hz": 11.638418079096043
+      },
+      "B": {
+       "base_hz": 15.230046948356808,
+       "onset_1_10ms_hz": 15.858111632759519,
+       "in_pulse_hz": 2.6270898195030505,
+       "post_0_50ms_hz": 0.09389671361502347,
+       "post_50_200ms_hz": 10.472613458528949
+      }
+     },
+     "purity": {
+      "n_spikes": 14860,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.165921789903513,
+      "ampsplit_ratio": 0.10653084423981571,
+      "ampsplit_burst_ratio": 2.495865493618539,
+      "neighbours": {
+       "25": "ambiguous",
+       "26": "ambiguous",
+       "27": "ambiguous",
+       "28": "distinct"
+      },
+      "neighbour_ratios": {
+       "25": 0.562,
+       "26": 0.434,
+       "27": 0.397,
+       "28": 0.775
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      49.4,
+      55.8,
+      65.3,
+      80.8,
+      108.8
+     ]
+    },
+    "25": {
+     "template_trough_uV": -123.7,
+     "template_wire_profile_uV": [
+      -63.70000076293945,
+      -123.30000305175781,
+      -123.69999694824219,
+      -39.79999923706055
+     ],
+     "n_seed": 2651,
+     "n_capture": 4754,
+     "seed_matched_by_capture": 0.839,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.468,
+     "seed_response": {
+      "A": {
+       "base_hz": 3.7288135593220337,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.04300942078352704,
+       "post_0_50ms_hz": 0.847457627118644,
+       "post_50_200ms_hz": 3.644067796610169
+      },
+      "B": {
+       "base_hz": 4.187793427230047,
+       "onset_1_10ms_hz": 1.1476264997391756,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 3.5931142410015644
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.169491525423728,
+       "onset_1_10ms_hz": 5.178907721280602,
+       "in_pulse_hz": 0.45159891822703396,
+       "post_0_50ms_hz": 1.0169491525423728,
+       "post_50_200ms_hz": 5.056497175141242
+      },
+      "B": {
+       "base_hz": 6.647887323943662,
+       "onset_1_10ms_hz": 3.651538862806468,
+       "in_pulse_hz": 0.3479589164904703,
+       "post_0_50ms_hz": 0.018779342723004695,
+       "post_50_200ms_hz": 5.5649452269170565
+      }
+     },
+     "purity": {
+      "n_spikes": 4754,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2914423527124582,
+      "ampsplit_ratio": 0.1486772064469818,
+      "ampsplit_burst_ratio": 3.5682529547275634,
+      "neighbours": {
+       "24": "ambiguous",
+       "26": "ambiguous",
+       "27": "ambiguous",
+       "28": "distinct"
+      },
+      "neighbour_ratios": {
+       "24": 0.562,
+       "26": 0.346,
+       "27": 0.53,
+       "28": 1.003
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      50.2,
+      59.8,
+      93.5,
+      143.9,
+      169.6
+     ]
+    },
+    "26": {
+     "template_trough_uV": -91.2,
+     "template_wire_profile_uV": [
+      -53.0,
+      -45.099998474121094,
+      -91.19999694824219,
+      -23.100000381469727
+     ],
+     "n_seed": 2257,
+     "n_capture": 7579,
+     "seed_matched_by_capture": 0.692,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.206,
+     "seed_response": {
+      "A": {
+       "base_hz": 2.0338983050847457,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.2542372881355932,
+       "post_50_200ms_hz": 2.570621468926553
+      },
+      "B": {
+       "base_hz": 2.572769953051643,
+       "onset_1_10ms_hz": 1.3562858633281167,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.018779342723004695,
+       "post_50_200ms_hz": 3.555555555555555
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 6.610169491525423,
+       "onset_1_10ms_hz": 5.649717514124293,
+       "in_pulse_hz": 0.9247025468458314,
+       "post_0_50ms_hz": 0.5084745762711864,
+       "post_50_200ms_hz": 6.55367231638418
+      },
+      "B": {
+       "base_hz": 8.244131455399062,
+       "onset_1_10ms_hz": 5.112154407929055,
+       "in_pulse_hz": 0.713315778805464,
+       "post_0_50ms_hz": 0.03755868544600939,
+       "post_50_200ms_hz": 7.148669796557119
+      }
+     },
+     "purity": {
+      "n_spikes": 7579,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.25800595081154326,
+      "ampsplit_ratio": 0.40942520611626215,
+      "ampsplit_burst_ratio": 1.9886367154218452,
+      "neighbours": {
+       "24": "ambiguous",
+       "25": "ambiguous",
+       "27": "ambiguous",
+       "28": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "24": 0.434,
+       "25": 0.346,
+       "27": 0.444,
+       "28": 0.685
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      49.2,
+      54.8,
+      64.2,
+      82.0,
+      126.9
+     ]
+    },
+    "27": {
+     "template_trough_uV": -81.5,
+     "template_wire_profile_uV": [
+      -53.29999923706055,
+      -68.80000305175781,
+      -38.5,
+      -81.5
+     ],
+     "n_seed": 3084,
+     "n_capture": 18475,
+     "seed_matched_by_capture": 0.777,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.13,
+     "seed_response": {
+      "A": {
+       "base_hz": 1.9491525423728813,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.34407536626821633,
+       "post_0_50ms_hz": 0.3389830508474576,
+       "post_50_200ms_hz": 3.67231638418079
+      },
+      "B": {
+       "base_hz": 3.3427230046948355,
+       "onset_1_10ms_hz": 1.7736045905059987,
+       "in_pulse_hz": 0.1391835665961881,
+       "post_0_50ms_hz": 0.07511737089201878,
+       "post_50_200ms_hz": 2.716744913928012
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 17.203389830508474,
+       "onset_1_10ms_hz": 14.124293785310734,
+       "in_pulse_hz": 1.6773674105575547,
+       "post_0_50ms_hz": 0.6779661016949152,
+       "post_50_200ms_hz": 16.497175141242934
+      },
+      "B": {
+       "base_hz": 20.676056338028168,
+       "onset_1_10ms_hz": 9.806990088680228,
+       "in_pulse_hz": 1.93117198652211,
+       "post_0_50ms_hz": 0.09389671361502347,
+       "post_50_200ms_hz": 15.167449139280123
+      }
+     },
+     "purity": {
+      "n_spikes": 18475,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2050364451182878,
+      "ampsplit_ratio": 0.24616122496123946,
+      "ampsplit_burst_ratio": 2.0480613916775123,
+      "neighbours": {
+       "24": "ambiguous",
+       "25": "ambiguous",
+       "26": "ambiguous",
+       "28": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "24": 0.397,
+       "25": 0.531,
+       "26": 0.444,
+       "28": 0.541
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      49.0,
+      54.5,
+      62.5,
+      74.4,
+      106.0
+     ]
+    },
+    "28": {
+     "template_trough_uV": -117.8,
+     "template_wire_profile_uV": [
+      -36.400001525878906,
+      -45.599998474121094,
+      -19.700000762939453,
+      -117.80000305175781
+     ],
+     "n_seed": 2086,
+     "n_capture": 1997,
+     "seed_matched_by_capture": 0.74,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.773,
+     "seed_response": {
+      "A": {
+       "base_hz": 1.1864406779661016,
+       "onset_1_10ms_hz": 0.4708097928436911,
+       "in_pulse_hz": 0.04300942078352704,
+       "post_0_50ms_hz": 0.5932203389830508,
+       "post_50_200ms_hz": 2.5423728813559316
+      },
+      "B": {
+       "base_hz": 1.596244131455399,
+       "onset_1_10ms_hz": 0.9389671361502346,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.018779342723004695,
+       "post_50_200ms_hz": 3.1173708920187786
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 1.0169491525423728,
+       "onset_1_10ms_hz": 0.0,
+       "in_pulse_hz": 0.04300942078352704,
+       "post_0_50ms_hz": 0.5084745762711864,
+       "post_50_200ms_hz": 2.259887005649717
+      },
+      "B": {
+       "base_hz": 1.596244131455399,
+       "onset_1_10ms_hz": 1.043296817944705,
+       "in_pulse_hz": 0.10438767494714109,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 2.6228482003129887
+      }
+     },
+     "purity": {
+      "n_spikes": 1997,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2064547608705107,
+      "ampsplit_ratio": 0.0,
+      "ampsplit_burst_ratio": 6.740415549247294,
+      "neighbours": {
+       "24": "distinct",
+       "25": "distinct",
+       "26": "ambiguous",
+       "27": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "24": 0.777,
+       "25": 1.003,
+       "26": 0.684,
+       "27": 0.541
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      54.1,
+      93.4,
+      119.2,
+      134.0,
+      153.0
+     ]
+    }
+   }
+  },
+  "TT8": {
+   "wires": [
+    "CH39",
+    "CH37",
+    "CH35",
+    "CH33"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    18.56399917602539,
+    10.366000175476074,
+    11.074000358581543,
+    12.913000106811523
+   ],
+   "noise_excised_uV": [
+    18.10300064086914,
+    9.413999557495117,
+    9.899999618530273,
+    12.092000007629395
+   ],
+   "excised_fraction": 0.2352,
+   "n_events": 119229,
+   "events_per_s": 96.5,
+   "n_accepted": 43665,
+   "n_pool": 75564,
+   "n_refractory_rejected": 550,
+   "accepted_by_pass": [
+    42561,
+    1601,
+    53
+   ],
+   "seconds": {
+    "load": 6.8,
+    "capture": 32.0
+   },
+   "units": {
+    "29": {
+     "template_trough_uV": -126.3,
+     "template_wire_profile_uV": [
+      -126.30000305175781,
+      -18.899999618530273,
+      -23.899999618530273,
+      -46.599998474121094
+     ],
+     "n_seed": 1433,
+     "n_capture": 5157,
+     "seed_matched_by_capture": 0.713,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.198,
+     "seed_response": {
+      "A": {
+       "base_hz": 1.7796610169491525,
+       "onset_1_10ms_hz": 1.8832391713747645,
+       "in_pulse_hz": 1.1612543611552302,
+       "post_0_50ms_hz": 1.0169491525423728,
+       "post_50_200ms_hz": 1.4124293785310733
+      },
+      "B": {
+       "base_hz": 0.9577464788732394,
+       "onset_1_10ms_hz": 1.6692749087115282,
+       "in_pulse_hz": 1.043876749471411,
+       "post_0_50ms_hz": 0.7136150234741784,
+       "post_50_200ms_hz": 0.9264475743348981
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.677966101694915,
+       "onset_1_10ms_hz": 5.649717514124293,
+       "in_pulse_hz": 5.182635204415009,
+       "post_0_50ms_hz": 3.559322033898305,
+       "post_50_200ms_hz": 5.056497175141242
+      },
+      "B": {
+       "base_hz": 3.624413145539906,
+       "onset_1_10ms_hz": 4.486176317162232,
+       "in_pulse_hz": 4.018925485464932,
+       "post_0_50ms_hz": 3.8309859154929575,
+       "post_50_200ms_hz": 3.3802816901408446
+      }
+     },
+     "purity": {
+      "n_spikes": 5157,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 1.145482591044704,
+      "ampsplit_ratio": 1.010849756456067,
+      "ampsplit_burst_ratio": 4.801536343166318,
+      "neighbours": {
+       "30": "ambiguous",
+       "31": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "30": 0.421,
+       "31": 0.381
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      83.1,
+      90.3,
+      99.3,
+      112.2,
+      142.6
+     ]
+    },
+    "30": {
+     "template_trough_uV": -77.7,
+     "template_wire_profile_uV": [
+      -28.799999237060547,
+      -77.69999694824219,
+      -43.0,
+      -51.29999923706055
+     ],
+     "n_seed": 7980,
+     "n_capture": 8889,
+     "seed_matched_by_capture": 0.401,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.36,
+     "seed_response": {
+      "A": {
+       "base_hz": 6.694915254237288,
+       "onset_1_10ms_hz": 4.708097928436911,
+       "in_pulse_hz": 0.02150471039176352,
+       "post_0_50ms_hz": 0.5084745762711864,
+       "post_50_200ms_hz": 7.005649717514123
+      },
+      "B": {
+       "base_hz": 8.995305164319248,
+       "onset_1_10ms_hz": 3.651538862806468,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.15023474178403756,
+       "post_50_200ms_hz": 9.120500782472611
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 7.11864406779661,
+       "onset_1_10ms_hz": 2.8248587570621466,
+       "in_pulse_hz": 0.04300942078352704,
+       "post_0_50ms_hz": 0.6779661016949152,
+       "post_50_200ms_hz": 7.51412429378531
+      },
+      "B": {
+       "base_hz": 9.389671361502348,
+       "onset_1_10ms_hz": 4.486176317162232,
+       "in_pulse_hz": 0.017397945824523513,
+       "post_0_50ms_hz": 0.22535211267605634,
+       "post_50_200ms_hz": 9.239436619718308
+      }
+     },
+     "purity": {
+      "n_spikes": 8889,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.14588251947671896,
+      "ampsplit_ratio": 0.17014179307432442,
+      "ampsplit_burst_ratio": 2.381985103040542,
+      "neighbours": {
+       "29": "ambiguous",
+       "31": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "29": 0.421,
+       "31": 0.468
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      88.3,
+      107.1,
+      128.8,
+      152.0,
+      192.0
+     ]
+    },
+    "31": {
+     "template_trough_uV": -85.6,
+     "template_wire_profile_uV": [
+      -31.600000381469727,
+      -39.79999923706055,
+      -85.5999984741211,
+      -21.600000381469727
+     ],
+     "n_seed": 17338,
+     "n_capture": 29619,
+     "seed_matched_by_capture": 0.712,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.417,
+     "seed_response": {
+      "A": {
+       "base_hz": 14.576271186440676,
+       "onset_1_10ms_hz": 7.062146892655367,
+       "in_pulse_hz": 0.04300942078352704,
+       "post_0_50ms_hz": 2.542372881355932,
+       "post_50_200ms_hz": 19.350282485875702
+      },
+      "B": {
+       "base_hz": 18.685446009389672,
+       "onset_1_10ms_hz": 5.94679186228482,
+       "in_pulse_hz": 0.03479589164904703,
+       "post_0_50ms_hz": 0.7511737089201878,
+       "post_50_200ms_hz": 20.37558685446009
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 26.779661016949152,
+       "onset_1_10ms_hz": 9.416195856873822,
+       "in_pulse_hz": 0.1935423935258717,
+       "post_0_50ms_hz": 5.508474576271186,
+       "post_50_200ms_hz": 28.531073446327678
+      },
+      "B": {
+       "base_hz": 29.051643192488264,
+       "onset_1_10ms_hz": 12.310902451747522,
+       "in_pulse_hz": 0.06959178329809405,
+       "post_0_50ms_hz": 0.7699530516431925,
+       "post_50_200ms_hz": 27.55555555555555
+      }
+     },
+     "purity": {
+      "n_spikes": 29619,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2102268905874672,
+      "ampsplit_ratio": 0.24897640731432535,
+      "ampsplit_burst_ratio": 1.6470746945409218,
+      "neighbours": {
+       "29": "ambiguous",
+       "30": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "29": 0.381,
+       "30": 0.468
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      98.6,
+      119.4,
+      135.8,
+      154.3,
+      193.7
+     ]
+    }
+   }
+  },
+  "TT9": {
+   "wires": [
+    "CH25",
+    "CH27",
+    "CH29",
+    "CH31"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    10.494000434875488,
+    8.395000457763672,
+    9.734000205993652,
+    8.402999877929688
+   ],
+   "noise_excised_uV": [
+    10.192999839782715,
+    8.305000305175781,
+    9.630000114440918,
+    8.305999755859375
+   ],
+   "excised_fraction": 0.0396,
+   "n_events": 8487,
+   "events_per_s": 6.9,
+   "n_accepted": 1461,
+   "n_pool": 7026,
+   "n_refractory_rejected": 1,
+   "accepted_by_pass": [
+    1459,
+    3,
+    0
+   ],
+   "seconds": {
+    "load": 2.5,
+    "capture": 24.0
+   },
+   "units": {
+    "32": {
+     "template_trough_uV": -48.3,
+     "template_wire_profile_uV": [
+      -29.399999618530273,
+      -48.29999923706055,
+      -41.400001525878906,
+      -33.70000076293945
+     ],
+     "n_seed": 119,
+     "n_capture": 1461,
+     "seed_matched_by_capture": 0.571,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.047,
+     "seed_response": {
+      "A": {
+       "base_hz": 0.1694915254237288,
+       "onset_1_10ms_hz": 0.4708097928436911,
+       "in_pulse_hz": 0.04300942078352704,
+       "post_0_50ms_hz": 0.1694915254237288,
+       "post_50_200ms_hz": 0.08474576271186439
+      },
+      "B": {
+       "base_hz": 0.07511737089201878,
+       "onset_1_10ms_hz": 0.10432968179447051,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 0.1877934272300469
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 1.7796610169491525,
+       "onset_1_10ms_hz": 3.295668549905838,
+       "in_pulse_hz": 0.1935423935258717,
+       "post_0_50ms_hz": 0.7627118644067796,
+       "post_50_200ms_hz": 0.9604519774011298
+      },
+      "B": {
+       "base_hz": 1.0892018779342723,
+       "onset_1_10ms_hz": 1.5649452269170578,
+       "in_pulse_hz": 0.06959178329809405,
+       "post_0_50ms_hz": 0.03755868544600939,
+       "post_50_200ms_hz": 1.7151799687010951
+      }
+     },
+     "purity": {
+      "n_spikes": 1461,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.19286374892644403,
+      "ampsplit_ratio": 0.0,
+      "ampsplit_burst_ratio": 0.0,
+      "neighbours": {},
+      "neighbour_ratios": {}
+     },
+     "capture_amp_uV_quantiles": [
+      46.7,
+      49.6,
+      53.3,
+      58.7,
+      68.3
+     ]
+    }
+   }
+  },
+  "TT10": {
+   "wires": [
+    "CH17",
+    "CH19",
+    "CH21",
+    "CH23"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    10.548999786376953,
+    10.809000015258789,
+    11.107999801635742,
+    11.052000045776367
+   ],
+   "noise_excised_uV": [
+    8.286999702453613,
+    8.164999961853027,
+    8.543999671936035,
+    8.809000015258789
+   ],
+   "excised_fraction": 0.4402,
+   "n_events": 317346,
+   "events_per_s": 257.0,
+   "n_accepted": 75106,
+   "n_pool": 242240,
+   "n_refractory_rejected": 722,
+   "accepted_by_pass": [
+    71699,
+    3936,
+    193
+   ],
+   "seconds": {
+    "load": 2.6,
+    "capture": 20.4
+   },
+   "units": {
+    "33": {
+     "template_trough_uV": -78.6,
+     "template_wire_profile_uV": [
+      -78.5999984741211,
+      -50.099998474121094,
+      -23.200000762939453,
+      -40.400001525878906
+     ],
+     "n_seed": 5144,
+     "n_capture": 28019,
+     "seed_matched_by_capture": 0.596,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.109,
+     "seed_response": {
+      "A": {
+       "base_hz": 5.338983050847458,
+       "onset_1_10ms_hz": 4.23728813559322,
+       "in_pulse_hz": 0.04300942078352704,
+       "post_0_50ms_hz": 1.694915254237288,
+       "post_50_200ms_hz": 7.542372881355931
+      },
+      "B": {
+       "base_hz": 5.55868544600939,
+       "onset_1_10ms_hz": 3.2342201356285862,
+       "in_pulse_hz": 0.03479589164904703,
+       "post_0_50ms_hz": 0.09389671361502347,
+       "post_50_200ms_hz": 5.7527386541471035
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 20.847457627118644,
+       "onset_1_10ms_hz": 64.030131826742,
+       "in_pulse_hz": 26.343270229910313,
+       "post_0_50ms_hz": 5.423728813559322,
+       "post_50_200ms_hz": 29.91525423728813
+      },
+      "B": {
+       "base_hz": 23.11737089201878,
+       "onset_1_10ms_hz": 67.18831507563901,
+       "in_pulse_hz": 52.83756146907791,
+       "post_0_50ms_hz": 1.352112676056338,
+       "post_50_200ms_hz": 21.496087636932703
+      }
+     },
+     "purity": {
+      "n_spikes": 28019,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.12165606324798581,
+      "ampsplit_ratio": 0.19261548539405612,
+      "ampsplit_burst_ratio": 1.5238025066729775,
+      "neighbours": {
+       "34": "duplicate",
+       "35": "duplicate",
+       "36": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "34": 0.291,
+       "35": 0.268,
+       "36": 0.46
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      41.7,
+      49.1,
+      59.2,
+      73.2,
+      97.8
+     ]
+    },
+    "34": {
+     "template_trough_uV": -66.2,
+     "template_wire_profile_uV": [
+      -65.0999984741211,
+      -38.70000076293945,
+      -43.099998474121094,
+      -66.19999694824219
+     ],
+     "n_seed": 3890,
+     "n_capture": 11911,
+     "seed_matched_by_capture": 0.268,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.087,
+     "seed_response": {
+      "A": {
+       "base_hz": 2.796610169491525,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.12902826235058112,
+       "post_0_50ms_hz": 1.271186440677966,
+       "post_50_200ms_hz": 4.491525423728813
+      },
+      "B": {
+       "base_hz": 4.413145539906103,
+       "onset_1_10ms_hz": 1.3562858633281167,
+       "in_pulse_hz": 0.22617329571880568,
+       "post_0_50ms_hz": 0.6572769953051644,
+       "post_50_200ms_hz": 3.2237871674491387
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 8.559322033898304,
+       "onset_1_10ms_hz": 19.774011299435028,
+       "in_pulse_hz": 10.924392879015869,
+       "post_0_50ms_hz": 3.4745762711864403,
+       "post_50_200ms_hz": 11.073446327683614
+      },
+      "B": {
+       "base_hz": 10.460093896713616,
+       "onset_1_10ms_hz": 16.06677099634846,
+       "in_pulse_hz": 7.8986674043336755,
+       "post_0_50ms_hz": 0.9577464788732394,
+       "post_50_200ms_hz": 9.239436619718308
+      }
+     },
+     "purity": {
+      "n_spikes": 11911,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.17410283274682192,
+      "ampsplit_ratio": 0.14211453435440505,
+      "ampsplit_burst_ratio": 1.326402320641114,
+      "neighbours": {
+       "33": "duplicate",
+       "35": "ambiguous",
+       "36": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "33": 0.291,
+       "35": 0.326,
+       "36": 0.519
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      42.5,
+      52.0,
+      64.1,
+      80.4,
+      112.0
+     ]
+    },
+    "35": {
+     "template_trough_uV": -83.0,
+     "template_wire_profile_uV": [
+      -41.20000076293945,
+      -83.0,
+      -27.299999237060547,
+      -38.900001525878906
+     ],
+     "n_seed": 12278,
+     "n_capture": 13645,
+     "seed_matched_by_capture": 0.266,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.239,
+     "seed_response": {
+      "A": {
+       "base_hz": 6.694915254237288,
+       "onset_1_10ms_hz": 71.56308851224105,
+       "in_pulse_hz": 10.365270408830018,
+       "post_0_50ms_hz": 5.2542372881355925,
+       "post_50_200ms_hz": 10.395480225988699
+      },
+      "B": {
+       "base_hz": 10.309859154929578,
+       "onset_1_10ms_hz": 50.18257694314032,
+       "in_pulse_hz": 12.004582618921225,
+       "post_0_50ms_hz": 2.028169014084507,
+       "post_50_200ms_hz": 8.938967136150232
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 7.627118644067796,
+       "onset_1_10ms_hz": 47.5517890772128,
+       "in_pulse_hz": 30.70872643943831,
+       "post_0_50ms_hz": 3.644067796610169,
+       "post_50_200ms_hz": 9.519774011299434
+      },
+      "B": {
+       "base_hz": 9.953051643192488,
+       "onset_1_10ms_hz": 30.568596765779862,
+       "in_pulse_hz": 27.262581107028346,
+       "post_0_50ms_hz": 1.8028169014084507,
+       "post_50_200ms_hz": 8.087636932707353
+      }
+     },
+     "purity": {
+      "n_spikes": 13645,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.1591975767246763,
+      "ampsplit_ratio": 0.1263340561491308,
+      "ampsplit_burst_ratio": 1.2272451168772707,
+      "neighbours": {
+       "33": "duplicate",
+       "34": "ambiguous",
+       "36": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "33": 0.268,
+       "34": 0.326,
+       "36": 0.596
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      44.8,
+      56.2,
+      67.9,
+      83.7,
+      117.3
+     ]
+    },
+    "36": {
+     "template_trough_uV": -95.9,
+     "template_wire_profile_uV": [
+      -27.799999237060547,
+      -41.5,
+      -95.9000015258789,
+      -51.29999923706055
+     ],
+     "n_seed": 12253,
+     "n_capture": 21531,
+     "seed_matched_by_capture": 0.411,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.234,
+     "seed_response": {
+      "A": {
+       "base_hz": 9.661016949152541,
+       "onset_1_10ms_hz": 12.711864406779661,
+       "in_pulse_hz": 1.2472732027222841,
+       "post_0_50ms_hz": 5.2542372881355925,
+       "post_50_200ms_hz": 13.785310734463275
+      },
+      "B": {
+       "base_hz": 12.88262910798122,
+       "onset_1_10ms_hz": 13.980177360459049,
+       "in_pulse_hz": 1.4440295034354518,
+       "post_0_50ms_hz": 2.347417840375587,
+       "post_50_200ms_hz": 12.532081377151798
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 21.35593220338983,
+       "onset_1_10ms_hz": 9.416195856873822,
+       "in_pulse_hz": 8.537370025530118,
+       "post_0_50ms_hz": 5.762711864406779,
+       "post_50_200ms_hz": 18.954802259887003
+      },
+      "B": {
+       "base_hz": 19.530516431924884,
+       "onset_1_10ms_hz": 10.328638497652582,
+       "in_pulse_hz": 5.706526230443712,
+       "post_0_50ms_hz": 3.7370892018779345,
+       "post_50_200ms_hz": 16.532081377151798
+      }
+     },
+     "purity": {
+      "n_spikes": 21531,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.31791107750502084,
+      "ampsplit_ratio": 0.13772819557106464,
+      "ampsplit_burst_ratio": 1.1308209741624256,
+      "neighbours": {
+       "33": "ambiguous",
+       "34": "ambiguous",
+       "35": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "33": 0.46,
+       "34": 0.519,
+       "35": 0.596
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      47.0,
+      61.0,
+      73.7,
+      92.3,
+      126.6
+     ]
+    }
+   }
+  },
+  "TT11": {
+   "wires": [
+    "CH9",
+    "CH11",
+    "CH13",
+    "CH15"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    8.984999656677246,
+    8.718000411987305,
+    9.211999893188477,
+    9.708999633789062
+   ],
+   "noise_excised_uV": [
+    7.504000186920166,
+    7.415999889373779,
+    7.9039998054504395,
+    8.253000259399414
+   ],
+   "excised_fraction": 0.2907,
+   "n_events": 167225,
+   "events_per_s": 135.4,
+   "n_accepted": 80304,
+   "n_pool": 86921,
+   "n_refractory_rejected": 395,
+   "accepted_by_pass": [
+    73341,
+    7008,
+    350
+   ],
+   "seconds": {
+    "load": 2.5,
+    "capture": 26.5
+   },
+   "units": {
+    "37": {
+     "template_trough_uV": -179.0,
+     "template_wire_profile_uV": [
+      -179.0,
+      -59.20000076293945,
+      -41.099998474121094,
+      -33.20000076293945
+     ],
+     "n_seed": 9387,
+     "n_capture": 9042,
+     "seed_matched_by_capture": 0.927,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.963,
+     "seed_response": {
+      "A": {
+       "base_hz": 5.338983050847458,
+       "onset_1_10ms_hz": 3.766478342749529,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.423728813559322,
+       "post_50_200ms_hz": 7.768361581920903
+      },
+      "B": {
+       "base_hz": 10.497652582159624,
+       "onset_1_10ms_hz": 2.5039123630672924,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 7.730829420970265
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.338983050847458,
+       "onset_1_10ms_hz": 3.295668549905838,
+       "in_pulse_hz": 1.2687779131140478,
+       "post_0_50ms_hz": 0.423728813559322,
+       "post_50_200ms_hz": 7.288135593220338
+      },
+      "B": {
+       "base_hz": 9.934272300469484,
+       "onset_1_10ms_hz": 2.9212310902451746,
+       "in_pulse_hz": 1.043876749471411,
+       "post_0_50ms_hz": 0.056338028169014086,
+       "post_50_200ms_hz": 7.305164319248825
+      }
+     },
+     "purity": {
+      "n_spikes": 9042,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.015105784530343402,
+      "ampsplit_ratio": 0.0,
+      "ampsplit_burst_ratio": 0.08219276740259346,
+      "neighbours": {
+       "38": "distinct",
+       "39": "ambiguous",
+       "40": "distinct",
+       "41": "distinct",
+       "42": "distinct",
+       "43": "distinct",
+       "44": "distinct",
+       "45": "distinct"
+      },
+      "neighbour_ratios": {
+       "38": 1.673,
+       "39": 0.353,
+       "40": 0.986,
+       "41": 0.75,
+       "42": 0.765,
+       "43": 1.446,
+       "44": 1.179,
+       "45": 1.142
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      140.0,
+      177.2,
+      194.7,
+      211.7,
+      236.2
+     ]
+    },
+    "38": {
+     "template_trough_uV": -153.3,
+     "template_wire_profile_uV": [
+      -153.3000030517578,
+      -121.69999694824219,
+      -117.5,
+      -118.0999984741211
+     ],
+     "n_seed": 705,
+     "n_capture": 12408,
+     "seed_matched_by_capture": 0.871,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.049,
+     "seed_response": {
+      "A": {
+       "base_hz": 0.1694915254237288,
+       "onset_1_10ms_hz": 0.0,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 1.15819209039548
+      },
+      "B": {
+       "base_hz": 0.9014084507042254,
+       "onset_1_10ms_hz": 0.31298904538341155,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 0.7762128325508606
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 9.067796610169491,
+       "onset_1_10ms_hz": 8.00376647834275,
+       "in_pulse_hz": 5.655738833033806,
+       "post_0_50ms_hz": 1.1016949152542372,
+       "post_50_200ms_hz": 12.34463276836158
+      },
+      "B": {
+       "base_hz": 15.267605633802816,
+       "onset_1_10ms_hz": 8.03338549817423,
+       "in_pulse_hz": 4.662649480972302,
+       "post_0_50ms_hz": 0.11267605633802817,
+       "post_50_200ms_hz": 10.748043818466352
+      }
+     },
+     "purity": {
+      "n_spikes": 12408,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2754131620128978,
+      "ampsplit_ratio": 0.17460688499599253,
+      "ampsplit_burst_ratio": 1.3968550799679402,
+      "neighbours": {
+       "37": "distinct",
+       "39": "ambiguous",
+       "40": "ambiguous",
+       "41": "distinct",
+       "42": "ambiguous",
+       "43": "ambiguous",
+       "44": "distinct",
+       "45": "distinct"
+      },
+      "neighbour_ratios": {
+       "37": 1.672,
+       "39": 0.429,
+       "40": 0.663,
+       "41": 1.085,
+       "42": 0.621,
+       "43": 0.683,
+       "44": 0.746,
+       "45": 1.69
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      39.9,
+      50.9,
+      62.6,
+      78.1,
+      146.8
+     ]
+    },
+    "39": {
+     "template_trough_uV": -89.9,
+     "template_wire_profile_uV": [
+      -89.9000015258789,
+      -62.5,
+      -34.29999923706055,
+      -40.400001525878906
+     ],
+     "n_seed": 1135,
+     "n_capture": 16298,
+     "seed_matched_by_capture": 0.687,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.048,
+     "seed_response": {
+      "A": {
+       "base_hz": 1.1016949152542372,
+       "onset_1_10ms_hz": 6.120527306967984,
+       "in_pulse_hz": 0.06451413117529056,
+       "post_0_50ms_hz": 0.0847457627118644,
+       "post_50_200ms_hz": 1.101694915254237
+      },
+      "B": {
+       "base_hz": 1.7464788732394365,
+       "onset_1_10ms_hz": 8.659363588941053,
+       "in_pulse_hz": 0.017397945824523513,
+       "post_0_50ms_hz": 0.018779342723004695,
+       "post_50_200ms_hz": 1.4835680751173705
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.762711864406779,
+       "onset_1_10ms_hz": 100.28248587570621,
+       "in_pulse_hz": 62.92278260630006,
+       "post_0_50ms_hz": 3.1355932203389827,
+       "post_50_200ms_hz": 8.27683615819209
+      },
+      "B": {
+       "base_hz": 8.507042253521126,
+       "onset_1_10ms_hz": 102.2430881585811,
+       "in_pulse_hz": 54.52516221405669,
+       "post_0_50ms_hz": 2.5539906103286385,
+       "post_50_200ms_hz": 7.7057902973395915
+      }
+     },
+     "purity": {
+      "n_spikes": 16298,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.09918874226151796,
+      "ampsplit_ratio": 0.050611824558320605,
+      "ampsplit_burst_ratio": 2.277532105124427,
+      "neighbours": {
+       "37": "ambiguous",
+       "38": "ambiguous",
+       "40": "duplicate",
+       "41": "duplicate",
+       "42": "ambiguous",
+       "43": "duplicate",
+       "44": "ambiguous",
+       "45": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "37": 0.353,
+       "38": 0.429,
+       "40": 0.265,
+       "41": 0.227,
+       "42": 0.468,
+       "43": 0.268,
+       "44": 0.378,
+       "45": 0.321
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      38.6,
+      43.8,
+      51.4,
+      65.8,
+      112.5
+     ]
+    },
+    "40": {
+     "template_trough_uV": -81.6,
+     "template_wire_profile_uV": [
+      -81.5999984741211,
+      -32.400001525878906,
+      -39.20000076293945,
+      -52.0
+     ],
+     "n_seed": 1286,
+     "n_capture": 10794,
+     "seed_matched_by_capture": 0.572,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.068,
+     "seed_response": {
+      "A": {
+       "base_hz": 0.6779661016949152,
+       "onset_1_10ms_hz": 0.9416195856873822,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.2542372881355932,
+       "post_50_200ms_hz": 1.5819209039548021
+      },
+      "B": {
+       "base_hz": 2.215962441314554,
+       "onset_1_10ms_hz": 1.8779342723004693,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.03755868544600939,
+       "post_50_200ms_hz": 1.5086071987480436
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 7.372881355932203,
+       "onset_1_10ms_hz": 8.945386064030131,
+       "in_pulse_hz": 14.214613568955688,
+       "post_0_50ms_hz": 0.9322033898305084,
+       "post_50_200ms_hz": 7.062146892655366
+      },
+      "B": {
+       "base_hz": 11.36150234741784,
+       "onset_1_10ms_hz": 10.954616588419404,
+       "in_pulse_hz": 14.040142280390477,
+       "post_0_50ms_hz": 0.4507042253521127,
+       "post_50_200ms_hz": 7.9499217527386525
+      }
+     },
+     "purity": {
+      "n_spikes": 10794,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.28973439960539005,
+      "ampsplit_ratio": 0.0865263499743063,
+      "ampsplit_burst_ratio": 1.6151585328537177,
+      "neighbours": {
+       "37": "distinct",
+       "38": "ambiguous",
+       "39": "duplicate",
+       "41": "distinct",
+       "42": "distinct",
+       "43": "ambiguous",
+       "44": "ambiguous",
+       "45": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "37": 0.987,
+       "38": 0.662,
+       "39": 0.265,
+       "41": 0.713,
+       "42": 1.045,
+       "43": 0.563,
+       "44": 0.592,
+       "45": 0.552
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      38.8,
+      45.6,
+      56.7,
+      73.5,
+      107.6
+     ]
+    },
+    "41": {
+     "template_trough_uV": -66.7,
+     "template_wire_profile_uV": [
+      -37.400001525878906,
+      -66.69999694824219,
+      -29.799999237060547,
+      -14.5
+     ],
+     "n_seed": 7831,
+     "n_capture": 6193,
+     "seed_matched_by_capture": 0.416,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.526,
+     "seed_response": {
+      "A": {
+       "base_hz": 5.762711864406779,
+       "onset_1_10ms_hz": 3.295668549905838,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.3389830508474576,
+       "post_50_200ms_hz": 9.745762711864405
+      },
+      "B": {
+       "base_hz": 8.769953051643192,
+       "onset_1_10ms_hz": 4.06885758998435,
+       "in_pulse_hz": 0.017397945824523513,
+       "post_0_50ms_hz": 0.018779342723004695,
+       "post_50_200ms_hz": 7.974960876369326
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 5.338983050847458,
+       "onset_1_10ms_hz": 1.8832391713747645,
+       "in_pulse_hz": 0.8601884156705408,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 6.666666666666665
+      },
+      "B": {
+       "base_hz": 6.403755868544601,
+       "onset_1_10ms_hz": 1.8779342723004693,
+       "in_pulse_hz": 0.6959178329809406,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 5.16431924882629
+      }
+     },
+     "purity": {
+      "n_spikes": 6193,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.13953791473804186,
+      "ampsplit_ratio": 0.2627566615264861,
+      "ampsplit_burst_ratio": 1.9268821845275645,
+      "neighbours": {
+       "37": "distinct",
+       "38": "distinct",
+       "39": "duplicate",
+       "40": "distinct",
+       "42": "ambiguous",
+       "43": "ambiguous",
+       "44": "distinct",
+       "45": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "37": 0.751,
+       "38": 1.085,
+       "39": 0.227,
+       "40": 0.714,
+       "42": 0.335,
+       "43": 0.62,
+       "44": 0.81,
+       "45": 0.573
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      42.5,
+      56.4,
+      69.7,
+      83.9,
+      110.3
+     ]
+    },
+    "42": {
+     "template_trough_uV": -125.0,
+     "template_wire_profile_uV": [
+      -94.9000015258789,
+      -125.0,
+      -37.099998474121094,
+      -31.299999237060547
+     ],
+     "n_seed": 1682,
+     "n_capture": 2405,
+     "seed_matched_by_capture": 0.697,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.488,
+     "seed_response": {
+      "A": {
+       "base_hz": 0.847457627118644,
+       "onset_1_10ms_hz": 0.0,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0847457627118644,
+       "post_50_200ms_hz": 3.1638418079096042
+      },
+      "B": {
+       "base_hz": 2.328638497652582,
+       "onset_1_10ms_hz": 0.6259780907668231,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 2.716744913928012
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 1.5254237288135593,
+       "onset_1_10ms_hz": 0.4708097928436911,
+       "in_pulse_hz": 0.7956742844952502,
+       "post_0_50ms_hz": 0.0847457627118644,
+       "post_50_200ms_hz": 3.8700564971751406
+      },
+      "B": {
+       "base_hz": 2.6854460093896715,
+       "onset_1_10ms_hz": 1.043296817944705,
+       "in_pulse_hz": 0.64372399550737,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 2.9233176838810637
+      }
+     },
+     "purity": {
+      "n_spikes": 2405,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2135217546028357,
+      "ampsplit_ratio": 0.0,
+      "ampsplit_burst_ratio": 2.322666438477678,
+      "neighbours": {
+       "37": "distinct",
+       "38": "ambiguous",
+       "39": "ambiguous",
+       "40": "distinct",
+       "41": "ambiguous",
+       "43": "distinct",
+       "44": "distinct",
+       "45": "distinct"
+      },
+      "neighbour_ratios": {
+       "37": 0.765,
+       "38": 0.621,
+       "39": 0.468,
+       "40": 1.045,
+       "41": 0.336,
+       "43": 1.037,
+       "44": 0.795,
+       "45": 1.044
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      43.3,
+      64.5,
+      98.7,
+      144.7,
+      172.2
+     ]
+    },
+    "43": {
+     "template_trough_uV": -75.4,
+     "template_wire_profile_uV": [
+      -37.599998474121094,
+      -39.20000076293945,
+      -75.4000015258789,
+      -38.79999923706055
+     ],
+     "n_seed": 4241,
+     "n_capture": 9755,
+     "seed_matched_by_capture": 0.569,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.248,
+     "seed_response": {
+      "A": {
+       "base_hz": 3.2203389830508473,
+       "onset_1_10ms_hz": 2.3540489642184554,
+       "in_pulse_hz": 0.02150471039176352,
+       "post_0_50ms_hz": 0.423728813559322,
+       "post_50_200ms_hz": 4.858757062146892
+      },
+      "B": {
+       "base_hz": 6.084507042253521,
+       "onset_1_10ms_hz": 3.3385498174230563,
+       "in_pulse_hz": 0.08698972912261757,
+       "post_0_50ms_hz": 0.03755868544600939,
+       "post_50_200ms_hz": 4.613458528951486
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 7.372881355932203,
+       "onset_1_10ms_hz": 5.649717514124293,
+       "in_pulse_hz": 8.472855894354828,
+       "post_0_50ms_hz": 1.0169491525423728,
+       "post_50_200ms_hz": 9.011299435028247
+      },
+      "B": {
+       "base_hz": 11.305164319248826,
+       "onset_1_10ms_hz": 6.05112154407929,
+       "in_pulse_hz": 8.577187291490093,
+       "post_0_50ms_hz": 0.3568075117370892,
+       "post_50_200ms_hz": 7.8184663536776196
+      }
+     },
+     "purity": {
+      "n_spikes": 9755,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.28984865639630597,
+      "ampsplit_ratio": 0.17660134508609668,
+      "ampsplit_burst_ratio": 1.2008891465854574,
+      "neighbours": {
+       "37": "distinct",
+       "38": "ambiguous",
+       "39": "duplicate",
+       "40": "ambiguous",
+       "41": "ambiguous",
+       "42": "distinct",
+       "44": "ambiguous",
+       "45": "distinct"
+      },
+      "neighbour_ratios": {
+       "37": 1.446,
+       "38": 0.683,
+       "39": 0.268,
+       "40": 0.563,
+       "41": 0.62,
+       "42": 1.04,
+       "44": 0.534,
+       "45": 0.71
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      38.6,
+      45.2,
+      56.5,
+      72.8,
+      101.3
+     ]
+    },
+    "44": {
+     "template_trough_uV": -120.7,
+     "template_wire_profile_uV": [
+      -43.900001525878906,
+      -26.5,
+      -71.19999694824219,
+      -120.69999694824219
+     ],
+     "n_seed": 1482,
+     "n_capture": 4815,
+     "seed_matched_by_capture": 0.717,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.221,
+     "seed_response": {
+      "A": {
+       "base_hz": 1.3559322033898304,
+       "onset_1_10ms_hz": 0.4708097928436911,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.3389830508474576,
+       "post_50_200ms_hz": 2.4576271186440675
+      },
+      "B": {
+       "base_hz": 2.103286384976526,
+       "onset_1_10ms_hz": 1.1476264997391756,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.018779342723004695,
+       "post_50_200ms_hz": 2.109546165884194
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 3.644067796610169,
+       "onset_1_10ms_hz": 3.295668549905838,
+       "in_pulse_hz": 0.8601884156705408,
+       "post_0_50ms_hz": 0.7627118644067796,
+       "post_50_200ms_hz": 5.056497175141242
+      },
+      "B": {
+       "base_hz": 6.084507042253521,
+       "onset_1_10ms_hz": 3.442879499217527,
+       "in_pulse_hz": 1.791988419925922,
+       "post_0_50ms_hz": 0.07511737089201878,
+       "post_50_200ms_hz": 4.9827856025039114
+      }
+     },
+     "purity": {
+      "n_spikes": 4815,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.23083507811405768,
+      "ampsplit_ratio": 0.2899887978037825,
+      "ampsplit_burst_ratio": 2.31991038243026,
+      "neighbours": {
+       "37": "distinct",
+       "38": "distinct",
+       "39": "ambiguous",
+       "40": "ambiguous",
+       "41": "distinct",
+       "42": "distinct",
+       "43": "ambiguous",
+       "45": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "37": 1.179,
+       "38": 0.746,
+       "39": 0.378,
+       "40": 0.592,
+       "41": 0.812,
+       "42": 0.795,
+       "43": 0.535,
+       "45": 0.534
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      39.9,
+      49.6,
+      67.7,
+      97.3,
+      150.0
+     ]
+    },
+    "45": {
+     "template_trough_uV": -83.6,
+     "template_wire_profile_uV": [
+      -38.5,
+      -17.600000381469727,
+      -28.399999618530273,
+      -83.5999984741211
+     ],
+     "n_seed": 10490,
+     "n_capture": 8594,
+     "seed_matched_by_capture": 0.452,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.551,
+     "seed_response": {
+      "A": {
+       "base_hz": 7.542372881355932,
+       "onset_1_10ms_hz": 3.766478342749529,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 1.271186440677966,
+       "post_50_200ms_hz": 10.19774011299435
+      },
+      "B": {
+       "base_hz": 14.910798122065728,
+       "onset_1_10ms_hz": 6.05112154407929,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.018779342723004695,
+       "post_50_200ms_hz": 11.46165884194053
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 6.101694915254237,
+       "onset_1_10ms_hz": 2.8248587570621466,
+       "in_pulse_hz": 1.3332920442893383,
+       "post_0_50ms_hz": 0.9322033898305084,
+       "post_50_200ms_hz": 7.316384180790959
+      },
+      "B": {
+       "base_hz": 11.173708920187794,
+       "onset_1_10ms_hz": 3.3385498174230563,
+       "in_pulse_hz": 1.7397945824523515,
+       "post_0_50ms_hz": 0.18779342723004694,
+       "post_50_200ms_hz": 7.730829420970265
+      }
+     },
+     "purity": {
+      "n_spikes": 8594,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.2619740025749877,
+      "ampsplit_ratio": 0.13649496363715669,
+      "ampsplit_burst_ratio": 3.366875769716532,
+      "neighbours": {
+       "37": "distinct",
+       "38": "distinct",
+       "39": "ambiguous",
+       "40": "ambiguous",
+       "41": "ambiguous",
+       "42": "distinct",
+       "43": "distinct",
+       "44": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "37": 1.14,
+       "38": 1.689,
+       "39": 0.321,
+       "40": 0.553,
+       "41": 0.573,
+       "42": 1.044,
+       "43": 0.711,
+       "44": 0.533
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      40.6,
+      54.0,
+      75.5,
+      93.3,
+      117.1
+     ]
+    }
+   }
+  },
+  "TT12": {
+   "wires": [
+    "CH1",
+    "CH3",
+    "CH5",
+    "CH7"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    12.444000244140625,
+    15.690999984741211,
+    13.274999618530273,
+    11.795999526977539
+   ],
+   "noise_excised_uV": [
+    10.800000190734863,
+    14.175000190734863,
+    11.755000114440918,
+    10.097999572753906
+   ],
+   "excised_fraction": 0.2921,
+   "n_events": 163118,
+   "events_per_s": 132.1,
+   "n_accepted": 75249,
+   "n_pool": 87869,
+   "n_refractory_rejected": 350,
+   "accepted_by_pass": [
+    69736,
+    5561,
+    302
+   ],
+   "seconds": {
+    "load": 4.9,
+    "capture": 29.3
+   },
+   "units": {
+    "46": {
+     "template_trough_uV": -89.0,
+     "template_wire_profile_uV": [
+      -89.0,
+      -42.20000076293945,
+      -44.099998474121094,
+      -39.20000076293945
+     ],
+     "n_seed": 3515,
+     "n_capture": 19106,
+     "seed_matched_by_capture": 0.632,
+     "seed_matched_by_any_event": 0.999,
+     "capture_in_seed": 0.116,
+     "seed_response": {
+      "A": {
+       "base_hz": 3.7288135593220337,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.1075235519588176,
+       "post_0_50ms_hz": 0.5084745762711864,
+       "post_50_200ms_hz": 6.638418079096044
+      },
+      "B": {
+       "base_hz": 4.0,
+       "onset_1_10ms_hz": 1.9822639540949398,
+       "in_pulse_hz": 0.06959178329809405,
+       "post_0_50ms_hz": 0.03755868544600939,
+       "post_50_200ms_hz": 4.431924882629107
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 16.101694915254235,
+       "onset_1_10ms_hz": 18.361581920903955,
+       "in_pulse_hz": 1.9354239352587168,
+       "post_0_50ms_hz": 4.322033898305085,
+       "post_50_200ms_hz": 24.971751412429374
+      },
+      "B": {
+       "base_hz": 19.661971830985916,
+       "onset_1_10ms_hz": 17.005738132498696,
+       "in_pulse_hz": 1.9485699323466337,
+       "post_0_50ms_hz": 0.8826291079812206,
+       "post_50_200ms_hz": 18.17840375586854
+      }
+     },
+     "purity": {
+      "n_spikes": 19106,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.12517986194411898,
+      "ampsplit_ratio": 0.20254012361643978,
+      "ampsplit_burst_ratio": 1.988575759143227,
+      "neighbours": {
+       "47": "ambiguous",
+       "48": "ambiguous",
+       "49": "distinct",
+       "50": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "47": 0.443,
+       "48": 0.417,
+       "49": 0.952,
+       "50": 0.349
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      66.5,
+      76.1,
+      88.0,
+      104.3,
+      137.2
+     ]
+    },
+    "47": {
+     "template_trough_uV": -106.2,
+     "template_wire_profile_uV": [
+      -30.600000381469727,
+      -106.19999694824219,
+      -10.899999618530273,
+      -29.399999618530273
+     ],
+     "n_seed": 12283,
+     "n_capture": 12530,
+     "seed_matched_by_capture": 0.64,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.628,
+     "seed_response": {
+      "A": {
+       "base_hz": 10.677966101694915,
+       "onset_1_10ms_hz": 4.23728813559322,
+       "in_pulse_hz": 0.02150471039176352,
+       "post_0_50ms_hz": 3.389830508474576,
+       "post_50_200ms_hz": 13.926553672316382
+      },
+      "B": {
+       "base_hz": 10.12206572769953,
+       "onset_1_10ms_hz": 3.5472091810119974,
+       "in_pulse_hz": 0.017397945824523513,
+       "post_0_50ms_hz": 0.11267605633802817,
+       "post_50_200ms_hz": 11.104851330203442
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 10.847457627118644,
+       "onset_1_10ms_hz": 6.120527306967984,
+       "in_pulse_hz": 0.494608339010561,
+       "post_0_50ms_hz": 2.796610169491525,
+       "post_50_200ms_hz": 11.38418079096045
+      },
+      "B": {
+       "base_hz": 11.305164319248826,
+       "onset_1_10ms_hz": 4.799165362545644,
+       "in_pulse_hz": 0.3479589164904703,
+       "post_0_50ms_hz": 0.18779342723004694,
+       "post_50_200ms_hz": 10.122065727699528
+      }
+     },
+     "purity": {
+      "n_spikes": 12530,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.057686152683767346,
+      "ampsplit_ratio": 0.10700000203311948,
+      "ampsplit_burst_ratio": 0.9416000178914513,
+      "neighbours": {
+       "46": "ambiguous",
+       "48": "distinct",
+       "49": "distinct",
+       "50": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "46": 0.443,
+       "48": 0.792,
+       "49": 1.054,
+       "50": 0.573
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      71.2,
+      86.7,
+      99.5,
+      113.9,
+      137.2
+     ]
+    },
+    "48": {
+     "template_trough_uV": -136.9,
+     "template_wire_profile_uV": [
+      -85.5999984741211,
+      -41.29999923706055,
+      -136.89999389648438,
+      -70.19999694824219
+     ],
+     "n_seed": 3348,
+     "n_capture": 11680,
+     "seed_matched_by_capture": 0.881,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.253,
+     "seed_response": {
+      "A": {
+       "base_hz": 3.7288135593220337,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 1.0169491525423728,
+       "post_50_200ms_hz": 4.378531073446327
+      },
+      "B": {
+       "base_hz": 2.647887323943662,
+       "onset_1_10ms_hz": 0.6259780907668231,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.0,
+       "post_50_200ms_hz": 3.3802816901408446
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 12.288135593220339,
+       "onset_1_10ms_hz": 2.8248587570621466,
+       "in_pulse_hz": 0.1075235519588176,
+       "post_0_50ms_hz": 2.2033898305084745,
+       "post_50_200ms_hz": 13.898305084745761
+      },
+      "B": {
+       "base_hz": 11.286384976525822,
+       "onset_1_10ms_hz": 3.3385498174230563,
+       "in_pulse_hz": 0.06959178329809405,
+       "post_0_50ms_hz": 0.13145539906103287,
+       "post_50_200ms_hz": 10.397496087636931
+      }
+     },
+     "purity": {
+      "n_spikes": 11680,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.24442767096899043,
+      "ampsplit_ratio": 0.14780206861314613,
+      "ampsplit_burst_ratio": 1.4780206861314613,
+      "neighbours": {
+       "46": "ambiguous",
+       "47": "distinct",
+       "49": "distinct",
+       "50": "ambiguous"
+      },
+      "neighbour_ratios": {
+       "46": 0.417,
+       "47": 0.793,
+       "49": 0.953,
+       "50": 0.48
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      67.9,
+      81.3,
+      102.1,
+      145.7,
+      192.5
+     ]
+    },
+    "49": {
+     "template_trough_uV": -188.8,
+     "template_wire_profile_uV": [
+      -105.4000015258789,
+      -39.599998474121094,
+      -188.8000030517578,
+      -75.0
+     ],
+     "n_seed": 17659,
+     "n_capture": 17022,
+     "seed_matched_by_capture": 0.92,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.954,
+     "seed_response": {
+      "A": {
+       "base_hz": 19.66101694915254,
+       "onset_1_10ms_hz": 3.766478342749529,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 3.3050847457627115,
+       "post_50_200ms_hz": 23.898305084745758
+      },
+      "B": {
+       "base_hz": 24.95774647887324,
+       "onset_1_10ms_hz": 6.259780907668231,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.24413145539906103,
+       "post_50_200ms_hz": 21.420970266040683
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 18.89830508474576,
+       "onset_1_10ms_hz": 3.295668549905838,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 2.542372881355932,
+       "post_50_200ms_hz": 21.61016949152542
+      },
+      "B": {
+       "base_hz": 24.0,
+       "onset_1_10ms_hz": 5.94679186228482,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.28169014084507044,
+       "post_50_200ms_hz": 20.16901408450704
+      }
+     },
+     "purity": {
+      "n_spikes": 17022,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.052569226633890596,
+      "ampsplit_ratio": 0.011597116996502151,
+      "ampsplit_burst_ratio": 1.4380425075662668,
+      "neighbours": {
+       "46": "distinct",
+       "47": "distinct",
+       "48": "distinct",
+       "50": "distinct"
+      },
+      "neighbour_ratios": {
+       "46": 0.952,
+       "47": 1.054,
+       "48": 0.953,
+       "50": 0.923
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      174.0,
+      210.3,
+      226.2,
+      242.2,
+      270.0
+     ]
+    },
+    "50": {
+     "template_trough_uV": -91.3,
+     "template_wire_profile_uV": [
+      -46.0,
+      -42.099998474121094,
+      -61.20000076293945,
+      -91.30000305175781
+     ],
+     "n_seed": 5657,
+     "n_capture": 14911,
+     "seed_matched_by_capture": 0.445,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.169,
+     "seed_response": {
+      "A": {
+       "base_hz": 4.067796610169491,
+       "onset_1_10ms_hz": 1.8832391713747645,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 2.2033898305084745,
+       "post_50_200ms_hz": 7.14689265536723
+      },
+      "B": {
+       "base_hz": 6.328638497652582,
+       "onset_1_10ms_hz": 3.2342201356285862,
+       "in_pulse_hz": 0.0,
+       "post_0_50ms_hz": 0.24413145539906103,
+       "post_50_200ms_hz": 7.28638497652582
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 13.559322033898304,
+       "onset_1_10ms_hz": 15.536723163841808,
+       "in_pulse_hz": 1.978433356042244,
+       "post_0_50ms_hz": 4.1525423728813555,
+       "post_50_200ms_hz": 15.903954802259884
+      },
+      "B": {
+       "base_hz": 14.985915492957746,
+       "onset_1_10ms_hz": 10.745957224830462,
+       "in_pulse_hz": 1.9485699323466337,
+       "post_0_50ms_hz": 0.5633802816901409,
+       "post_50_200ms_hz": 14.272300469483566
+      }
+     },
+     "purity": {
+      "n_spikes": 14911,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.18330431586611803,
+      "ampsplit_ratio": 0.3325057220284913,
+      "ampsplit_burst_ratio": 1.813667574700862,
+      "neighbours": {
+       "46": "ambiguous",
+       "47": "ambiguous",
+       "48": "ambiguous",
+       "49": "distinct"
+      },
+      "neighbour_ratios": {
+       "46": 0.349,
+       "47": 0.573,
+       "48": 0.48,
+       "49": 0.923
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      68.1,
+      81.8,
+      97.9,
+      117.8,
+      160.7
+     ]
+    }
+   }
+  },
+  "TT13": {
+   "wires": [
+    "CH4",
+    "CH6",
+    "CH8",
+    "CH2"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    5.382999897003174,
+    6.408999919891357,
+    6.28000020980835,
+    5.8429999351501465
+   ],
+   "noise_excised_uV": [
+    5.322999954223633,
+    6.354000091552734,
+    6.2230000495910645,
+    5.789000034332275
+   ],
+   "excised_fraction": 0.035,
+   "n_events": 8295,
+   "events_per_s": 6.7,
+   "n_accepted": 1408,
+   "n_pool": 6887,
+   "n_refractory_rejected": 35,
+   "accepted_by_pass": [
+    1396,
+    46,
+    1
+   ],
+   "seconds": {
+    "load": 2.5,
+    "capture": 10.1
+   },
+   "units": {
+    "51": {
+     "template_trough_uV": -34.7,
+     "template_wire_profile_uV": [
+      -24.600000381469727,
+      -23.0,
+      -19.100000381469727,
+      -34.70000076293945
+     ],
+     "n_seed": 596,
+     "n_capture": 1408,
+     "seed_matched_by_capture": 0.544,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.23,
+     "seed_response": {
+      "A": {
+       "base_hz": 0.9322033898305084,
+       "onset_1_10ms_hz": 0.0,
+       "in_pulse_hz": 0.3010659454846893,
+       "post_0_50ms_hz": 0.0847457627118644,
+       "post_50_200ms_hz": 1.0169491525423726
+      },
+      "B": {
+       "base_hz": 0.4507042253521127,
+       "onset_1_10ms_hz": 0.9389671361502346,
+       "in_pulse_hz": 0.4349486456130879,
+       "post_0_50ms_hz": 0.22535211267605634,
+       "post_50_200ms_hz": 0.3505477308294209
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 2.11864406779661,
+       "onset_1_10ms_hz": 2.8248587570621466,
+       "in_pulse_hz": 1.2902826235058114,
+       "post_0_50ms_hz": 1.3559322033898304,
+       "post_50_200ms_hz": 2.11864406779661
+      },
+      "B": {
+       "base_hz": 0.7511737089201878,
+       "onset_1_10ms_hz": 1.043296817944705,
+       "in_pulse_hz": 0.9046931828752227,
+       "post_0_50ms_hz": 0.5821596244131455,
+       "post_50_200ms_hz": 0.8012519561815336
+      }
+     },
+     "purity": {
+      "n_spikes": 1408,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 7.267980794495021,
+      "ampsplit_ratio": 1.693780769401323,
+      "ampsplit_burst_ratio": 20.325369232815877,
+      "neighbours": {},
+      "neighbour_ratios": {}
+     },
+     "capture_amp_uV_quantiles": [
+      29.2,
+      31.8,
+      35.2,
+      40.4,
+      51.7
+     ]
+    }
+   }
+  },
+  "TT14": {
+   "wires": [
+    "CH10",
+    "CH12",
+    "CH14",
+    "CH16"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    24.22599983215332,
+    24.41699981689453,
+    26.343000411987305,
+    23.993000030517578
+   ],
+   "noise_excised_uV": [
+    22.09000015258789,
+    22.283000946044922,
+    23.53700065612793,
+    21.851999282836914
+   ],
+   "excised_fraction": 0.1313,
+   "n_events": 54296,
+   "events_per_s": 44.0,
+   "n_accepted": 28524,
+   "n_pool": 25772,
+   "n_refractory_rejected": 1299,
+   "accepted_by_pass": [
+    28015,
+    1668,
+    140
+   ],
+   "seconds": {
+    "load": 2.5,
+    "capture": 17.2
+   },
+   "units": {
+    "52": {
+     "template_trough_uV": -223.3,
+     "template_wire_profile_uV": [
+      -208.8000030517578,
+      -223.3000030517578,
+      -217.1999969482422,
+      -216.5
+     ],
+     "n_seed": 785,
+     "n_capture": 28524,
+     "seed_matched_by_capture": 0.817,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.022,
+     "seed_response": {
+      "A": {
+       "base_hz": 0.7627118644067796,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 0.5591224701858516,
+       "post_0_50ms_hz": 0.423728813559322,
+       "post_50_200ms_hz": 1.101694915254237
+      },
+      "B": {
+       "base_hz": 0.5258215962441315,
+       "onset_1_10ms_hz": 1.1476264997391756,
+       "in_pulse_hz": 0.5219383747357055,
+       "post_0_50ms_hz": 0.20657276995305165,
+       "post_50_200ms_hz": 0.5571205007824725
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 30.338983050847457,
+       "onset_1_10ms_hz": 31.073446327683616,
+       "in_pulse_hz": 25.311044131105664,
+       "post_0_50ms_hz": 26.779661016949152,
+       "post_50_200ms_hz": 26.66666666666666
+      },
+      "B": {
+       "base_hz": 19.830985915492956,
+       "onset_1_10ms_hz": 22.11789254042775,
+       "in_pulse_hz": 19.88585207743038,
+       "post_0_50ms_hz": 20.488262910798124,
+       "post_50_200ms_hz": 20.87010954616588
+      }
+     },
+     "purity": {
+      "n_spikes": 28524,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.6572632225234084,
+      "ampsplit_ratio": 0.5286300673670464,
+      "ampsplit_burst_ratio": 2.064961200652525,
+      "neighbours": {},
+      "neighbour_ratios": {}
+     },
+     "capture_amp_uV_quantiles": [
+      107.3,
+      113.1,
+      122.5,
+      140.0,
+      195.6
+     ]
+    }
+   }
+  },
+  "TT15": {
+   "wires": [
+    "CH18",
+    "CH20",
+    "CH22",
+    "CH24"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    4.732999801635742,
+    6.130000114440918,
+    9.321999549865723,
+    4.054999828338623
+   ],
+   "noise_excised_uV": [
+    3.632999897003174,
+    5.059999942779541,
+    5.493000030517578,
+    3.8010001182556152
+   ],
+   "excised_fraction": 0.4643,
+   "n_events": 467203,
+   "events_per_s": 378.3,
+   "n_accepted": 105011,
+   "n_pool": 362192,
+   "n_refractory_rejected": 1176,
+   "accepted_by_pass": [
+    104428,
+    1729,
+    30
+   ],
+   "seconds": {
+    "load": 2.6,
+    "capture": 26.8
+   },
+   "units": {
+    "53": {
+     "template_trough_uV": -93.0,
+     "template_wire_profile_uV": [
+      -22.5,
+      -31.399999618530273,
+      -93.0,
+      -7.400000095367432
+     ],
+     "n_seed": 2796,
+     "n_capture": 104040,
+     "seed_matched_by_capture": 0.999,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.027,
+     "seed_response": {
+      "A": {
+       "base_hz": 2.542372881355932,
+       "onset_1_10ms_hz": 3.295668549905838,
+       "in_pulse_hz": 2.1289663287845886,
+       "post_0_50ms_hz": 2.4576271186440675,
+       "post_50_200ms_hz": 2.683615819209039
+      },
+      "B": {
+       "base_hz": 2.4225352112676055,
+       "onset_1_10ms_hz": 3.025560772039645,
+       "in_pulse_hz": 2.435712415433292,
+       "post_0_50ms_hz": 2.15962441314554,
+       "post_50_200ms_hz": 2.2597809076682314
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 85.42372881355932,
+       "onset_1_10ms_hz": 86.15819209039547,
+       "in_pulse_hz": 85.09413902020825,
+       "post_0_50ms_hz": 86.18644067796609,
+       "post_50_200ms_hz": 85.16949152542371
+      },
+      "B": {
+       "base_hz": 84.8075117370892,
+       "onset_1_10ms_hz": 82.21178925404277,
+       "in_pulse_hz": 84.51922081553523,
+       "post_0_50ms_hz": 85.82159624413146,
+       "post_50_200ms_hz": 84.33802816901407
+      }
+     },
+     "purity": {
+      "n_spikes": 104040,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 0.04358479090889786,
+      "ampsplit_ratio": 0.02763148762967488,
+      "ampsplit_burst_ratio": 0.017386104575975208,
+      "neighbours": {
+       "54": "distinct"
+      },
+      "neighbour_ratios": {
+       "54": 1.296
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      30.8,
+      36.3,
+      40.5,
+      45.4,
+      85.9
+     ]
+    },
+    "54": {
+     "template_trough_uV": -30.7,
+     "template_wire_profile_uV": [
+      -22.700000762939453,
+      -21.899999618530273,
+      -27.5,
+      -30.700000762939453
+     ],
+     "n_seed": 1042,
+     "n_capture": 971,
+     "seed_matched_by_capture": 0.369,
+     "seed_matched_by_any_event": 0.995,
+     "capture_in_seed": 0.396,
+     "seed_response": {
+      "A": {
+       "base_hz": 1.9491525423728813,
+       "onset_1_10ms_hz": 1.8832391713747645,
+       "in_pulse_hz": 1.1182449403717032,
+       "post_0_50ms_hz": 0.9322033898305084,
+       "post_50_200ms_hz": 1.6949152542372878
+      },
+      "B": {
+       "base_hz": 0.6009389671361502,
+       "onset_1_10ms_hz": 0.7303077725612936,
+       "in_pulse_hz": 0.4871424830866584,
+       "post_0_50ms_hz": 0.48826291079812206,
+       "post_50_200ms_hz": 0.5821596244131454
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 2.11864406779661,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 1.5053297274234465,
+       "post_0_50ms_hz": 0.9322033898305084,
+       "post_50_200ms_hz": 1.525423728813559
+      },
+      "B": {
+       "base_hz": 0.5633802816901409,
+       "onset_1_10ms_hz": 0.41731872717788204,
+       "in_pulse_hz": 0.4349486456130879,
+       "post_0_50ms_hz": 0.5821596244131455,
+       "post_50_200ms_hz": 0.5383411580594678
+      }
+     },
+     "purity": {
+      "n_spikes": 971,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 13.098869975602106,
+      "ampsplit_ratio": 10.683522202998846,
+      "ampsplit_burst_ratio": 42.734088811995385,
+      "neighbours": {
+       "53": "distinct"
+      },
+      "neighbour_ratios": {
+       "53": 1.295
+      }
+     },
+     "capture_amp_uV_quantiles": [
+      26.7,
+      32.6,
+      42.2,
+      59.9,
+      81.0
+     ]
+    }
+   }
+  },
+  "TT16": {
+   "wires": [
+    "CH26",
+    "CH28",
+    "CH30",
+    "CH32"
+   ],
+   "seed": "main",
+   "noise_plain_uV": [
+    3.365000009536743,
+    3.9119999408721924,
+    3.506999969482422,
+    3.5409998893737793
+   ],
+   "noise_excised_uV": [
+    3.2669999599456787,
+    3.809000015258789,
+    3.3929998874664307,
+    3.421999931335449
+   ],
+   "excised_fraction": 0.0874,
+   "n_events": 33742,
+   "events_per_s": 27.3,
+   "n_accepted": 8174,
+   "n_pool": 25568,
+   "n_refractory_rejected": 520,
+   "accepted_by_pass": [
+    8033,
+    613,
+    48
+   ],
+   "seconds": {
+    "load": 2.5,
+    "capture": 13.1
+   },
+   "units": {
+    "55": {
+     "template_trough_uV": -33.3,
+     "template_wire_profile_uV": [
+      -25.5,
+      -25.200000762939453,
+      -30.799999237060547,
+      -33.29999923706055
+     ],
+     "n_seed": 2064,
+     "n_capture": 8174,
+     "seed_matched_by_capture": 0.607,
+     "seed_matched_by_any_event": 1.0,
+     "capture_in_seed": 0.153,
+     "seed_response": {
+      "A": {
+       "base_hz": 3.1355932203389827,
+       "onset_1_10ms_hz": 1.4124293785310733,
+       "in_pulse_hz": 1.8924145144751898,
+       "post_0_50ms_hz": 2.0338983050847457,
+       "post_50_200ms_hz": 3.27683615819209
+      },
+      "B": {
+       "base_hz": 1.164319248826291,
+       "onset_1_10ms_hz": 1.5649452269170578,
+       "in_pulse_hz": 1.0264788036468873,
+       "post_0_50ms_hz": 0.9953051643192489,
+       "post_50_200ms_hz": 1.1830985915492955
+      }
+     },
+     "capture_response": {
+      "A": {
+       "base_hz": 10.338983050847457,
+       "onset_1_10ms_hz": 14.124293785310734,
+       "in_pulse_hz": 9.09649249571597,
+       "post_0_50ms_hz": 7.033898305084746,
+       "post_50_200ms_hz": 9.661016949152541
+      },
+      "B": {
+       "base_hz": 4.882629107981221,
+       "onset_1_10ms_hz": 5.112154407929055,
+       "in_pulse_hz": 4.9758125058137255,
+       "post_0_50ms_hz": 4.28169014084507,
+       "post_50_200ms_hz": 5.051643192488262
+      }
+     },
+     "purity": {
+      "n_spikes": 8174,
+      "rp_contamination": 0.0,
+      "rp_violations": 0,
+      "refractory_conflict_ratio": 3.203945449555654,
+      "ampsplit_ratio": 0.40235120623586756,
+      "ampsplit_burst_ratio": 5.2305656810662775,
+      "neighbours": {},
+      "neighbour_ratios": {}
+     },
+     "capture_amp_uV_quantiles": [
+      17.6,
+      19.6,
+      22.8,
+      28.6,
+      42.7
+     ]
+    }
+   }
+  }
+ }
+}
