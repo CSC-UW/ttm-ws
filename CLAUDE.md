@@ -66,3 +66,11 @@
 ## Repository size
 - No single file over 5 MB; repository under 200 MB without first discussing
   git LFS. `git count-objects -vH`.
+
+## Current work
+- The TTM-003 48 h spike-sorting plan, written 2026-10-22 for the agent
+  that continues after the workspace moves to `~/projects/ttm-ws/`:
+  `docs/plans/2026-10-22_ttm003_48h_sorting_plan.md`. Read it after this
+  file. It carries the TTM-003 short-session findings, the TTM-001
+  pipeline's state, the data and machine facts, and the working rules
+  that used to come from the parent workspace.
