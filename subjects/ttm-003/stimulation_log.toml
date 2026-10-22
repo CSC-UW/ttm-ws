@@ -40,3 +40,19 @@ trains = [
   # Logged under pattern A; the TTL record shows pattern-B pulses (see the CSV).
   { n = 5, pattern = "A", laser_level = 4.5, power_mW = 9.8,  approx_time = "15m",   state = "drowsy", behavior_change = "none", neural_response = "clear" },
 ]
+
+# The 48 h recording has no train-by-train hand log. Graham Findlay's planned
+# protocol (2026-10-22): pattern A (200 ms on, 1 pulse/s), laser level 4.5
+# (9.8 mW), 60 pulses per train, one train every 2 h. Block times and the
+# measured parameters come from the TTL
+# (results/stimulation_blocks_2026-10-20_09-02-12.csv); trains that depart
+# from the plan are flagged there.
+[sessions."2026-10-20_09-02-12"]
+experiment = "TTM-003-48H"
+planned = { pattern = "A", laser_level = 4.5, power_mW = 9.8, pulses_per_train = 60, period_h = 2 }
+# Between 7.69 h and 8.09 h (16:43 to 17:08 local) the TTL carries single
+# pulses, short runs and one 164 s high interval; the laser was not connected
+# to the animal then (experimenter, 2026-10-22), so those trains delivered no
+# light. The fifth delivered train is the one at about 17:11. Whether the
+# 60-pulse train at 17:09:28 (TTL train 24) reached the animal is unconfirmed.
+not_delivered = [{ from_h = 7.6, to_h = 8.1, reason = "laser not connected to the animal" }]

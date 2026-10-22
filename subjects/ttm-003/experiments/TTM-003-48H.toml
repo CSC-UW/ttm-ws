@@ -1,0 +1,13 @@
+# Keys are the fields of ttm.subject.Experiment.
+# 48 h continuous recording with optotagging trains (207 ms pulses at 1 Hz,
+# 60 per train) every 2 h from 8.15 h to 46.15 h, preceded by four trains in
+# the first 6 h and a block of manual tests near 8 h; see
+# results/stimulation_blocks_2026-10-20_09-02-12.csv. The experiment name,
+# the light/dark schedule and any deprivation are not yet confirmed by the
+# experimenter; the bad-channel lists are carried over from the October 16
+# sessions pending the channel QC of this recording.
+session = "2026-10-20_09-02-12"
+acquisition = "TTM3/2026-10-20_09-02-12"
+
+badChannels = ["CH2", "CH10", "CH12", "CH14", "CH16"]
+badTetrodes = ["TT14"]

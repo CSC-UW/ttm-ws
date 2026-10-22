@@ -8,17 +8,28 @@ joins the trains in order with the hand log. Writes
 ``results/stimulation_pulses_<session>.csv`` (one row per pulse, session
 seconds relative to the first acquisition-board sample).
 
+A session listed without ``trains`` has no hand log; its trains are written
+unjoined to ``results/stimulation_blocks_<session>.csv`` with the onset in
+session hours and local time, the pattern matched from the TTL alone,
+``anomalous`` set where a pulse width lies outside every pattern, and, when
+the entry carries a ``planned`` protocol, its power and ``as_planned`` set
+where the train's pattern and pulse count match it. ``delivered`` is False
+for trains inside the entry's ``not_delivered`` windows (session hours).
+
 Usage: python subjects/ttm-003/scripts/stim_trains.py
 """
 
 from __future__ import annotations
 
+import datetime as dt
 import pathlib
 import tomllib
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
 
+from ttm.experiment import read_session_t0_unix
 from ttm.subject import find_subject
 
 SUBJECT_DIR = pathlib.Path(__file__).resolve().parents[1]
@@ -62,6 +73,7 @@ def summarize_trains(pulses: pd.DataFrame) -> pd.DataFrame:
             "ttl_train": k,
             "onset_s": g.onset_s.iloc[0],
             "offset_s": g.offset_s.iloc[-1],
+            "duration_s": round(float(g.offset_s.iloc[-1] - g.onset_s.iloc[0]), 2),
             "n_pulses": len(g),
             "pulse_ms_median": round(float(g.duration_ms.median()), 2),
             "pulse_ms_min": round(float(g.duration_ms.min()), 2),
@@ -81,6 +93,27 @@ def ttl_pattern(row: pd.Series, patterns: dict) -> str:
     return "?"
 
 
+def unlogged_blocks(trains: pd.DataFrame, patterns: dict, t0_unix: float, tz: str,
+                    planned: dict | None = None, not_delivered: list[dict] = ()) -> pd.DataFrame:
+    """Per-train table for a session with no hand log."""
+    blocks = trains.copy()
+    blocks["onset_h"] = (blocks.onset_s / 3600).round(4)
+    t0 = dt.datetime.fromtimestamp(t0_unix, ZoneInfo(tz))
+    blocks["onset_local"] = [(t0 + dt.timedelta(seconds=float(s))).strftime("%Y-%m-%d %H:%M:%S") for s in blocks.onset_s]
+    blocks["ttl_pattern"] = blocks.apply(ttl_pattern, axis=1, patterns=patterns)
+    widths = [p["pulse_ms"] for p in patterns.values()]
+    blocks["anomalous"] = [not any(abs(w - pw) < 25 for pw in widths) for w in blocks.pulse_ms_max]
+    if planned:
+        blocks["planned_pattern"] = planned["pattern"]
+        blocks["laser_level"] = planned["laser_level"]
+        blocks["power_mW"] = planned["power_mW"]
+        blocks["as_planned"] = (blocks.ttl_pattern == planned["pattern"]) & (blocks.n_pulses == planned["pulses_per_train"])
+    blocks["delivered"] = True
+    for w in not_delivered:
+        blocks.loc[(blocks.onset_h >= w["from_h"]) & (blocks.onset_h < w["to_h"]), "delivered"] = False
+    return blocks
+
+
 def main() -> None:
     log = tomllib.loads(LOG.read_text())
     subject = find_subject("TTM-003")
@@ -92,6 +125,16 @@ def main() -> None:
         pulses = read_laser_pulses(exp.acquisition_dir)
         pulses.round(5).to_csv(RESULTS / f"stimulation_pulses_{session}.csv", index=False)
         trains = summarize_trains(pulses)
+        if "trains" not in entry:
+            blocks = unlogged_blocks(trains, log["patterns"], read_session_t0_unix(exp.acquisition_dir), exp.timezone,
+                                     planned=entry.get("planned"), not_delivered=entry.get("not_delivered", ()))
+            blocks.insert(0, "experiment", entry["experiment"])
+            blocks.insert(0, "session", session)
+            blocks.round(5).to_csv(RESULTS / f"stimulation_blocks_{session}.csv", index=False)
+            show = ["ttl_train", "onset_h", "onset_local", "n_pulses", "pulse_ms_median", "pulse_ms_max",
+                    "rate_hz", "duration_s", "ttl_pattern", "anomalous", "delivered"] + (["as_planned"] if "as_planned" in blocks else [])
+            print(blocks[show].to_string(index=False))
+            continue
         hand = pd.DataFrame(entry["trains"]).rename(columns={"pattern": "logged_pattern"})
         if len(hand) != len(trains):
             raise ValueError(f"{session}: {len(hand)} logged trains, {len(trains)} in the TTL")
