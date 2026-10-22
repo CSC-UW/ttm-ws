@@ -58,6 +58,7 @@ _SLICE_TABLE_COLS = [
     "t_start",
     "t_end",
     "gap_s",
+    "timestamp_glitches_repaired",
 ]
 
 
@@ -108,6 +109,32 @@ def _num_blocks(oe_session_dir: pathlib.Path, stream_id: str) -> int:
     return len(fs[node]["experiments"])
 
 
+def repair_timestamp_glitches(times: np.ndarray, *, fs: float, max_jump_samples: float = 1.5) -> list[int]:
+    """Replace single-sample outliers of an Open Ephys time vector in place; return their indices.
+
+    The Acquisition Board's ``timestamps.npy`` carries, once every 3 x 2^29
+    samples (14.9 h at 30 kHz), one sample whose time is 85,899.379 s too
+    large while the sample numbers run on without a break and the next
+    sample is back on the clock. Such a sample is a glitch, not a gap: a
+    forward jump of more than ``max_jump_samples`` periods followed by a
+    backward jump that brings the next sample back to within one period of
+    where it belongs. Each is replaced by the mean of its neighbours. Real
+    gaps (a forward jump that is not cancelled) are left alone for the
+    caller to notice.
+    """
+    if times.shape[0] < 3:
+        return []
+    period = 1.0 / fs
+    d = np.diff(times)
+    forward = np.flatnonzero(d[:-1] > max_jump_samples * period)
+    fixed = []
+    for i in forward:
+        if abs(d[i] + d[i + 1] - 2 * period) <= period:
+            times[i + 1] = 0.5 * (times[i] + times[i + 2])
+            fixed.append(int(i + 1))
+    return fixed
+
+
 def _segment_records(
     oe_session_dir: pathlib.Path,
     stream_id: str,
@@ -145,7 +172,10 @@ def _segment_records(
         rec_ids = sorted(rec_entries)
         for s in range(ext.get_num_segments()):
             seg = ext.select_segments([s])
-            t = np.asarray(ext.get_times(segment_index=s))
+            t = np.array(ext.get_times(segment_index=s), dtype="float64")
+            glitches = repair_timestamp_glitches(t, fs=float(ext.get_sampling_frequency()))
+            if glitches:
+                print(f"  repaired {len(glitches)} single-sample timestamp glitch(es) at {glitches}", flush=True)
             rec_name = (
                 rec_entries[rec_ids[s]]["name"] if s < len(rec_ids) else f"recording{s + 1}"
             )
@@ -162,6 +192,7 @@ def _segment_records(
                     "oe_software_time_s": _read_software_time_s(recording_dir),
                     "fs": float(ext.get_sampling_frequency()),
                     "n_samples": int(t.shape[0]),
+                    "timestamp_glitches_repaired": glitches,
                 }
             )
     return recs, times, meta
