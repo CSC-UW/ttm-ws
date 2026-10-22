@@ -13,8 +13,9 @@ pulse). Three galleries, as multi-page PDFs under
 * ``units``: one row per sorted cluster (every cluster, whatever its
   quality), grouped by tetrode, plus one grey row per tetrode with its
   unassigned crossings.
-* ``tt_traces``: the 300-6000 Hz traces of one tetrode (``--trace-tetrode``,
-  lab name, default TT6) around each pulse with the sorted spikes marked.
+* ``tt_traces``: the 300-6000 Hz traces of each tetrode in ``--trace-tetrode``
+  (lab names, default TT6, or ``all``) around each pulse with the sorted
+  spikes marked, one PDF per tetrode.
 
 "Unassigned" means a negative crossing of ``--thresh-mad`` (default 4.5)
 times the channel's MAD on the preprocessed (bandpass + CMR) recording with
@@ -99,7 +100,7 @@ def main() -> None:
     p.add_argument("--thresh-mad", type=float, default=4.5)
     p.add_argument("--pulses", default="first,middle,last",
                    help="which pulses of each train: comma list of first/middle/last, or 'all'")
-    p.add_argument("--trace-tetrode", default="TT6")
+    p.add_argument("--trace-tetrode", nargs="+", default=["TT6"], help="lab tetrode names, or 'all'")
     p.add_argument("--galleries", nargs="+", default=["channels", "tetrodes", "units", "tt_traces"])
     a = p.parse_args()
     exp = experiment_from_args(a)
@@ -244,12 +245,13 @@ def main() -> None:
         gallery("units", rows_units, unit_labels, per_page=4, figsize=(16, 20))
 
     # ---- traces of one tetrode ---------------------------------------------
-    if "tt_traces" in a.galleries:
-        g = int(a.trace_tetrode.removeprefix("TT")) - 1
+    trace_tts = [tt_name[g] for g in tets] if a.trace_tetrode == ["all"] else a.trace_tetrode
+    for trace_tt in (trace_tts if "tt_traces" in a.galleries else []):
+        g = int(trace_tt.removeprefix("TT")) - 1
         chans = np.flatnonzero(groups == g)
         tunits = [u for u in units if ugroup[u] == g]
         gain = float(rec.get_property("gain_to_uV")[chans[0]]) if "gain_to_uV" in rec.get_property_keys() else 1.0
-        pdf_path = gal_dir / f"{a.trace_tetrode}_traces_{a.variant}.pdf"
+        pdf_path = gal_dir / f"{trace_tt}_traces_{a.variant}.pdf"
         with PdfPages(pdf_path) as pdf:
             rows = list(pulses.itertuples())
             for s in range(0, len(rows), 4):
@@ -276,7 +278,7 @@ def main() -> None:
                     ax.set_rasterized(True)
                 axes[0].legend(fontsize=5, ncol=8, loc="upper right")
                 axes[-1].set_xlabel("ms from laser onset", fontsize=7)
-                fig.suptitle(f"{exp.experiment} {a.trace_tetrode}: 300-6000 Hz + CMR traces (uV) with sorted spikes (colour) and unassigned crossings (grey)", fontsize=8)
+                fig.suptitle(f"{exp.experiment} {trace_tt}: 300-6000 Hz + CMR traces (uV) with sorted spikes (colour) and unassigned crossings (grey)", fontsize=8)
                 fig.tight_layout(rect=(0, 0, 1, 0.97)); pdf.savefig(fig, dpi=130); plt.close(fig)
         print("wrote", pdf_path)
 
