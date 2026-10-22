@@ -22,7 +22,11 @@ times the channel's MAD on the preprocessed (bandpass + CMR) recording with
 no sorted spike of any cluster on the same tetrode within 0.5 ms; these
 are the spikes the sorter dropped or never detected. Channels listed as
 bad in the manifest contribute no crossings and are labelled "(bad)". Crossings are cached
-in ``<session>/sortings_opto/<variant>/crossings_<thresh>mad.npz``.
+in ``<session>/sortings_opto/<variant>/crossings_<thresh>mad_<tag>.npz``.
+With ``--resort THR`` the clusters of ``resort_<TT>_thr<THR>/`` replace the
+main sort's on every tetrode that has such a re-sort, the unassigned
+crossings are recomputed against them, and outputs carry the suffix
+``_resort<THR>``.
 
 Usage: python subjects/ttm-003/scripts/opto_pulse_gallery.py --subject TTM-003 --experiment TTM-003-OPTO1 [--pulses first,middle,last|all]
 """
@@ -102,6 +106,8 @@ def main() -> None:
                    help="which pulses of each train: comma list of first/middle/last, or 'all'")
     p.add_argument("--trace-tetrode", nargs="+", default=["TT6"], help="lab tetrode names, or 'all'")
     p.add_argument("--galleries", nargs="+", default=["channels", "tetrodes", "units", "tt_traces"])
+    p.add_argument("--resort", type=float, default=None,
+                   help="use the clusters of resort_<TT>_thr<THR>/ (opto_tt_resort.py) in place of the main sort's, on every tetrode that has one")
     a = p.parse_args()
     exp = experiment_from_args(a)
     out = exp.sorting_dir(a.variant, subdir="sortings_opto")
@@ -114,11 +120,30 @@ def main() -> None:
     ids = np.asarray(rec.channel_ids); groups = np.asarray(rec.get_property("group")).astype(int)
     tt_name = {g: f"TT{g + 1}" for g in np.unique(groups)}
     ugroup = pd.Series(sorting.get_property("group"), index=sorting.unit_ids).astype(int)
-    peak_ch = si.get_template_extremum_channel(analyzer, outputs="index")
+    peak_ch = dict(si.get_template_extremum_channel(analyzer, outputs="index"))
     units = list(sorting.unit_ids)
     spikes = {u: sorting.get_unit_spike_train(u) for u in units}
+    ugroup = dict(ugroup)
+    tag = a.variant
+    if a.resort is not None:
+        tag = f"{a.variant}_resort{a.resort:g}"
+        for g in np.unique(groups):
+            rdir = out / f"resort_{tt_name[g]}_thr{a.resort:g}" / "sorting"
+            if not rdir.exists():
+                continue
+            rs = si.load(str(rdir))
+            chans_g = np.flatnonzero(groups == g)
+            units = [u for u in units if ugroup[u] != g]
+            for ru in rs.unit_ids:
+                uid = f"{tt_name[g]}r{a.resort:g}c{ru}"
+                fr = rs.get_unit_spike_train(ru)
+                pick = fr[(fr > 30) & (fr < rec.get_num_frames() - 30)][:: max(1, len(fr) // 300)][:300]
+                trough = np.mean([rec.get_traces(start_frame=f - 10, end_frame=f + 10, channel_ids=ids[chans_g]).min(0) for f in pick], axis=0)
+                units.append(uid); spikes[uid] = fr; ugroup[uid] = int(g); peak_ch[uid] = int(chans_g[int(np.argmin(trough))])
+            print(f"{tt_name[g]}: {len(rs.unit_ids)} clusters from the threshold-{a.resort:g} re-sort replace the main sort's")
+    ugroup = pd.Series(ugroup)
 
-    cache = out / f"crossings_{a.thresh_mad:g}mad.npz"
+    cache = out / f"crossings_{a.thresh_mad:g}mad_{tag}.npz"
     if cache.exists():
         z = np.load(cache); cross = [z[f"ch{c}"] for c in range(len(ids))]; unas = [z[f"un{c}"] for c in range(len(ids))]
     else:
@@ -166,7 +191,7 @@ def main() -> None:
         ax.invert_yaxis(); ax.set_title(ttl, fontsize=7); ax.tick_params(labelsize=6)
 
     def gallery(name, rows_fn, labels, per_page, figsize):
-        pdf_path = gal_dir / f"{name}_{a.variant}.pdf"
+        pdf_path = gal_dir / f"{name}_{tag}.pdf"
         nrow = len(labels)
         with PdfPages(pdf_path) as pdf:
             rows = list(pulses.itertuples())
@@ -251,7 +276,7 @@ def main() -> None:
         chans = np.flatnonzero(groups == g)
         tunits = [u for u in units if ugroup[u] == g]
         gain = float(rec.get_property("gain_to_uV")[chans[0]]) if "gain_to_uV" in rec.get_property_keys() else 1.0
-        pdf_path = gal_dir / f"{trace_tt}_traces_{a.variant}.pdf"
+        pdf_path = gal_dir / f"{trace_tt}_traces_{tag}.pdf"
         with PdfPages(pdf_path) as pdf:
             rows = list(pulses.itertuples())
             for s in range(0, len(rows), 4):
