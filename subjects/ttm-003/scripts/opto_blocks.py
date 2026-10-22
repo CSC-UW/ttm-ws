@@ -20,7 +20,8 @@ while the in-pulse to baseline ratios agree, so compare rates only within
 this script's output.
 
 Usage: python subjects/ttm-003/scripts/opto_blocks.py --subject TTM-003 --experiment TTM-003-48H
-           [--blocks 24,25,26] [--margin-s 60]  (default: delivered, non-anomalous trains of 10 or more pulses) [--max-pulses 200] [--workers 8]
+           [--blocks 24,25,26] [--include-undelivered] [--margin-s 60]
+           (default: delivered, non-anomalous trains of 10 or more pulses) [--max-pulses 200] [--workers 8]
 """
 
 from __future__ import annotations
@@ -204,6 +205,8 @@ def main() -> None:
     p.add_argument("--margin-s", type=float, default=60.0)
     p.add_argument("--max-pulses", type=int, default=200)
     p.add_argument("--workers", type=int, default=8)
+    p.add_argument("--include-undelivered", action="store_true",
+                   help="keep trains the log marks as not delivered (controls for the artifact check)")
     a = p.parse_args()
     exp = experiment_from_args(a)
     figdir = exp.figures_dir / "blocks"
@@ -215,7 +218,7 @@ def main() -> None:
         blocks = blocks[blocks.ttl_train.isin(want)]
     else:
         blocks = blocks[(~blocks.anomalous) & (blocks.n_pulses >= 10)]
-        if "delivered" in blocks:
+        if "delivered" in blocks and not a.include_undelivered:
             blocks = blocks[blocks.delivered]
     blocks = blocks.reset_index(drop=True)
     rec = si.read_zarr(str(exp.store_path()))

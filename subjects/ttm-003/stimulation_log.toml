@@ -53,6 +53,9 @@ planned = { pattern = "A", laser_level = 4.5, power_mW = 9.8, pulses_per_train =
 # Between 7.69 h and 8.09 h (16:43 to 17:08 local) the TTL carries single
 # pulses, short runs and one 164 s high interval; the laser was not connected
 # to the animal then (experimenter, 2026-10-22), so those trains delivered no
-# light. The fifth delivered train is the one at about 17:11. Whether the
-# 60-pulse train at 17:09:28 (TTL train 24) reached the animal is unconfirmed.
-not_delivered = [{ from_h = 7.6, to_h = 8.1, reason = "laser not connected to the animal" }]
+# light. The fifth delivered train is the one at about 17:11 (TTL train 25).
+# The 60-pulse train at 17:09:28 (train 24) did not reach the animal either:
+# opto_blocks.py gives it an evoked spike-band response of 8 uV against 50 to
+# 80 for every delivered block, a slow potential a fifth of block 25's, and no
+# suppression on TT6, TT8 or TT12 (results/opto_blocks_TTM-003-48H.csv).
+not_delivered = [{ from_h = 7.6, to_h = 8.13, reason = "laser not connected to the animal" }]
