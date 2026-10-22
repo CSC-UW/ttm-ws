@@ -485,9 +485,9 @@ The population picture, pattern B at 9.8 mW, `opto_tag.py` classes:
 
 | | OPTO1 asis | OPTO1 capture | OPTO2 asis | OPTO2 capture | OPTO2 capture at 4.5 MAD |
 |---|---|---|---|---|---|
-| suppressed | 40 | 18 | 44 | 17 | 23 |
-| activated or weakly activated | 2 | 8 | 1 | 8 | |
-| unaffected | 14 | 30 | 11 | 31 | |
+| suppressed | 40 | 18 | 44 | 17 | 24 |
+| activated or weakly activated | 2 | 8 | 1 | 8 | 7 |
+| unaffected | 14 | 30 | 11 | 31 | 25 |
 | asis-suppressed units still suppressed | | 17 of 40 | | 16 of 44 | 23 of 44 |
 | median in-pulse gain of asis-suppressed units, per second | | 4.6 | | 3.4 | 1.8 |
 | median in-pulse rate of asis-suppressed units, fraction of baseline | 0.027 | 0.33 | 0.029 | 0.31 | |
