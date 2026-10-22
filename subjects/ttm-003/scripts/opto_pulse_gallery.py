@@ -22,11 +22,12 @@ times the channel's MAD on the preprocessed (bandpass + CMR) recording with
 no sorted spike of any cluster on the same tetrode within 0.5 ms; these
 are the spikes the sorter dropped or never detected. Channels listed as
 bad in the manifest contribute no crossings and are labelled "(bad)". Crossings are cached
-in ``<session>/sortings_opto/<variant>/crossings_<thresh>mad_<tag>.npz``.
+in ``<session>/sortings_opto/<variant>/crossings_<thresh>mad_<tag>[_<TT>...].npz``
+(the suffix lists the tetrodes whose re-sort clusters the unassigned set was computed against).
 With ``--resort THR`` the clusters of ``resort_<TT>_thr<THR>/`` replace the
 main sort's on every tetrode that has such a re-sort, the unassigned
 crossings are recomputed against them, and outputs carry the suffix
-``_resort<THR>``.
+``_resort<THR>``; a non-default ``--thresh-mad`` adds ``_<thresh>mad``.
 
 Usage: python subjects/ttm-003/scripts/opto_pulse_gallery.py --subject TTM-003 --experiment TTM-003-OPTO1 [--pulses first,middle,last|all]
 """
@@ -124,7 +125,7 @@ def main() -> None:
     units = list(sorting.unit_ids)
     spikes = {u: sorting.get_unit_spike_train(u) for u in units}
     ugroup = dict(ugroup)
-    tag = a.variant
+    tag = a.variant; resorted = []
     if a.resort is not None:
         tag = f"{a.variant}_resort{a.resort:g}"
         for g in np.unique(groups):
@@ -140,10 +141,13 @@ def main() -> None:
                 pick = fr[(fr > 30) & (fr < rec.get_num_frames() - 30)][:: max(1, len(fr) // 300)][:300]
                 trough = np.mean([rec.get_traces(start_frame=f - 10, end_frame=f + 10, channel_ids=ids[chans_g]).min(0) for f in pick], axis=0)
                 units.append(uid); spikes[uid] = fr; ugroup[uid] = int(g); peak_ch[uid] = int(chans_g[int(np.argmin(trough))])
+            resorted.append(tt_name[g])
             print(f"{tt_name[g]}: {len(rs.unit_ids)} clusters from the threshold-{a.resort:g} re-sort replace the main sort's")
     ugroup = pd.Series(ugroup)
 
-    cache = out / f"crossings_{a.thresh_mad:g}mad_{tag}.npz"
+    cache = out / f"crossings_{a.thresh_mad:g}mad_{tag}{''.join('_' + r for r in resorted)}.npz"
+    if a.thresh_mad != 4.5:
+        tag += f"_{a.thresh_mad:g}mad"
     if cache.exists():
         z = np.load(cache); cross = [z[f"ch{c}"] for c in range(len(ids))]; unas = [z[f"un{c}"] for c in range(len(ids))]
     else:

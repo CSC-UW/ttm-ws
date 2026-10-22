@@ -3,7 +3,8 @@
 Runs MountainSort5 scheme 2 on the four wires of ``--tetrode`` taken from
 the session's preprocessed (bandpass + CMR) recording, at each
 ``--thresholds`` value, under
-``<session>/sortings_opto/<variant>/resort_<TT>_thr<thr>/``. For every new
+``<session>/sortings_opto/<variant>/resort_<TT>_thr<thr>[_<tag>]/`` (``--ms5
+KEY=VALUE`` passes extra sorter parameters, ``--tag`` names that variant). For every new
 cluster it reports spikes, rate, amplitude, ISI violations, the four-wire
 fingerprint cosine to a reference cluster of the main sort (``--unit``),
 the fraction of the reference cluster's spikes it reproduces (within
@@ -57,8 +58,14 @@ def main() -> None:
     p.add_argument("--tetrode", default="TT6")
     p.add_argument("--unit", type=int, required=True)
     p.add_argument("--thresholds", nargs="+", type=float, default=[4.0, 3.5])
+    p.add_argument("--ms5", nargs="*", default=[], metavar="KEY=VALUE",
+                   help="extra MountainSort5 parameters, e.g. snippet_T2=45 npca_per_channel=5")
+    p.add_argument("--tag", default="", help="suffix for the re-sort folder and outputs (use with --ms5)")
     p.add_argument("--overwrite", action="store_true")
     a = p.parse_args()
+    ms5_kwargs = {k: (int(v) if v.lstrip("-").isdigit() else float(v) if v.replace(".", "", 1).lstrip("-").isdigit() else v)
+                  for k, v in (kv.split("=", 1) for kv in a.ms5)}
+    tag = f"_{a.tag}" if a.tag else ""
     exp = experiment_from_args(a)
     out = exp.sorting_dir(a.variant, subdir="sortings_opto")
     rec = si.load(str(out / "preprocessed")); main_sorting = si.load(str(out / "sorting"))
@@ -82,7 +89,7 @@ def main() -> None:
 
     rows = []
     for thr in a.thresholds:
-        folder = out / f"resort_{a.tetrode}_thr{thr:g}"
+        folder = out / f"resort_{a.tetrode}_thr{thr:g}{tag}"
         if folder.exists() and a.overwrite:
             shutil.rmtree(folder)
         if (folder / "sorting").exists():
@@ -90,7 +97,7 @@ def main() -> None:
         else:
             sorting = ss.run_sorter("mountainsort5", rec_tt, folder=str(folder / "ms5"), verbose=False,
                                     scheme="2", filter=False, whiten=True, whitening_seed=42,
-                                    detect_threshold=thr, detect_sign=-1, remove_existing_folder=True)
+                                    detect_threshold=thr, detect_sign=-1, remove_existing_folder=True, **ms5_kwargs)
             sorting = sorting.save(folder=str(folder / "sorting"), overwrite=True)
         an = si.create_sorting_analyzer(sorting, rec_tt, format="memory", sparse=False)
         an.compute({"random_spikes": {"max_spikes_per_unit": 500, "seed": 42}, "waveforms": {"ms_before": 1.0, "ms_after": 2.0},
@@ -136,10 +143,10 @@ def main() -> None:
             for tr in trains.itertuples():
                 ax.axvspan(tr.onset_s / 60, tr.offset_s / 60, color="c", alpha=0.2)
             ax.set_title(f"trough amplitude on {ids[chans[dom]]} over the session (uV)", fontsize=8); ax.set_xlabel("min")
-        fig.suptitle(f"{exp.experiment} {a.tetrode} re-sorted at threshold {thr:g} (reference: main-sort unit {a.unit})")
-        fig.tight_layout(); fig.savefig(exp.figures_dir / f"opto_{a.tetrode}_resort_thr{thr:g}.png", dpi=100); plt.close(fig)
+        fig.suptitle(f"{exp.experiment} {a.tetrode} re-sorted at threshold {thr:g}{tag} {ms5_kwargs or ''} (reference: main-sort unit {a.unit})")
+        fig.tight_layout(); fig.savefig(exp.figures_dir / f"opto_{a.tetrode}_resort_thr{thr:g}{tag}.png", dpi=100); plt.close(fig)
     df = pd.DataFrame(rows)
-    df.to_csv(RESULTS / f"resort_{exp.experiment}_{a.tetrode}.csv", index=False)
+    df.to_csv(RESULTS / f"resort_{exp.experiment}_{a.tetrode}{tag}.csv", index=False)
     pd.set_option("display.width", 250)
     print(df.to_string(index=False))
 

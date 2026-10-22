@@ -1,6 +1,6 @@
 ---
 title: TTM-003 optogenetic sessions of 2026-10-16, first analysis
-updated: 2026-10-21
+updated: 2026-10-22
 status: needs_verification
 ---
 
@@ -237,9 +237,68 @@ shares the wire but is silenced by the light and never activated.
 
 For tagging on these tetrodes, the practical consequence is that the
 sort must run at a lower threshold on the tetrodes of interest, or the
-in-pulse spikes must be assigned afterwards by template matching with
-amplitude-scaled templates (the matching-pursuit production sort does the
-latter for the 48 h data).
+in-pulse spikes must be assigned afterwards by shape to the cell's
+template with the amplitude left free. The TTM-001 production sort
+(`investigations/spike-sorting/97_production_pipeline.py`) does not do
+this: its matcher accepts a spike only at 0.8 of the template amplitude
+or more, and its residual pass only looks at unclaimed events of 10 MAD
+or more, so it would drop these half-amplitude spikes as well.
+
+### 5c. TT10 re-sorted at a lower threshold (2026-10-22)
+
+Graham Findlay saw the same problem in `galleries/TT10_traces_asis.pdf`:
+small spikes during the pulse left grey (unassigned), and in other panels
+in-pulse spikes with no tick at all. The second case is a display
+threshold: the TT10 wires have a noise MAD of about 12 uV, the in-pulse
+spikes are mostly 40 to 60 uV, and the galleries only ticked crossings
+above 4.5 MAD (54 uV). `opto_tt6_inpulse.py --tetrode TT10` (crossings
+above 3.5 MAD, fingerprint of unit 34/35) gives, per second, over the
+9.8 mW pulses:
+
+| | baseline | onset 0 to 10 ms | rest of pulse | 100 ms after |
+|---|---|---|---|---|
+| OPTO1: crossings / claimed by unit 34 / fingerprint look-alikes left unsorted | 189 / 7.7 / 33 | 373 / 51 / 119 | 207 / 13 / 115 | 130 / 5.6 / 23 |
+| OPTO2: same for unit 35 | 213 / 8.4 / 41 | 390 / 45 / 114 | 250 / 12 / 139 | 111 / 4.0 / 22 |
+
+So the light raises the rate of CH19-dominant events three to four times
+and the 5.5 sort claims about a tenth of them; their median trough is
+-52 and -49 uV (about 4.3 MAD), just under the sorter's threshold. In the
+first pulse of OPTO2's first train, CH19 carries a train of spikes every
+3.3 ms for the first 30 ms, each at -50 uV, of which the main sort keeps
+three. Unlike TT6, the in-pulse events are not the reference unit's
+waveform shrunk: their mean waveform is broader (trough to peak 0.83 vs
+0.63 ms in OPTO1, 0.73 vs 0.60 in OPTO2; dominant-wire shape correlation
+to the template 0.92 to 0.95, vs 0.99 for the baseline look-alikes).
+
+`opto_tt_resort.py --tetrode TT10` at thresholds 4.0, 3.5 and 3.0 gives
+three to five clusters per session, one per wire, every one with 0.2 to
+0.5 refractory contamination: TT10 is a multi-unit tetrode and the sorter
+is dividing its hash by dominant wire. The CH19 cluster absorbs the
+in-pulse events (OPTO1 at 3.5: 43 per second baseline, 264 at onset, 178
+through the pulse, 29 after; OPTO2: 44, 232, 170, 20), so the galleries
+now show the pulse filled with its ticks (`TT10_traces_asis_resort3.5.pdf`,
+and `TT10_traces_asis_resort3.5_3.5mad.pdf` with grey ticks down to 3.5
+MAD). In OPTO2 only, threshold 4.0 splits the CH19 activity in two:
+cluster 4 (-59 uV, 21 Hz, ISI violation ratio 0.12, refractory
+contamination 0.05) fires 13 per second at baseline, 174 at onset, 114
+through the pulse and 4 in the 100 ms after, with a broad trough and a
+large positive afterwave; cluster 3 (-68 uV, 17 Hz, contamination 1.0)
+is silenced by the light like the rest of the tetrode. Outside the trains
+their cross-correlogram is flat at 0.5 to 1 ms (83 and 107 pairs against
+83 expected) while cluster 4's autocorrelogram dips to half of
+expectation out to 1.5 ms, so cluster 4 is a credible single unit, and
+*conjecture:* the directly driven cell on TT10. The split does not
+survive thresholds 3.5 or 3.0, does not appear in OPTO1 at any
+threshold, and disappears again when the snippet window is lengthened to
+1.5 ms after the trough (`--ms5 snippet_T2=45 --tag t2_45`, meant to give
+the afterwave more weight). `results/resort_<experiment>_TT10*.csv`,
+`figures/opto_TT10_resort_thr*.png`, `TT10_traces_asis_resort4.pdf`
+(OPTO2).
+
+What the cell needs is a sort that uses waveform shape with the amplitude
+left free, at a detection threshold near 3.5 MAD, with the refractory
+period of the candidate used to reject the hash; MountainSort5's
+threshold and PCA clustering only reach it by chance.
 
 ## 6. Figures
 
@@ -249,14 +308,17 @@ MUA PSTH), `opto_onset_zoom_*.png` and `opto_onset_single_trials_*.png`
 (artifact check), `opto_session_mua.png`, `optotag_asis_population_{A,B}.png`
 (z-scored PSTH of every unit), `optotag_asis_unit*_{summary,ccgs,lfp}.png`
 (candidates), `opto_population_asis.png` (pooled suppression per train),
-`opto_TT6_inpulse_asis.png` (section 5a), `galleries/*.pdf` (per-pulse
-rasters).
+`opto_TT6_inpulse_asis.png` (section 5a), `opto_TT10_inpulse_asis.png`
+and `opto_TT10_resort_thr*.png` (section 5c), `galleries/*.pdf` (per-pulse
+rasters; `_resort<thr>` suffix = that re-sort's clusters drawn in place of
+the main sort's on TT6 and TT10).
 
 ## 7. What would help next
 
 Short pulses (1 to 5 ms) at several powers including well below 0.5 mW,
 for latency-based tagging and a dose-response curve; a control recording
 with the fibre disconnected or an opsin-negative animal for the slow
-evoked potential; a re-sort of TT4 and TT10 as described above; and
+evoked potential; a shape-based, amplitude-free assignment pass on TT4,
+TT6 and TT10 (section 5c); and
 sleep scoring for the drowsy trains, which the `state` column of the hand
 log only approximates.

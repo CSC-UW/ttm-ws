@@ -1,0 +1,110 @@
+{
+ "experiment": "TTM-003-OPTO1",
+ "unsorted_lookalikes": {
+  "n_in_pulse_unsorted": 4393,
+  "n_baseline_unsorted": 7010,
+  "in_pulse_isi_ms_quantiles": [
+   2.4,
+   2.9,
+   5.2,
+   9.4,
+   20.0
+  ],
+  "in_pulse_isi_cv": 0.84,
+  "mean_trough_uV_by_wire": {
+   "in_pulse": {
+    "CH17": -23.3,
+    "CH19": -52.7,
+    "CH21": -14.5,
+    "CH23": -23.7
+   },
+   "baseline": {
+    "CH17": -34.3,
+    "CH19": -55.5,
+    "CH21": -20.4,
+    "CH23": -29.8
+   },
+   "ref_template": {
+    "CH17": -39.2,
+    "CH19": -82.6,
+    "CH21": -26.2,
+    "CH23": -38.2
+   }
+  },
+  "dominant_wire_shape_corr": {
+   "in_pulse_vs_template": 0.945,
+   "baseline_vs_template": 0.991
+  },
+  "trough_to_peak_ms": {
+   "in_pulse": 0.83,
+   "baseline": 0.63,
+   "template": 0.63
+  }
+ },
+ "tetrode": "TT10",
+ "ref_unit": 34,
+ "power_mW": 9.8,
+ "n_pulses": 710,
+ "pulse_s": 0.064,
+ "thresh_mad": 3.5,
+ "ref_fingerprint": {
+  "CH17": -0.383,
+  "CH19": -0.806,
+  "CH21": -0.256,
+  "CH23": -0.373
+ },
+ "by_phase": {
+  "baseline": {
+   "events_per_s": 189.2,
+   "sorted_per_s": 26.4,
+   "ref_unit_per_s": 7.7,
+   "lookalike_cos>0.95_per_s": 38.9,
+   "lookalike_unsorted_per_s": 33.0,
+   "lookalike_amp_uV_quantiles": [
+    -83.1,
+    -55.2,
+    -44.9
+   ],
+   "all_amp_uV_median": -56.7
+  },
+  "onset_0_10ms": {
+   "events_per_s": 373.4,
+   "sorted_per_s": 71.1,
+   "ref_unit_per_s": 50.6,
+   "lookalike_cos>0.95_per_s": 158.8,
+   "lookalike_unsorted_per_s": 119.0,
+   "lookalike_amp_uV_quantiles": [
+    -84.9,
+    -59.1,
+    -46.7
+   ],
+   "all_amp_uV_median": -59.2
+  },
+  "in_pulse": {
+   "events_per_s": 206.5,
+   "sorted_per_s": 17.3,
+   "ref_unit_per_s": 12.9,
+   "lookalike_cos>0.95_per_s": 126.0,
+   "lookalike_unsorted_per_s": 114.6,
+   "lookalike_amp_uV_quantiles": [
+    -67.4,
+    -52.2,
+    -44.7
+   ],
+   "all_amp_uV_median": -52.6
+  },
+  "post_100ms": {
+   "events_per_s": 130.1,
+   "sorted_per_s": 18.9,
+   "ref_unit_per_s": 5.6,
+   "lookalike_cos>0.95_per_s": 26.7,
+   "lookalike_unsorted_per_s": 22.5,
+   "lookalike_amp_uV_quantiles": [
+    -83.6,
+    -56.7,
+    -44.9
+   ],
+   "all_amp_uV_median": -57.6
+  }
+ }
+}

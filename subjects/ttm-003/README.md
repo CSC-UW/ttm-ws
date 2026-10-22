@@ -41,9 +41,9 @@ environment, in this order:
 | `opto_sort.py ... --variant asis [--blank-ms PRE POST]` | `<session>/sortings_opto/<variant>/{preprocessed,by_group,sorting,analyzer}`, `results/units_<E>_<variant>.csv` |
 | `opto_tag.py ... --variant asis` | `results/optotag_<E>_<variant>.csv`, `..._candidates.json`, `figures/optotag_*.png` |
 | `opto_population.py ...` | `results/opto_population_<E>_<variant>.json`, `figures/opto_population_<variant>.png` |
-| `opto_pulse_gallery.py ... [--pulses first,middle,last\|all]` | `figures/galleries/{channels,tetrodes,units,<TT>_traces}_<variant>.pdf`, `<session>/sortings_opto/<variant>/crossings_*.npz` |
+| `opto_pulse_gallery.py ... [--pulses first,middle,last\|all] [--resort THR] [--thresh-mad 4.5]` | `figures/galleries/{channels,tetrodes,units,<TT>_traces}_<variant>[_resort<THR>][_<thresh>mad].pdf`, `<session>/sortings_opto/<variant>/crossings_*.npz` |
 | `opto_tt6_inpulse.py ... --unit U [--tetrode TT6]` | `results/tt_inpulse_<E>_<TT>.json`, `figures/opto_<TT>_inpulse_<variant>.png` |
-| `opto_tt_resort.py ... --unit U --thresholds 4.0 3.5` | `<session>/sortings_opto/<variant>/resort_<TT>_thr<thr>/`, `results/resort_<E>_<TT>.csv`, `figures/opto_<TT>_resort_thr*.png` |
+| `opto_tt_resort.py ... --unit U --thresholds 4.0 3.5 [--ms5 KEY=VALUE ...] [--tag T]` | `<session>/sortings_opto/<variant>/resort_<TT>_thr<thr>[_T]/`, `results/resort_<E>_<TT>[_T].csv`, `figures/opto_<TT>_resort_thr*.png` |
 | `opto_tt_amplitude_split.py ... --threshold 3.5 --cluster C` | `results/ampsplit_<E>_<TT>_thr<thr>_c<C>.json`, `figures/opto_<TT>_ampsplit_*.png` |
 
 `results/unit_metrics_<E>_asis.csv` (template and quality metrics per
