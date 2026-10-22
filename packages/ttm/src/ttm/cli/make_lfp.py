@@ -36,6 +36,9 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--subsample", type=int, default=125, help="Tetrode-lead sub-LFP rate (Hz); 0 to skip")
     p.add_argument("--n-jobs", type=int, default=16)
     p.add_argument("--check-plot", action="store_true")
+    p.add_argument("--gap-tolerance-ms", type=float, default=None,
+                   help="Treat time-vector gaps up to this size as continuous and resample larger ones "
+                        "section by section; default refuses a store whose time vector has gaps")
     a = p.parse_args(argv)
     exp = experiment_from_args(a)
 
@@ -43,7 +46,7 @@ def main(argv: list[str] | None = None) -> None:
     if exp.lfp_path.exists():
         print(f"exists, skipping: {exp.lfp_path}")
     else:
-        make_lfp(src, exp.lfp_path, n_jobs=a.n_jobs)
+        make_lfp(src, exp.lfp_path, n_jobs=a.n_jobs, gap_tolerance_ms=a.gap_tolerance_ms)
     lfp = open_lfps_dataarray(exp.lfp_path)
     print(f"LFP {lfp.dims} {lfp.shape} @ {lfp.attrs['fs']} Hz")
 
@@ -53,7 +56,8 @@ def main(argv: list[str] | None = None) -> None:
         if sub_path.exists():
             print(f"exists, skipping: {sub_path}")
         else:
-            make_subsampled_lfp(exp.lfp_path, sub_path, resample_rate=a.subsample, n_jobs=a.n_jobs)
+            make_subsampled_lfp(exp.lfp_path, sub_path, resample_rate=a.subsample, n_jobs=a.n_jobs,
+                                gap_tolerance_ms=a.gap_tolerance_ms)
         sub = open_lfps_dataarray(sub_path)
         print(f"sub-LFP {sub.dims} {sub.shape} @ {sub.attrs['fs']} Hz, tetrodes "
               f"{list(map(str, sub['tetrode'].values)) if 'tetrode' in sub.coords else 'n/a'}")

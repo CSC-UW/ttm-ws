@@ -43,12 +43,16 @@ def downsample_to_lfp(
     *,
     stage_rates: tuple[int, ...] = DEFAULT_STAGE_RATES,
     dtype: str = "float32",
+    gap_tolerance_ms: float | None = None,
 ):
     """Return a lazily-resampled LFP recording (microvolts) at ``stage_rates[-1]``.
 
     Scales int traces to microvolts first, then applies anti-aliased decimation
     in stages. Each ``parent_rate / stage_rate`` must be an integer so
     `resample` uses `scipy.signal.decimate` (not the FFT fallback).
+    ``gap_tolerance_ms`` is passed to `resample`: with ``None`` a time vector
+    with gaps is refused; a value makes gaps up to that size be treated as
+    continuous and larger ones split the resampling into sections.
     """
     rec = spre.scale_to_uV(recording) if recording.has_scaleable_traces() else recording
     for rate in stage_rates:
@@ -58,7 +62,7 @@ def downsample_to_lfp(
                 f"Stage rate {rate} does not evenly divide parent rate {parent}; "
                 "pick integer-ratio stages so decimate (anti-aliased) is used."
             )
-        rec = spre.resample(rec, rate, dtype=dtype)
+        rec = spre.resample(rec, rate, dtype=dtype, gap_tolerance_ms=gap_tolerance_ms)
     return rec
 
 
@@ -69,11 +73,12 @@ def make_lfp(
     stage_rates: tuple[int, ...] = DEFAULT_STAGE_RATES,
     time_chunk_s: float = 300.0,
     n_jobs: int = 16,
+    gap_tolerance_ms: float | None = None,
 ) -> object:
     """Produce a 625 Hz float32 LFP Zarr store from a 30 kHz tetrode store."""
     out_zarr = pathlib.Path(out_zarr)
     rec = si.read_zarr(str(in_zarr))
-    lfp = downsample_to_lfp(rec, stage_rates=stage_rates)
+    lfp = downsample_to_lfp(rec, stage_rates=stage_rates, gap_tolerance_ms=gap_tolerance_ms)
     print(
         f"LFP: {rec.get_sampling_frequency():.0f} Hz -> {lfp.get_sampling_frequency():.0f} Hz "
         f"({rec.get_num_channels()} ch, {lfp.get_num_frames() / lfp.get_sampling_frequency() / 3600:.2f} h) "
@@ -121,6 +126,7 @@ def make_subsampled_lfp(
     resample_rate: int = 125,
     time_chunk_s: float = 300.0,
     n_jobs: int = 16,
+    gap_tolerance_ms: float | None = None,
 ) -> object:
     """Downsample selected channels of an LFP Zarr store to ``resample_rate`` Hz.
 
@@ -146,7 +152,7 @@ def make_subsampled_lfp(
             f"{parent_fs}; pick a divisor (e.g. 125 = 625/5) so resample uses the "
             "anti-aliased scipy.signal.decimate rather than its FFT fallback."
         )
-    lfp = spre.resample(sub, resample_rate)
+    lfp = spre.resample(sub, resample_rate, gap_tolerance_ms=gap_tolerance_ms)
     print(
         f"sub-LFP: {parent_fs:.2f} Hz -> {resample_rate} Hz (÷{int(parent_fs / resample_rate)}) | "
         f"{sub.get_num_channels()} ch, "
