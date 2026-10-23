@@ -1,4 +1,4 @@
-session,experiment,ttl_train,onset_s,offset_s,duration_s,n_pulses,pulse_ms_median,pulse_ms_min,pulse_ms_max,ipi_ms_median,rate_hz,n_glitch_edges_before,onset_h,onset_local,ttl_pattern,anomalous,planned_pattern,laser_level,power_mW,as_planned,delivered
+session,experiment,ttl_train,onset_s,offset_s,duration_s,n_pulses,pulse_ms_median,pulse_ms_min,pulse_ms_max,ipi_ms_median,rate_hz,n_glitch_edges_before,onset_h,onset_local,ttl_pattern,anomalous,expected_pattern,laser_level,power_mW,as_expected,delivered
 2026-10-20_09-02-12,TTM-003-48H,1,1622.95357,1680.47557,57.52,58,207.97,205.97,209.0,1005.13,0.995,2,0.4508,2026-10-20 09:29:15,A,False,A,4.5,9.8,False,True
 2026-10-20_09-02-12,TTM-003-48H,2,7124.58643,7182.0902,57.5,58,207.77,206.0,208.17,1005.4,0.995,2,1.9791,2026-10-20 11:00:57,A,False,A,4.5,9.8,False,True
 2026-10-20_09-02-12,TTM-003-48H,3,15588.94597,15646.46337,57.52,58,207.87,205.53,208.07,1005.13,0.995,2,4.3303,2026-10-20 13:22:01,A,False,A,4.5,9.8,False,True

@@ -41,15 +41,13 @@ spontaneous wake surrounds it); its bad channel is CH22 (TT15, the 400 Hz comb a
 found TT14 and CH2, bad on October 16, to be ordinary quiet channels
 here, and the spike-band noise of every channel two and a half times
 higher at 7.4 h, 25.8 h and from 37 h to the end than in the quiet
-windows (`figures/channel_qc.png`). The planned protocol (`stimulation_log.toml`)
+windows (`figures/channel_qc.png`). The expected protocol (`stimulation_log.toml`)
 was pattern A (200 ms on, 1 pulse/s) at laser level 4.5 (9.8 mW), 60
-pulses per train, one train every 2 h. The level was a mistake for the
-intended 4.2 (4.2 mW), recorded as `intended` in the log; whether 9.8 mW
-over 24 trains fatigues the driven cells is a question for the per-block
-tables, not settled. There is no train-by-train hand
+pulses per train, one train every 2 h; the level was set in error for
+4.2 (4.2 mW), `optogenetic_stimulation.md`. There is no train-by-train hand
 log, so the block times and measured parameters come from the TTL,
 `results/stimulation_blocks_2026-10-20_09-02-12.csv` (`stim_trains.py`,
-`as_planned` column). All 1,584 real pulses are pattern A (207 ms at
+`as_expected` column). All 1,584 real pulses are pattern A (207 ms at
 0.995 Hz). Blocks 1 to 4 (58 pulses each) fall at 0.45, 1.98, 4.33 and
 5.96 h; TTL trains 5 to 23 between 7.69 and 8.09 h are single pulses and
 runs of 3 to 5 with one 483 ms pulse and one 164 s high interval, during

@@ -1,6 +1,6 @@
 ---
-title: TTM-003 optogenetic stimulation sessions (2026-10-16)
-updated: 2026-10-21
+title: TTM-003 optogenetic stimulation (2026-10-16 and the 48 h recording)
+updated: 2026-10-23
 ---
 
 # TTM-003 optogenetic stimulation, 2026-10-16
@@ -77,3 +77,25 @@ The fifth train of `2026-10-16_14-44-22` is logged under pattern A at
 laser level 4.5, but its TTL pulses are pattern B (355 x 64 ms at 2.86 Hz).
 The hand log keeps the experimenter's entry; the CSV carries both
 `logged_pattern` and `ttl_pattern`.
+
+## The 48 h recording (2026-10-20_09-02-12)
+
+No train-by-train hand log was kept. The protocol as run, which is what the
+TTL is expected to show (`expected` in `stimulation_log.toml`): pattern A
+(200 ms on, 1 pulse/s), 60 pulses per train, one train every 2 h, at laser
+level 4.5 (9.8 mW). The level was set by mistake: the intended level was
+4.2 (4.2 mW), the level of the clear pattern-A responses on October 16, and
+the error was caught after the recording (Graham Findlay, 2026-10-23). The
+power may fatigue or damage the driven cells if they are pushed too hard;
+whether it did is a question for the per-block tables.
+
+What the TTL recorded (`results/stimulation_blocks_2026-10-20_09-02-12.csv`):
+44 trains. Trains 1 to 4 (58 pulses each) at 0.45, 1.98, 4.33 and 5.96 h;
+trains 5 to 23 between 7.69 and 8.09 h (16:43 to 17:08) are single pulses
+and short runs from manual tests while the laser was not connected to the
+animal, and train 24 at 17:09:28, a full 60-pulse train, did not reach the
+animal either (no evoked volley, no suppression on TT6, TT8 or TT12; the
+fifth delivered train is the one at 17:11). Trains 25 to 44 are the 60-pulse
+trains every 2.000 h from 8.15 h to 46.15 h. The `not_delivered` window of
+7.6 h to 8.13 h in the log marks trains 5 to 24 as not delivered, so 24
+trains were delivered. All real pulses measure 207 ms at 0.995 Hz.
