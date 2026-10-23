@@ -12,7 +12,10 @@ sample of ``--n-pages`` units and, with ``--other``, every unit on which the
 two sortings disagree: units are paired by template cosine on the same
 tetrode and the agreement is the fraction of the smaller train's spikes
 within 0.5 ms of a spike of the other (``results/purity_match_<E>_<name>_vs_<other-name>.csv``);
-pairs under ``--agree`` and unpaired units get a page in both files.
+pairs under ``--agree`` and unpaired units get a page in both files. The
+per-spike scores are cached next to each sorting
+(``purity_scores_<sorting>.npz``) so a rerun only redraws; scatter pages
+show at most 20,000 points, rasterised.
 
 Usage: python subjects/ttm-003/scripts/sorting_purity.py --subject TTM-003 --experiment TTM-003-48H
            --sorting <dir>/assembled_candidate --name candidate [--dead-ms 0.3]
@@ -45,6 +48,7 @@ SUBJECT_DIR = pathlib.Path(__file__).resolve().parents[1]
 RESULTS = SUBJECT_DIR / "results"
 FS = 30000.0
 WIN_S = 1800.0
+MAX_POINTS = 20_000   # scatter points per page; a 48 h unit has millions of spikes
 
 
 def _window_scores(binary: str, group: int, a: int, b: int, trains: dict) -> dict:
@@ -69,12 +73,19 @@ def _window_scores(binary: str, group: int, a: int, b: int, trains: dict) -> dic
     return out
 
 
-def score_sorting(binary: str, sorting, workers: int) -> tuple[dict, dict, dict, dict]:
-    rec = si.load(binary)
-    nfr = rec.get_num_frames()
+def score_sorting(binary: str, sorting, workers: int, cache: pathlib.Path | None = None) -> tuple[dict, dict, dict, dict]:
+    """Per unit: frames, trough amplitudes (MAD) and cosines of every spike; cached in ``cache`` (npz)."""
     units = [int(u) for u in sorting.unit_ids]
     groups = np.asarray(sorting.get_property("group")).astype(int)
     ugroup = dict(zip(units, groups.tolist()))
+    if cache is not None and cache.exists():
+        z = np.load(cache)
+        frames = {u: z[f"frames_{u}"] for u in units}
+        amps = {u: z[f"amps_{u}"] for u in units}
+        rs = {u: z[f"rs_{u}"] for u in units}
+        return frames, amps, rs, ugroup
+    rec = si.load(binary)
+    nfr = rec.get_num_frames()
     trains = {u: np.sort(sorting.get_unit_spike_train(u).astype(np.int64)) for u in units}
     wf = int(WIN_S * FS)
     tasks = [(g, s, min(s + wf, nfr)) for s in range(0, nfr, wf) for g in sorted(set(groups.tolist()))]
@@ -90,6 +101,9 @@ def score_sorting(binary: str, sorting, workers: int) -> tuple[dict, dict, dict,
     frames = {u: cat(frames, u, np.int64) for u in units}
     amps = {u: cat(amps, u, float) for u in units}
     rs = {u: cat(rs, u, float) for u in units}
+    if cache is not None:
+        np.savez(cache, **{f"frames_{u}": frames[u] for u in units}, **{f"amps_{u}": amps[u] for u in units},
+                 **{f"rs_{u}": rs[u] for u in units})
     return frames, amps, rs, ugroup
 
 
@@ -147,11 +161,13 @@ def unit_page(axes, binary: str, u: int, frames: dict, amps: dict, rs: dict, ugr
     for c in range(4):
         ax.plot(tt + c * 3.2, templates[u][:, c] * gain, color="k", lw=1.2)
     ax.set_xlabel("ms, wires offset by 3.2 ms"); ax.set_ylabel("uV")
+    sub = np.sort(np.random.default_rng(1).choice(fr.size, min(fr.size, MAX_POINTS), replace=False)) if fr.size else np.zeros(0, int)
     ax = axes[0, 1]
-    ax.scatter(rr, am, s=2, c="0.4", alpha=0.4)
-    ax.set_xlabel("cosine to the unit's window template"); ax.set_ylabel("trough amplitude (MAD)"); ax.set_title("amplitude by shape", fontsize=8)
+    ax.scatter(rr[sub], am[sub], s=2, c="0.4", alpha=0.4, rasterized=True)
+    ax.set_xlabel("cosine to the unit's window template"); ax.set_ylabel("trough amplitude (MAD)")
+    ax.set_title(f"amplitude by shape ({sub.size:,} of {fr.size:,} spikes)", fontsize=8)
     ax = axes[0, 2]
-    ax.scatter(fr / FS / 3600, am, s=1, c="0.4", alpha=0.4)
+    ax.scatter(fr[sub] / FS / 3600, am[sub], s=1, c="0.4", alpha=0.4, rasterized=True)
     ax.set_xlabel("session hour"); ax.set_ylabel("trough amplitude (MAD)"); ax.set_title("amplitude over time", fontsize=8)
     ax = axes[1, 0]
     isi = np.diff(fr) / FS * 1000
@@ -210,7 +226,8 @@ def main() -> None:
     def one(path, name, dead):
         s = si.load(path)
         print(f"{name}: {s.get_num_units()} units; scoring every spike ...", flush=True)
-        frames, amps, rs, ugroup = score_sorting(binary, s, a.workers)
+        cache = pathlib.Path(path).parent / f"purity_scores_{pathlib.Path(path).name}.npz"
+        frames, amps, rs, ugroup = score_sorting(binary, s, a.workers, cache=cache)
         tab = purity_table(frames, amps, ugroup, nfr, dead)
         if "is_mua" in s.get_property_keys():
             mua = dict(zip([int(u) for u in s.unit_ids], np.asarray(s.get_property("is_mua")).astype(bool)))
@@ -260,7 +277,7 @@ def main() -> None:
                     continue
                 fig, axes = plt.subplots(2, 3, figsize=(20, 10))
                 unit_page(axes, binary, u, fr, am, rr, ug, T, gain, nfr, dead, f"{exp.experiment} {name}")
-                fig.tight_layout(); pdf.savefig(fig); plt.close(fig)
+                fig.tight_layout(); pdf.savefig(fig, dpi=110); plt.close(fig)
         print(f"wrote {figdir / f'purity_{name}.pdf'} ({len(pages[name])} pages)", flush=True)
     summ = {}
     for name, tab in {a.name: t1, **({a.other_name: t2} if a.other else {})}.items():
