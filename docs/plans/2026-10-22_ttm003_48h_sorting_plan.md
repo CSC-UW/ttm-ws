@@ -388,19 +388,54 @@ June scoreboard, and compute. The expected gain over the candidate is on
 the units the capture should never have touched; the expected gain over
 the June pipeline is the trains.
 
-### Track G. Wobble for the full-size stages
+### Track G. Wobble for the full-size stages, on TTM-001 first
 
 June built a shape-gated wobble matcher that beat circus-omp on precision
 and coverage but never ran the 48 h go/no-go, and the review found those
 metrics do not measure per-unit purity. On October 22 wobble found an
 eighth of the TT6 train, because its energy threshold weighs against a
-small template; that weakness does not apply to a full-size stage. So:
-wobble in place of circus-omp for stages 1 and 2 only, on the same binary,
-windows and seed bank, judged on the same purity pages and per-block
-tables as track F. One bounded run on the 48 h, after track F is in place
-so both are judged in one framework.
+small template; that weakness does not apply to a full-size stage.
+
+The test belongs on TTM-001's 48 h recording, not on TTM-003. The June
+pipeline was built and run there: the materialised binary, the seed bank,
+the 95 windows, the re-seeded bank and the production assembly with its
+analyzers are on the server (section 3), and wobble is wired into the
+same code (`_mp_common.run_matching(shape_gate_r=)`). Swapping circus-omp
+for wobble in stages 1 and 2 on that binary, those windows and that seed
+bank changes one thing, with no tagged cells, no small-spike module and
+no fading unit to confound the verdict. The purity complaint in
+`OPEN_CONCERNS.md` is about TTM-001 units the user has looked at, and
+per-unit purity is the one measure June's wobble evaluation lacked; the
+purity pages now exist. Only the full-size matcher's behaviour transfers
+to TTM-003; the small-spike capture stays on TTM-003, where the tagged
+cells judge it.
+
+1. A bounded span first: 12 windows across one re-seed boundary, all
+   tetrodes, wobble in place of circus-omp for the carry-forward and for
+   the residual pass, the same seed bank at the span's start and the same
+   re-seed bank at the boundary, everything downstream unchanged. Judged
+   against the June assembly on the same windows, head to head, with the
+   purity pages and per-window tables: coverage, assignment purity,
+   refractory contamination, cross-correlogram verdicts against every
+   same-tetrode neighbour, within-cluster waveform spread, and galleries
+   of what each matcher admits that the other does not.
+2. Every per-unit table split by template amplitude. Wobble's energy
+   threshold weighs against small templates, so a loss on the small units
+   must not be read as a loss overall.
+3. The full 95-window pass only if the span says wobble wins. Check
+   `df -h /nvme` before either run; a wobble pass gets its own directory
+   under the session's sortings, and nothing under TTM-001's existing
+   sortings is deleted or overwritten.
+4. Wobble for stages 1 and 2 of track F on TTM-003 only if TTM-001 says
+   yes.
+
+The track is independent of track F and runs alongside it. Its record is
+a new directory under `investigations/` with a row in
+`investigations/README.md`, and a report under `docs/reports/`.
 
 ### Order
 
-F's settings on the October 16 sessions, then F on the 48 h, then G.
-Track E's hand-offs follow whichever the user chooses.
+F's settings on the October 16 sessions and G's bounded span on TTM-001
+in parallel; then F on the 48 h; then the full G pass and, if wobble
+wins, wobble inside F on TTM-003. Track E's hand-offs follow whichever
+the user chooses.
