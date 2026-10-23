@@ -1,6 +1,6 @@
 ---
 title: TTM-003 optogenetic sessions of 2026-10-16, first analysis
-updated: 2026-10-22
+updated: 2026-10-23
 status: needs_verification
 ---
 
@@ -548,3 +548,115 @@ greedy match is not unique), and four units without a partner. The
 suppression profile is therefore stable enough across 40 min to serve as
 the weaker identity check the plan asks about, for units the sorter
 isolated well; for hash collectors it is the hash's profile.
+
+## 9. TT6 cell: the 3.5 against the 4.5 detection floor, window by window (2026-10-23)
+
+`tt6_floor.py` runs the capture of section 8 on TT6 twice per window, at
+3.5 and at 4.5 excised MAD, with everything else equal (the OPTO2
+templates for all three experiments, the same excised noise, cosine gate
+0.6, three peeling passes, the 1.5 ms refractory rule), and splits the
+spikes the 3.5 run gives to the cell's template (OPTO2 unit 22) at 4.5 MAD
+into the class only 3.5 admits ("low", 3.5 to 4.5 MAD on the deepest
+wire, 35 to 45 uV) and the class both admit ("high"). Windows: the two
+October 16 sessions whole, and six 1800 s windows of the 48 h recording
+centred on a delivered block, chosen from a coarse scan of the TT6
+spike-band noise (10 s every 15 min, excised MAD 10.7 to 16.8 uV over the
+48 h; the two-and-a-half-fold figure of the README is the raw-band QC):
+blocks 1 and 4 (0.2 and 5.7 h, the blocks in which the cell showed its
+October 16 signature), 26 and 41 (9.9 and 39.9 h, quiet), 33 and 35
+(23.9 and 27.9 h, the noisiest stretch, in the sleep deprivation).
+Cross-correlograms between the classes are drawn before the refractory
+rule (the events the rule removed are put back), because the rule hollows
+the centre by construction. `results/tt6_floor_<experiment>.csv` has one
+row per window with every number below and more.
+
+Figures, one per window (3 by 4: trough-amplitude histogram of both runs
+with the floors marked and the per-wire noise; 80 overlaid waveforms of
+each class on the template; the classes' mean shapes normalised to their
+trough; CCG low against high and each class's ACG before the rule; the
+laser PSTH of each class and of the 4.5 run; the rate of each class over
+the window; the capture's neighbour CCGs with verdicts, conflict ratio and
+amplitude-split ratio at each floor; the ISI of each class) and a purity
+page per floor (`plot_unit_purity`):
+`<data_root>/TTM-003/TTM-003-OPTO1/figures/tt6_floor/TTM-003-OPTO1_full{.png,_purity.pdf}`,
+`.../TTM-003-OPTO2/figures/tt6_floor/TTM-003-OPTO2_full{.png,_purity.pdf}`,
+`.../TTM-003-48H/figures/tt6_floor/TTM-003-48H_b{1,4,26,33,35,41}{.png,_purity.pdf}`,
+and across every window `.../TTM-003-48H/figures/tt6_floor/summary.png`
+(spikes by class, refractory violations of each class, the CCG dip, the
+laser response of each class, the purity numbers at each floor, the
+window's noise and the agreement of the two runs).
+
+| window | hours | excised noise (uV) | cell spikes 3.5 / 4.5 | gained by 3.5 | low lost to the rule, % (of chance) | high lost, % (of chance) | CCG low x high, 0.3 to 1.5 ms over flank | in pulse / baseline, low | in pulse / baseline, high | conflict ratio 3.5 / 4.5 | neighbours dup/amb/dist 3.5 / 4.5 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| OPTO1 full | 0 to 0.53 | 9.7 | 54,772 / 51,162 | 3,527 (6.4 %) | 1.1 (0.13) | 0.6 (0.07) | 0.08 duplicate | 16.9 / 1.1 = 16 | 86 / 14 = 6.0 | 0.073 / 0.073 | 0/4/6 / 0/5/5 |
+| OPTO2 full | 0 to 0.34 | 9.5 | 33,615 / 31,779 | 1,783 (5.3 %) | 0.9 (0.11) | 0.6 (0.07) | 0.08 duplicate | 11.5 / 0.5 = 23 | 75 / 19 = 4.0 | 0.077 / 0.077 | 0/5/5 / 0/5/5 |
+| 48H b1 | 0.21 to 0.71 | 12.9 | 26,723 / 25,002 | 1,649 (6.2 %) | 1.2 (0.27) | 0.4 (0.08) | 0.26 duplicate | 31.4 / 0.3 = 91 | 75 / 1.4 = 54 | 0.095 / 0.084 | 0/5/5 / 0/5/5 |
+| 48H b4 | 5.72 to 6.22 | 11.8 | 26,939 / 25,759 | 1,140 (4.2 %) | 1.1 (0.25) | 0.6 (0.13) | 0.26 duplicate | 19.7 / 0.0 | 52 / 3.1 = 17 | 0.135 / 0.135 | 0/4/6 / 0/4/6 |
+| 48H b26 | 9.91 to 10.41 | 11.8 | 27,948 / 26,710 | 1,181 (4.2 %) | 2.1 (0.44) | 0.5 (0.11) | 0.73 distinct | 7.1 / 0.3 = 21 | 5.3 / 9.3 = 0.57 | 0.130 / 0.115 | 0/4/6 / 0/4/6 |
+| 48H b33 | 23.91 to 24.41 | 14.3 | 38,375 / 35,318 | 2,912 (7.6 %) | 1.4 (0.22) | 0.5 (0.08) | 0.46 ambiguous | 0.5 / 1.3 = 0.38 | 0.3 / 17.7 = 0.02 | 0.092 / 0.077 | 0/4/6 / 0/4/6 |
+| 48H b35 | 27.91 to 28.41 | 14.4 | 37,147 / 34,229 | 2,793 (7.5 %) | 1.5 (0.24) | 0.5 (0.09) | 0.47 ambiguous | 10.8 / 0.3 = 32 | 3.3 / 13.7 = 0.24 | 0.098 / 0.083 | 0/4/6 / 0/5/5 |
+| 48H b41 | 39.91 to 40.41 | 12.7 | 23,817 / 22,243 | 1,520 (6.4 %) | 1.1 (0.28) | 0.3 (0.08) | 0.49 ambiguous | 0.5 / 1.0 = 0.51 | 0.0 / 9.3 = 0.00 | 0.093 / 0.078 | 0/5/5 / 0/5/5 |
+
+Rates are per second over the delivered pulses of the window (OPTO: the
+pattern-A 207 ms pulses at 9.8 mW, 354 and 236 of them; 48 h: the block's
+58 or 60); baseline is the 50 ms before onset, in pulse 10 ms to offset.
+"Lost to the rule" is the share of a class's candidates (events whose
+best template was the cell's at cosine 0.6 or better) that fell within
+1.5 ms of another candidate, and "of chance" that count relative to two
+independent trains of those sizes.
+
+What the two floors admit and lose:
+
+- The 4.5 run is the 3.5 run with the low class removed and nothing else:
+  99.5 to 99.8 % of the 3.5 run's high spikes are in the 4.5 run within
+  0.5 ms, and 99.9 to 100 % of the 4.5 run's spikes are in the 3.5 run's
+  high class. The peel and the refractory rule move under 0.5 % of the
+  spikes between the runs, so the choice is only whether the low class
+  belongs to the cell.
+- The low class is 4 to 8 % of the cell's spikes in every window, 0.5 to
+  1.6 per second outside the trains. Its share and its rate rise with the
+  window's noise (0.5 to 0.9 per second at 11.8 to 12.9 uV excised noise,
+  1.5 to 1.6 at 14.3 to 14.4 uV), as a class that sits on the detection
+  floor would.
+- Its mean waveform, normalised to the trough, matches the template on
+  all four wires in every window (the panels in the top right); the
+  overlays show the noise of events at 3.5 to 4.5 MAD and some snippets
+  with another cell's spike 1 to 2 ms away.
+- Refractory: the low class loses 0.9 to 2.1 % of its candidates to the
+  1.5 ms rule (0.11 to 0.44 of chance), two to four times the high
+  class's 0.3 to 0.6 % (0.07 to 0.13 of chance), and under 0.15 % of its
+  own ISIs are below 1.5 ms. The capture's conflict ratio for the whole
+  unit is 0.07 to 0.14 at either floor and differs between the floors by
+  at most 0.015; the amplitude-split ratio and the neighbour verdicts are
+  the same at both floors in every window but one (b35, one neighbour
+  changes from distinct to ambiguous at 3.5).
+- The cross-correlogram between the classes: in the October 16 sessions
+  the low class avoids the high class within 1.5 ms at 0.08 of the flank
+  (the arbiter's "duplicate", one refractory period, with the whole
+  plus or minus 4 ms depressed); in 48 h blocks 1 and 4 at 0.26, with
+  peaks at plus and minus 3 ms; in blocks 26 to 41 at 0.46 to 0.73, a
+  shallow dip or none ("ambiguous" or "distinct"). The low class's own
+  ACG is empty within 1.5 ms in six windows and at 0.39 to 0.47 in the
+  two noisy blocks; the high class's is 0.10 to 0.26 in every window.
+- The laser: in the October 16 sessions and in blocks 1 and 4 both
+  classes fire through the pulse, the low at 11 to 31 per second against
+  0.0 to 1.1 at baseline, the high at 52 to 86 against 1.4 to 19, with
+  the same time course (the PSTH panel). From block 26 on the high class
+  is suppressed in the pulse (0.57, 0.02, 0.24 and 0.00 of baseline, like
+  the tetrode's other units in section 4), while the low class is driven
+  in blocks 26 and 35 (7.1 and 10.8 per second against 0.3) and silent in
+  blocks 33 and 41 (0.5 against 1.0 to 1.3).
+
+So in the sessions where the cell's identity is established (October 16,
+and the first 48 h blocks) the 3.5 floor admits 4 to 6 % more spikes
+that share the cell's shape, its refractory period and its pulse
+response, at the price of a refractory loss two to four times the high
+class's; the 4.5 floor loses exactly those. From block 26 on the two
+classes no longer behave alike. *Conjecture:* after the cell's amplitude
+loss around 6 h (README) the template's high class is a different,
+suppressed cell or a mixture, and the low class in blocks 26 and 35 is
+what remains of the driven cell near the floor plus noise troughs, which
+the 3.5 floor admits in part and the 4.5 floor not at all; the
+alternative reading is that the low class there is hash of the driven
+cells of the tetrode. The pictures above are what the choice rests on;
+no floor is recommended here.
