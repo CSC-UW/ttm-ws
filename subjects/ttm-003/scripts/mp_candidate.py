@@ -30,10 +30,21 @@ one ``is_mua`` unit. Stages, cached under
             whole sorting (coverage only), against the baseline's peaks
             (``spike_coverage.npz``): ``production_scoreboard.json``
 
+``--extra-templates`` adds templates from another session's capture
+output to their tetrodes (``TT6=capture:22`` is unit 22 of
+``<extra-session>/sortings_opto/capture/templates_TT6.npz``; ``--xseed``
+is the four tagged and driven cells of October 16). An extra template
+is offered in every window of its tetrode unless the bank already holds
+it (template cosine 0.95 or more, the June dedup bar); its windows run
+in order, and the template is re-estimated from the spikes it claimed in
+the previous window when there were at least 100, carried otherwise.
+Extra units get ids ``100000 + unit``.
+
 Timing per stage goes to ``candidate_timing.json``.
 
 Usage: python subjects/ttm-003/scripts/mp_candidate.py --subject TTM-003 --experiment TTM-003-48H
            [--stages capture,merge,analyzer] [--max-windows N] [--tag T] [--workers 48] [--n-jobs 16]
+           [--xseed | --extra-templates TT6=capture:22 ...] [--extra-session 2026-10-16_14-44-22]
 """
 
 from __future__ import annotations
@@ -64,6 +75,10 @@ BASE_NAME = "assembled_reseed_c12"
 MIN_SPIKES_TEMPLATE = 100
 PROPOSE_COS, FALLBACK_COS = 0.90, 0.95
 STAGES = ["capture", "merge", "analyzer", "score"]
+EXTRA_ID_BASE = 100000
+EXTRA_DEDUP_COS = 0.95
+XSEED = ["TT6=capture:22", "TT10=capture_tt10seed:1004", "TT4=capture:3", "TT11=capture:39"]
+EXTRA_SESSION = "2026-10-16_14-44-22"
 
 
 def _log(msg: str) -> None:
@@ -80,21 +95,37 @@ def _maxrss_gb() -> float:
 
 
 def capture_task(binary: str, group: int, a: int, b: int, trains: dict, gain: float, *, thresh_mad: float,
-                 gate_r: float, n_pass: int, refr_frames: int, min_trough_uV: float) -> dict:
+                 gate_r: float, n_pass: int, refr_frames: int, min_trough_uV: float,
+                 extra: dict | None = None) -> dict:
     """One window of one tetrode: window-local templates from the baseline trains, then the capture.
-    ``trains`` are whole-recording frames of this tetrode's units; returns absolute frames."""
+    ``trains`` are whole-recording frames of this tetrode's units; returns absolute frames. ``extra``
+    maps extra unit ids to templates offered in this window on top of the bank (dropped when the bank
+    already holds one within EXTRA_DEDUP_COS); the result carries each extra's re-estimated template
+    (from its claimed spikes when at least MIN_SPIKES_TEMPLATE) or None."""
     rec = si.load(binary)
     x = cp.load_tetrode_traces(rec, group, a, b)
     local = {u: fr[(fr >= a) & (fr < b)] - a for u, fr in trains.items()}
     local = {u: fr for u, fr in local.items() if fr.size >= MIN_SPIKES_TEMPLATE}
     out = {"group": group, "start": a, "end": b, "units": {}, "skipped_shallow": [], "n_events": 0,
-           "pool": np.zeros(0, np.int64), "no_templates": False}
+           "pool": np.zeros(0, np.int64), "no_templates": False, "extra_dedup": [], "extra_reestimated": {}}
+    T, ids = np.zeros((0, cp.N_SAMP, 4), np.float32), []
     if local:
         T, ids = cp.templates_from_trains(x, local)
         deep = np.array([T[i].min() * gain <= -min_trough_uV for i in range(len(ids))])
         out["skipped_shallow"] = [int(u) for u, d in zip(ids, deep) if not d]
         T, ids = T[deep], [u for u, d in zip(ids, deep) if d]
-    if not local or not ids:
+    if extra:
+        keep_x, keep_t = [], []
+        for u, t in extra.items():
+            best = max((cp.template_cosine(t, T[i]) for i in range(len(ids))), default=-1.0)
+            if best >= EXTRA_DEDUP_COS:
+                out["extra_dedup"].append(int(u))
+            else:
+                keep_x.append(int(u)); keep_t.append(t)
+        if keep_x:
+            T = np.concatenate([T, np.stack(keep_t).astype(np.float32)]) if len(ids) else np.stack(keep_t).astype(np.float32)
+            ids = list(ids) + keep_x
+    if not ids:
         # No template above the floor in this window: nothing is detected, so a tetrode without
         # units (or with only noise-sized ones) does not fill its multi-unit unit with noise troughs.
         out["no_templates"] = True
@@ -104,12 +135,50 @@ def capture_task(binary: str, group: int, a: int, b: int, trains: dict, gain: fl
     for i, u in enumerate(ids):
         m = C.label == i
         out["units"][int(u)] = {"frames": C.frames[m] + a, "amp_mad": C.amp_mad[m], "r": C.r[m],
-                                "n_rejected": int(rej[i]), "n_seed": int(local[u].size),
+                                "n_rejected": int(rej[i]), "n_seed": int(local[u].size) if u in local else 0,
                                 "trough_uV": float(T[i].min() * gain)}
+        if extra and u in extra:
+            fr = C.frames[m]
+            if fr.size >= MIN_SPIKES_TEMPLATE:
+                out["extra_reestimated"][int(u)] = cp.templates_from_trains(x, {u: fr})[0][0]
+            else:
+                out["extra_reestimated"][int(u)] = None
     out["n_events"] = int(C.frames.size)
     out["pool"] = C.pool + a
     out["noise_uV"] = (C.noise * gain).tolist()
     out["accepted_by_pass"] = np.bincount(C.pass_index[C.pass_index >= 0], minlength=n_pass).tolist()
+    return out
+
+
+def chain_task(binary: str, group: int, windows: list, trains: dict, gain: float, extra: dict, **kw) -> list:
+    """The windows of one tetrode in order, carrying each extra template forward: re-estimated from the
+    previous window's claimed spikes when there were enough, otherwise kept."""
+    cur = dict(extra)
+    results = []
+    for a, b in windows:
+        res = capture_task(binary, group, a, b, trains, gain, extra=cur, **kw)
+        for u, t in res["extra_reestimated"].items():
+            if t is not None:
+                cur[u] = t
+        results.append(res)
+    return results
+
+
+def load_extra_templates(specs: list[str], session_dir: pathlib.Path, rec) -> dict:
+    """{group: {EXTRA_ID_BASE + unit: (90, 4) template in this recording's wire order}} from
+    ``TT6=capture:22`` specs naming ``<session_dir>/sortings_opto/<variant>/templates_<TT>.npz``."""
+    ch_ids = np.asarray(rec.channel_ids)
+    out = {}
+    for spec in specs:
+        tt, rest = spec.split("=", 1)
+        variant, unit = rest.split(":")
+        g = int(tt.removeprefix("TT")) - 1
+        z = np.load(session_dir / "sortings_opto" / variant / f"templates_{tt}.npz")
+        wires = [str(w) for w in z["wires"]]
+        here = [str(c) for c in ch_ids[cp.tetrode_channel_indices(rec, g)]]
+        order = [wires.index(w) for w in here]
+        ids = [int(u) for u in z["unit_ids"]]
+        out.setdefault(g, {})[EXTRA_ID_BASE + int(unit)] = np.asarray(z["templates"][ids.index(int(unit))][:, order], np.float32)
     return out
 
 
@@ -133,16 +202,28 @@ def stage_capture(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
     if a.max_windows:
         starts = starts[:a.max_windows]
     refr_frames = int(round(a.refr_ms * FS / 1000))
-    tasks = [(g, s, min(s + wf, nfr)) for s in starts for g in groups]
+    specs = XSEED if a.xseed else list(a.extra_templates or [])
+    extra = load_extra_templates(specs, exp.data_root / a.extra_session, rec) if specs else {}
+    for g, d in extra.items():
+        for u in d:
+            ugroup[u] = g
+            trains[u] = np.zeros(0, np.int64)
+    kw = dict(thresh_mad=a.thresh_mad, gate_r=a.gate_r, n_pass=a.n_pass, refr_frames=refr_frames,
+              min_trough_uV=a.min_trough_uV)
+    windows = [(s, min(s + wf, nfr)) for s in starts]
+    tasks = [(g, s, e) for s, e in windows for g in groups if g not in extra]
+    chains = [g for g in groups if g in extra]
     _log(f"capture: {len(starts)} windows x {len(groups)} tetrodes (bad {sorted(bad)}), {len(base.unit_ids)} baseline units, "
-         f"{a.workers} workers; {a.thresh_mad} MAD, gate {a.gate_r}, {a.n_pass} passes, min trough {a.min_trough_uV} uV")
+         f"{a.workers} workers; {a.thresh_mad} MAD, gate {a.gate_r}, {a.n_pass} passes, min trough {a.min_trough_uV} uV"
+         + (f"; extra templates {specs} carried on {[f'TT{g + 1}' for g in chains]}" if extra else ""))
     t0 = time.perf_counter()
-    results = Parallel(n_jobs=a.workers, batch_size=1)(
-        delayed(capture_task)(binary, g, s, e, {u: trains[u] for u in trains if ugroup[u] == g}, gain,
-                              thresh_mad=a.thresh_mad, gate_r=a.gate_r, n_pass=a.n_pass, refr_frames=refr_frames,
-                              min_trough_uV=a.min_trough_uV)
-        for g, s, e in tasks)
-    _log(f"capture: {len(tasks)} tasks in {(time.perf_counter() - t0) / 60:.1f} min")
+    jobs = [delayed(chain_task)(binary, g, windows, {u: trains[u] for u in trains if ugroup[u] == g}, gain, extra[g], **kw)
+            for g in chains]
+    jobs += [delayed(capture_task)(binary, g, s, e, {u: trains[u] for u in trains if ugroup[u] == g}, gain, **kw)
+             for g, s, e in tasks]
+    results = Parallel(n_jobs=a.workers, batch_size=1)(jobs)
+    results = [r for res in results[:len(chains)] for r in res] + results[len(chains):]
+    _log(f"capture: {len(tasks) + len(chains)} tasks in {(time.perf_counter() - t0) / 60:.1f} min")
 
     unit_frames = {u: [] for u in trains}
     unit_amp = {u: [] for u in trains}
@@ -155,7 +236,9 @@ def stage_capture(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
     summary = {"windows": len(starts), "tetrodes": [f"TT{g + 1}" for g in groups], "bad_tetrodes": exp.badTetrodes,
                "params": {"thresh_mad": a.thresh_mad, "gate_r": a.gate_r, "n_pass": a.n_pass, "refr_ms": a.refr_ms,
                           "min_trough_uV": a.min_trough_uV, "min_spikes_template": MIN_SPIKES_TEMPLATE},
-               "n_events": 0, "n_accepted": 0, "n_pool": 0, "shallow_skips": {}, "windows_without_templates": {}, "per_tetrode": {}}
+               "n_events": 0, "n_accepted": 0, "n_pool": 0, "shallow_skips": {}, "windows_without_templates": {}, "per_tetrode": {},
+               "extra_templates": specs, "extra_session": a.extra_session if specs else None,
+               "extra_dedup_windows": {}, "extra_reestimated_windows": {}}
     for res in results:
         g, wi = res["group"], starts.index(res["start"])
         summary["n_events"] += res["n_events"]
@@ -164,6 +247,11 @@ def stage_capture(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
         tt = per_tt[g]
         tt["frames"].append(res["pool"]); tt["label"].append(np.full(res["pool"].size, -1)); tt["amp_mad"].append(np.full(res["pool"].size, np.nan))
         tt["r"].append(np.full(res["pool"].size, np.nan)); tt["window"].append(np.full(res["pool"].size, wi))
+        for u in res["extra_dedup"]:
+            summary["extra_dedup_windows"][str(u)] = summary["extra_dedup_windows"].get(str(u), 0) + 1
+        for u, t in res["extra_reestimated"].items():
+            if t is not None:
+                summary["extra_reestimated_windows"][str(u)] = summary["extra_reestimated_windows"].get(str(u), 0) + 1
         if res["no_templates"]:
             summary["windows_without_templates"][f"TT{g + 1}"] = summary["windows_without_templates"].get(f"TT{g + 1}", 0) + 1
         for u in res["skipped_shallow"]:
@@ -325,6 +413,10 @@ def main() -> None:
     ap.add_argument("--n-pass", type=int, default=3)
     ap.add_argument("--refr-ms", type=float, default=1.5)
     ap.add_argument("--min-trough-uV", type=float, default=40.0, help="templates shallower than this are not captured")
+    ap.add_argument("--extra-templates", nargs="*", default=None, metavar="TT=VARIANT:UNIT",
+                    help="templates from <extra-session>/sortings_opto/<VARIANT>/templates_<TT>.npz offered on TT in every window")
+    ap.add_argument("--xseed", action="store_true", help=f"the October 16 tagged and driven cells: {XSEED}")
+    ap.add_argument("--extra-session", default=EXTRA_SESSION)
     a = ap.parse_args()
     exp = experiment_from_args(a)
     stages = [s.strip() for s in a.stages.split(",") if s.strip()]
