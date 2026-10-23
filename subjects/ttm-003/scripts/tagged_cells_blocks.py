@@ -45,6 +45,7 @@ from joblib import Parallel, delayed
 from ttm import capture as cp
 from ttm import config
 from ttm.cli._common import add_experiment_args, experiment_from_args, line_buffered
+from ttm.purity import unit_templates
 
 SUBJECT_DIR = pathlib.Path(__file__).resolve().parents[1]
 RESULTS = SUBJECT_DIR / "results"
@@ -83,62 +84,6 @@ def reference_templates(dirs: list[pathlib.Path]) -> dict:
             else:
                 out[tt] = (T, ids, wires)
     return out
-
-
-def _window_snippets(binary: str, group: int, a: int, b: int, trains: dict, per_unit: int, pad: int) -> dict:
-    rec = si.load(binary)
-    x = cp.load_tetrode_traces(rec, group, a, b)
-    out = {}
-    rng = np.random.default_rng(a)
-    for u, fr in trains.items():
-        loc = fr[(fr >= a + cp.NBEFORE + pad) & (fr + cp.NAFTER + pad < b)] - a
-        if loc.size == 0:
-            continue
-        if loc.size > per_unit:
-            loc = np.sort(rng.choice(loc, per_unit, replace=False))
-        out[u] = cp.snippets(x, loc, nbefore=cp.NBEFORE + pad, nafter=cp.NAFTER + pad)
-    return out
-
-
-def unit_templates(binary: str, trains: dict, ugroup: dict, nfr: int, *, n_windows: int = 8, win_s: float = 60.0,
-                   max_spikes: int = 1000, workers: int = 16) -> tuple[dict, dict]:
-    """Four-wire templates of every unit from evenly spaced windows (single reads for sparse units),
-    aligned at the trough. Returns ({unit: (90, 4)}, {unit: n spikes used})."""
-    pad = 10
-    wf = int(win_s * FS)
-    starts = np.linspace(0, nfr - wf, n_windows + 2)[1:-1].astype(int)
-    groups = sorted(set(ugroup.values()))
-    tasks = [(g, int(s)) for s in starts for g in groups]
-    per_unit = max(max_spikes // n_windows, 20)
-    res = Parallel(n_jobs=workers)(delayed(_window_snippets)(binary, g, s, s + wf, {u: trains[u] for u in trains if ugroup[u] == g},
-                                                              per_unit, pad) for g, s in tasks)
-    acc = {u: [] for u in trains}
-    for r in res:
-        for u, sn in r.items():
-            acc[u].append(sn)
-    rec = si.load(binary)
-    templates, n_used = {}, {}
-    rng = np.random.default_rng(0)
-    for u in trains:
-        sn = np.concatenate(acc[u]) if acc[u] else np.zeros((0, cp.N_SAMP + 2 * pad, 4), np.float32)
-        if sn.shape[0] < 50 and trains[u].size:
-            fr = trains[u][(trains[u] >= cp.NBEFORE + pad) & (trains[u] + cp.NAFTER + pad < nfr)]
-            pick = np.sort(rng.choice(fr, min(200, fr.size), replace=False)) if fr.size else fr
-            idx = cp.tetrode_channel_indices(rec, ugroup[u])
-            ids = list(np.asarray(rec.channel_ids)[idx])
-            extra = [rec.get_traces(start_frame=f - cp.NBEFORE - pad, end_frame=f + cp.NAFTER + pad, channel_ids=ids).astype(np.float32)
-                     for f in pick]
-            if extra:
-                sn = np.concatenate([sn, np.stack(extra)])
-        n_used[u] = int(sn.shape[0])
-        if sn.shape[0] == 0:
-            templates[u] = np.zeros((cp.N_SAMP, 4), np.float32)
-            continue
-        wide = sn.mean(axis=0)
-        k = int(np.argmin(wide[pad:pad + cp.N_SAMP].min(axis=1)))
-        shift = int(np.clip(k - cp.NBEFORE, -pad, pad))
-        templates[u] = wide[pad + shift:pad + shift + cp.N_SAMP]
-    return templates, n_used
 
 
 def psth_profile(spk_s: np.ndarray, on: np.ndarray, dur: float) -> dict:
