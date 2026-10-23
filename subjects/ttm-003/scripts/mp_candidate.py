@@ -37,8 +37,9 @@ is the four tagged and driven cells of October 16). An extra template
 is offered in every window of its tetrode unless the bank already holds
 it (template cosine 0.95 or more, the June dedup bar); its windows run
 in order, and the template is re-estimated from the spikes it claimed in
-the previous window when there were at least 100, carried otherwise.
-Extra units get ids ``100000 + unit``.
+the previous window when there were at least 100, carried otherwise;
+``--extra-fixed`` keeps the templates as given and ``--extra-no-dedup``
+offers them in every window. Extra units get ids ``100000 + unit``.
 
 Timing per stage goes to ``candidate_timing.json``.
 
@@ -96,7 +97,7 @@ def _maxrss_gb() -> float:
 
 def capture_task(binary: str, group: int, a: int, b: int, trains: dict, gain: float, *, thresh_mad: float,
                  gate_r: float, n_pass: int, refr_frames: int, min_trough_uV: float,
-                 extra: dict | None = None) -> dict:
+                 extra: dict | None = None, extra_dedup: bool = True, extra_fixed: bool = False) -> dict:
     """One window of one tetrode: window-local templates from the baseline trains, then the capture.
     ``trains`` are whole-recording frames of this tetrode's units; returns absolute frames. ``extra``
     maps extra unit ids to templates offered in this window on top of the bank (dropped when the bank
@@ -118,7 +119,7 @@ def capture_task(binary: str, group: int, a: int, b: int, trains: dict, gain: fl
         keep_x, keep_t = [], []
         for u, t in extra.items():
             best = max((cp.template_cosine(t, T[i]) for i in range(len(ids))), default=-1.0)
-            if best >= EXTRA_DEDUP_COS:
+            if extra_dedup and best >= EXTRA_DEDUP_COS:
                 out["extra_dedup"].append(int(u))
             else:
                 keep_x.append(int(u)); keep_t.append(t)
@@ -139,7 +140,7 @@ def capture_task(binary: str, group: int, a: int, b: int, trains: dict, gain: fl
                                 "trough_uV": float(T[i].min() * gain)}
         if extra and u in extra:
             fr = C.frames[m]
-            if fr.size >= MIN_SPIKES_TEMPLATE:
+            if fr.size >= MIN_SPIKES_TEMPLATE and not extra_fixed:
                 out["extra_reestimated"][int(u)] = cp.templates_from_trains(x, {u: fr})[0][0]
             else:
                 out["extra_reestimated"][int(u)] = None
@@ -210,14 +211,16 @@ def stage_capture(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
             trains[u] = np.zeros(0, np.int64)
     kw = dict(thresh_mad=a.thresh_mad, gate_r=a.gate_r, n_pass=a.n_pass, refr_frames=refr_frames,
               min_trough_uV=a.min_trough_uV)
+    chain_kw = dict(kw, extra_dedup=not a.extra_no_dedup, extra_fixed=a.extra_fixed)
     windows = [(s, min(s + wf, nfr)) for s in starts]
     tasks = [(g, s, e) for s, e in windows for g in groups if g not in extra]
     chains = [g for g in groups if g in extra]
     _log(f"capture: {len(starts)} windows x {len(groups)} tetrodes (bad {sorted(bad)}), {len(base.unit_ids)} baseline units, "
          f"{a.workers} workers; {a.thresh_mad} MAD, gate {a.gate_r}, {a.n_pass} passes, min trough {a.min_trough_uV} uV"
-         + (f"; extra templates {specs} carried on {[f'TT{g + 1}' for g in chains]}" if extra else ""))
+         + (f"; extra templates {specs} on {[f'TT{g + 1}' for g in chains]}, "
+            f"{'fixed' if a.extra_fixed else 'carried'}, dedup {'off' if a.extra_no_dedup else 'on'}" if extra else ""))
     t0 = time.perf_counter()
-    jobs = [delayed(chain_task)(binary, g, windows, {u: trains[u] for u in trains if ugroup[u] == g}, gain, extra[g], **kw)
+    jobs = [delayed(chain_task)(binary, g, windows, {u: trains[u] for u in trains if ugroup[u] == g}, gain, extra[g], **chain_kw)
             for g in chains]
     jobs += [delayed(capture_task)(binary, g, s, e, {u: trains[u] for u in trains if ugroup[u] == g}, gain, **kw)
              for g, s, e in tasks]
@@ -238,6 +241,7 @@ def stage_capture(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
                           "min_trough_uV": a.min_trough_uV, "min_spikes_template": MIN_SPIKES_TEMPLATE},
                "n_events": 0, "n_accepted": 0, "n_pool": 0, "shallow_skips": {}, "windows_without_templates": {}, "per_tetrode": {},
                "extra_templates": specs, "extra_session": a.extra_session if specs else None,
+               "extra_fixed": a.extra_fixed, "extra_dedup": not a.extra_no_dedup,
                "extra_dedup_windows": {}, "extra_reestimated_windows": {}}
     for res in results:
         g, wi = res["group"], starts.index(res["start"])
@@ -417,6 +421,8 @@ def main() -> None:
                     help="templates from <extra-session>/sortings_opto/<VARIANT>/templates_<TT>.npz offered on TT in every window")
     ap.add_argument("--xseed", action="store_true", help=f"the October 16 tagged and driven cells: {XSEED}")
     ap.add_argument("--extra-session", default=EXTRA_SESSION)
+    ap.add_argument("--extra-fixed", action="store_true", help="keep extra templates as given (no per-window re-estimation)")
+    ap.add_argument("--extra-no-dedup", action="store_true", help="offer extra templates even where the bank holds a similar one")
     a = ap.parse_args()
     exp = experiment_from_args(a)
     stages = [s.strip() for s in a.stages.split(",") if s.strip()]
