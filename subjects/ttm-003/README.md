@@ -58,6 +58,16 @@ So 24 trains were delivered: four of 58 pulses in the first 6 h and
 twenty of 60 pulses every 2 h from 8.15 h to 46.15 h. The plan for it is
 `docs/plans/2026-10-22_ttm003_48h_sorting_plan.md`.
 
+The derived products of the pipeline exist as of 2026-10-22 (the store
+converted in 54 min at 1.74 to 1, 381 GB; `experiment_params.json`; the
+625 Hz LFP and 125 Hz tetrode leads, built with `--gap-tolerance-ms 1e8`
+because the store's time vector carries three single-sample timestamp
+glitches, `docs/developer_notes/openephys_timestamp_glitches.md`, and
+checked to have clean time vectors; `delta.idelta.zarr`,
+`stft_bandpowers.zarr`, `synthetic_emg_methods.zarr` and the `swa_*` and
+`emg_*` figures). The light/dark cycle is not drawn on the SWA figures
+because the manifest has no schedule.
+
 Per-block checks before any sort (`opto_blocks.py --include-undelivered`,
 `results/opto_blocks_TTM-003-48H.{csv,json}`, `figures/blocks/`,
 `figures/opto_blocks_summary.png`, 2026-10-22): the light-edge amplitude
