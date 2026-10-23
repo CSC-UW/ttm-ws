@@ -1,0 +1,28 @@
+{
+ "candidate": {
+  "n_units": 70,
+  "rp_contamination_median": 0.0,
+  "units_rp_under_0.1": 70,
+  "ampsplit_ratio_median": 0.105,
+  "units_ampsplit_under_0.3": 45,
+  "neighbour_verdicts": {
+   "duplicate": 28,
+   "ambiguous": 183,
+   "distinct": 145,
+   "segregated": 42
+  }
+ },
+ "baseline": {
+  "n_units": 84,
+  "rp_contamination_median": 1.0,
+  "units_rp_under_0.1": 10,
+  "ampsplit_ratio_median": 0.3125,
+  "units_ampsplit_under_0.3": 39,
+  "neighbour_verdicts": {
+   "duplicate": 77,
+   "ambiguous": 110,
+   "distinct": 242,
+   "segregated": 109
+  }
+ }
+}
