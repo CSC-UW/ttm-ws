@@ -146,6 +146,7 @@ environment, in this order:
 | `opto_tt_amplitude_split.py ... --threshold 3.5 --cluster C` | `results/ampsplit_<E>_<TT>_thr<thr>_c<C>.json`, `figures/opto_<TT>_ampsplit_*.png` |
 | `opto_capture.py ... [--tetrodes TT6 TT10\|all] [--seed TT10=resort_TT10_thr4] [--templates-from DIR] [--wobble] [--noise-check] [--analyzer]` | `<session>/sortings_opto/<out>/{sorting,templates_<TT>.npz,capture_<TT>.npz,wobble_<TT>.npz,analyzer}`, `results/capture_<E>_<out>.json`, `figures/capture/<out>_<TT>_purity.pdf`, `..._noise_vs_rate.png` |
 | `opto_capture_compare.py --experiments E1 E2 --out capture` | `results/capture_xsession_<E1>_<E2>_<out>.csv` |
+| `tt6_floor.py ... --windows full\|b<N>\|h<X> [--floors 3.5 4.5] [--unit 22]` | the TT6 cell captured at two detection floors per window, the spikes between the floors against those above both: `results/tt6_floor_<E>.csv`, `figures/tt6_floor/<E>_<window>.png`, `..._purity.pdf`, `figures/tt6_floor/summary.png` |
 
 `results/unit_metrics_<E>_asis.csv` (template and quality metrics per
 unit) was written from the analyzers by hand on 2026-10-21.
