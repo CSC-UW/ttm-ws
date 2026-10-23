@@ -72,35 +72,35 @@ it is present in the recording for the first 6 h only. The headline table
 gives, at every delivered block, what each pipeline makes of it: the
 baseline's unit 16, the candidate's unit 16 (same seed), the capture around
 the block with the cell's own October template (`tagged_xsession`, no 48 h
-sorting involved), and the cross-seeded variant's unit 16 and its extra
-October template. Rates per second over the block's pulses.
+sorting involved), and the two cross-seeded variants' unit 16 and extra
+October template (section 2.5). Rates per second over the block's pulses.
 
-| block | hour | baseline unit 16 base / onset / in pulse | candidate unit 16 base / onset / in pulse | October template alone onset / in pulse | cross-seeded: unit 16 in pulse, extra in pulse |
-|---|---|---|---|---|---|
-| 1 | 0.45 | 0.7 / 15 / 3.7 | 2.1 / 69 / 124.9 | 59 / 110.9 | 124.9, 0.0 |
-| 2 | 1.98 | 3.1 / 13 / 0.1 | 5.9 / 90 / 94.7 | 84 / 94.8 | 94.7, 0.0 |
-| 3 | 4.33 | 0.7 / 4 / 0.0 | 3.4 / 69 / 74.8 | 98 / 81.2 | 74.8, 0.0 |
-| 4 | 5.96 | 2.1 / 4 / 0.0 | 9.3 / 56 / 70.5 | 50 / 73.1 | 70.5, 0.0 |
-| 25 | 8.15 | 3.0 / 4 / 0.0 | 11.3 / 28 / 19.8 | 35 / 26.0 | 8.4, 35.5 |
-| 26 | 10.15 | 5.0 / 2 / 0.0 | 16.3 / 26 / 10.6 | 17 / 13.7 | 7.7, 20.3 |
-| 27 | 12.15 | 4.7 / 0 / 0.0 | 17.7 / 11 / 4.0 | 9 / 5.2 | 3.4, 5.6 |
-| 28 | 14.15 | 5.0 / 2 / 0.0 | 16.7 / 17 / 4.9 | 4 / 6.4 | 4.7, 5.7 |
-| 29 | 16.15 | 2.0 / 2 / 0.0 | 13.7 / 22 / 7.8 | 9 / 9.1 | 7.5, 6.1 |
-| 30 | 18.15 | 2.3 / 0 / 0.0 | 17.3 / 9 / 2.5 | 6 / 2.8 | 2.4, 3.5 |
-| 31 | 20.15 | 2.0 / 0 / 0.0 | 8.7 / 2 / 4.3 | 0 / 1.8 | 4.1, 3.3 |
-| 32 | 22.15 | 4.0 / 2 / 0.0 | 10.0 / 11 / 4.7 | 6 / 2.6 | 4.2, 4.7 |
-| 33 | 24.15 | 12.0 / 7 / 0.0 | 25.0 / 11 / 2.3 | 4 / 1.3 | 1.9, 1.5 |
-| 34 | 26.15 | 4.3 / 2 / 0.0 | 20.0 / 9 / 3.0 | 6 / 2.3 | 2.3, 2.4 |
-| 35 | 28.15 | 6.0 / 6 / 0.0 | 17.3 / 20 / 6.1 | 17 / 17.0 | 5.3, 4.0 |
-| 36 | 30.15 | 3.7 / 4 / 0.0 | 8.0 / 24 / 6.5 | 13 / 12.1 | 5.7, 7.6 |
-| 37 | 32.15 | 3.7 / 4 / 0.0 | 13.0 / 11 / 1.4 | 0 / 4.5 | 1.3, 4.8 |
-| 38 | 34.15 | 5.3 / 4 / 0.0 | 18.0 / 9 / 1.9 | 2 / 2.1 | 1.5, 2.7 |
-| 39 | 36.15 | 6.7 / 2 / 0.0 | 13.7 / 11 / 0.8 | 4 / 1.8 | 0.7, 1.9 |
-| 40 | 38.15 | 4.7 / 0 / 0.0 | 10.3 / 6 / 1.0 | 0 / 0.9 | 1.0, 1.7 |
-| 41 | 40.15 | 7.0 / 4 / 0.0 | 11.7 / 13 / 0.8 | 4 / 0.4 | 0.5, 3.2 |
-| 42 | 42.15 | 4.7 / 2 / 0.0 | 11.0 / 7 / 0.8 | 7 / 0.3 | 0.6, 2.6 |
-| 43 | 44.15 | 8.3 / 0 / 0.1 | 10.3 / 6 / 1.1 | 6 / 0.7 | 0.9, 1.4 |
-| 44 | 46.15 | 14.0 / 4 / 0.0 | 25.0 / 6 / 1.1 | 7 / 0.3 | 0.8, 2.2 |
+| block | hour | baseline unit 16 base / onset / in pulse | candidate unit 16 base / onset / in pulse | October template alone onset / in pulse | carried extra: unit 16 in pulse, extra in pulse | fixed extra: unit 16 in pulse, extra in pulse |
+|---|---|---|---|---|---|---|
+| 1 | 0.45 | 0.7 / 15 / 3.7 | 2.1 / 69 / 124.9 | 59 / 110.9 | 124.9, 0.0 | 95, 34 |
+| 2 | 1.98 | 3.1 / 13 / 0.1 | 5.9 / 90 / 94.7 | 84 / 94.8 | 94.7, 0.0 | 61, 41 |
+| 3 | 4.33 | 0.7 / 4 / 0.0 | 3.4 / 69 / 74.8 | 98 / 81.2 | 74.8, 0.0 | 51, 36 |
+| 4 | 5.96 | 2.1 / 4 / 0.0 | 9.3 / 56 / 70.5 | 50 / 73.1 | 70.5, 0.0 | 50, 33 |
+| 25 | 8.15 | 3.0 / 4 / 0.0 | 11.3 / 28 / 19.8 | 35 / 26.0 | 8.4, 35.5 | 11, 19 |
+| 26 | 10.15 | 5.0 / 2 / 0.0 | 16.3 / 26 / 10.6 | 17 / 13.7 | 7.7, 20.3 | 7, 9 |
+| 27 | 12.15 | 4.7 / 0 / 0.0 | 17.7 / 11 / 4.0 | 9 / 5.2 | 3.4, 5.6 | 3, 2 |
+| 28 | 14.15 | 5.0 / 2 / 0.0 | 16.7 / 17 / 4.9 | 4 / 6.4 | 4.7, 5.7 | 4, 2 |
+| 29 | 16.15 | 2.0 / 2 / 0.0 | 13.7 / 22 / 7.8 | 9 / 9.1 | 7.5, 6.1 | 6, 5 |
+| 30 | 18.15 | 2.3 / 0 / 0.0 | 17.3 / 9 / 2.5 | 6 / 2.8 | 2.4, 3.5 | 2, 1 |
+| 31 | 20.15 | 2.0 / 0 / 0.0 | 8.7 / 2 / 4.3 | 0 / 1.8 | 4.1, 3.3 | 4, 1 |
+| 32 | 22.15 | 4.0 / 2 / 0.0 | 10.0 / 11 / 4.7 | 6 / 2.6 | 4.2, 4.7 | 4, 1 |
+| 33 | 24.15 | 12.0 / 7 / 0.0 | 25.0 / 11 / 2.3 | 4 / 1.3 | 1.9, 1.5 | 2, 0 |
+| 34 | 26.15 | 4.3 / 2 / 0.0 | 20.0 / 9 / 3.0 | 6 / 2.3 | 2.3, 2.4 | 3, 1 |
+| 35 | 28.15 | 6.0 / 6 / 0.0 | 17.3 / 20 / 6.1 | 17 / 17.0 | 5.3, 4.0 | 4, 9 |
+| 36 | 30.15 | 3.7 / 4 / 0.0 | 8.0 / 24 / 6.5 | 13 / 12.1 | 5.7, 7.6 | 5, 9 |
+| 37 | 32.15 | 3.7 / 4 / 0.0 | 13.0 / 11 / 1.4 | 0 / 4.5 | 1.3, 4.8 | 1, 2 |
+| 38 | 34.15 | 5.3 / 4 / 0.0 | 18.0 / 9 / 1.9 | 2 / 2.1 | 1.5, 2.7 | 2, 1 |
+| 39 | 36.15 | 6.7 / 2 / 0.0 | 13.7 / 11 / 0.8 | 4 / 1.8 | 0.7, 1.9 | 1, 1 |
+| 40 | 38.15 | 4.7 / 0 / 0.0 | 10.3 / 6 / 1.0 | 0 / 0.9 | 1.0, 1.7 | 1, 1 |
+| 41 | 40.15 | 7.0 / 4 / 0.0 | 11.7 / 13 / 0.8 | 4 / 0.4 | 0.5, 3.2 | 1, 0 |
+| 42 | 42.15 | 4.7 / 2 / 0.0 | 11.0 / 7 / 0.8 | 7 / 0.3 | 0.6, 2.6 | 1, 0 |
+| 43 | 44.15 | 8.3 / 0 / 0.1 | 10.3 / 6 / 1.1 | 6 / 0.7 | 0.9, 1.4 | 1, 0 |
+| 44 | 46.15 | 14.0 / 4 / 0.0 | 25.0 / 6 / 1.1 | 7 / 0.3 | 0.8, 2.2 | 1, 0 |
 
 Over the first four blocks (medians): the baseline's unit 16 fires 1.4 at
 base, 9 at onset and nothing in the pulse (reliability 0.08); the
@@ -293,16 +293,30 @@ that accepts a cosine of 0.95 over a "distinct" verdict is the June
 fallback and is worth revisiting here.
 
 Fixed and offered everywhere (`mp_candidate_xfixed`): the October templates
-as given, in every window. (Numbers filled in when the run finishes.)
+as given, in every window, no dedup. On TT6 the extra and the bank's unit
+16 now divide the cell's train in the first four blocks (extra 34 to 41,
+unit 16 50 to 95 per s in the pulse; their sum is the control's 73 to
+111), and after the cell fades the fixed extra reports its absence
+honestly: 5.8 per s at base, 4 at onset and 1.5 in the pulse at the median
+block, against 9.5, 40 and 3.0 for the carried one, with the five blocks
+above twice baseline being exactly blocks 1 to 4 and 35. The TT10 extra
+merged with the bank's seeds 26 and 65 as a CCG duplicate (cosines 0.90
+and 0.91) and the merged unit holds 126 at onset and 64 in the pulse at
+the median block; the TT4 extra merged with seed 72 (79 and 66); the TT11
+extra merged with seed 66 (36 and 43), and the bank's seed 28 keeps its
+own train (80 and 20). Merging 85 to 71 single units, 16 pairs.
 
-What the two variants show is that cross-session templates work as seeds
-when a cell has none in the bank (TT10, TT4 and TT11 extras carry their
+What the two variants show: cross-session templates work as seeds when a
+cell has none in the bank (the TT10, TT4 and TT11 extras carry their
 cells' trains at every block, on tetrodes where the bank's own units also
-had them), that the dedup rule correctly yields to a bank unit that holds
-the cell, and that re-estimating a template from its own claimed spikes
-after the cell has gone is how a template turns into a hash collector; a
-carried template should be re-estimated only while its claimed spikes
-keep the cell's signature, or kept fixed.
+had them, and the merge folds them into those units); the dedup rule
+correctly yields to a bank unit that already holds the cell, and without
+it the extra and the bank unit split the cell's spikes; and re-estimating
+a template from its own claimed spikes after the cell has gone is how a
+template turns into a hash collector, which a fixed template does not do.
+A carried template should be re-estimated only while its claimed spikes
+keep the cell's signature (the per-block check can gate it), or kept
+fixed.
 
 ## 3. Population, presence and identity
 
@@ -455,7 +469,7 @@ are not summarised further here.
 |---|---|---|
 | materialise (96 jobs) | 0.77 h, 1.33 TB | shared |
 | seed sort and carry-forward (16 jobs) | 6.8 h, 9.4 GB | |
-| capture (80 processes, one window of one tetrode each) | | 0.62 h, 58 GB, 29 GB on disk |
+| capture (80 processes, one window of one tetrode each) | | 0.62 h, 58 GB, 29 GB on disk; with four carried extras 1.42 h, fixed 1.21 h |
 | peaks (16 jobs) | 0.07 h | shared |
 | merge, residual, multi-unit bucket, scoring | 2.9 h, 37 GB | merge 0.09 h, 85 GB; scoring 1.6 h |
 | analyzer (16 jobs) | 1.9 h | 2.7 h (156 M spikes) |
