@@ -50,6 +50,10 @@ trains = [
 [sessions."2026-10-20_09-02-12"]
 experiment = "TTM-003-48H"
 planned = { pattern = "A", laser_level = 4.5, power_mW = 9.8, pulses_per_train = 60, period_h = 2 }
+# The laser level was set to 4.5 (9.8 mW) by mistake; the intended level was
+# 4.2 (4.2 mW), the level of the clear pattern-A responses on October 16
+# (experimenter, 2026-10-23). `planned` records what was delivered.
+intended = { laser_level = 4.2, power_mW = 4.2 }
 # Between 7.69 h and 8.09 h (16:43 to 17:08 local) the TTL carries single
 # pulses, short runs and one 164 s high interval; the laser was not connected
 # to the animal then (experimenter, 2026-10-22), so those trains delivered no

@@ -107,9 +107,12 @@ the names. Eleven files were changed (64 channels each, 80 for
 Unknown/2026-06-16): TTM2 2026-09-24, 2026-10-09 (two recordings),
 2026-10-10, 2026-10-11; TTM3 2026-10-16 (both sessions); Unknown 2026-06-16,
 2026-06-24, 2026-09-18, 2026-09-22. The patched copy someone else made under
-`TTM2/Analysis/2026-10-09_09-33-42/oe_mirror/` was left alone. The script
-is kept in this session's scratchpad only; the repair is not expected to be
-needed again once the rig is fixed.
+`TTM2/Analysis/2026-10-09_09-33-42/oe_mirror/` was left alone. TTM3
+2026-10-20 (the 48 h recording) followed on 2026-10-23; its file is owned by
+root, so the backup is a plain byte copy (`copyfile`, not `copy2`, which
+fails setting the timestamps). The script is kept in this session's
+scratchpad only; the repair is not expected to be needed again once the
+rig is fixed.
 
 After the repair spikeinterface reads TTM2 2026-09-24 as 64 channels
 `CH1`..`CH64`, 30 kHz, one segment, 48.23 h, gain 0.195.

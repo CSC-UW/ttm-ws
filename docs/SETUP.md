@@ -111,13 +111,14 @@ The server's facts, dated 2026-10-22, for anyone sharing it:
 | `/ssd-raid0` | 7.0 TB | 6.0 TB | Allowed for stores and sorting caches. Slower than `/nvme`, much faster than spinning disk. The TTM-003 48 h session directory `2026-10-20_09-02-12` lives at `/ssd-raid0/neuropixels/tetrode_data/` and is reached through a symlink of the same name under `data_root`, so no tool needs a second root. |
 | `/Volumes/tetrode` | CIFS | | `remotes.archive`. Writing needs the `paxilline` group (`sg paxilline -c '...'` in a shell that predates the membership) and `rsync --inplace`. |
 
-Until the 48 h session's `structure.oebin` on `/Volumes/tetrode` is repaired in
-place (`docs/developer_notes/openephys_blank_channel_names.md`), its store was
-converted from `<session>/oe_mirror/`, a symlink mirror of the acquisition with
-a repaired copy of the oebin, selected with
-`TTM_REMOTE_ARCHIVE=/ssd-raid0/neuropixels/tetrode_data/2026-10-20_09-02-12/oe_mirror`;
-the store's provenance records the mirror's `settings.xml` path. The mirror can
-go once the in-place repair is done.
+The 48 h session's store was converted on 2026-10-22 from
+`<session>/oe_mirror/`, a symlink mirror of the acquisition with a repaired
+copy of its `structure.oebin`, selected with
+`TTM_REMOTE_ARCHIVE=/ssd-raid0/neuropixels/tetrode_data/2026-10-20_09-02-12/oe_mirror`,
+because the file on `/Volumes/tetrode` still had blank channel names
+(`docs/developer_notes/openephys_blank_channel_names.md`); the store's
+provenance records the mirror's `settings.xml` path. That file was repaired in
+place on 2026-10-23, so the mirror is now redundant and can be removed.
 
 Other machines use it at the same time: never kill processes by pattern
 (`pkill -f` matches the shell that runs it), find PIDs with

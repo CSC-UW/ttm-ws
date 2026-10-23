@@ -2,9 +2,10 @@
 # 48 h continuous recording with optotagging trains (207 ms pulses at 1 Hz,
 # 60 per train) every 2 h from 8.15 h to 46.15 h, preceded by four trains in
 # the first 6 h and a block of manual tests near 8 h; see
-# results/stimulation_blocks_2026-10-20_09-02-12.csv. The experiment name,
-# the light/dark schedule and any deprivation are not yet confirmed by the
-# experimenter. Bad channels from scripts/channel_qc.py on this recording
+# results/stimulation_blocks_2026-10-20_09-02-12.csv. Lights 12 h/12 h,
+# on at 09:00 and off at 21:00; sleep deprivation with novel objects from
+# 09:00 to 14:00 on 2026-10-21 (experimenter, 2026-10-23), the same design
+# as TTM-002-SD. Bad channels from scripts/channel_qc.py on this recording
 # (results/channel_qc_TTM-003-48H_summary.csv, 2026-10-22): CH22 on TT15
 # carries the 400 Hz comb at 80 to 260 times its flanks with 150 to 200
 # threshold crossings per second in most windows; CH18 and CH20 carry it
@@ -14,5 +15,9 @@
 session = "2026-10-20_09-02-12"
 acquisition = "TTM3/2026-10-20_09-02-12"
 
+lightsOn = ["2026-10-20T09:00:00", "2026-10-21T09:00:00", "2026-10-22T09:00:00"]
+lightsOff = ["2026-10-20T21:00:00", "2026-10-21T21:00:00"]
+novel_objects_start = "2026-10-21T09:00:00"
+novel_objects_end = "2026-10-21T14:00:00"
 badChannels = ["CH22"]
 badTetrodes = []

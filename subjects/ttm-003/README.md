@@ -12,7 +12,7 @@ stimulation. Raw acquisitions: `/Volumes/tetrode/TTM3/<session>/`.
 |---|---|---|
 | `TTM-003-OPTO1` | `2026-10-16_14-06-44` | 32 min, seven laser trains |
 | `TTM-003-OPTO2` | `2026-10-16_14-44-22` | 20.6 min, five laser trains |
-| `TTM-003-48H` (name provisional) | `2026-10-20_09-02-12` | 47.98 h, 44 laser trains: 20 blocks every 2 h from 8.15 h, four earlier blocks, manual tests near 8 h |
+| `TTM-003-48H` | `2026-10-20_09-02-12` | 47.98 h, 44 laser trains: 20 blocks every 2 h from 8.15 h, four earlier blocks, manual tests near 8 h |
 
 ## The 48 h recording
 
@@ -28,19 +28,25 @@ one experiment and one recording, 671 GB, finished the morning of
 Its `structure.oebin` has all 64 headstage channel names blank, the
 Acquisition Board plugin bug in
 `docs/developer_notes/openephys_blank_channel_names.md`; the two October
-16 sessions were repaired on 2026-10-21 and this one has not been repaired
-in place yet. On 2026-10-22 it was converted (blosc-zstd) from a symlink
-mirror with a repaired copy of the oebin (`docs/SETUP.md`, tononi-2); the
-session directory lives on `/ssd-raid0` behind a symlink under
-`data_root`. The manifest `TTM-003-48H` carries no light schedule and
-no deprivation; its bad channel is CH22 (TT15, the 400 Hz comb at 80 to
+16 sessions were repaired on 2026-10-21 and this one on 2026-10-23. On
+2026-10-22, before that repair, it was converted (blosc-zstd) from a
+symlink mirror with a repaired copy of the oebin (`docs/SETUP.md`,
+tononi-2); the session directory lives on `/ssd-raid0` behind a symlink
+under `data_root`. The manifest `TTM-003-48H` has lights on at 09:00 and
+off at 21:00 and sleep deprivation with novel objects from 09:00 to
+14:00 on 2026-10-21 (the 23.5 h to 29.5 h stretch of continuous high EMG
+on `figures/emg_methods_vs_swa_full.png` is that period plus whatever
+spontaneous wake surrounds it); its bad channel is CH22 (TT15, the 400 Hz comb at 80 to
 260 times its flanks), from `channel_qc.py` on this recording, which also
 found TT14 and CH2, bad on October 16, to be ordinary quiet channels
 here, and the spike-band noise of every channel two and a half times
 higher at 7.4 h, 25.8 h and from 37 h to the end than in the quiet
 windows (`figures/channel_qc.png`). The planned protocol (`stimulation_log.toml`)
 was pattern A (200 ms on, 1 pulse/s) at laser level 4.5 (9.8 mW), 60
-pulses per train, one train every 2 h; there is no train-by-train hand
+pulses per train, one train every 2 h. The level was a mistake for the
+intended 4.2 (4.2 mW), recorded as `intended` in the log; whether 9.8 mW
+over 24 trains fatigues the driven cells is a question for the per-block
+tables, not settled. There is no train-by-train hand
 log, so the block times and measured parameters come from the TTL,
 `results/stimulation_blocks_2026-10-20_09-02-12.csv` (`stim_trains.py`,
 `as_planned` column). All 1,584 real pulses are pattern A (207 ms at
@@ -61,12 +67,13 @@ twenty of 60 pulses every 2 h from 8.15 h to 46.15 h. The plan for it is
 The derived products of the pipeline exist as of 2026-10-22 (the store
 converted in 54 min at 1.74 to 1, 381 GB; `experiment_params.json`; the
 625 Hz LFP and 125 Hz tetrode leads, built with `--gap-tolerance-ms 1e8`
-because the store's time vector carries three single-sample timestamp
-glitches, `docs/developer_notes/openephys_timestamp_glitches.md`, and
-checked to have clean time vectors; `delta.idelta.zarr`,
-`stft_bandpowers.zarr`, `synthetic_emg_methods.zarr` and the `swa_*` and
-`emg_*` figures). The light/dark cycle is not drawn on the SWA figures
-because the manifest has no schedule.
+because the store's time vector then carried three single-sample
+timestamp glitches, `docs/developer_notes/openephys_timestamp_glitches.md`,
+and checked to have clean time vectors; the three samples were patched in
+the store on 2026-10-23; `delta.idelta.zarr`, `stft_bandpowers.zarr`,
+`synthetic_emg_methods.zarr` and the `swa_*` and `emg_*` figures). The
+SWA figures predate the schedule in the manifest and do not draw the
+light/dark cycle or the deprivation.
 
 The June TTM-001 production pipeline ran unchanged on it as the baseline
 (`mp_baseline.py`, 2026-10-22 to 23, 12.4 h in all: materialise 0.77 h

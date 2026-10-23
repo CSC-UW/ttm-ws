@@ -44,10 +44,13 @@ minutes.
   the next step brings back to within one period of where it belongs is
   replaced by the mean of its neighbours), prints the count and records
   the indices in the slice table (`timestamp_glitches_repaired`). A real
-  gap is not touched. Stores converted before 2026-10-22, among them the
-  TTM-003 48 h store, carry the glitches in their `times_seg0` array;
-  the fix for an existing store is to write the three repaired values
-  into that array in place, which needs no re-conversion.
+  gap is not touched. A store converted before 2026-10-22 carries the
+  glitches in its `times_seg0` array; the fix is to write the repaired
+  values into that array in place, which needs no re-conversion. The
+  TTM-003 48 h store was patched that way on 2026-10-23 (samples
+  756781655, 2367394391 and 3978007127 set to the mean of their
+  neighbours; the chunk rewrite is atomic in zarr 2's directory store,
+  so the sorting jobs reading the store at the time were not disturbed).
 - Anything that maps sample indices to times through the store's time
   vector (`sample_index_to_time`, the viz bundle's `spikes.parquet`)
   gives those three samples a time 23.9 h ahead. The sorters themselves
