@@ -1,0 +1,50 @@
+{
+ "TT6_cell": {
+  "opto2_unit": 22,
+  "blocks": 24,
+  "median_base_hz": 7.5,
+  "median_onset_hz": 6.48,
+  "median_in_pulse_hz": 3.63,
+  "median_post_0_50_hz": 0.33,
+  "median_reliability": 0.058,
+  "blocks_in_pulse_over_2x_base": 5,
+  "blocks_onset_over_3x_base": 5,
+  "median_rate_window_hz": 13.13
+ },
+ "TT10_driven": {
+  "opto2_unit": 1004,
+  "blocks": 24,
+  "median_base_hz": 3.33,
+  "median_onset_hz": 50.0,
+  "median_in_pulse_hz": 22.2,
+  "median_post_0_50_hz": 0.67,
+  "median_reliability": 0.367,
+  "blocks_in_pulse_over_2x_base": 24,
+  "blocks_onset_over_3x_base": 23,
+  "median_rate_window_hz": 5.19
+ },
+ "TT4_candidate": {
+  "opto2_unit": 3,
+  "blocks": 24,
+  "median_base_hz": 6.83,
+  "median_onset_hz": 112.96,
+  "median_in_pulse_hz": 88.67,
+  "median_post_0_50_hz": 2.83,
+  "median_reliability": 0.686,
+  "blocks_in_pulse_over_2x_base": 24,
+  "blocks_onset_over_3x_base": 24,
+  "median_rate_window_hz": 21.63
+ },
+ "TT11_candidate": {
+  "opto2_unit": 39,
+  "blocks": 24,
+  "median_base_hz": 3.83,
+  "median_onset_hz": 54.63,
+  "median_in_pulse_hz": 47.68,
+  "median_post_0_50_hz": 2.33,
+  "median_reliability": 0.367,
+  "blocks_in_pulse_over_2x_base": 24,
+  "blocks_onset_over_3x_base": 24,
+  "median_rate_window_hz": 9.41
+ }
+}
