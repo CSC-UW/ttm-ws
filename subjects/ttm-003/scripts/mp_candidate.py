@@ -25,6 +25,10 @@ one ``is_mua`` unit. Stages, cached under
             multi-unit units appended), ``candidate_merges.json`` (pairs and
             the old-to-new id map)
   analyzer  ``analyzer_candidate.zarr`` as ``mp_baseline.py`` builds it
+  score     the June three-axis scoreboard (script 97's stage_score) of the
+            single units (coverage, assignment purity, identity) and of the
+            whole sorting (coverage only), against the baseline's peaks
+            (``spike_coverage.npz``): ``production_scoreboard.json``
 
 Timing per stage goes to ``candidate_timing.json``.
 
@@ -59,7 +63,7 @@ WIN_S = 1800.0
 BASE_NAME = "assembled_reseed_c12"
 MIN_SPIKES_TEMPLATE = 100
 PROPOSE_COS, FALLBACK_COS = 0.90, 0.95
-STAGES = ["capture", "merge", "analyzer"]
+STAGES = ["capture", "merge", "analyzer", "score"]
 
 
 def _log(msg: str) -> None:
@@ -288,6 +292,25 @@ def stage_analyzer(base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
     _log(f"analyzer: extensions {sorted(analyzer.get_loaded_extension_names())}")
 
 
+def stage_score(base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("p97", SORTING_DIR / "97_production_pipeline.py")
+    p97 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(p97)
+    p97.OUT = out
+    p97.N_JOBS = a.n_jobs
+    rec = si.load(str(base_dir / "binary"))
+    z = np.load(base_dir / "spike_coverage.npz", mmap_mode="r")
+    peaks = (np.asarray(z["peak_sample"]), np.asarray(z["peak_group"]), np.asarray(z["amp_mad"]))
+    starts = p97.window_starts(rec.get_num_frames(), max_windows=a.max_windows)
+    full = si.load(str(out / "assembled_candidate"))
+    is_mua = np.asarray(full.get_property("is_mua")).astype(bool)
+    sua = full.select_units([u for u, m in zip(full.unit_ids, is_mua) if not m])
+    _log(f"score: {sua.get_num_units()} single units and the whole sorting over {len(starts)} windows")
+    p97.stage_score(rec, [("candidate_sua", sua, True, True), ("candidate_sua+mua", full, False, False)], peaks, starts, tag="")
+
+
 def main() -> None:
     line_buffered()
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -324,6 +347,8 @@ def main() -> None:
             stage_merge(base_dir, out, a)
         elif stage == "analyzer":
             stage_analyzer(base_dir, out, a)
+        elif stage == "score":
+            stage_score(base_dir, out, a)
         row = {"stage": stage, "max_windows": a.max_windows, "workers": a.workers,
                "started": time.strftime("%F %T", time.localtime(t0)), "hours": round((time.time() - t0) / 3600, 3),
                "max_rss_gb": round(_maxrss_gb(), 2), "disk_added_gb": round((_dir_bytes(out) - before) / 1e9, 2)}
