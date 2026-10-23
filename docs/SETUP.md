@@ -118,7 +118,9 @@ copy of its `structure.oebin`, selected with
 because the file on `/Volumes/tetrode` still had blank channel names
 (`docs/developer_notes/openephys_blank_channel_names.md`); the store's
 provenance records the mirror's `settings.xml` path. That file was repaired in
-place on 2026-10-23, so the mirror is now redundant and can be removed.
+place on 2026-10-23 and the mirror was removed the same day; the provenance
+path of the three stores (the raw store and the two LFP stores) is the only
+trace of it.
 
 Other machines use it at the same time: never kill processes by pattern
 (`pkill -f` matches the shell that runs it), find PIDs with

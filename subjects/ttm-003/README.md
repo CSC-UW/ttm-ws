@@ -31,8 +31,8 @@ Acquisition Board plugin bug in
 16 sessions were repaired on 2026-10-21 and this one on 2026-10-23. On
 2026-10-22, before that repair, it was converted (blosc-zstd) from a
 symlink mirror with a repaired copy of the oebin (`docs/SETUP.md`,
-tononi-2); the session directory lives on `/ssd-raid0` behind a symlink
-under `data_root`. The manifest `TTM-003-48H` has lights on at 09:00 and
+tononi-2), removed on 2026-10-23; the session directory lives on
+`/ssd-raid0` behind a symlink under `data_root`. The manifest `TTM-003-48H` has lights on at 09:00 and
 off at 21:00 and sleep deprivation with novel objects from 09:00 to
 14:00 on 2026-10-21 (the 23.5 h to 29.5 h stretch of continuous high EMG
 on `figures/emg_methods_vs_swa_full.png` is that period plus whatever
