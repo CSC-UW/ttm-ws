@@ -68,6 +68,23 @@ checked to have clean time vectors; `delta.idelta.zarr`,
 `emg_*` figures). The light/dark cycle is not drawn on the SWA figures
 because the manifest has no schedule.
 
+The June TTM-001 production pipeline ran unchanged on it as the baseline
+(`mp_baseline.py`, 2026-10-22 to 23, 12.4 h in all: materialise 0.77 h
+for the 1.33 TB binary, seed and carry-forward 6.8 h, peaks 0.07 h,
+merge, residual capture, multi-unit bucket and scoreboard 2.9 h at 37 GB
+peak memory, analyzer 1.9 h; `results/mp_baseline_TTM-003-48H_timing.json`).
+The seed window gave 55 units, 45 after the confidence and dedup cuts;
+re-seeding every 6 h added 43 more for 88 tracked units; the merge took
+them to 84, which with 16 per-tetrode multi-unit units is the 100-unit
+`assembled_prod`. The scoreboard
+(`results/mp_baseline_TTM-003-48H_scoreboard.json`) gives the single
+units 77.8 % of the events at 10 MAD or more and 52.5 % overall (86.1 and
+59.0 % with the multi-unit units), a spike-weighted full-window
+assignment purity of 0.953 (0.826 in the tight window) with 4 of 79
+scored units flagged, and 14 CCG-duplicate pairs against 115 distinct
+among 227 same-tetrode pairs. The per-block tagged-cell checks and the
+candidate comparison are in `docs/reports/`.
+
 Per-block checks before any sort (`opto_blocks.py --include-undelivered`,
 `results/opto_blocks_TTM-003-48H.{csv,json}`, `figures/blocks/`,
 `figures/opto_blocks_summary.png`, 2026-10-22): the light-edge amplitude
