@@ -1,6 +1,6 @@
 ---
 title: TTM-003 48 h spike sorting plan (SOM+ capture, single-unit purity, 48 h tracking)
-updated: 2026-10-22
+updated: 2026-10-23
 ---
 
 # TTM-003 48 h spike sorting plan
@@ -9,8 +9,10 @@ Written 2026-10-22 for the agent that continues after the workspace moves
 to `~/projects/ttm-ws/`. Read `CLAUDE.md` first (conventions, git rules,
 analysis practice), then `docs/SETUP.md` (environment, per-machine config,
 the tononi-2 notes), then this file, then the documents it points at.
-Nothing on the 48 h recording has been started; the user said "don't
-start yet" on 2026-10-22, and the fresh agent starts.
+Tracks A to D ran on 2026-10-22 and 23; their outcome is in
+`docs/reports/2026-10-23_ttm003_48h_baseline_vs_candidate.md`, the
+findings file's sections 8 and 9, and the README of `subjects/ttm-003/`.
+Section 8 below, added 2026-10-23, is what follows from them.
 
 ## 1. Goal, in the user's words
 
@@ -329,3 +331,76 @@ on the data volume.
 4. What the June "cosine purity bar" meant, so track A encodes the right
    criterion (recorded as unresolved in `OPEN_CONCERNS.md`).
 5. Whether the agent commits as it goes or leaves edits unstaged.
+
+## 8. After the comparison: the staged pipeline (2026-10-23)
+
+What tracks C and D showed, in short. The June pipeline keeps the first
+spike after light onset and drops the in-pulse train of every tagged or
+driven cell, as on October 16. The candidate, with shape capture in place
+of the matcher, keeps the trains for every cell its seed bank holds, in
+half the compute, but it is less self-consistent on the June scoreboard,
+its absolute 40 uV template floor drops real small units on TT7 and TT9
+that the June pipeline keeps, and a template keeps collecting look-alike
+spikes after its cell has gone. The TT6 cell itself faded between 15:00
+and 21:00 on October 20, confirmed on the traces
+(`scripts/opto_traces.py`, figures under `figures/opto_traces/`); the
+user's reading is that it drifted out of the tetrode's reach.
+
+The user's decision (2026-10-23): neither pipeline as it stands. Keep the
+June matcher for full-size spikes and use shape capture only on what it
+leaves, in stages.
+
+### Track F. The staged pipeline
+
+1. Full-size matching: the June matcher (circus-omp, amplitudes 0.8 of
+   the template and up) inside the windowed carry-forward with template
+   re-estimation and re-seeding every 12 windows, unchanged.
+2. Full-size residual: the June residual pass (events of 10 MAD and up
+   that no unit claimed, proposed to their best same-tetrode template at
+   cosine 0.8), unchanged.
+3. Small-spike residual capture, an optional module for recordings with
+   optogenetic tagging: `ttm.capture` on the events the first two stages
+   leave, with the amplitude free, gated on the noise-corrected cosine
+   rather than the raw one, and run only for templates whose unit answers
+   the light. This is where the TT6 cell's in-pulse train is recovered and
+   nowhere else, so a cell that stops answering the light stops being
+   captured instead of turning its template into a collector.
+4. The multi-unit pool of what remains, then the CCG-guarded merge,
+   purity pages and analyzer as in track D.
+
+Settings to fix before the 48 h run, each on the October 16 sessions
+first because a run there takes minutes and the cells' identities are
+settled, then confirmed on blocks 1 to 4 of the 48 h:
+
+- The gate on the noise-corrected cosine for stage 3 (the raw gate of
+  0.6 was never varied; section 9 of the findings file has the two
+  detection floors at that gate).
+- The detection floor for stage 3, 3.5 or 4.5 excised MAD, with section
+  9's pictures and the trace page as the evidence.
+- No absolute template floor. If a floor is needed it is in noise units.
+- How a template earns and keeps its place in stage 3: a response to the
+  light at the most recent train. Trains are waypoints whenever they
+  happen, not a cadence; the clock re-seeding of stage 1 stays.
+
+Judged as track D was: the per-block tables of the tagged cells against
+the sorting-free control, the purity pages of the units involved, the
+June scoreboard, and compute. The expected gain over the candidate is on
+the units the capture should never have touched; the expected gain over
+the June pipeline is the trains.
+
+### Track G. Wobble for the full-size stages
+
+June built a shape-gated wobble matcher that beat circus-omp on precision
+and coverage but never ran the 48 h go/no-go, and the review found those
+metrics do not measure per-unit purity. On October 22 wobble found an
+eighth of the TT6 train, because its energy threshold weighs against a
+small template; that weakness does not apply to a full-size stage. So:
+wobble in place of circus-omp for stages 1 and 2 only, on the same binary,
+windows and seed bank, judged on the same purity pages and per-block
+tables as track F. One bounded run on the 48 h, after track F is in place
+so both are judged in one framework.
+
+### Order
+
+F's settings on the October 16 sessions, then F on the 48 h, then G.
+Track E's hand-offs follow whichever the user chooses.
