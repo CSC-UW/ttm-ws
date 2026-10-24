@@ -1,0 +1,219 @@
+{
+ "june": {
+  "production_residual": {
+   "base": "merge",
+   "mad_floor": 10.0,
+   "tau_cos": 0.8,
+   "tally": {
+    "residual": 1363385,
+    "no_template": 1090488,
+    "refractory_reject": 183,
+    "recovered": 272714
+   },
+   "n_units_gained": 71,
+   "ccg_verdicts": {
+    "duplicate": 41,
+    "SEGREGATED": 22
+   }
+  },
+  "production_mua": {
+   "theta": 0.55,
+   "mad_floor": 7.0,
+   "counts": {
+    "classified": 4548555,
+    "mua": 2984552,
+    "noise": 1067583,
+    "sua_recoverable": 496420
+   },
+   "n_mua_units": 16,
+   "mua_events_per_tetrode": {
+    "0": 305280,
+    "1": 8391,
+    "2": 172090,
+    "3": 38008,
+    "4": 309157,
+    "5": 305299,
+    "6": 209369,
+    "7": 269267,
+    "8": 43103,
+    "9": 37828,
+    "10": 317795,
+    "11": 72045,
+    "12": 275696,
+    "13": 82558,
+    "14": 228161,
+    "15": 310505
+   }
+  },
+  "merges": {
+   "n": 17,
+   "by_verdict": {
+    "duplicate": 15,
+    "ambiguous": 2
+   }
+  }
+ },
+ "w35": {
+  "production_residual": {
+   "base": "merge",
+   "mad_floor": 10.0,
+   "tau_cos": 0.8,
+   "tally": {
+    "residual": 265217,
+    "no_template": 263717,
+    "refractory_reject": 1,
+    "recovered": 1499
+   },
+   "n_units_gained": 45,
+   "ccg_verdicts": {
+    "SEGREGATED": 22,
+    "duplicate": 5
+   }
+  },
+  "production_mua": {
+   "theta": 0.55,
+   "mad_floor": 7.0,
+   "counts": {
+    "classified": 1655391,
+    "mua": 683154,
+    "noise": 950610,
+    "sua_recoverable": 21627
+   },
+   "n_mua_units": 16,
+   "mua_events_per_tetrode": {
+    "0": 44405,
+    "1": 6751,
+    "2": 59426,
+    "3": 29245,
+    "4": 20389,
+    "5": 63125,
+    "6": 47585,
+    "7": 87178,
+    "8": 37672,
+    "9": 7331,
+    "10": 20813,
+    "11": 14513,
+    "12": 40304,
+    "13": 40711,
+    "14": 53690,
+    "15": 110016
+   }
+  },
+  "merges": {
+   "n": 22,
+   "by_verdict": {
+    "duplicate": 15,
+    "ambiguous": 7
+   }
+  }
+ },
+ "w25": {
+  "production_residual": {
+   "base": "merge",
+   "mad_floor": 10.0,
+   "tau_cos": 0.8,
+   "tally": {
+    "residual": 239724,
+    "no_template": 239209,
+    "refractory_reject": 1,
+    "recovered": 514
+   },
+   "n_units_gained": 31,
+   "ccg_verdicts": {
+    "SEGREGATED": 12,
+    "duplicate": 1
+   }
+  },
+  "production_mua": {
+   "theta": 0.55,
+   "mad_floor": 7.0,
+   "counts": {
+    "classified": 1329258,
+    "mua": 405908,
+    "noise": 915684,
+    "sua_recoverable": 7666
+   },
+   "n_mua_units": 16,
+   "mua_events_per_tetrode": {
+    "0": 28249,
+    "1": 3589,
+    "2": 37593,
+    "3": 13466,
+    "4": 13604,
+    "5": 46931,
+    "6": 20550,
+    "7": 45449,
+    "8": 17897,
+    "9": 5406,
+    "10": 33858,
+    "11": 12095,
+    "12": 36408,
+    "13": 25214,
+    "14": 27245,
+    "15": 38354
+   }
+  },
+  "merges": {
+   "n": 29,
+   "by_verdict": {
+    "duplicate": 21,
+    "ambiguous": 7,
+    "distinct": 1
+   }
+  }
+ },
+ "w35a": {
+  "production_residual": {
+   "base": "merge",
+   "mad_floor": 10.0,
+   "tau_cos": 0.8,
+   "tally": {
+    "residual": 516517,
+    "no_template": 494039,
+    "refractory_reject": 5,
+    "recovered": 22473
+   },
+   "n_units_gained": 45,
+   "ccg_verdicts": {
+    "duplicate": 15,
+    "SEGREGATED": 17
+   }
+  },
+  "production_mua": {
+   "theta": 0.55,
+   "mad_floor": 7.0,
+   "counts": {
+    "classified": 2996492,
+    "mua": 1531899,
+    "noise": 1355894,
+    "sua_recoverable": 108699
+   },
+   "n_mua_units": 16,
+   "mua_events_per_tetrode": {
+    "0": 112913,
+    "1": 9479,
+    "2": 126812,
+    "3": 71074,
+    "4": 121624,
+    "5": 181984,
+    "6": 86124,
+    "7": 137870,
+    "8": 67375,
+    "9": 16633,
+    "10": 33252,
+    "11": 22663,
+    "12": 77024,
+    "13": 68637,
+    "14": 130673,
+    "15": 267762
+   }
+  },
+  "merges": {
+   "n": 38,
+   "by_verdict": {
+    "duplicate": 31,
+    "ambiguous": 7
+   }
+  }
+ }
+}

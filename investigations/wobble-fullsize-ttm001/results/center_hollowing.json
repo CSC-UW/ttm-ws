@@ -1,0 +1,81 @@
+{
+ "pairs": 241,
+ "june_distinct_pairs": 110,
+ "per_arm": {
+  "june": {
+   "median_ratio_all": 0.632,
+   "median_ratio_on_june_distinct": 0.996,
+   "june_distinct_now_below_0.3": 0,
+   "pairs_below_0.3": 55,
+   "pairs_above_0.7": 110,
+   "isi_per_1000_0_1ms": 2.581,
+   "isi_per_1000_1_3ms": 16.986,
+   "isi_per_1000_3_6ms": 41.191,
+   "xlag_per_1000_0_0.25ms": 1.146,
+   "xlag_per_1000_0.25_2ms": 31.266,
+   "xlag_per_1000_2_3.75ms": 53.897,
+   "xlag_per_1000_0_1.5ms": 21.334,
+   "xlag_per_1000_3_6ms": 96.996
+  },
+  "circus": {
+   "median_ratio_all": 0.612,
+   "median_ratio_on_june_distinct": 1.001,
+   "june_distinct_now_below_0.3": 0,
+   "pairs_below_0.3": 55,
+   "pairs_above_0.7": 111,
+   "isi_per_1000_0_1ms": 2.484,
+   "isi_per_1000_1_3ms": 16.722,
+   "isi_per_1000_3_6ms": 41.044,
+   "xlag_per_1000_0_0.25ms": 1.098,
+   "xlag_per_1000_0.25_2ms": 30.884,
+   "xlag_per_1000_2_3.75ms": 53.392,
+   "xlag_per_1000_0_1.5ms": 21.034,
+   "xlag_per_1000_3_6ms": 96.35
+  },
+  "w35": {
+   "median_ratio_all": 0.353,
+   "median_ratio_on_june_distinct": 0.445,
+   "june_distinct_now_below_0.3": 27,
+   "pairs_below_0.3": 99,
+   "pairs_above_0.7": 35,
+   "isi_per_1000_0_1ms": 0.124,
+   "isi_per_1000_1_3ms": 45.673,
+   "isi_per_1000_3_6ms": 83.639,
+   "xlag_per_1000_0_0.25ms": 13.603,
+   "xlag_per_1000_0.25_2ms": 32.274,
+   "xlag_per_1000_2_3.75ms": 114.71,
+   "xlag_per_1000_0_1.5ms": 28.504,
+   "xlag_per_1000_3_6ms": 190.038
+  },
+  "w25": {
+   "median_ratio_all": 0.348,
+   "median_ratio_on_june_distinct": 0.436,
+   "june_distinct_now_below_0.3": 23,
+   "pairs_below_0.3": 92,
+   "pairs_above_0.7": 32,
+   "isi_per_1000_0_1ms": 0.142,
+   "isi_per_1000_1_3ms": 52.334,
+   "isi_per_1000_3_6ms": 92.401,
+   "xlag_per_1000_0_0.25ms": 17.11,
+   "xlag_per_1000_0.25_2ms": 38.099,
+   "xlag_per_1000_2_3.75ms": 134.255,
+   "xlag_per_1000_0_1.5ms": 34.676,
+   "xlag_per_1000_3_6ms": 221.818
+  },
+  "w35a": {
+   "median_ratio_all": 0.32,
+   "median_ratio_on_june_distinct": 0.408,
+   "june_distinct_now_below_0.3": 33,
+   "pairs_below_0.3": 114,
+   "pairs_above_0.7": 35,
+   "isi_per_1000_0_1ms": 0.061,
+   "isi_per_1000_1_3ms": 30.238,
+   "isi_per_1000_3_6ms": 66.435,
+   "xlag_per_1000_0_0.25ms": 4.711,
+   "xlag_per_1000_0.25_2ms": 17.49,
+   "xlag_per_1000_2_3.75ms": 69.733,
+   "xlag_per_1000_0_1.5ms": 12.469,
+   "xlag_per_1000_3_6ms": 119.935
+  }
+ }
+}

@@ -1,0 +1,34 @@
+{
+ "circus": {
+  "pairs_ungated": 241,
+  "median_ratio_ungated": 0.612,
+  "pairs_below_0.3_ungated": 55,
+  "pairs_gated": 238,
+  "median_ratio_gated": 0.145,
+  "pairs_below_0.3_gated": 189
+ },
+ "w35": {
+  "pairs_ungated": 241,
+  "median_ratio_ungated": 0.928,
+  "pairs_below_0.3_ungated": 13,
+  "pairs_gated": 241,
+  "median_ratio_gated": 0.353,
+  "pairs_below_0.3_gated": 99
+ },
+ "w25": {
+  "pairs_ungated": 241,
+  "median_ratio_ungated": 0.924,
+  "pairs_below_0.3_ungated": 9,
+  "pairs_gated": 241,
+  "median_ratio_gated": 0.348,
+  "pairs_below_0.3_gated": 92
+ },
+ "w35a": {
+  "pairs_ungated": 241,
+  "median_ratio_ungated": 0.892,
+  "pairs_below_0.3_ungated": 20,
+  "pairs_gated": 239,
+  "median_ratio_gated": 0.32,
+  "pairs_below_0.3_gated": 114
+ }
+}
