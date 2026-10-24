@@ -1,0 +1,116 @@
+{
+ "staged": [
+  {
+   "stage": "offer",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 17:43:59",
+   "hours": 0.445,
+   "max_rss_gb": 11.07,
+   "disk_added_gb": 6.03
+  },
+  {
+   "stage": "admit",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 18:10:41",
+   "hours": 0.047,
+   "max_rss_gb": 15.6,
+   "disk_added_gb": 2.88
+  },
+  {
+   "stage": "merge",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 18:13:30",
+   "hours": 0.054,
+   "max_rss_gb": 20.74,
+   "disk_added_gb": 2.88
+  },
+  {
+   "stage": "mua",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 18:16:45",
+   "hours": 0.264,
+   "max_rss_gb": 20.74,
+   "disk_added_gb": 3.01
+  },
+  {
+   "stage": "analyzer",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 18:32:34",
+   "hours": 1.892,
+   "max_rss_gb": 20.74,
+   "disk_added_gb": 6.41
+  },
+  {
+   "stage": "score",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 20:26:06",
+   "hours": 1.16,
+   "max_rss_gb": 27.3,
+   "disk_added_gb": 0.0
+  }
+ ],
+ "staged_pulses": [
+  {
+   "stage": "offer",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 18:38:34",
+   "hours": 0.0,
+   "max_rss_gb": 0.23,
+   "disk_added_gb": 0.0
+  },
+  {
+   "stage": "admit",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 18:38:34",
+   "hours": 0.066,
+   "max_rss_gb": 12.58,
+   "disk_added_gb": 2.05
+  },
+  {
+   "stage": "merge",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 18:42:32",
+   "hours": 0.058,
+   "max_rss_gb": 15.11,
+   "disk_added_gb": 2.05
+  },
+  {
+   "stage": "mua",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-23 18:46:03",
+   "hours": 0.291,
+   "max_rss_gb": 16.31,
+   "disk_added_gb": 2.2
+  }
+ ],
+ "confirmation_first_12_windows": [
+  {
+   "stage": "offer",
+   "max_windows": 12,
+   "workers": 48,
+   "started": "2026-10-23 17:36:48",
+   "hours": 0.063,
+   "max_rss_gb": 11.07,
+   "disk_added_gb": 0.97
+  },
+  {
+   "stage": "admit",
+   "max_windows": 12,
+   "workers": 48,
+   "started": "2026-10-23 17:40:36",
+   "hours": 0.025,
+   "max_rss_gb": 13.06,
+   "disk_added_gb": 2.18
+  }
+ ]
+}
