@@ -32,6 +32,10 @@ units. Stages, cached under ``<session>/sortings_seed42_pcafix/mp_staged<tag>/``
   analyzer  ``analyzer_staged.zarr`` as ``mp_baseline.py`` builds it
   score     the June three-axis scoreboard: ``production_scoreboard.json``
 
+``--pulses-only`` keeps stage-3 spikes only inside the delivered pulses, so
+every unit is its June self outside them; with ``--offer-from`` it reuses
+another run's offers and only admits, merges and buckets again.
+
 Timing per stage goes to ``staged_timing.json``.
 
 Usage: python subjects/ttm-003/scripts/mp_staged.py --subject TTM-003 --experiment TTM-003-48H
@@ -102,6 +106,22 @@ def _p97(out: pathlib.Path, n_jobs: int):
     return p97
 
 
+def offer_dir_of(exp, out: pathlib.Path, a) -> pathlib.Path:
+    """Where the offer files are: this run's ``offer/`` or, with ``--offer-from``, another run's."""
+    return exp.sorting_dir(f"mp_staged{a.offer_from}") / "offer" if a.offer_from is not None else out / "offer"
+
+
+def in_pulses(frames: np.ndarray, pulses: pd.DataFrame) -> np.ndarray:
+    """Boolean per frame: inside a delivered pulse (onset to offset)."""
+    on, off = pulses.onset_s.values, pulses.offset_s.values
+    t = frames / FS
+    k = np.searchsorted(on, t, side="right") - 1
+    ok = k >= 0
+    m = np.zeros(t.size, bool)
+    m[ok] = t[ok] < off[k[ok]]
+    return m
+
+
 def delivered_trains(session: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """(trains, pulses) of the delivered trains of ten pulses or more, from the block table where one
     exists (trains the laser did not deliver are excluded there) or the hand-logged trains."""
@@ -157,6 +177,9 @@ def offer_task(binary: str, group: int, wi: int, a: int, b: int, trains: dict, g
 
 
 def stage_offer(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
+    if a.offer_from is not None:
+        _log(f"offer: reuse the offers of mp_staged{a.offer_from}")
+        return
     offer_dir = out / "offer"
     offer_dir.mkdir(exist_ok=True)
     binary = str(base_dir / "binary")
@@ -214,7 +237,7 @@ def admission_table(exp, base_dir: pathlib.Path, out: pathlib.Path, a, starts: l
         on, off = pp.onset_s.values, pp.offset_s.values
         lo, hi = int((on[0] - 2) * FS), int((off[-1] + 2) * FS)
         for g in sorted(set(ugroup.values())):
-            f = out / "offer" / f"TT{g + 1}_w{wi:03d}.npz"
+            f = offer_dir_of(exp, out, a) / f"TT{g + 1}_w{wi:03d}.npz"
             if not f.exists():
                 continue
             z = np.load(f)
@@ -283,7 +306,8 @@ def stage_admit(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
     counts = np.zeros((len(s2), len(starts)), np.int64)
     uidx = {u: i for i, u in enumerate(sorted(s2))}
     tally = {"offered": 0, "offered_admitted_unit": 0, "accepted": 0, "refractory_lost": 0}
-    for f in sorted((out / "offer").glob("TT*_w*.npz")):
+    _, pulses = delivered_trains(exp.session)
+    for f in sorted(offer_dir_of(exp, out, a).glob("TT*_w*.npz")):
         g = int(f.stem.split("_")[0].removeprefix("TT")) - 1
         wi = int(f.stem.split("_w")[1])
         if wi >= len(starts):
@@ -303,10 +327,15 @@ def stage_admit(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
         off = sc.Offer(frames=z["frames"], amp_mad=z["amp_mad"], best=lab, r=z["r"].astype(float), rc=z["rc"].astype(float),
                        a=np.zeros(z["frames"].size), offered=z["offered"], pass_index=z["pass_index"])
         keep = sc.accept_offered(off, elig, {u: s2[u] for u in ids}, ids, refr_frames=refr)
+        lost = z["offered"] & elig & ~keep
+        if a.pulses_only:
+            inside = in_pulses(z["frames"], pulses)
+            keep &= inside
+            lost &= inside
         tally["offered"] += int(z["offered"].sum())
         tally["offered_admitted_unit"] += int((z["offered"] & elig).sum())
         tally["accepted"] += int(keep.sum())
-        tally["refractory_lost"] += int((z["offered"] & elig & ~keep).sum())
+        tally["refractory_lost"] += int(lost.sum())
         for u in ids:
             fr = z["frames"][keep & (best == u)]
             if fr.size:
@@ -323,7 +352,8 @@ def stage_admit(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
     per_unit = {str(u): int(counts[uidx[u]].sum()) for u in sorted(s2) if counts[uidx[u]].sum()}
     summary = {"params": {"floor": a.floor, "gate_rc": a.gate_rc, "n_pass": a.n_pass, "refr_ms": a.refr_ms,
                           "min_ratio": a.min_ratio, "max_p": a.max_p, "min_in_hz": a.min_in_hz,
-                          "train_margin_s": TRAIN_MARGIN_S, "min_spikes_template": MIN_SPIKES_TEMPLATE},
+                          "train_margin_s": TRAIN_MARGIN_S, "min_spikes_template": MIN_SPIKES_TEMPLATE,
+                          "pulses_only": a.pulses_only, "offer_from": a.offer_from},
                "windows": len(starts), "tally": tally, "stage2_spikes": int(sum(t.size for t in s2.values())),
                "stage3_spikes_per_unit": per_unit,
                "admitted_per_train": {str(t): sorted(int(u) for tt, u in admitted if tt == t) for t in order}}
@@ -433,6 +463,10 @@ def main() -> None:
     ap.add_argument("--min-ratio", type=float, default=MIN_RATIO, help="light test: in-pulse over pre-pulse rate")
     ap.add_argument("--max-p", type=float, default=MAX_P, help="light test: one-sided count test")
     ap.add_argument("--min-in-hz", type=float, default=MIN_IN_HZ, help="light test: in-pulse rate")
+    ap.add_argument("--pulses-only", action="store_true",
+                    help="keep stage-3 spikes only inside delivered pulses (the units are the June ones elsewhere)")
+    ap.add_argument("--offer-from", default=None, metavar="TAG",
+                    help="read the offer files of mp_staged<TAG> instead of computing them (same floor and gate)")
     a = ap.parse_args()
     exp = experiment_from_args(a)
     stages = [s.strip() for s in a.stages.split(",") if s.strip()]

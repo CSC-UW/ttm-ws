@@ -240,7 +240,9 @@ def cell_pages(exp, keep_dir: pathlib.Path, binary: str, base_tag: str, windows:
     rng = np.random.default_rng(0)
     for name, a, b in windows:
         on_all = pp.onset_s.values
-        on = on_all[(on_all * FS >= a + 0.2 * FS) & (on_all * FS < b - 0.5 * FS)]
+        in_win = (on_all * FS >= a + 0.2 * FS) & (on_all * FS < b - 0.5 * FS)
+        on = on_all[in_win]
+        win_trains = sorted({int(t) for t in pp.train.values[in_win]})
         dur = float(np.median((pp.offset_s - pp.onset_s).values)) if len(pp) else 0.2
         for role, (tt, _) in TAGGED.items():
             if role not in ("TT6_cell", "TT10_driven"):
@@ -308,7 +310,7 @@ def cell_pages(exp, keep_dir: pathlib.Path, binary: str, base_tag: str, windows:
                     if c == 0:
                         ax.legend(fontsize=6)
                 fig.suptitle(f"{exp.experiment} {name} {role} (June unit {unit}, {tt}), floor {floor:g} MAD: what each gate admits and "
-                             f"leaves; PSTH over {on.size} pulses of trains {psth_trains}; black = template scaled to the mean", fontsize=10)
+                             f"leaves; PSTH over {on.size} pulses of trains {win_trains}; black = template scaled to the mean", fontsize=10)
                 fig.tight_layout()
                 fig.savefig(figdir / f"{exp.experiment}_{name}_{role}_f{floor:g}.png", dpi=90)
                 plt.close(fig)
