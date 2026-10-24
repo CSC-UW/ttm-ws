@@ -157,7 +157,7 @@ def main() -> None:
     ax.set_xticks(range(len(trains))); ax.set_xticklabels([f"{t}\n{hours[t]:.1f} h" for t in trains], fontsize=6)
     ax.set_yticks(range(len(units_adm))); ax.set_yticklabels([f"{tt} u{u}" for tt, u in units_adm], fontsize=7)
     ax.set_title("stage 3: units admitted at each delivered train (green), with the in-pulse over pre-pulse rate; "
-                 "grey = no template in that window", fontsize=9)
+                 "pale yellow = no template in that window", fontsize=9)
     fig.tight_layout(); fig.savefig(exp.figures_dir / "staged_admission.png", dpi=110); plt.close(fig)
 
     staged = si.load(str(out / "assembled_staged"))
