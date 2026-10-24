@@ -1,6 +1,6 @@
 ---
 title: Subject TTM-003
-updated: 2026-10-22
+updated: 2026-10-23
 ---
 
 # TTM-003
@@ -88,7 +88,10 @@ units 77.8 % of the events at 10 MAD or more and 52.5 % overall (86.1 and
 assignment purity of 0.953 (0.826 in the tight window) with 4 of 79
 scored units flagged, and 14 CCG-duplicate pairs against 115 distinct
 among 227 same-tetrode pairs. The per-block tagged-cell checks and the
-candidate comparison are in `docs/reports/`.
+candidate comparison are in `docs/reports/`; the staged pipeline (the
+June stages plus small-spike capture for units that answer the light,
+`mp_staged.py`, 2026-10-23) and its comparison with both are in
+`docs/reports/2026-10-23_ttm003_48h_staged_pipeline.md`.
 
 Per-block checks before any sort (`opto_blocks.py --include-undelivered`,
 `results/opto_blocks_TTM-003-48H.{csv,json}`, `figures/blocks/`,
@@ -134,9 +137,12 @@ environment, in this order:
 | `channel_qc.py ... [--n-windows 12]` | per-channel std, rail fraction, MAD, crossing rate and 400 Hz comb in 60 s windows: `results/channel_qc_<E>{,_summary}.csv`, `figures/channel_qc.png` |
 | `mp_baseline.py ... [--stages ...] [--max-windows N] [--tag T]` | the June TTM-001 production matching-pursuit pipeline unchanged: `<session>/sortings_seed42_pcafix/mp_baseline/{binary,assembled_reseed_c12,spike_coverage.npz,assembled_prod,analyzer_prod.zarr,production_scoreboard.json,baseline_timing.json}` |
 | `mp_candidate.py ... [--stages capture,merge,analyzer] [--tag T] [--xseed] [--extra-fixed] [--extra-no-dedup]` | the candidate: the baseline's binary, windows and seed units with `ttm.capture` in place of the matcher, then the June merge; `--xseed` adds the October 16 templates of the tagged cells: `<session>/sortings_seed42_pcafix/mp_candidate<tag>/assembled_candidate` |
+| `staged_settings.py ... [--base-tag _smoke] [--windows full\|b<N>] [--floors 3.5 4.5] [--gates 0.5 ... 0.95] [--figures]`; `--summarize E1 E2 ...` | stage 3 of the staged pipeline on chosen windows at each floor and gate, the light test for every unit and train, and the sorting-free control on a short session: `results/staged_settings_<E>{,_control,_timing}.csv`, `results/staged_settings_summary.csv`, `results/staged_settings_rule.csv`, `figures/staged_settings/<E>_<window>_<role>_f<floor>.png`, `summary_<E>.png`, `rule.png` |
+| `mp_staged.py ... [--stages offer,admit,merge,mua,analyzer,score] [--max-windows N] [--tag T] [--pulses-only --offer-from ""]` | the staged pipeline: the June stages' `assembled_prod_sua`, then `ttm.staged_capture` for units that answer the light at the most recent delivered train (floor 3.5, noise-corrected gate 0.8, light test ratio 2 and p 0.001), the June merge, multi-unit bucket, analyzer and scoreboard: `<session>/sortings_seed42_pcafix/mp_staged<tag>/{offer/,admission.csv,assembled_stage3,assembled_staged,analyzer_staged.zarr,production_scoreboard.json,staged_timing.json}` |
 | `tagged_cells_blocks.py --sorting <dir> --name <N>` | every unit of a sorting at every delivered block (base, onset, in-pulse and post rates, reliability, suppression profile, presence) and its match to the OPTO2 templates: `results/tagged_blocks_<E>_<N>.{csv,json}`, `results/tagged_match_<E>_<N>.csv`, `figures/tagged_blocks_<N>.png` |
 | `tagged_cells_xsession.py [--tetrodes TT6 TT10 TT4 TT11]` | the control that needs no 48 h sorting: the traces around each block captured with the October 16 templates themselves: `results/tagged_xsession_<E>.{csv,json}`, `figures/tagged_xsession.png` |
 | `sorting_purity.py --sorting <dir> --name <N> [--other <dir> --other-name <M>]` | per-spike purity scores, verdicts and pages for every unit of a long sorting, and the unit pairs on which two sortings disagree: `results/purity_<E>_<N>.csv`, `results/purity_match_<E>_<N>_vs_<M>.csv`, `figures/compare/purity_<N>.pdf` |
+| `staged_compare.py [--tag T] [--no-pages]` | the staged sorting against the baseline and the candidate: `results/staged_admission_<E>.csv`, `results/purity_<E>_staged.csv`, `results/staged_units_<E>.csv` (stage-3 spikes, admissions, purity and refractory conflict ratio per June unit), `results/staged_presence_<E>.csv`, `results/staged_compare_<E>.json`, `figures/staged_admission.png`, `figures/compare/purity_staged{,_baseline}.pdf` |
 | `opto_explore.py --subject TTM-003 --experiment <E>` | `results/opto_explore_<E>.json`, `figures/opto_*.png`, `<session>/mua_crossings_5mad.npz` |
 | `opto_onset_zoom.py ...` | `results/opto_onset_zoom_<E>.json`, `figures/opto_onset_*.png` |
 | `opto_sort.py ... --variant asis [--blank-ms PRE POST]` | `<session>/sortings_opto/<variant>/{preprocessed,by_group,sorting,analyzer}`, `results/units_<E>_<variant>.csv` |
