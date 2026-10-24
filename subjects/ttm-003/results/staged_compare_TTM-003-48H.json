@@ -1,0 +1,50 @@
+{
+ "units_touched_by_stage3": 28,
+ "stage3_spikes": 34511005,
+ "june_spikes_of_touched_units": 39790689,
+ "merges": 0,
+ "n_single_staged": 84,
+ "admitted_per_train": {
+  "1": 12,
+  "2": 15,
+  "3": 19,
+  "4": 16,
+  "25": 13,
+  "26": 13,
+  "27": 7,
+  "28": 6,
+  "29": 10,
+  "30": 8,
+  "31": 14,
+  "32": 15,
+  "33": 8,
+  "34": 5,
+  "35": 9,
+  "36": 15,
+  "37": 12,
+  "38": 10,
+  "39": 10,
+  "40": 15,
+  "41": 12,
+  "42": 17,
+  "43": 15,
+  "44": 6
+ },
+ "presence_median": {
+  "baseline": 1.0,
+  "candidate": 1.0,
+  "staged": 1.0
+ },
+ "staged_purity": {
+  "ampsplit_ratio_median": 0.2065,
+  "units_ampsplit_under_0.3": 49,
+  "units_ampsplit_over_0.7": 25,
+  "rp_contamination_median": 0.90375,
+  "neighbour_verdicts": {
+   "duplicate": 82,
+   "ambiguous": 143,
+   "distinct": 204,
+   "segregated": 109
+  }
+ }
+}
