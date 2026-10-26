@@ -728,7 +728,8 @@ split version from the saved offers took 3.0 h (admit 0.04, merge 0.05,
 multi-unit bucket 0.26, analyzer 1.86, scoreboard 0.81); the grid itself
 (`staged_split.py`, 20 settings, two arms) is admit-only and ran in under
 an hour. The pulses-only version's scoreboard took 0.85 h on top of its
-0.42 h; it still has no analyzer, which would be another 1.9 h.
+0.42 h, and its analyzer (`mp_staged_pulses/analyzer_staged.zarr`) another
+1.85 h.
 
 ### 7.5 Reading
 

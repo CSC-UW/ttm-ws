@@ -100,6 +100,15 @@
    "hours": 0.849,
    "max_rss_gb": 24.08,
    "disk_added_gb": 2.57
+  },
+  {
+   "stage": "analyzer",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-26 15:27:34",
+   "hours": 1.85,
+   "max_rss_gb": 10.88,
+   "disk_added_gb": 0.56
   }
  ],
  "confirmation_first_12_windows": [
