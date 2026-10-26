@@ -1,6 +1,6 @@
 ---
 title: TTM-003 48 h, the staged pipeline
-updated: 2026-10-23
+updated: 2026-10-26
 status: needs_verification
 ---
 
@@ -537,3 +537,122 @@ Measurements first, then the analyst's reading, marked.
 - The light test's threshold of 2: at 1.5 the TT6 cell would stay admitted
   at block 26, at 3 the TT10 driven unit would drop at most October 16
   trains (section 3.4).
+
+## 7. Stricter settings between the pulses (2026-10-26)
+
+Graham Findlay read the median conflict ratio of 0.27 as too high for the
+whole-window version, and asked whether a stricter criterion between the
+pulses can make the between-pulse additions as clean as the in-pulse ones,
+with the October 16 in-pulse figure near 0.1 as the target (not parity with
+June); if no setting reaches it, the pulses-only version is the answer.
+`staged_split.py` answers from the saved offers of the 48 h run
+(`mp_staged/offer/`), with the admissions unchanged.
+
+Terms. "In-pulse" is from onset to offset of a delivered pulse; "between
+pulses" is every other moment the unit is admitted (between the pulses of
+a train and between trains). A setting is a floor (residual trough depth in
+excised MAD) and a gate (noise-corrected cosine); an event offered at floor
+3.5 and gate 0.8 is kept under a stricter setting only if its recorded
+depth and cosine also clear it. The refractory conflict ratio (section 1)
+is split into two parts: conflicts of the added spikes with the unit's own
+June spikes ("with June") and conflicts among the added spikes themselves
+("internal"); each is the count the refractory rule removed over the count
+independent trains would give. "Survival" is the fraction of the floor-3.5,
+gate-0.8 additions a setting keeps. A setting is called negligible when it
+keeps under 1 % of them.
+
+How exact the post hoc filter is. Re-running the offer from the binary at
+each setting on six window-tetrodes (TT4, TT5, TT6, TT10, TT11, TT12) gives
+back the saved offers exactly at 3.5 and 0.8. At the stricter settings, 96
+to 99.6 % of the events the re-run offers are in the filtered set and 94
+to 97 % of the filtered set is in the re-run (the filter keeps a few events
+scored on a snippet that a neighbour's peel had cleaned). The fraction lost
+to the refractory rule agrees to within 0.0013 (at 5.5 and 0.95,
+0.0073 against 0.0074 at the median window-tetrode)
+(`results/staged_split_TTM-003-48H_check.csv`).
+
+### 7.1 The whole-window result, split
+
+At floor 3.5 and gate 0.8, as run, per admitted unit
+(`results/staged_split_TTM-003-48H.csv`):
+
+| | spikes added | conflict ratio, median (quartiles) | with June, median | internal, median | units over 0.2 | units at 0.1 or under |
+|---|---|---|---|---|---|---|
+| in-pulse | 0.14 M | 0.12 (0.06 to 0.17) | 0.18 | 0.08 | 4 of 28 | 11 |
+| between pulses | 34.37 M | 0.28 (0.18 to 0.42) | 0.41 | 0.20 | 18 of 28 | 1 |
+
+The TT6 cell's unit 16 has 7,358 in-pulse additions at 0.003 and 0.66 M
+between-pulse additions at 0.28. So the 0.27 of the earlier sections is the
+between-pulse part; the in-pulse additions are at the October 16 level.
+
+### 7.2 The grid
+
+Between-pulse additions at floors 3.5 to 5.5 and gates 0.80 to 0.95, the
+in-pulse ones kept as run. Median (quartiles) of the conflict ratio over
+the 28 admitted units, units over 0.2, spikes kept, survival
+(`results/staged_split_TTM-003-48H_summary.json`; the figure is
+`figures/staged_split.png`, one panel per floor and gate, one dot per unit,
+with the internal part as open circles):
+
+| floor | gate 0.80 | gate 0.85 | gate 0.90 | gate 0.95 |
+|---|---|---|---|---|
+| 3.5 | 0.28 (0.18 to 0.42), 18, 34.4 M, 100 % | 0.24 (0.15 to 0.39), 15, 26.3 M, 77 % | 0.21 (0.14 to 0.33), 14, 19.5 M, 57 % | 0.18 (0.12 to 0.31), 12, 14.0 M, 41 % |
+| 4.0 | 0.27 (0.18 to 0.49), 18, 23.5 M, 68 % | 0.23 (0.15 to 0.46), 16, 17.4 M, 51 % | 0.21 (0.13 to 0.39), 15, 12.4 M, 36 % | 0.19 (0.11 to 0.34), 12, 8.4 M, 24 % |
+| 4.5 | 0.27 (0.18 to 0.50), 17, 16.4 M, 48 % | 0.23 (0.15 to 0.44), 16, 11.8 M, 34 % | 0.21 (0.12 to 0.37), 15, 8.0 M, 23 % | 0.19 (0.10 to 0.32), 12, 5.1 M, 15 % |
+| 5.0 | 0.29 (0.19 to 0.47), 18, 11.6 M, 34 % | 0.24 (0.15 to 0.43), 17, 8.2 M, 24 % | 0.21 (0.12 to 0.37), 14, 5.3 M, 15 % | 0.18 (0.10 to 0.33), 12, 3.2 M, 9 % |
+| 5.5 | 0.31 (0.19 to 0.49), 20, 8.3 M, 24 % | 0.24 (0.15 to 0.40), 17, 5.7 M, 17 % | 0.19 (0.11 to 0.33), 13, 3.6 M, 10 % | 0.14 (0.08 to 0.29), 12, 2.0 M, 6 % |
+
+No setting reaches a median of 0.1. The strictest, floor 5.5 and gate 0.95,
+gives 0.14 with 12 of 28 units over 0.2 and 6 % of the additions (2.0 M
+spikes; 4.5 % at the median unit). Extending the gate to 0.99
+(`results/staged_split_TTM-003-48H_ext_summary.json`) moves the median to
+0.13 at floor 5.5 (1.2 M spikes, 3.4 %, 9 units over 0.2) and to 0.155 at
+floor 3.5 (10.5 M, 31 %): the noise-corrected cosine saturates near one for
+events near the floor, so a higher gate stops removing them. Raising the
+floor alone does not help at all (0.27 to 0.31 at gate 0.8 from floor 3.5 to
+5.5). A gate on the raw cosine instead keeps 0.3 % at 0.85 and almost
+nothing at 0.9 (`..._raw_summary.json`), because small residual events have
+low raw cosines whatever their source. Before the additions become
+negligible, the between-pulse conflict ratio stops near 0.13 to 0.14, above
+the target of 0.1 and above the in-pulse additions' 0.12.
+
+The two parts behave differently. The internal part falls with the
+setting: 0.20 at 3.5 and 0.8, 0.10 at 4.5 and 0.97 or 5.5 and 0.80, and
+0.05 to 0.08 at floor 5.0 and above with gates of 0.90 and above. The part
+with June falls only to 0.17 at 5.5 and 0.95 (0.41 at 3.5 and 0.8). Over the
+same admitted time, the June spikes of these 28 units conflict with each
+other at a median 1.16 on the same scale (intervals of 0.3 to 1.5 ms at
+about the rate an independent train would give;
+`june_conflict_admitted` in the table). *Conjecture:* the conflicts with
+June are partly the June units' own foreign or doubly matched spikes, so no
+filter on the added spikes can bring that part, and with it the total,
+below what June's own contamination allows; the in-pulse additions escape
+it because the June spikes they are checked against are few while the
+light silences the tetrode. Either way the measured answer to the question
+as set is no: no setting between the pulses reaches 0.1 before the
+additions become a few per cent of what they were.
+
+### 7.3 The control arm: the strict setting inside the pulses too
+
+Floor 5.5 and gate 0.95 applied to the in-pulse events as well
+(`arm == "both"` in the table; `results/staged_split_TTM-003-48H_blocks.csv`).
+In-pulse rate per block, as run / strict inside the pulses too / the
+sorting-free control, per s (a unit not admitted at a block keeps its June
+rate):
+
+| unit | block 1 | 2 | 3 | 4 | 25 | 26 | 27 |
+|---|---|---|---|---|---|---|---|
+| TT6 cell, unit 16 | 196 / 34 / 111 | 159 / 31 / 95 | 129 / 14 / 81 | 106 / 14 / 73 | 42 / 2 / 26 | 0 / 0 / 14 | 0 / 0 / 5 |
+| TT10, unit 26 | 3 / 3 / 22 | 41 / 6 / 32 | 53 / 10 / 31 | 62 / 12 / 30 | 71 / 14 / 30 | 74 / 15 / 33 | 14 / 14 / 23 |
+| TT4, unit 7 | 197 / 93 / 96 | 155 / 52 / 73 | 154 / 41 / 63 | 178 / 50 / 81 | 206 / 95 / 48 | 158 / 56 / 35 | 146 / 52 / 20 |
+| TT4, unit 49 | absent | absent | absent | absent | 12 / 12 / 118 | 56 / 34 / 110 | 39 / 39 / 105 |
+| TT11, unit 28 | 77 / 27 / 49 | 66 / 12 / 46 | 56 / 4 / 46 | 52 / 3 / 57 | 46 / 2 / 56 | 46 / 3 / 51 | 49 / 2 / 41 |
+
+Applied inside the pulses, the strict setting keeps 9 % of the in-pulse
+additions (13,138 of 141,569 spikes) and takes the trains back towards June:
+the TT6 cell's in-pulse rate falls by 82 to 95 % at blocks 1 to 4 and 25
+(to 14 to 34 per s against the control's 73 to 111), and the TT10 and TT11
+units fall to their June rates (6 to 15 and 2 to 27 per s). So the special
+treatment of the pulses is what carries the trains: the in-pulse additions
+pass the target at floor 3.5 and gate 0.8, and the setting that comes
+closest to the target between the pulses would remove most of them.
