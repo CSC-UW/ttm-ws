@@ -91,6 +91,15 @@
    "hours": 0.291,
    "max_rss_gb": 16.31,
    "disk_added_gb": 2.2
+  },
+  {
+   "stage": "score",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-26 11:34:23",
+   "hours": 0.849,
+   "max_rss_gb": 24.08,
+   "disk_added_gb": 2.57
   }
  ],
  "confirmation_first_12_windows": [
@@ -111,6 +120,62 @@
    "hours": 0.025,
    "max_rss_gb": 13.06,
    "disk_added_gb": 2.18
+  }
+ ],
+ "staged_split_f5.5_g0.95": [
+  {
+   "stage": "offer",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-26 11:12:51",
+   "hours": 0.0,
+   "max_rss_gb": 0.25,
+   "disk_added_gb": 0.0
+  },
+  {
+   "stage": "admit",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-26 11:12:51",
+   "hours": 0.039,
+   "max_rss_gb": 12.73,
+   "disk_added_gb": 2.1
+  },
+  {
+   "stage": "merge",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-26 11:15:12",
+   "hours": 0.047,
+   "max_rss_gb": 15.41,
+   "disk_added_gb": 2.1
+  },
+  {
+   "stage": "mua",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-26 11:18:01",
+   "hours": 0.262,
+   "max_rss_gb": 16.13,
+   "disk_added_gb": 2.25
+  },
+  {
+   "stage": "analyzer",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-26 11:33:43",
+   "hours": 1.857,
+   "max_rss_gb": 16.13,
+   "disk_added_gb": 3.19
+  },
+  {
+   "stage": "score",
+   "max_windows": null,
+   "workers": 48,
+   "started": "2026-10-26 13:25:10",
+   "hours": 0.808,
+   "max_rss_gb": 24.46,
+   "disk_added_gb": 0.0
   }
  ]
 }

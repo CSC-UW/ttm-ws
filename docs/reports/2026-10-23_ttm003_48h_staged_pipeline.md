@@ -656,3 +656,101 @@ units fall to their June rates (6 to 15 and 2 to 27 per s). So the special
 treatment of the pulses is what carries the trains: the in-pulse additions
 pass the target at floor 3.5 and gate 0.8, and the setting that comes
 closest to the target between the pulses would remove most of them.
+
+### 7.4 The closest setting through the whole pipeline
+
+No setting met the target, so none is chosen by it. To show what the
+strictest grid setting gives as a sorting next to the others, the split
+arm at floor 5.5 and gate 0.95 (in-pulse events at 3.5 and 0.8 as run) went
+through admit, merge, multi-unit bucket, analyzer and scoreboard
+(`mp_staged.py --offer-from "" --between-floor 5.5 --between-gate 0.95
+--tag _split_f5.5_g0.95`, `mp_staged_split_f5.5_g0.95/`), with purity pages
+(`figures/compare/purity_staged_split_f5.5_g0.95.pdf`) and the per-block
+tagged tables. The pulses-only version got the scoreboard and purity table
+it lacked (`mp_staged_pulses/`). The merge found nothing to merge in either.
+
+Stage-3 spikes and their conflict ratios:
+
+| | stage-3 spikes | in pulses | between pulses | between-pulse conflict ratio, median (quartiles) |
+|---|---|---|---|---|
+| whole-window (3.5, 0.8) | 34.5 M | 0.14 M | 34.4 M | 0.28 (0.18 to 0.42) |
+| split (5.5, 0.95 between) | 2.15 M | 0.14 M | 2.0 M | 0.14 (0.08 to 0.29) |
+| pulses-only | 0.14 M | 0.14 M | 0 | none added |
+
+The tagged cells, pre-pulse (-50 to 0 ms) / in-pulse rate per s, median
+over the 24 blocks (the TT6 cell over the blocks named):
+
+| unit | split | whole-window | pulses-only | June | candidate | control in pulse |
+|---|---|---|---|---|---|---|
+| TT6 cell, unit 16 (blocks 1 to 4) | 2.6 / 143.5 | 6.6 / 143.7 | 1.4 / 143.5 | 1.4 / 0.0 | 4.7 / 84.7 | 88.0 |
+| TT6 cell, unit 16 (blocks 28 to 44) | 4.7 / 0.0 | 4.7 / 0.0 | 4.7 / 0.0 | 4.7 / 0.0 | 13.7 / 2.3 | 2.1 |
+| TT10, unit 26 | 6.6 / 49.9 | 15.0 / 50.0 | 5.8 / 49.9 | 5.8 / 9.8 | 20.8 / 60.3 | 22.2 |
+| TT4, unit 49 | 3.7 / 68.7 | 14.8 / 68.8 | 2.8 / 68.7 | 2.8 / 6.8 | 9.7 / 50.6 | 88.7 |
+| TT4, unit 7 | 3.8 / 142.6 | 11.5 / 142.8 | 3.5 / 142.5 | 3.5 / 16.4 | 5.8 / 99.8 | 41.6 |
+| TT11, unit 28 | 1.7 / 27.9 | 6.7 / 27.9 | 1.4 / 27.9 | 1.4 / 1.7 | 4.7 / 20.6 | 47.7 |
+
+The three staged versions carry the same in-pulse trains; they differ
+between the pulses, where the split version raises the pre-pulse rate over
+June's by 9 to 32 % for the TT10, TT4 and TT11 units (and from 1.4 to 2.6
+per s for the TT6 cell over blocks 1 to 4) and the whole-window version
+multiplies it by two to five.
+
+Neighbour verdicts over the 84 single units (duplicate / ambiguous /
+distinct / segregated; candidate over its 70):
+
+| June | candidate | whole-window | pulses-only | split |
+|---|---|---|---|---|
+| 77 / 110 / 242 / 109 | 28 / 183 / 145 / 42 | 82 / 143 / 204 / 109 | 78 / 109 / 242 / 109 | 78 / 113 / 238 / 109 |
+
+The June scoreboard on the same 5.5 MAD peaks (section 4.4 for the axes;
+single units, the multi-unit bucket adds the same to every staged version):
+
+| | June (84) | candidate (70) | whole-window | pulses-only | split (5.5, 0.95) |
+|---|---|---|---|---|---|
+| A: 5.5 to 7 MAD claimed | 35.3 % | 61.2 % | 42.0 % | 35.3 % | 36.9 % |
+| A: overall | 52.5 | 69.9 | 57.2 | 52.5 | 53.5 |
+| A: overall with the multi-unit bucket | 59.0 | 94.8 | 62.9 | 59.0 | 60.0 |
+| B: units flagged cross-contaminated | 4 of 79 | 0 of 70 | 5 of 79 | 4 of 79 | 4 of 79 |
+| B: spike-weighted purity, full window | 0.953 | 0.910 | 0.914 | 0.953 | 0.949 |
+| B: spike-weighted purity, tight window | 0.826 | 0.804 | 0.797 | 0.826 | 0.824 |
+| B: median best-match fraction | 0.967 | 0.926 | 0.945 | 0.966 | 0.959 |
+| C: same-tetrode pairs, CCG duplicate / distinct | 227: 14 / 115 | 164: 24 / 31 | 227: 15 / 97 | 227: 14 / 114 | 227: 14 / 112 |
+
+(`results/mp_staged_pulses_TTM-003-48H_scoreboard.json`,
+`results/mp_staged_split_f5.5_g0.95_TTM-003-48H_scoreboard.json`.) The
+pulses-only version is June's scoreboard to the rounding, as it must be:
+0.14 M spikes added to 85 M. The split version sits between it and June
+on every axis, three distinct pairs short of June, with the whole-window
+version's loss of 18 distinct pairs reduced to 3.
+
+Compute (`results/mp_staged_TTM-003-48H_timing.json`, 48 workers): the
+split version from the saved offers took 3.0 h (admit 0.04, merge 0.05,
+multi-unit bucket 0.26, analyzer 1.86, scoreboard 0.81); the grid itself
+(`staged_split.py`, 20 settings, two arms) is admit-only and ran in under
+an hour. The pulses-only version's scoreboard took 0.85 h on top of its
+0.42 h; it still has no analyzer, which would be another 1.9 h.
+
+### 7.5 Reading
+
+Measurements first, then the reading, marked.
+
+- The in-pulse additions are at the target as run (median 0.12, the TT6
+  cell 0.003); the between-pulse additions are not (0.28), and no floor up
+  to 5.5 or noise-corrected gate up to 0.99 brings their median to 0.1. The
+  closest, 5.5 and 0.95, reaches 0.14 with 6 % of the additions, and 12 of
+  28 units stay over 0.2. Raising the floor alone does not lower the ratio
+  at all, and a raw-cosine gate removes nearly everything.
+- Applying that setting inside the pulses as well removes 82 to 95 % of the
+  TT6 cell's train and takes the TT10 and TT11 units back to their June
+  rates; the in-pulse trains exist only because the pulses are treated
+  differently.
+- The split version at 5.5 and 0.95 is close to pulses-only on every
+  whole-sorting measure (neighbour verdicts 78 / 113 / 238 / 109 against
+  78 / 109 / 242 / 109), adds 2.0 M spikes between the pulses at a median
+  conflict ratio of 0.14, and keeps the same trains.
+- *Conjecture:* the part of the conflict ratio that will not fall is the
+  part measured against the June spikes, which conflict with each other at
+  about chance over the same time; a stricter filter on the added spikes
+  cannot remove a conflict whose other half is a June spike that is not the
+  cell's. By the target Graham set, pulses-only is the answer, and the
+  split version is the most that can be added between the pulses at 0.14.
