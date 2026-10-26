@@ -35,6 +35,11 @@ units. Stages, cached under ``<session>/sortings_seed42_pcafix/mp_staged<tag>/``
 ``--pulses-only`` keeps stage-3 spikes only inside the delivered pulses, so
 every unit is its June self outside them; with ``--offer-from`` it reuses
 another run's offers and only admits, merges and buckets again.
+``--between-floor`` and ``--between-gate`` (and ``--inpulse-*``) keep only
+the offered events that also clear a stricter depth and noise-corrected
+cosine between (inside) the pulses: a filter on the saved offers, which
+agrees with re-running the offer at that setting on 94 to 99 % of events
+(``staged_split.py --check``).
 
 Timing per stage goes to ``staged_timing.json``.
 
@@ -326,14 +331,21 @@ def stage_admit(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
         lab = np.where(best >= 0, pos, -1)
         off = sc.Offer(frames=z["frames"], amp_mad=z["amp_mad"], best=lab, r=z["r"].astype(float), rc=z["rc"].astype(float),
                        a=np.zeros(z["frames"].size), offered=z["offered"], pass_index=z["pass_index"])
+        inside = in_pulses(z["frames"], pulses)
+        offered = z["offered"].copy()
+        for region, fl, gt in ((inside, a.inpulse_floor, a.inpulse_gate), (~inside, a.between_floor, a.between_gate)):
+            if fl is not None:
+                offered &= ~region | (z["amp_mad"] >= fl)
+            if gt is not None:
+                offered &= ~region | (z["rc"] >= gt)
+        off.offered = offered
         keep = sc.accept_offered(off, elig, {u: s2[u] for u in ids}, ids, refr_frames=refr)
-        lost = z["offered"] & elig & ~keep
+        lost = offered & elig & ~keep
         if a.pulses_only:
-            inside = in_pulses(z["frames"], pulses)
             keep &= inside
             lost &= inside
-        tally["offered"] += int(z["offered"].sum())
-        tally["offered_admitted_unit"] += int((z["offered"] & elig).sum())
+        tally["offered"] += int(offered.sum())
+        tally["offered_admitted_unit"] += int((offered & elig).sum())
         tally["accepted"] += int(keep.sum())
         tally["refractory_lost"] += int(lost.sum())
         for u in ids:
@@ -353,7 +365,9 @@ def stage_admit(exp, base_dir: pathlib.Path, out: pathlib.Path, a) -> None:
     summary = {"params": {"floor": a.floor, "gate_rc": a.gate_rc, "n_pass": a.n_pass, "refr_ms": a.refr_ms,
                           "min_ratio": a.min_ratio, "max_p": a.max_p, "min_in_hz": a.min_in_hz,
                           "train_margin_s": TRAIN_MARGIN_S, "min_spikes_template": MIN_SPIKES_TEMPLATE,
-                          "pulses_only": a.pulses_only, "offer_from": a.offer_from},
+                          "pulses_only": a.pulses_only, "offer_from": a.offer_from,
+                          "between_floor": a.between_floor, "between_gate": a.between_gate,
+                          "inpulse_floor": a.inpulse_floor, "inpulse_gate": a.inpulse_gate},
                "windows": len(starts), "tally": tally, "stage2_spikes": int(sum(t.size for t in s2.values())),
                "stage3_spikes_per_unit": per_unit,
                "admitted_per_train": {str(t): sorted(int(u) for tt, u in admitted if tt == t) for t in order}}
@@ -465,6 +479,12 @@ def main() -> None:
     ap.add_argument("--min-in-hz", type=float, default=MIN_IN_HZ, help="light test: in-pulse rate")
     ap.add_argument("--pulses-only", action="store_true",
                     help="keep stage-3 spikes only inside delivered pulses (the units are the June ones elsewhere)")
+    ap.add_argument("--between-floor", type=float, default=None,
+                    help="keep between-pulse offered events only at this depth (excised MAD) or more; a post hoc filter")
+    ap.add_argument("--between-gate", type=float, default=None,
+                    help="keep between-pulse offered events only at this noise-corrected cosine or more")
+    ap.add_argument("--inpulse-floor", type=float, default=None, help="the same inside the delivered pulses")
+    ap.add_argument("--inpulse-gate", type=float, default=None, help="the same inside the delivered pulses")
     ap.add_argument("--offer-from", default=None, metavar="TAG",
                     help="read the offer files of mp_staged<TAG> instead of computing them (same floor and gate)")
     a = ap.parse_args()
