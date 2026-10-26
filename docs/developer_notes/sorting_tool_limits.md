@@ -32,7 +32,8 @@ with the record that established it. They hold on any machine.
   the top level only.
 - Kilosort4's final clustering allocates a dense (spikes by clusters)
   tensor, about 42 GiB for one tetrode's 48 h, which does not fit a 32 GB
-  GPU. The `kilosort` fork pin adds `clustering_chunk_size`.
+  GPU. The `kilosort` fork pin chunks it (`clustering_chunk_size`, default
+  2**18 rows; the chunk size does not change the sort).
   `investigations/spike-sorting/KS4_FEASIBILITY_FINDINGS.md`.
 - Tetrode geometry in the ProbeGroup is fictional (tetrodes 300 um apart,
   wires 10 um apart), so sorters and drift models that localise spikes

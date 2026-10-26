@@ -237,7 +237,6 @@ def sort_store_ks4(
     nearest_chans: int = 4,
     whitening_range: int = 4,
     dminx: float = 16.0,
-    clustering_chunk_size: int | None = 2_000_000,
     sort_n_jobs: int = 1,
     use_binary_file: bool = True,
     write_n_jobs: int = 16,
@@ -271,14 +270,10 @@ def sort_store_ks4(
       it still fails.
     - ``nearest_chans``/``whitening_range`` default to 4 (only 4 channels exist per
       tetrode); ``dminx=16`` ~ the tetrode contact x-spread (~20 um).
-    - ``clustering_chunk_size`` (default 2_000_000) bounds the GPU memory of KS4's
-      final graph clustering. Upstream builds the full ``(n_spikes x n_clusters)``
-      assignment matrix in one shot, which OOMs a 32 GB GPU at ~24M spikes/tetrode
-      over 48 h; chunking the per-spike argmax over this many rows at a time is exact
-      (byte-identical sort) and caps peak memory. Set to ``None`` for upstream
-      behavior. NOTE: requires the patched ``kilosort`` fork that registers this
-      setting (workspace editable install); against stock PyPI kilosort the key is
-      unrecognized and KS4 raises ``ValueError``.
+    - KS4's final graph clustering is chunked by the pinned ``kilosort`` fork
+      (``clustering_chunk_size``, default 2**18 rows), which is what lets one
+      tetrode's 48 h fit a 32 GB GPU; the chunk size does not change the sort.
+      Pass a different value through ``sorter_params`` if ever needed.
 
     ``sort_n_jobs`` is the joblib engine parallelism across tetrodes; default 1
     (sequential) so a single KS4 process owns the GPU at a time -- clean footprint
@@ -326,12 +321,6 @@ def sort_store_ks4(
         nearest_chans=nearest_chans,
         whitening_range=whitening_range,
         dminx=dminx,
-        # Bound the GPU memory of KS4's final graph clustering. The default path
-        # materializes the full (n_spikes x n_clusters) assignment matrix, which OOMs
-        # a 32 GB GPU at ~24M spikes/tetrode over 48 h; chunking the per-spike argmax
-        # is exact (identical sort) and caps peak memory. Requires the patched
-        # kilosort fork that registers this setting (see gfys_workspace [tool.uv.sources]).
-        clustering_chunk_size=clustering_chunk_size,
         torch_device=torch_device,
         use_binary_file=use_binary_file,
         # job kwargs for the per-tetrode binary rewrite (split out by

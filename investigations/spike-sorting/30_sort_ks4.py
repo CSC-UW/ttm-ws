@@ -10,11 +10,12 @@ so that allocation (~12.6 GiB) plus the ~30 GiB clustering working set needed ~4
 and OOMed the 32 GB V100. This was the SAME wall as sorting all tetrodes together (it is
 per-tetrode spike volume, NOT channel count or joint clustering), and no stock KS4
 parameter chunked it (max_cluster_subset/cluster_downsampling bound only the landmark
-subset). The patched kilosort fork adds a `clustering_chunk_size` setting that computes
-the per-spike cluster argmax in row chunks instead of one shot -- an EXACT change
-(identical sort), bounding peak GPU memory to roughly one (chunk x n_clusters) tile. Set
-here to 2_000_000 (see KS4 dict below). Detection already ran fine (~62 min/tetrode on
-GPU). Full original diagnosis + failure ladder are in KS4_FEASIBILITY_FINDINGS.md and
+subset). The pinned kilosort fork computes the per-spike cluster argmax in row chunks
+instead of one shot (`clustering_chunk_size`, default 2**18 since fork commit 5612db15;
+upstream PR MouseLand/Kilosort#1037) -- an EXACT change (identical sort), bounding peak
+GPU memory to roughly one (chunk x n_clusters) tile. This script ran with the setting at
+2_000_000 before the default existed; the sort is the same. Detection already ran fine
+(~62 min/tetrode on GPU). Full original diagnosis + failure ladder are in KS4_FEASIBILITY_FINDINGS.md and
 the patch rationale in KS4_CLUSTERING_PATCH_PROPOSAL.md.
 
 Preprocessing is IDENTICAL to the MS5 runs: bandpass(300-6000 Hz) + global CMR,
@@ -65,14 +66,12 @@ GPU_ID = 0
 # Sort BY TETRODE GROUP: one KS4 run per tetrode (4 ch), like MS5.
 # templates_from_data=False is REQUIRED (the data-derived universal-template KMeans
 # hangs for hours at 48 h); clear_cache frees reserved GPU memory between ops.
-# clustering_chunk_size=2_000_000 is what makes the 48 h clustering fit the 32 GB GPU
-# (chunks KS4's per-spike argmax instead of the full (n_spikes x n_clusters) matrix;
-# exact -- identical sort). Requires the patched kilosort fork (see module docstring).
+# The fork's chunked clustering (clustering_chunk_size, default 2**18) is what makes
+# the 48 h clustering fit the 32 GB GPU (see module docstring).
 KS4 = dict(
     batch_size=300_000, do_CAR=False, do_correction=False, nblocks=0,
     skip_kilosort_preprocessing=False, nearest_chans=4, whitening_range=4,
     dminx=16.0, torch_device="auto",
-    clustering_chunk_size=2_000_000,  # bound clustering GPU memory (see docstring)
     grouping_property="group",  # one KS4 run per tetrode (by-group, like MS5)
     use_binary_file=True,       # rewrite a contiguous 4-ch .dat per tetrode (KS4 fast reader)
     sort_n_jobs=1,              # tetrodes sorted sequentially -> one KS4 process owns the GPU

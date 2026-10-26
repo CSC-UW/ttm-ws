@@ -35,7 +35,7 @@ ttm = { workspace = true }
 # To hack on one locally for a session: `uv pip install -e ../NAME`.
 ecephys            = { git = "https://github.com/CSC-UW/ecephys.git",                 rev = "88e410e16d7762425c0f73870a0e4db0a6d8549c" }
 loupe              = { git = "https://github.com/CSC-UW/loupe.git",                   rev = "bc33e3b150bcc508786ba7141861d257416abd62" }
-kilosort           = { git = "https://github.com/grahamfindlay/Kilosort.git",         rev = "c5e98f3e1fa079ef35569c64bac0f64af661dcfc" }
+kilosort           = { git = "https://github.com/grahamfindlay/Kilosort.git",         rev = "5612db15bded66699d476b52ba482e85c2d39547" }
 
 [dependency-groups]
 dev = [
