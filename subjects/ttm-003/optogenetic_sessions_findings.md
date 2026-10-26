@@ -598,7 +598,7 @@ window's noise and the agreement of the two runs).
 | 48H b41 | 39.91 to 40.41 | 12.7 | 23,817 / 22,243 | 1,520 (6.4 %) | 1.1 (0.28) | 0.3 (0.08) | 0.49 ambiguous | 0.5 / 1.0 = 0.51 | 0.0 / 9.3 = 0.00 | 0.093 / 0.078 | 0/5/5 / 0/5/5 |
 
 Rates are per second over the delivered pulses of the window (OPTO: the
-pattern-A 207 ms pulses at 9.8 mW, 354 and 236 of them; 48 h: the block's
+pattern-A 207 ms pulses at 4.2 mW, 354 and 236 of them; 48 h: the block's
 58 or 60); baseline is the 50 ms before onset, in pulse 10 ms to offset.
 "Lost to the rule" is the share of a class's candidates (events whose
 best template was the cell's at cosine 0.6 or better) that fell within
