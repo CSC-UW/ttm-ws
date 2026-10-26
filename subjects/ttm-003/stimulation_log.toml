@@ -37,8 +37,9 @@ trains = [
   { n = 2, pattern = "B", laser_level = 4.5, power_mW = 9.8,  approx_time = "4m",    state = "drowsy", behavior_change = "none", neural_response = "clear" },
   { n = 3, pattern = "A", laser_level = 4.2, power_mW = 4.2,  approx_time = "8m30s", state = "drowsy", behavior_change = "none", neural_response = "clear" },
   { n = 4, pattern = "A", laser_level = 4.2, power_mW = 4.2,  approx_time = "11m30s",state = "drowsy", behavior_change = "none", neural_response = "clear" },
-  # Logged under pattern A; the TTL record shows pattern-B pulses (see the CSV).
-  { n = 5, pattern = "A", laser_level = 4.5, power_mW = 9.8,  approx_time = "15m",   state = "drowsy", behavior_change = "none", neural_response = "clear" },
+  # Hand-logged as pattern A on the day; corrected to B on 2026-10-26 to match
+  # the TTL record (355 x 64 ms pulses at 2.86 Hz).
+  { n = 5, pattern = "B", laser_level = 4.5, power_mW = 9.8,  approx_time = "15m",   state = "drowsy", behavior_change = "none", neural_response = "clear" },
 ]
 
 # The 48 h recording has no train-by-train hand log. `expected` is the

@@ -1,6 +1,6 @@
 ---
 title: TTM-003 optogenetic stimulation (2026-10-16 and the 48 h recording)
-updated: 2026-10-23
+updated: 2026-10-26
 ---
 
 # TTM-003 optogenetic stimulation, 2026-10-16
@@ -73,10 +73,10 @@ Each train is preceded (by 0.4 s for pattern A, within the first period for
 pattern B) by two to five sub-millisecond toggles on the laser line; the
 scripts drop them (`glitch` column) and they are not counted above.
 
-The fifth train of `2026-10-16_14-44-22` is logged under pattern A at
+The fifth train of `2026-10-16_14-44-22` was hand-logged as pattern A at
 laser level 4.5, but its TTL pulses are pattern B (355 x 64 ms at 2.86 Hz).
-The hand log keeps the experimenter's entry; the CSV carries both
-`logged_pattern` and `ttl_pattern`.
+The log entry was corrected to B on 2026-10-26; the CSV carries both
+`logged_pattern` and `ttl_pattern`, which now agree for every train.
 
 ## The 48 h recording (2026-10-20_09-02-12)
 
