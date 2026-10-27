@@ -31,12 +31,14 @@ session's sortings; the binary always comes from ``mp_baseline/binary``.
 ``--template-seed`` changes the seed of the random spikes from which
 ``_mp_common`` builds templates (the seed-bank dedup, each window's
 re-estimation and the re-seeds; June: 0), a control for how much two runs on
-the same data differ.
+the same data differ. ``--per-tetrode-matching`` runs circus-omp on each
+tetrode's channels with that tetrode's templates (``ttm.matching``) instead of
+on all channels at once (June).
 
 Usage: python subjects/ttm-003/scripts/mp_baseline.py --subject TTM-003 --experiment TTM-003-48H
            [--stages materialize,carry,peaks,production,analyzer] [--max-windows N]
            [--n-jobs 16] [--materialize-jobs 96] [--tag ""]
-           [--bad-periods CSV --out mp_baseline_masked] [--template-seed 0]
+           [--bad-periods CSV --out mp_baseline_masked] [--template-seed 0] [--per-tetrode-matching]
 """
 
 from __future__ import annotations
@@ -56,6 +58,7 @@ import spikeinterface as si
 
 from ttm.bad_periods import mask_bad_periods, read_table
 from ttm.cli._common import add_experiment_args, experiment_from_args, line_buffered
+from ttm.matching import find_spikes_per_group
 from ttm.sorting import create_group_sparse_analyzer
 from ttm.tracking import Chunk, materialize_chunk, sort_chunk, to_int_numpy_sorting
 
@@ -235,6 +238,8 @@ def main() -> None:
     ap.add_argument("--out", default="mp_baseline", help="output directory name under the session's sortings")
     ap.add_argument("--template-seed", type=int, default=0,
                     help="random-spikes seed of the templates _mp_common builds (dedup, re-estimation, re-seeds)")
+    ap.add_argument("--per-tetrode-matching", action="store_true",
+                    help="match each tetrode on its own channels (ttm.matching) instead of all channels at once")
     a = ap.parse_args()
     exp = experiment_from_args(a)
     stages = [s.strip() for s in a.stages.split(",") if s.strip()]
@@ -249,6 +254,9 @@ def main() -> None:
     if a.template_seed != 0:
         _mp_common.build_templates_object = functools.partial(build_templates_object, seed=a.template_seed)
         _log(f"carry-forward template re-estimation with random-spikes seed {a.template_seed}")
+    if a.per_tetrode_matching:
+        _mp_common.find_spikes_from_templates = find_spikes_per_group
+        _log("matching each tetrode on its own channels")
     timing_path = out / "baseline_timing.json"
     timing = json.loads(timing_path.read_text()) if timing_path.exists() else []
 
