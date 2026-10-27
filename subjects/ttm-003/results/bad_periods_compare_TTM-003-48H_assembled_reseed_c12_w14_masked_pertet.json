@@ -1,0 +1,54 @@
+{
+ "table": "2026-10-20_09-02-12/bad_periods/bad_periods.csv",
+ "n_windows": 14,
+ "sortings": {
+  "baseline": "2026-10-20_09-02-12/sortings_seed42_pcafix/mp_baseline/assembled_reseed_c12",
+  "masked_pertet": "2026-10-20_09-02-12/sortings_seed42_pcafix/mp_baseline_masked_pertet_w14/assembled_reseed_c12"
+ },
+ "flagged_s_per_tetrode": {
+  "TT1": 425.0,
+  "TT2": 434.0,
+  "TT3": 706.0,
+  "TT4": 412.0,
+  "TT5": 6.0,
+  "TT6": 0.0,
+  "TT7": 3.0,
+  "TT8": 3.0,
+  "TT9": 0.0,
+  "TT10": 3.0,
+  "TT11": 3.0,
+  "TT12": 0.0,
+  "TT13": 6.0,
+  "TT14": 448.0,
+  "TT15": 502.0,
+  "TT16": 1221.0
+ },
+ "baseline": {
+  "n_single_units": 52,
+  "single_spikes_in_flagged_time": 832069,
+  "units_mostly_in_flagged_time": 7,
+  "rp_contamination_median": 1.0,
+  "rv_frac_median": 0.009942504159616044,
+  "cos_median_median": 0.70685,
+  "resid_median_median": 2.641,
+  "presence_median": 1.0,
+  "units_present_after_window_1": 45,
+  "units_clock_locked": 4,
+  "clean_events_claimed_pct": 52.45,
+  "clean_events_10mad_claimed_pct": 82.31
+ },
+ "masked_pertet": {
+  "n_single_units": 53,
+  "single_spikes_in_flagged_time": 2107,
+  "units_mostly_in_flagged_time": 0,
+  "rp_contamination_median": 1.0,
+  "rv_frac_median": 0.021616895301657373,
+  "cos_median_median": 0.6532,
+  "resid_median_median": 2.329,
+  "presence_median": 1.0,
+  "units_present_after_window_1": 53,
+  "units_clock_locked": 5,
+  "clean_events_claimed_pct": 71.05,
+  "clean_events_10mad_claimed_pct": 94.96
+ }
+}
