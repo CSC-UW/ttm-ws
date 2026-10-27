@@ -1,0 +1,5 @@
+synthetic, threshold 26252: per group 540 spikes, separate per tetrode 540, joint 540; per group equals separate: True; channel indices equal: True
+artifact on tetrode 0: other tetrodes' spikes unchanged per group: True (360 and 360); jointly: True (360 and 360)
+
+TTM-001 99600 to 99620 s, 80 units, threshold 1409713: per group 18502 spikes, separate per tetrode 18502, per group with one job 18502; per group equals separate: True; 16 jobs equal one: True
+spikes per tetrode, per group: [1199, 129, 749, 1267, 1355, 938, 682, 666, 445, 996, 2464, 2263, 2055, 1158, 1064, 1072]
