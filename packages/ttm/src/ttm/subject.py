@@ -144,6 +144,11 @@ class Experiment:
         return self.session_dir / f"{self.session}.{tag}.zarr"
 
     @property
+    def bad_periods_dir(self) -> pathlib.Path:
+        """Bad-period scan and table of the session's recording (``ttm-bad-periods``)."""
+        return self.session_dir / "bad_periods"
+
+    @property
     def lfp_path(self) -> pathlib.Path:
         return self.session_dir / f"{self.session}.lfp.zarr"
 
