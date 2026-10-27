@@ -23,9 +23,16 @@ population. Stages, each cached and skipped when its output exists:
 Wall-clock, peak resident memory and disk per stage go to
 ``baseline_timing.json``.
 
+``--bad-periods`` names a table from ``ttm-bad-periods``; every stage after
+materialize then reads the binary through ``ttm.bad_periods.mask_bad_periods``,
+which replaces each listed tetrode's channels by noise inside its intervals.
+``--out`` puts the products of such a run in another directory under the
+session's sortings; the binary always comes from ``mp_baseline/binary``.
+
 Usage: python subjects/ttm-003/scripts/mp_baseline.py --subject TTM-003 --experiment TTM-003-48H
            [--stages materialize,carry,peaks,production,analyzer] [--max-windows N]
            [--n-jobs 16] [--materialize-jobs 96] [--tag ""]
+           [--bad-periods CSV --out mp_baseline_masked]
 """
 
 from __future__ import annotations
@@ -42,6 +49,7 @@ import time
 import numpy as np
 import spikeinterface as si
 
+from ttm.bad_periods import mask_bad_periods, read_table
 from ttm.cli._common import add_experiment_args, experiment_from_args, line_buffered
 from ttm.sorting import create_group_sparse_analyzer
 from ttm.tracking import Chunk, materialize_chunk, sort_chunk, to_int_numpy_sorting
@@ -216,14 +224,20 @@ def main() -> None:
     ap.add_argument("--n-jobs", type=int, default=16)
     ap.add_argument("--materialize-jobs", type=int, default=96)
     ap.add_argument("--tag", default="", help="suffix for production outputs (smoke runs use _smoke)")
+    ap.add_argument("--bad-periods", type=pathlib.Path, default=None,
+                    help="bad-period table (ttm-bad-periods); masks those tetrodes and intervals")
+    ap.add_argument("--out", default="mp_baseline", help="output directory name under the session's sortings")
     a = ap.parse_args()
     exp = experiment_from_args(a)
     stages = [s.strip() for s in a.stages.split(",") if s.strip()]
     unknown = set(stages) - set(STAGES)
     if unknown:
         ap.error(f"unknown stages {sorted(unknown)}; choose from {STAGES}")
-    out = exp.sorting_dir("mp_baseline")
+    out = exp.sorting_dir(a.out)
     out.mkdir(parents=True, exist_ok=True)
+    binary = exp.sorting_dir("mp_baseline") / "binary"
+    if "materialize" in stages and out != binary.parent:
+        ap.error("materialize writes mp_baseline/binary; run it without --out")
     timing_path = out / "baseline_timing.json"
     timing = json.loads(timing_path.read_text()) if timing_path.exists() else []
 
@@ -234,9 +248,14 @@ def main() -> None:
         t0 = time.time()
         before = _dir_bytes(out)
         if stage == "materialize":
-            rec = stage_materialize(exp, out, n_jobs=a.materialize_jobs)
+            stage_materialize(exp, out, n_jobs=a.materialize_jobs)
         else:
-            rec = rec if rec is not None else si.load(out / "binary")
+            if rec is None:
+                rec = si.load(binary)
+                if a.bad_periods is not None:
+                    table = read_table(a.bad_periods)
+                    rec = mask_bad_periods(rec, table)
+                    _log(f"masking {len(table)} bad periods from {a.bad_periods}")
             if stage == "carry":
                 stage_carry(rec, out, n_jobs=a.n_jobs, max_windows=a.max_windows)
             elif stage == "peaks":
