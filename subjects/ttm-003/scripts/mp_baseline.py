@@ -28,16 +28,21 @@ materialize then reads the binary through ``ttm.bad_periods.mask_bad_periods``,
 which replaces each listed tetrode's channels by noise inside its intervals.
 ``--out`` puts the products of such a run in another directory under the
 session's sortings; the binary always comes from ``mp_baseline/binary``.
+``--template-seed`` changes the seed of the random spikes from which
+``_mp_common`` builds templates (the seed-bank dedup, each window's
+re-estimation and the re-seeds; June: 0), a control for how much two runs on
+the same data differ.
 
 Usage: python subjects/ttm-003/scripts/mp_baseline.py --subject TTM-003 --experiment TTM-003-48H
            [--stages materialize,carry,peaks,production,analyzer] [--max-windows N]
            [--n-jobs 16] [--materialize-jobs 96] [--tag ""]
-           [--bad-periods CSV --out mp_baseline_masked]
+           [--bad-periods CSV --out mp_baseline_masked] [--template-seed 0]
 """
 
 from __future__ import annotations
 
 import argparse
+import functools
 import importlib.util
 import json
 import pathlib
@@ -56,6 +61,7 @@ from ttm.tracking import Chunk, materialize_chunk, sort_chunk, to_int_numpy_sort
 
 SORTING_DIR = pathlib.Path(__file__).resolve().parents[3] / "investigations" / "spike-sorting"
 sys.path.insert(0, str(SORTING_DIR))
+import _mp_common  # noqa: E402
 from _mp_common import build_templates_object, dedup_sorting, windowed_carry_forward_reseed  # noqa: E402
 
 FS = 30000.0
@@ -227,6 +233,8 @@ def main() -> None:
     ap.add_argument("--bad-periods", type=pathlib.Path, default=None,
                     help="bad-period table (ttm-bad-periods); masks those tetrodes and intervals")
     ap.add_argument("--out", default="mp_baseline", help="output directory name under the session's sortings")
+    ap.add_argument("--template-seed", type=int, default=0,
+                    help="random-spikes seed of the templates _mp_common builds (dedup, re-estimation, re-seeds)")
     a = ap.parse_args()
     exp = experiment_from_args(a)
     stages = [s.strip() for s in a.stages.split(",") if s.strip()]
@@ -238,6 +246,9 @@ def main() -> None:
     binary = exp.sorting_dir("mp_baseline") / "binary"
     if "materialize" in stages and out != binary.parent:
         ap.error("materialize writes mp_baseline/binary; run it without --out")
+    if a.template_seed != 0:
+        _mp_common.build_templates_object = functools.partial(build_templates_object, seed=a.template_seed)
+        _log(f"carry-forward template re-estimation with random-spikes seed {a.template_seed}")
     timing_path = out / "baseline_timing.json"
     timing = json.loads(timing_path.read_text()) if timing_path.exists() else []
 
