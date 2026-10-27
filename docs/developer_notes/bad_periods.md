@@ -1,6 +1,6 @@
 ---
 title: Transient bad periods per tetrode (ttm.bad_periods, ttm-bad-periods)
-updated: 2026-10-26
+updated: 2026-10-27
 status: needs_verification
 ---
 
@@ -84,6 +84,18 @@ the sorter wrappers need.
 A masked 60 s read of the TTM-003 binary in which eight tetrodes are masked
 takes about 4 s, most of it reading the binary; chunks without an interval
 cost nothing extra.
+
+## Why it matters to tetrodes without bad periods
+
+circus-omp, the June pipeline's matcher, fits the templates of all channels
+to each 1 s chunk together. When several tetrodes carry an artifact, its
+fits take over the chunk and the other tetrodes lose most of their spikes
+there, although their own data are clean. On TTM-003, from 2287 to 2700 s,
+TT5 to TT12 kept about a fifth of their spikes unmasked; with the mask, or
+unmasked with only their own templates, they kept all of them
+(`investigations/bad-periods-ttm003/`). A single flagged tetrode did not
+have this effect. Masking a bad period therefore protects the whole probe,
+and a bad period the detector misses costs more than its own tetrode.
 
 ## What it does not do
 
