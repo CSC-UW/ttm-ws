@@ -1,0 +1,42 @@
+2100 to 2220 s, templates from window 0 (44 units); 6996 clean events >= 10 MAD
+arm                          class      spikes  claimed%  isi<1.5ms%  cos_med  wall s
+joint, amp>=0.8, mf=5        TT4          8689      94.9        5.97    0.644    12.9
+joint, amp>=0.8, mf=5        TT5-TT12    43290      94.7        3.44    0.687    12.9
+joint, amp>=0.8, mf=5        few-unit     7243      70.3        3.42    0.671    12.9
+joint, amp>=0.8, mf=5        TT9          1145       nan        2.62    0.572    12.9
+per tetrode, amp>=0.8, mf=5  TT4          9629      95.6        8.15    0.625    18.6
+per tetrode, amp>=0.8, mf=5  TT5-TT12    52891      95.1        5.66    0.649    18.6
+per tetrode, amp>=0.8, mf=5  few-unit    11604      89.8       19.52    0.625    18.6
+per tetrode, amp>=0.8, mf=5  TT9          5434       nan       16.76    0.444    18.6
+per tetrode, amp>=0.8, mf=2  TT4          9542      95.8        7.90    0.627    18.0
+per tetrode, amp>=0.8, mf=2  TT5-TT12    52274      95.1        5.46    0.651    18.0
+per tetrode, amp>=0.8, mf=2  few-unit    11725      89.2       17.48    0.628    18.0
+per tetrode, amp>=0.8, mf=2  TT9          5361       nan       16.30    0.446    18.0
+per tetrode, amp>=0.8, mf=1  TT4          9115      95.1        7.03    0.635    15.1
+per tetrode, amp>=0.8, mf=1  TT5-TT12    50196      95.0        5.01    0.660    15.1
+per tetrode, amp>=0.8, mf=1  few-unit    11035      87.3       13.94    0.639    15.1
+per tetrode, amp>=0.8, mf=1  TT9          4733       nan       15.02    0.457    15.1
+per tetrode, amp>=0.9, mf=5  TT4          6754      84.5        6.54    0.658    19.1
+per tetrode, amp>=0.9, mf=5  TT5-TT12    33938      90.8        3.98    0.682    19.1
+per tetrode, amp>=0.9, mf=5  few-unit     7565      81.8       19.48    0.645    19.1
+per tetrode, amp>=0.9, mf=5  TT9          2684       nan       10.62    0.477    19.1
+per tetrode, amp>=0.9, mf=2  TT4          6607      83.9        6.10    0.661    17.5
+per tetrode, amp>=0.9, mf=2  TT5-TT12    33386      90.9        3.75    0.685    17.5
+per tetrode, amp>=0.9, mf=2  few-unit     7779      80.5       16.38    0.649    17.5
+per tetrode, amp>=0.9, mf=2  TT9          2561       nan        9.88    0.483    17.5
+per tetrode, amp>=0.9, mf=1  TT4          6310      82.8        5.18    0.670    13.8
+per tetrode, amp>=0.9, mf=1  TT5-TT12    31600      90.7        3.24    0.695    13.8
+per tetrode, amp>=0.9, mf=1  few-unit     7416      78.5       11.73    0.657    13.8
+per tetrode, amp>=0.9, mf=1  TT9          2048       nan        8.20    0.504    13.8
+per tetrode, amp>=1.0, mf=5  TT4          4548      65.2        5.21    0.680    19.4
+per tetrode, amp>=1.0, mf=5  TT5-TT12    21807      83.4        2.99    0.709    19.4
+per tetrode, amp>=1.0, mf=5  few-unit     4708      72.8       20.67    0.647    19.4
+per tetrode, amp>=1.0, mf=5  TT9          1280       nan        7.03    0.510    19.4
+per tetrode, amp>=1.0, mf=2  TT4          4435      65.1        5.01    0.684    16.6
+per tetrode, amp>=1.0, mf=2  TT5-TT12    21221      83.3        2.77    0.713    16.6
+per tetrode, amp>=1.0, mf=2  few-unit     4608      71.0       17.01    0.660    16.6
+per tetrode, amp>=1.0, mf=2  TT9          1104       nan        6.25    0.521    16.6
+per tetrode, amp>=1.0, mf=1  TT4          4249      64.8        4.40    0.691    12.3
+per tetrode, amp>=1.0, mf=1  TT5-TT12    19807      82.4        2.32    0.724    12.3
+per tetrode, amp>=1.0, mf=1  few-unit     4283      66.6       11.86    0.674    12.3
+per tetrode, amp>=1.0, mf=1  TT9           834       nan        4.80    0.553    12.3

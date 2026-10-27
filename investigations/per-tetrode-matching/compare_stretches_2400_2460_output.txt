@@ -1,0 +1,54 @@
+2400 to 2460 s; templates from window 0 (44 units, 31 on TT5-TT12); tetrodes with bad periods here: ['TT1', 'TT2', 'TT3', 'TT4', 'TT14', 'TT15', 'TT16']
+
+arm                       TT5-TT12     other   claimed % (10 MAD, clean)  wall s
+joint, unmasked               4943    133863                        60.7    16.2
+per tetrode, unmasked        42730    286619                        96.7    19.7
+joint, masked                33372       491                        96.1     8.8
+per tetrode, masked          42730      1906                        96.7    10.5
+
+claimed % per tetrode (3682 clean events at 10 MAD or more)
+tetrode  n_events  joint/unma  per t/unma  joint/mask  per t/mask
+  TT5         229        47.6       100.0       100.0       100.0
+  TT6        1693        77.0        95.0        94.7        95.0
+  TT7         282        38.3        99.3        99.3        99.3
+  TT8         598        60.7        98.8        98.2        98.8
+  TT9           1         0.0         0.0         0.0         0.0
+  TT10        300        35.3       100.0       100.0       100.0
+  TT11        273        42.5        90.1        87.5        90.1
+  TT12        262        49.6        99.6        99.2        99.6
+  TT13         44         0.0        97.7        90.9        97.7
+
+TT5-TT12 spikes by tenth of the 1 s chunk
+  joint, unmasked          [938, 676, 557, 473, 426, 424, 405, 366, 362, 316]
+  per tetrode, unmasked    [4628, 4494, 4098, 4065, 4342, 4188, 4373, 4241, 4128, 4173]
+  joint, masked            [3760, 3539, 3247, 3210, 3415, 3276, 3335, 3240, 3199, 3151]
+  per tetrode, masked      [4628, 4494, 4098, 4065, 4342, 4188, 4373, 4241, 4128, 4173]
+
+unmasked: joint 138806 spikes, per tetrode 329349; in both (same unit, 3 samples) 129550; joint only 9256, per tetrode only 199799
+  TT1    joint   16454  per tetrode   33771  both   15211
+  TT2    joint    1737  per tetrode   22063  both    1731
+  TT3    joint    7036  per tetrode   45652  both    6998
+  TT4    joint  104832  per tetrode  126522  both   97020
+  TT5    joint     547  per tetrode    7313  both     535
+  TT6    joint    2037  per tetrode    4931  both    2016
+  TT7    joint     265  per tetrode    2154  both     261
+  TT8    joint     837  per tetrode    4578  both     805
+  TT9    joint       0  per tetrode    5715  both       0
+  TT10   joint     327  per tetrode    7676  both     321
+  TT11   joint     322  per tetrode    4657  both     315
+  TT12   joint     608  per tetrode    5706  both     593
+  TT13   joint       0  per tetrode    1906  both       0
+  TT14   joint    3505  per tetrode   18360  both    3445
+  TT15   joint      24  per tetrode   14020  both      24
+  TT16   joint     275  per tetrode   24325  both     275
+
+masked: joint 33863 spikes, per tetrode 44636; in both (same unit, 3 samples) 31011; joint only 2852, per tetrode only 13625
+  TT5    joint    6323  per tetrode    7313  both    5692
+  TT6    joint    4774  per tetrode    4931  both    4587
+  TT7    joint    1794  per tetrode    2154  both    1639
+  TT8    joint    3919  per tetrode    4578  both    3635
+  TT9    joint    1100  per tetrode    5715  both     994
+  TT10   joint    6256  per tetrode    7676  both    5628
+  TT11   joint    4007  per tetrode    4657  both    3680
+  TT12   joint    5199  per tetrode    5706  both    4669
+  TT13   joint     491  per tetrode    1906  both     487

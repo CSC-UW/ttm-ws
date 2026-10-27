@@ -1,0 +1,101 @@
+2100 to 2220 s, templates from window 0 (44 units)
+
+spikes by category, per tetrode
+tetrode         category     n  cos_median  cos_below_0.6_pct  amp_median
+    TT1             both   203       0.719                8.4       1.086
+    TT1       joint only    10       0.702               20.0       0.816
+    TT1 per tetrode only   880       0.485               71.8       0.617
+    TT2             both   352       0.755                8.0       1.112
+    TT2       joint only    21       0.660               28.6       0.850
+    TT2 per tetrode only  1195       0.507               67.4       0.608
+    TT3             both    63       0.733               12.7       1.005
+    TT3       joint only     1       0.637                0.0       0.865
+    TT3 per tetrode only   137       0.571               55.5       0.736
+    TT4             both  7922       0.655               35.9       0.975
+    TT4       joint only   766       0.533               67.5       0.828
+    TT4 per tetrode only  1707       0.458               81.1       0.700
+    TT5             both  5341       0.663               30.6       0.954
+    TT5       joint only   607       0.606               47.6       0.827
+    TT5 per tetrode only  1559       0.538               70.5       0.718
+    TT6             both  5136       0.814                9.5       0.961
+    TT6       joint only   178       0.651               38.8       0.797
+    TT6 per tetrode only   323       0.637               40.6       0.732
+    TT7             both  2202       0.755               10.7       0.928
+    TT7       joint only   174       0.674               25.9       0.814
+    TT7 per tetrode only   561       0.600               49.6       0.700
+    TT8             both  4443       0.771               16.0       0.921
+    TT8       joint only   241       0.612               46.1       0.777
+    TT8 per tetrode only   885       0.542               62.4       0.671
+    TT9             both  1033       0.575               64.2       0.927
+    TT9       joint only   112       0.544               92.0       0.842
+    TT9 per tetrode only  4401       0.413               98.2       0.640
+   TT10             both 10912       0.629               42.7       0.965
+   TT10       joint only  1255       0.545               64.1       0.813
+   TT10 per tetrode only  3212       0.476               80.7       0.696
+   TT11             both  4253       0.716               18.9       0.952
+   TT11       joint only   287       0.608               47.7       0.811
+   TT11 per tetrode only   898       0.565               61.7       0.722
+   TT12             both  6460       0.696               22.9       0.953
+   TT12       joint only   655       0.590               53.6       0.808
+   TT12 per tetrode only  1272       0.556               64.5       0.718
+   TT13             both   315       0.714                9.5       1.008
+   TT13       joint only    12       0.677                0.0       0.816
+   TT13 per tetrode only   712       0.498               74.9       0.638
+   TT14             both   415       0.737               14.9       0.951
+   TT14       joint only    17       0.699               29.4       0.805
+   TT14 per tetrode only   357       0.525               68.1       0.613
+   TT15             both  3607       0.675               11.0       0.996
+   TT15       joint only  1313       0.616               32.7       0.907
+   TT15 per tetrode only   898       0.548               73.2       0.771
+   TT16             both   871       0.707               25.3       1.018
+   TT16       joint only    50       0.653               34.0       0.836
+   TT16 per tetrode only  1599       0.395               81.2       0.505
+
+per unit: spikes and intervals under 1.5 ms, joint against per tetrode
+unit  tetrode   joint_n  joint_rp   pertet_n  pertet_rp
+   0  TT1          213        10       1083        331
+   1  TT2          373        21       1547        467
+   3  TT3           63         5        200         31
+   4  TT4         1560         1       1681          1
+   5  TT4         2171       240       2706        428
+   6  TT4         3161       245       3369        309
+   7  TT4         1797        33       1873         47
+   8  TT5         1709        38       1862         48
+   9  TT5         1362        60       1620         86
+  10  TT5         1309        25       1563         48
+  11  TT5         1568        28       1855         48
+  12  TT6         1341         4       1387          5
+  13  TT6          378         1        391          1
+  14  TT6          916         1        926          3
+  15  TT6         1243         8       1266          8
+  16  TT6         1436        22       1489         18
+  17  TT7          407         1        462          1
+  18  TT7         1072         8       1247         12
+  19  TT7          614         3        763         11
+  20  TT7          283         0        291          0
+  21  TT8         1675       220       2129        358
+  22  TT8         3011        57       3199         64
+  23  TT9         1145        30       5434        911
+  24  TT10        2364        61       2671         82
+  25  TT10        4113       294       4758        396
+  26  TT10        2248        65       2652        114
+  27  TT10        3441       375       4043        513
+  28  TT11        1172        17       1341         26
+  29  TT11         906         5       1072         15
+  30  TT11         117         1        126          1
+  31  TT11        1111        21       1249         26
+  32  TT11        1150        19       1278         20
+  33  TT11          84         0         85          0
+  34  TT12        1542        30       1726         40
+  35  TT12         799         5        835          5
+  36  TT12        1634        46       1861         74
+  37  TT12        1631        32       1698         39
+  38  TT12        1509        14       1612         21
+  39  TT13         327        10       1027        224
+  40  TT14         432        41        772        139
+  41  TT15         288         0        238          2
+  42  TT15         764         0        762          5
+  43  TT15        3865        29       3505        133
+  44  TT16         918       132       2470        933
+
+white noise at the clean noise level, 120 s: joint 0 spikes, per tetrode 0

@@ -1,0 +1,45 @@
+2100 to 2220 s; templates from window 0 (44 units, 31 on TT5-TT12); tetrodes with bad periods here: ['TT16']
+
+arm                       TT5-TT12     other   claimed % (10 MAD, clean)  wall s
+joint, unmasked              43290     15932                        91.8    12.5
+per tetrode, unmasked        52891     21233                        94.6    18.8
+
+claimed % per tetrode (6996 clean events at 10 MAD or more)
+tetrode  n_events  joint/unma  per t/unma
+  TT1         134        54.5        97.8
+  TT2          63        85.7       100.0
+  TT3          21        71.4       100.0
+  TT4        2425        94.9        95.6
+  TT5         136       100.0       100.0
+  TT6        1318        90.6        91.2
+  TT7         187        99.5        99.5
+  TT8         784        98.2        99.2
+  TT10        555       100.0       100.0
+  TT11        384        85.9        86.5
+  TT12        362        98.9        98.1
+  TT13         15        93.3       100.0
+  TT14        285        80.0        89.8
+  TT15         57        54.4        71.9
+  TT16        270        66.3        85.9
+
+TT5-TT12 spikes by tenth of the 1 s chunk
+  joint, unmasked          [4578, 4718, 4337, 4379, 4001, 4275, 4244, 4307, 4218, 4233]
+  per tetrode, unmasked    [5665, 5714, 5283, 5376, 4877, 5323, 5141, 5207, 5069, 5236]
+
+unmasked: joint 59222 spikes, per tetrode 74124; in both (same unit, 3 samples) 53523; joint only 5699, per tetrode only 20601
+  TT1    joint     213  per tetrode    1083  both     203
+  TT2    joint     373  per tetrode    1547  both     352
+  TT3    joint      63  per tetrode     200  both      62
+  TT4    joint    8689  per tetrode    9629  both    7923
+  TT5    joint    5948  per tetrode    6900  both    5341
+  TT6    joint    5314  per tetrode    5459  both    5136
+  TT7    joint    2376  per tetrode    2763  both    2202
+  TT8    joint    4686  per tetrode    5328  both    4445
+  TT9    joint    1145  per tetrode    5434  both    1033
+  TT10   joint   12166  per tetrode   14124  both   10911
+  TT11   joint    4540  per tetrode    5151  both    4253
+  TT12   joint    7115  per tetrode    7732  both    6460
+  TT13   joint     327  per tetrode    1027  both     315
+  TT14   joint     432  per tetrode     772  both     415
+  TT15   joint    4917  per tetrode    4505  both    3604
+  TT16   joint     918  per tetrode    2470  both     868
