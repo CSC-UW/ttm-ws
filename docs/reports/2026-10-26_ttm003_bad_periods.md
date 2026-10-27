@@ -421,7 +421,10 @@ on TT15. The masked run's TT15 has fewer clean spikes (11.7 M against
   2287 s event it keeps TT5 to TT12's spikes unmasked. On clean data it
   also adds about a quarter more spikes, mostly poorly shaped or shared with
   another tetrode, which the joint matcher's competition across tetrodes
-  kept out (`investigations/per-tetrode-matching/`). It is off by default.
+  kept out, and over 14 carry-forward windows the templates of the small
+  units shrink toward noise, masked or not: TT9's units have 16,100 clean
+  spikes in window 0 and 2.6 to 3.0 M in window 6, at a median trough of
+  3.0 MAD (`investigations/per-tetrode-matching/`). It is off by default.
 - TT15's clock-locked units remain in both runs. Dropping CH22, the
   manifest's bad channel, from TT15 before sorting, or subtracting the
   cycle mean where it is the main contaminant, has not been tried.

@@ -1,0 +1,134 @@
+windows 0 to 13, clean time, single units; 1421098 clean events at 10 MAD or more
+
+TT4
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              5    608061    63.5     3.37     22.5   0.694
+  pertet             5    857708    70.7     6.65     71.1   0.654
+  joint_masked       5   1332262    94.5     2.54     21.1   0.684
+  pertet_masked      4   1777777    96.6     5.34     78.2   0.650
+
+TT5-TT12
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint             32   7368858    92.8     2.40     18.1   0.716
+  pertet            32  35777862    93.8    59.26     61.0   0.288
+  joint_masked      32   7637026    93.9     2.51     18.9   0.714
+  pertet_masked     33  35435501    94.2    58.65     73.0   0.291
+
+few-unit
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint             13   1799984    29.8     0.22     12.0   0.868
+  pertet            18  29468108    53.5    70.35     74.1   0.254
+  joint_masked      11    997267    48.9     0.55     16.4   0.895
+  pertet_masked     16  55075525    95.3    59.48     86.1   0.295
+
+TT1 (4525 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              2      1209    10.1     4.22     87.9   0.515
+  pertet             3     78912    31.1    33.07     82.2   0.319
+  joint_masked       1      2788    29.8     3.73     87.0   0.743
+  pertet_masked      3   4759536   100.0    35.82     92.8   0.351
+
+TT2 (1077 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              2      3535    68.2     4.13     38.7   0.660
+  pertet             3   1268638    84.4    18.62     86.3   0.083
+  joint_masked       2      4407    73.3     3.36     54.5   0.770
+  pertet_masked      3   6519604   100.0    22.21     85.8   0.375
+
+TT3 (839 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              1      1041    21.5     4.61     73.2   0.530
+  pertet             2     37308    37.2    31.00     87.6   0.237
+  joint_masked       1      3844    63.4     3.54     75.3   0.771
+  pertet_masked      2   9021779    99.0    56.90     89.1   0.266
+
+TT4 (428057 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              5    608061    63.5     3.37     22.5   0.694
+  pertet             5    857708    70.7     6.65     71.1   0.654
+  joint_masked       5   1332262    94.5     2.54     21.1   0.684
+  pertet_masked      4   1777777    96.6     5.34     78.2   0.650
+
+TT5 (43104 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              4   1008526    98.1     2.20     18.1   0.699
+  pertet             4   1712790    99.7     4.29     62.8   0.654
+  joint_masked       4   1064221    99.6     2.37     20.7   0.692
+  pertet_masked      4   1751164    99.8     4.17     70.9   0.654
+
+TT6 (448360 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              5    884478    89.0     0.76     15.7   0.830
+  pertet             5    891422    89.2     0.87     54.3   0.829
+  joint_masked       5    889249    89.8     0.79     16.1   0.830
+  pertet_masked      5    929415    90.0     0.90     61.1   0.826
+
+TT7 (42804 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              4    721529    96.2     1.03     18.0   0.733
+  pertet             4   1948505    98.0     6.83     74.1   0.598
+  joint_masked       4    718769    98.0     0.96     18.4   0.737
+  pertet_masked      4   1945506    98.2     6.66     81.0   0.603
+
+TT8 (112837 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              2    685691    97.3     2.61     20.5   0.778
+  pertet             2   1526531    99.7     9.54     72.7   0.628
+  joint_masked       2    718192    99.1     2.75     21.4   0.777
+  pertet_masked      2   1340715    99.7     8.05     77.8   0.651
+
+TT9 (27 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              1    145390    59.3     2.99     20.7   0.583
+  pertet             2  24146102    96.3    85.23     58.3   0.226
+  joint_masked       1    172654    66.7     3.35     20.9   0.578
+  pertet_masked      2  23890007    96.3    84.58     73.1   0.228
+
+TT10 (126521 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              5   1721172    98.2     4.71     16.4   0.658
+  pertet             4   2577920    99.7     7.30     63.5   0.614
+  joint_masked       5   1797784    99.4     4.95     16.7   0.655
+  pertet_masked      5   2574566    99.6     6.91     69.8   0.615
+
+TT11 (86087 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              6    793701    88.6     1.37     20.7   0.733
+  pertet             6   1135211    91.3     2.22     63.9   0.703
+  joint_masked       6    836829    89.8     1.41     21.4   0.732
+  pertet_masked      6   1165098    91.5     2.31     69.9   0.701
+
+TT12 (95682 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              5   1408371    98.1     1.88     18.9   0.706
+  pertet             5   1839381    98.4     2.68     68.3   0.677
+  joint_masked       5   1439328    98.9     1.82     19.5   0.705
+  pertet_masked      5   1839030    98.6     2.78     74.2   0.678
+
+TT13 (899 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              1      9179    73.9     3.89     93.5   0.732
+  pertet             2  16233228    99.9    79.55     73.0   0.219
+  joint_masked       1     12760    92.8     4.95     93.4   0.722
+  pertet_masked      2  15196540    99.9    76.58     84.9   0.221
+
+TT14 (14892 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              1      7161    25.0    11.77     88.1   0.677
+  pertet             1   9706701    84.4    77.18     75.5   0.322
+  joint_masked       1     11922    41.8    13.86     85.7   0.721
+  pertet_masked      1  15008746    96.7    76.57     83.2   0.325
+
+TT15 (2834 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              4   1769182    45.7     0.10     11.0   0.869
+  pertet             5   2094891    48.9     1.50     67.7   0.337
+  joint_masked       3    939911    42.3     0.06     13.3   0.899
+  pertet_masked      3   1206151    59.1     2.29     72.6   0.870
+
+TT16 (12553 events)
+  run            units    spikes  claim% isi<1.5%    xtet% cos_med
+  joint              2      8677    33.0     9.40     42.0   0.689
+  pertet             2     48430    21.0    40.92     76.8   0.230
+  joint_masked       2     21635    59.5    10.44     38.7   0.746
+  pertet_masked      2   3363169    99.3    39.02     92.2   0.450
