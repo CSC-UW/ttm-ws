@@ -14,21 +14,31 @@ whether they fall in a bad period of the unit's tetrode. Writes
   valid time) and presence, paired with the other sorting's unit of most
   similar template on the same tetrode (``ttm.purity.match_units``, on
   clean-time spikes);
+- ``results/bad_periods_coverage_<E>_<tag>.csv``: the share of the first run's
+  detected events (``spike_coverage.npz``, 5.5 MAD) that a single unit of each
+  sorting claims within 0.5 ms on the same tetrode, in clean and flagged time per
+  tetrode, and in clean time by the number of other tetrodes flagged in that
+  second;
 - ``results/bad_periods_compare_<E>_<tag>.json``: the medians and counts;
 - ``figures/bad_periods/counts_<tag>_<tetrode>.png``: clean-time spikes per
   1800 s window of every unit of each tetrode with flagged time, both sortings;
 - ``figures/bad_periods/templates_<tag>_<tetrode>.png``: each unit's mean
-  waveform in the first windows, from the spikes each sorting gave it.
+  waveform in the first windows, from the spikes each sorting gave it;
+- ``figures/bad_periods/coverage_<tag>.png``: tetrodes flagged and clean-time
+  coverage of events at 10 MAD or more per 60 s.
 
 A unit is present in a window when it has 20 clean spikes or more there;
 presence is over the windows from its first such window on in which its
-tetrode has at least half the window valid. ``--max-windows N`` restricts
-both sortings to the first N windows (for a carry-forward run made with
-``mp_baseline.py --max-windows``).
+tetrode has at least half the window valid. ``clock_lock`` is the largest share
+of a unit's spikes in one tenth of a 300-sample (10 ms) cycle counted from the
+first sample (units with 100 spikes or more); 0.1 for spikes unrelated to the
+acquisition clock.
+``--max-windows N`` restricts both sortings to the first N windows (for a
+carry-forward run made with ``mp_baseline.py --max-windows``).
 
 Usage: python subjects/ttm-003/scripts/bad_periods_compare.py --subject TTM-003 --experiment TTM-003-48H
            [--a mp_baseline --b mp_baseline_masked --sorting assembled_prod] [--max-windows N]
-           [--tag T] [--workers 48]
+           [--tag T] [--workers 48] [--no-coverage]
 """
 
 from __future__ import annotations
@@ -54,6 +64,11 @@ RESULTS = SUBJECT_DIR / "results"
 FS = 30000.0
 WIN_S = 1800.0
 MIN_SPIKES = 20
+CLOCK_PERIOD = 300
+CLOCK_LOCKED = 0.2
+CLOCK_MIN_SPIKES = 100
+COVER_TOL = int(0.5e-3 * FS)
+K_BINS = ((0, 0), (1, 1), (2, 2), (3, 4), (5, 8), (9, 16))
 
 
 def load_run(path: pathlib.Path, binary: str, workers: int, nfr: int, cache_tag: str):
@@ -89,6 +104,90 @@ def valid_per_window(table: pd.DataFrame, g: int, n_win: int, nfr: int) -> np.nd
     return out
 
 
+def clock_lock(frames: np.ndarray) -> float:
+    if frames.size < CLOCK_MIN_SPIKES:
+        return float("nan")
+    h = np.bincount((frames % CLOCK_PERIOD) * 10 // CLOCK_PERIOD, minlength=10)
+    return float(h.max() / frames.size)
+
+
+def claimed(peak_s, peak_g, frames, ugroup, units) -> np.ndarray:
+    """Per detected event: a spike of one of ``units`` on the event's tetrode within ``COVER_TOL``."""
+    out = np.zeros(peak_s.size, bool)
+    for g in np.unique(peak_g):
+        tr = [frames[u] for u in units if ugroup[u] == g]
+        if not tr or not sum(t.size for t in tr):
+            continue
+        ref = np.sort(np.concatenate(tr)).astype(np.int64)
+        sel = np.flatnonzero(peak_g == g)
+        q = peak_s[sel]
+        i = np.searchsorted(ref, q)
+        d = np.minimum(np.abs(q - ref[np.clip(i - 1, 0, ref.size - 1)]), np.abs(ref[np.clip(i, 0, ref.size - 1)] - q))
+        out[sel] = d <= COVER_TOL
+    return out
+
+
+def coverage(peaks_npz, runs, names, table, nfr):
+    z = np.load(peaks_npz)
+    keep = z["peak_sample"] < nfr
+    ps, pg, am = z["peak_sample"][keep], z["peak_group"][keep], z["amp_mad"][keep]
+    n_s = int(np.ceil(nfr / FS))
+    flag = np.zeros((int(max(pg.max(), table.group.max())) + 1, n_s), bool)
+    for r in table.itertuples():
+        flag[int(r.group), int(r.start_s):int(np.ceil(r.end_s))] = True
+    sec = (ps // FS).astype(np.int64)
+    bad = np.zeros(ps.size, bool)
+    for g in np.unique(pg):
+        sel = pg == g
+        bad[sel] = bp.bad_mask(table, int(g), ps[sel], FS)
+    k_other = flag.sum(0)[sec] - flag[pg, sec]
+    cl = {n: claimed(ps, pg, runs[n]["frames"], runs[n]["ugroup"],
+                     [u for u in runs[n]["frames"] if not runs[n]["mua"][u]]) for n in names}
+    rows = []
+
+    def add(scope, tet, sel):
+        big = sel & (am >= 10)
+        row = {"scope": scope, "tetrode": tet, "n_events": int(sel.sum()), "n_events_10mad": int(big.sum())}
+        for n in names:
+            row[f"{n}_pct"] = round(100 * cl[n][sel].mean(), 2) if sel.any() else float("nan")
+            row[f"{n}_pct_10mad"] = round(100 * cl[n][big].mean(), 2) if big.any() else float("nan")
+        rows.append(row)
+
+    add("clean", "all", ~bad)
+    add("flagged", "all", bad)
+    for g in np.unique(pg):
+        add("clean", f"TT{g + 1}", ~bad & (pg == g))
+        add("flagged", f"TT{g + 1}", bad & (pg == g))
+    for lo, hi in K_BINS:
+        label = f"{lo}" if lo == hi else f"{lo}-{hi}"
+        add(f"clean, {label} other tetrodes flagged", "all", ~bad & (k_other >= lo) & (k_other <= hi))
+    minute = sec // 60
+    n_min = int(np.ceil(n_s / 60))
+    sel = ~bad & (am >= 10)
+    den = np.bincount(minute[sel], minlength=n_min)
+    series = {n: np.bincount(minute[sel], weights=cl[n][sel], minlength=n_min) / np.maximum(den, 1) * 100
+              for n in names}
+    n_flag = np.pad(flag.sum(0), (0, n_min * 60 - n_s)).reshape(n_min, 60).max(1)
+    return pd.DataFrame(rows), series, den, n_flag
+
+
+def plot_coverage(path, series, den, n_flag, names, title):
+    t = (np.arange(n_flag.size) + 0.5) / 60
+    fig, axs = plt.subplots(2, 1, figsize=(13, 5), sharex=True, gridspec_kw={"height_ratios": [1, 2]})
+    axs[0].step(t, n_flag, where="mid", color="r", lw=0.8)
+    axs[0].set_ylabel("tetrodes flagged\n(max per 60 s)")
+    for n in names:
+        y = np.where(den >= 20, series[n], np.nan)
+        axs[1].plot(t, y, lw=0.8, label=n)
+    axs[1].set_ylabel("clean events >= 10 MAD\nclaimed by a single unit (%)")
+    axs[1].set_xlabel("time (h)")
+    axs[1].legend(fontsize=8)
+    axs[0].set_title(title)
+    fig.tight_layout()
+    fig.savefig(path, dpi=100)
+    plt.close(fig)
+
+
 def presence(counts: np.ndarray, valid_frac: np.ndarray) -> tuple[float, int, int]:
     present = counts >= MIN_SPIKES
     if not present.any():
@@ -114,6 +213,7 @@ def unit_table(name, frames, amps, rs, resid, ugroup, mua, clean, table, nfr, n_
             pres, first, last = presence(window_counts(fr[u], n_win), vf)
             rows.append({**r.to_dict(), "sorting": name, "is_mua": bool(mua[u]),
                          "rv_frac": r.rp_violations / r.n_spikes if r.n_spikes else float("nan"),
+                         "clock_lock": clock_lock(frames[u]),
                          "n_flagged_time": int((~clean[u]).sum()), "presence": pres, "first_window": first,
                          "last_window": last})
     return pd.DataFrame(rows)
@@ -184,6 +284,7 @@ def main() -> None:
     ap.add_argument("--tag", default=None, help="output tag (default <sorting>[_w<N>])")
     ap.add_argument("--table", default=None, help="bad-period table (default <session>/bad_periods/bad_periods.csv)")
     ap.add_argument("--workers", type=int, default=48)
+    ap.add_argument("--no-coverage", action="store_true", help="skip the detected-event coverage")
     a = ap.parse_args()
     exp = experiment_from_args(a)
     binary = str(exp.sorting_dir("mp_baseline") / "binary")
@@ -233,7 +334,7 @@ def main() -> None:
                        tuple(r["ugroup"] for r in runs.values()), (temps[names[0]], temps[names[1]]),
                        (sua[names[0]], sua[names[1]]))
     cols = ["n_spikes", "rate_hz", "amp_mad_median", "rp_contamination", "rv_frac", "ampsplit_ratio", "cos_median", "cos_p10",
-            "resid_median", "amp_cv", "n_flagged_time", "presence", "first_window", "last_window"]
+            "resid_median", "amp_cv", "clock_lock", "n_flagged_time", "presence", "first_window", "last_window"]
     out = m.copy()
     for name in names:
         t = tabs[name].set_index("unit")
@@ -241,8 +342,12 @@ def main() -> None:
             out[f"{c}_{name}"] = out[name].map(lambda u, c=c, t=t: t.loc[int(u), c] if pd.notna(u) else None)
     out.to_csv(RESULTS / f"bad_periods_units_{exp.experiment}_{tag}.csv", index=False)
 
-    summary = {"table": str(a.table or exp.bad_periods_dir / "bad_periods.csv"), "n_windows": n_win,
-               "sortings": {n: str(exp.sorting_dir(d) / a.sorting) for n, d in zip(names, (a.a, a.b))},
+    def rel(p):
+        p = pathlib.Path(p)
+        return str(p.relative_to(exp.data_root)) if p.is_relative_to(exp.data_root) else str(p)
+
+    summary = {"table": rel(a.table or exp.bad_periods_dir / "bad_periods.csv"), "n_windows": n_win,
+               "sortings": {n: rel(exp.sorting_dir(d) / a.sorting) for n, d in zip(names, (a.a, a.b))},
                "flagged_s_per_tetrode": {tname[g]: round(nfr / FS - valid[g], 1) for g in gids}}
     for name in names:
         t = tabs[name][~tabs[name].is_mua]
@@ -255,7 +360,19 @@ def main() -> None:
             "cos_median_median": float(t.cos_median.median()),
             "resid_median_median": float(t.resid_median.median()),
             "presence_median": float(t.presence.median()),
-            "units_present_after_window_1": int((t.last_window > 1).sum())}
+            "units_present_after_window_1": int((t.last_window > 1).sum()),
+            "units_clock_locked": int((t.clock_lock > CLOCK_LOCKED).sum())}
+    peaks_npz = exp.sorting_dir(a.a) / "spike_coverage.npz"
+    if not a.no_coverage and peaks_npz.exists():
+        cov, series, den, n_flag = coverage(peaks_npz, runs, names, table, nfr)
+        cov.to_csv(RESULTS / f"bad_periods_coverage_{exp.experiment}_{tag}.csv", index=False)
+        print(cov[cov.tetrode == "all"].to_string(index=False))
+        plot_coverage(figdir / f"coverage_{tag}.png", series, den, n_flag, names,
+                      f"{exp.experiment}: events of {a.a} at 10 MAD or more in clean time, claimed by a single unit")
+        for name in names:
+            c = cov[(cov.scope == "clean") & (cov.tetrode == "all")].iloc[0]
+            summary[name]["clean_events_claimed_pct"] = float(c[f"{name}_pct"])
+            summary[name]["clean_events_10mad_claimed_pct"] = float(c[f"{name}_pct_10mad"])
     (RESULTS / f"bad_periods_compare_{exp.experiment}_{tag}.json").write_text(json.dumps(summary, indent=1) + "\n")
     print(json.dumps({k: v for k, v in summary.items() if k in names}, indent=1))
 
