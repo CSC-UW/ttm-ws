@@ -110,6 +110,10 @@ and a bad period the detector misses costs more than its own tetrode.
 - One-millisecond electrical pops on the good tetrodes are flagged as 3 s
   intervals (1 s bin plus padding); on TTM-003 that is under a minute per
   good tetrode over 48 h.
+- A stretch in which a tetrode's wires stay between about 1.3 and 2.5
+  times their baseline is flagged only where it lies between two flagged
+  bins with some wire at twice its baseline throughout. On TTM-003 the
+  80 s tail of the 96,900 s event on TT1 and TT16 is missed this way.
 - Times are seconds of the recording it scanned. `ttm-bad-periods --binary`
   on a binary cropped from the session (TTM-001's `mp_long_s2000_d170000`)
   writes times relative to the crop.
