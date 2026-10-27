@@ -1,0 +1,64 @@
+reference (baseline seed sort, TT15): {1: 442, 2: 1809, 3: 4965}
+unmasked_s42: 3 units
+  unit 0:     442 spikes; covers 1.000 of ref 1, 1.000 of its spikes in ref 1
+  unit 1:    1809 spikes; covers 1.000 of ref 2, 1.000 of its spikes in ref 2
+  unit 2:    4965 spikes; covers 1.000 of ref 3, 1.000 of its spikes in ref 3
+masked_s42: 2 units
+  unit 0:    2243 spikes; covers 0.998 of ref 2, 0.805 of its spikes in ref 2
+  unit 1:    4536 spikes; covers 0.895 of ref 3, 0.979 of its spikes in ref 3
+unmasked_s1: 3 units
+  unit 0:     224 spikes; covers 0.000 of ref 1, 0.000 of its spikes in ref 1
+  unit 1:     962 spikes; covers 0.509 of ref 1, 0.234 of its spikes in ref 1
+  unit 2:    5099 spikes; covers 0.984 of ref 3, 0.958 of its spikes in ref 3
+unmasked_s2: 4 units
+  unit 0:     321 spikes; covers 0.005 of ref 1, 0.006 of its spikes in ref 1
+  unit 1:     412 spikes; covers 0.916 of ref 1, 0.983 of its spikes in ref 1
+  unit 2:    1562 spikes; covers 0.862 of ref 2, 0.999 of its spikes in ref 2
+  unit 3:    4828 spikes; covers 0.954 of ref 3, 0.981 of its spikes in ref 3
+unmasked_s3: 4 units
+  unit 0:     387 spikes; covers 0.005 of ref 1, 0.005 of its spikes in ref 1
+  unit 1:     245 spikes; covers 0.000 of ref 3, 0.004 of its spikes in ref 3
+  unit 2:    2562 spikes; covers 0.998 of ref 2, 0.705 of its spikes in ref 2
+  unit 3:    5466 spikes; covers 0.986 of ref 3, 0.896 of its spikes in ref 3
+unmasked_s4: 3 units
+  unit 0:     192 spikes; covers 0.002 of ref 1, 0.005 of its spikes in ref 1
+  unit 1:    1140 spikes; covers 0.579 of ref 1, 0.225 of its spikes in ref 1
+  unit 2:    3368 spikes; covers 0.671 of ref 3, 0.990 of its spikes in ref 3
+masked_s1: 3 units
+  unit 0:     217 spikes; covers 0.000 of ref 1, 0.000 of its spikes in ref 1
+  unit 1:     962 spikes; covers 0.509 of ref 1, 0.234 of its spikes in ref 1
+  unit 2:    4604 spikes; covers 0.890 of ref 3, 0.960 of its spikes in ref 3
+masked_s2: 3 units
+  unit 0:     320 spikes; covers 0.005 of ref 1, 0.006 of its spikes in ref 1
+  unit 1:    1969 spikes; covers 0.912 of ref 1, 0.205 of its spikes in ref 1
+  unit 2:    4377 spikes; covers 0.866 of ref 3, 0.982 of its spikes in ref 3
+masked_s3: 3 units
+  unit 0:     555 spikes; covers 0.005 of ref 1, 0.004 of its spikes in ref 1
+  unit 1:    2558 spikes; covers 0.998 of ref 2, 0.706 of its spikes in ref 2
+  unit 2:    4996 spikes; covers 0.896 of ref 3, 0.891 of its spikes in ref 3
+masked_s4: 3 units
+  unit 0:     193 spikes; covers 0.002 of ref 1, 0.005 of its spikes in ref 1
+  unit 1:    1139 spikes; covers 0.579 of ref 1, 0.225 of its spikes in ref 1
+  unit 2:    3025 spikes; covers 0.603 of ref 3, 0.990 of its spikes in ref 3
+unmasked_t5: 4 units
+  unit 0:      11 spikes; covers 0.002 of ref 3, 1.000 of its spikes in ref 3
+  unit 1:     154 spikes; covers 0.000 of ref 3, 0.006 of its spikes in ref 3
+  unit 2:     946 spikes; covers 0.505 of ref 1, 0.236 of its spikes in ref 1
+  unit 3:    4204 spikes; covers 0.833 of ref 3, 0.984 of its spikes in ref 3
+unmasked_t10: 6 units
+  unit 0:      10 spikes; covers 0.002 of ref 3, 1.000 of its spikes in ref 3
+  unit 1:     219 spikes; covers 0.001 of ref 2, 0.009 of its spikes in ref 2
+  unit 2:    1974 spikes; covers 0.994 of ref 2, 0.911 of its spikes in ref 2
+  unit 3:     467 spikes; covers 0.980 of ref 1, 0.927 of its spikes in ref 1
+  unit 4:      58 spikes; covers 0.005 of ref 1, 0.034 of its spikes in ref 1
+  unit 5:    4219 spikes; covers 0.834 of ref 3, 0.982 of its spikes in ref 3
+unmasked_t30: 3 units
+  unit 0:     154 spikes; covers 0.000 of ref 1, 0.000 of its spikes in ref 1
+  unit 1:     806 spikes; covers 0.441 of ref 1, 0.242 of its spikes in ref 1
+  unit 2:    4729 spikes; covers 0.931 of ref 3, 0.978 of its spikes in ref 3
+unmasked_t60: 4 units
+  unit 0:      11 spikes; covers 0.002 of ref 3, 1.000 of its spikes in ref 3
+  unit 1:     172 spikes; covers 0.005 of ref 1, 0.012 of its spikes in ref 1
+  unit 2:    1175 spikes; covers 0.595 of ref 1, 0.224 of its spikes in ref 1
+  unit 3:    4018 spikes; covers 0.796 of ref 3, 0.984 of its spikes in ref 3
+

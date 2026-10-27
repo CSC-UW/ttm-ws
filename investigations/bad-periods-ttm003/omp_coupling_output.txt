@@ -1,0 +1,6 @@
+44 units with >= 100 window-0 spikes, 31 on TT5-TT12; 2400 to 2460 s
+unmasked, all units              TT5-TT12     4943   other tetrodes   133863   (10 s)
+masked, all units                TT5-TT12    33372   other tetrodes      491   (8 s)
+unmasked, TT5-TT12 units only    TT5-TT12    33432   other tetrodes        0   (7 s)
+unmasked, all units              TT5-TT12 spikes by tenth of the 1 s chunk: [938, 676, 557, 473, 426, 424, 405, 366, 362, 316]
+masked, all units                TT5-TT12 spikes by tenth of the 1 s chunk: [3760, 3539, 3247, 3210, 3415, 3276, 3335, 3240, 3199, 3151]

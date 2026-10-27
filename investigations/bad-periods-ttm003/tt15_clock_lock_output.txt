@@ -1,0 +1,112 @@
+baseline, first 14 windows: share of spikes per tenth of the 300-sample cycle
+  TT1   unit   0 n    98215  max tenth 0.185  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.014
+  TT2   unit   1 n     8033  max tenth 0.113  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.017
+  TT2   unit   2 n     1952  max tenth 0.119  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.011
+  TT3   unit   3 n    51214  max tenth 0.141  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.026
+  TT4   unit   4 n   556489  max tenth 0.109  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.002
+  TT4   unit   5 n    61226  max tenth 0.198  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.069
+  TT4   unit   6 n   322043  max tenth 0.115  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT4   unit   7 n   285488  max tenth 0.109  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT5   unit   8 n   226976  max tenth 0.107  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.017
+  TT5   unit   9 n   273316  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT5   unit  10 n   255706  max tenth 0.101  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT5   unit  11 n   252794  max tenth 0.110  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT6   unit  12 n   221394  max tenth 0.101  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT6   unit  13 n   197126  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT6   unit  14 n   148771  max tenth 0.101  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT6   unit  15 n   114235  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT6   unit  16 n   202953  max tenth 0.102  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT7   unit  17 n   193094  max tenth 0.108  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT7   unit  18 n   243349  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT7   unit  19 n   217200  max tenth 0.106  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT7   unit  20 n    68081  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT8   unit  21 n   223990  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.017
+  TT8   unit  22 n   461939  max tenth 0.104  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT9   unit  23 n   145390  max tenth 0.129  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT10  unit  24 n   414635  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.017
+  TT10  unit  25 n   445285  max tenth 0.102  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.016
+  TT10  unit  26 n   392974  max tenth 0.106  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT10  unit  27 n   462404  max tenth 0.101  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.016
+  TT11  unit  28 n   150983  max tenth 0.114  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT11  unit  29 n   132555  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT11  unit  30 n    37015  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT11  unit  31 n   171579  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT11  unit  32 n   271328  max tenth 0.102  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT11  unit  33 n    30297  max tenth 0.102  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT12  unit  34 n   245265  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT12  unit  35 n   137012  max tenth 0.104  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT12  unit  36 n   346750  max tenth 0.108  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT12  unit  37 n   354200  max tenth 0.101  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT12  unit  38 n   325144  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT13  unit  39 n     9211  max tenth 0.108  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT14  unit  40 n    33867  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.007
+  TT15  unit  41 n   862940  max tenth 0.643  empty tenths 4  ISI within 0.1 ms of k*10 ms 0.656  <-- locked
+  TT15  unit  42 n   170205  max tenth 0.266  empty tenths 5  ISI within 0.1 ms of k*10 ms 0.139  <-- locked
+  TT15  unit  43 n   744309  max tenth 0.992  empty tenths 9  ISI within 0.1 ms of k*10 ms 0.975  <-- locked
+  TT16  unit  44 n    18733  max tenth 0.108  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.016
+  TT4   unit  49 n    14864  max tenth 0.124  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.071
+  TT10  unit  50 n     6016  max tenth 0.110  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.021
+masked, first 14 windows: share of spikes per tenth of the 300-sample cycle
+  TT1   unit   0 n     2788  max tenth 0.108  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT2   unit   1 n     4014  max tenth 0.107  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT3   unit   3 n     3836  max tenth 0.117  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.022
+  TT4   unit   4 n   335833  max tenth 0.101  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT4   unit   5 n   349856  max tenth 0.123  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT4   unit   6 n   321341  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.017
+  TT4   unit   7 n   310983  max tenth 0.102  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT5   unit   8 n   246162  max tenth 0.106  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.017
+  TT5   unit   9 n   305292  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT5   unit  10 n   277292  max tenth 0.102  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT5   unit  11 n   235475  max tenth 0.110  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT6   unit  12 n   227528  max tenth 0.101  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT6   unit  13 n   204966  max tenth 0.104  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT6   unit  14 n   151880  max tenth 0.101  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT6   unit  15 n   124689  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT6   unit  16 n   180187  max tenth 0.102  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT7   unit  17 n   227953  max tenth 0.104  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT7   unit  18 n   224313  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT7   unit  19 n   197271  max tenth 0.109  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT7   unit  20 n    69232  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT8   unit  21 n   233488  max tenth 0.105  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT8   unit  22 n   484704  max tenth 0.104  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT9   unit  23 n   172654  max tenth 0.130  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT10  unit  24 n   421444  max tenth 0.106  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.017
+  TT10  unit  25 n   458186  max tenth 0.102  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.016
+  TT10  unit  26 n   403221  max tenth 0.106  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT10  unit  27 n   508657  max tenth 0.101  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.015
+  TT11  unit  28 n   169194  max tenth 0.115  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT11  unit  29 n   154396  max tenth 0.106  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT11  unit  30 n    36357  max tenth 0.104  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.020
+  TT11  unit  31 n   163879  max tenth 0.106  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT11  unit  32 n   282962  max tenth 0.102  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT11  unit  33 n    30042  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT12  unit  34 n   229759  max tenth 0.106  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT12  unit  35 n   134162  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.019
+  TT12  unit  36 n   352134  max tenth 0.106  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT12  unit  37 n   391170  max tenth 0.103  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT12  unit  38 n   332103  max tenth 0.104  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT13  unit  39 n    12760  max tenth 0.107  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+  TT14  unit  40 n    11922  max tenth 0.122  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.014
+  TT15  unit  41 n   187867  max tenth 0.253  empty tenths 5  ISI within 0.1 ms of k*10 ms 0.138  <-- locked
+  TT15  unit  42 n   751943  max tenth 0.993  empty tenths 9  ISI within 0.1 ms of k*10 ms 0.977  <-- locked
+  TT16  unit  43 n    21515  max tenth 0.114  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.014
+  TT4   unit  47 n    14250  max tenth 0.123  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.072
+  TT10  unit  48 n     6280  max tenth 0.107  empty tenths 0  ISI within 0.1 ms of k*10 ms 0.018
+
+300-sample cycle mean over 60 s, peak to peak / MAD
+  t=1000 s: CH22 (TT15) 10.00, CH20 (TT15) 6.08, CH18 (TT15) 4.60, CH40 (TT1) 2.87, CH14 (TT14) 2.61, CH16 (TT14) 2.61 | median channel 0.646
+  t=30000 s: CH22 (TT15) 10.35, CH20 (TT15) 6.97, CH18 (TT15) 4.81, CH40 (TT1) 2.85, CH14 (TT14) 2.57, CH10 (TT14) 2.55 | median channel 0.647
+  t=100000 s: CH22 (TT15) 9.70, CH20 (TT15) 6.66, CH18 (TT15) 4.52, CH40 (TT1) 2.68, CH24 (TT15) 2.18, CH42 (TT2) 1.70 | median channel 0.517
+  t=160000 s: CH22 (TT15) 9.74, CH20 (TT15) 6.75, CH18 (TT15) 4.45, CH40 (TT1) 2.65, CH24 (TT15) 2.10, CH42 (TT2) 1.74 | median channel 0.554
+
+CH22 cycle waveform against its shape at 0.3 h
+    0.3 h: lag +0 samples, corr 1.000, trough at sample 13
+    5.6 h: lag +0 samples, corr 0.995, trough at sample 13
+   16.7 h: lag +0 samples, corr 0.980, trough at sample 12
+   27.8 h: lag +0 samples, corr 0.982, trough at sample 13
+   38.9 h: lag +0 samples, corr 0.984, trough at sample 13
+   47.2 h: lag +0 samples, corr 0.985, trough at sample 12
+
+assembled_prod, tenth of the cycle with most spikes per 6 h block
+  unit 43: 0 0 0 0 0 - 0 0
+  unit 74: - - - - - 0 0 0
