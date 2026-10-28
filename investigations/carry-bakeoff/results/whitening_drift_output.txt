@@ -1,0 +1,16 @@
+TT 1 w0: |r|max 0.04 var 1.02-1.07 | w12: |r|max 0.09 var 0.90-0.97 | w24: |r|max 0.05 var 1.07-1.10 | w48: |r|max 0.07 var 1.09-1.17 | w72: |r|max 0.09 var 0.92-1.05 | w95: |r|max 0.04 var 1.08-1.17
+TT 2 w0: |r|max 0.04 var 1.05-1.06 | w12: |r|max 0.09 var 0.81-0.96 | w24: |r|max 0.05 var 1.04-1.14 | w48: |r|max 0.11 var 1.09-1.18 | w72: |r|max 0.21 var 0.96-1.01 | w95: |r|max 0.18 var 1.13-1.33
+TT 3 w0: |r|max 0.04 var 1.00-1.07 | w12: |r|max 0.08 var 0.93-1.03 | w24: |r|max 0.03 var 1.04-1.25 | w48: |r|max 0.06 var 1.00-1.44 | w72: |r|max 0.11 var 1.12-1.38 | w95: |r|max 0.08 var 1.16-1.53
+TT 4 w0: |r|max 0.02 var 1.01-1.09 | w12: |r|max 0.18 var 0.71-0.85 | w24: |r|max 0.06 var 0.94-1.09 | w48: |r|max 0.18 var 1.07-1.33 | w72: |r|max 0.13 var 0.76-0.83 | w95: |r|max 0.11 var 1.01-1.08
+TT 5 w0: |r|max 0.01 var 0.99-1.01 | w12: |r|max 0.19 var 0.65-0.80 | w24: |r|max 0.07 var 0.97-1.02 | w48: |r|max 0.09 var 1.23-1.41 | w72: |r|max 0.22 var 0.70-0.87 | w95: |r|max 0.09 var 1.10-1.25
+TT 6 w0: |r|max 0.01 var 0.99-1.01 | w12: |r|max 0.14 var 0.81-0.86 | w24: |r|max 0.09 var 0.94-1.12 | w48: |r|max 0.09 var 1.18-1.31 | w72: |r|max 0.15 var 0.87-0.92 | w95: |r|max 0.09 var 1.02-1.10
+TT 7 w0: |r|max 0.01 var 1.00-1.03 | w12: |r|max 0.11 var 0.82-0.88 | w24: |r|max 0.04 var 1.00-1.02 | w48: |r|max 0.14 var 1.03-1.34 | w72: |r|max 0.07 var 0.70-0.82 | w95: |r|max 0.03 var 0.95-1.04
+TT 8 w0: |r|max 0.03 var 1.01-1.05 | w12: |r|max 0.19 var 0.73-0.82 | w24: |r|max 0.04 var 0.91-1.08 | w48: |r|max 0.11 var 1.03-1.53 | w72: |r|max 0.15 var 0.84-0.95 | w95: |r|max 0.09 var 0.91-1.22
+TT 9 w0: |r|max 0.01 var 0.99-1.02 | w12: |r|max 0.10 var 0.63-0.91 | w24: |r|max 0.07 var 0.69-1.02 | w48: |r|max 0.13 var 0.92-1.32 | w72: |r|max 0.06 var 0.71-0.98 | w95: |r|max 0.09 var 0.73-1.16
+TT10 w0: |r|max 0.01 var 0.99-1.03 | w12: |r|max 0.23 var 0.64-0.88 | w24: |r|max 0.07 var 0.92-1.11 | w48: |r|max 0.11 var 1.11-1.36 | w72: |r|max 0.23 var 0.64-0.87 | w95: |r|max 0.11 var 1.02-1.24
+TT11 w0: |r|max 0.01 var 1.00-1.00 | w12: |r|max 0.13 var 0.81-1.05 | w24: |r|max 0.02 var 1.05-1.12 | w48: |r|max 0.08 var 1.25-1.34 | w72: |r|max 0.10 var 0.92-0.99 | w95: |r|max 0.04 var 1.12-1.22
+TT12 w0: |r|max 0.02 var 1.01-1.02 | w12: |r|max 0.15 var 0.74-0.82 | w24: |r|max 0.02 var 0.96-1.03 | w48: |r|max 0.10 var 1.16-1.24 | w72: |r|max 0.14 var 0.76-0.85 | w95: |r|max 0.10 var 1.01-1.16
+TT13 w0: |r|max 0.03 var 1.02-1.07 | w12: |r|max 0.08 var 0.89-1.11 | w24: |r|max 0.04 var 1.09-1.25 | w48: |r|max 0.11 var 1.18-1.53 | w72: |r|max 0.04 var 1.11-1.37 | w95: |r|max 0.11 var 1.28-1.73
+TT14 w0: |r|max 0.04 var 1.03-1.06 | w12: |r|max 0.15 var 0.73-1.00 | w24: |r|max 0.07 var 0.76-1.04 | w48: |r|max 0.28 var 0.64-0.77 | w72: |r|max 0.27 var 0.57-0.72 | w95: |r|max 0.29 var 0.58-0.75
+TT15 w0: |r|max 0.05 var 0.99-1.09 | w12: |r|max 0.10 var 0.96-1.22 | w24: |r|max 0.05 var 1.29-1.40 | w48: |r|max 0.06 var 1.31-1.39 | w72: |r|max 0.10 var 1.08-1.29 | w95: |r|max 0.03 var 1.26-1.34
+TT16 w0: |r|max 0.08 var 1.04-1.11 | w12: |r|max 0.11 var 0.88-0.98 | w24: |r|max 0.07 var 1.06-1.10 | w48: |r|max 0.11 var 1.05-1.17 | w72: |r|max 0.11 var 0.88-1.07 | w95: |r|max 0.07 var 1.05-1.23

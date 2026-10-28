@@ -68,7 +68,8 @@ def inpulse_rate(f: np.ndarray, on: np.ndarray, off: np.ndarray, a: int, b: int)
 def score_arm(arm_dir) -> tuple[pd.DataFrame, pd.DataFrame]:
     gt = np.load(bk.BAKE / "gt.npz")
     b0 = bk.Bank.load(bk.BAKE / "bank_start.npz")
-    e0 = {u: float((t.astype(np.float64) ** 2).sum()) for u, t in zip(b0.ids, b0.T)}
+    first = bk.Bank.load(arm_dir / "bankin_w00.npz") if (arm_dir / "bankin_w00.npz").exists() else b0
+    e0 = {u: float((t.astype(np.float64) ** 2).sum()) for u, t in zip(first.ids, first.T)}
     grp = dict(zip(b0.ids.tolist(), b0.group.tolist()))
     rows_gt, rows_real = [], []
     import json
