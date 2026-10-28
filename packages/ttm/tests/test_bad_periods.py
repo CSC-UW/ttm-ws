@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -94,3 +96,21 @@ def test_mask_is_chunk_independent_and_serializable(tmp_path):
     np.testing.assert_array_equal(sub, whole[:, [5, 2]])
     m2 = si.load(m.to_dict())
     np.testing.assert_array_equal(m2.get_traces(start_frame=9000, end_frame=19000), whole)
+
+
+def test_mask_with_overlapping_and_nearby_periods():
+    rec, x = _recording(n_s=40)
+    t = pd.DataFrame({"group": [0, 1, 0], "start_s": [10.0, 12.0, 16.01], "end_s": [16.0, 14.0, 17.0],
+                      "kind": "loud", "channels": "", "max_loud": 5.0, "max_corr_excess": 0.0, "flagged_s": 1.0})
+    m = mask_bad_periods(rec, t, mode="noise", taper_frames=30, noise_levels=np.full(8, 3.0), seed=3)
+    whole = m.get_traces(start_frame=0, end_frame=int(30 * FS))
+    cuts = [0, 9990, 12005, 13999, 16005, 16015, 30000]
+    parts = np.vstack([m.get_traces(start_frame=a, end_frame=b) for a, b in itertools.pairwise(cuts)])
+    np.testing.assert_array_equal(whole, parts)
+    np.testing.assert_array_equal(whole[:9970], x[:9970])
+    np.testing.assert_array_equal(whole[17030:], x[17030:30000])
+    np.testing.assert_array_equal(whole[:11970, 4:], x[:11970, 4:])
+    np.testing.assert_array_equal(whole[14030:, 4:], x[14030:30000, 4:])
+    assert np.std(whole[10000:16000, :4]) == pytest.approx(3.0, rel=0.05)
+    assert np.std(whole[12000:14000, 4:]) == pytest.approx(3.0, rel=0.05)
+    assert np.all(whole[16000:16010, :4] != x[16000:16010, :4])

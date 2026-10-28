@@ -377,12 +377,16 @@ class _MaskedPeriodsSegment(BasePreprocessorSegment):
         self.block = block_frames
         self.n_ch = n_channels
 
-    def _noise(self, start: int, end: int, chans: np.ndarray) -> np.ndarray:
+    def _noise(self, start: int, end: int, chans: np.ndarray, need: np.ndarray) -> np.ndarray:
+        """Noise for frames [start, end) of ``chans``, drawn only in blocks where ``need`` (frames x
+        chans) has a True; zero elsewhere."""
         out = np.zeros((end - start, len(chans)), dtype=np.float32)
         for blk in range(start // self.block, (end - 1) // self.block + 1):
             b0 = blk * self.block
             a, b = max(start, b0), min(end, b0 + self.block)
             for k, c in enumerate(chans):
+                if not need[a - start:b - start, k].any():
+                    continue
                 z = np.random.default_rng((self.seed, blk, int(c))).standard_normal(self.block, dtype=np.float32)
                 out[a - start:b - start, k] = z[a - b0:b - b0]
         return out * self.noise_levels[chans]
@@ -414,23 +418,37 @@ class _MaskedPeriodsSegment(BasePreprocessorSegment):
             return traces
         all_ch = np.arange(self.n_ch) if channel_indices is None else np.arange(self.n_ch)[channel_indices]
         pos = {int(c): k for k, c in enumerate(all_ch)}
-        col_w = {}
+        spans = []
         for i in hits:
             a, b, chans = self.periods[i]
             cols = [pos[c] for c in chans if c in pos]
-            if cols:
-                w = self._weight(a, b, start_frame, end_frame)
+            s0, s1 = max(start_frame, a - self.taper), min(end_frame, b + self.taper)
+            if cols and s0 < s1:
+                spans.append((s0, s1, a, b, cols))
+        if not spans:
+            return traces
+        spans.sort(key=lambda s: s[0])
+        out = np.array(traces, dtype=traces.dtype, copy=True)
+        j = 0
+        while j < len(spans):
+            s0, s1 = spans[j][0], spans[j][1]
+            k = j + 1
+            while k < len(spans) and spans[k][0] < s1:
+                s1 = max(s1, spans[k][1])
+                k += 1
+            col_w = {}
+            for _, _, a, b, cols in spans[j:k]:
+                w = self._weight(a, b, s0, s1)
                 for col in cols:
                     col_w[col] = w if col not in col_w else np.maximum(col_w[col], w)
-        if not col_w:
-            return traces
-        cols = np.array(sorted(col_w))
-        weight = np.stack([col_w[c] for c in cols], axis=1)
-        out = np.array(traces, dtype=traces.dtype, copy=True)
-        mixed = traces[:, cols].astype(np.float32) * (1.0 - weight)
-        if self.mode == "noise":
-            mixed += weight * self._noise(start_frame, end_frame, all_ch[cols])
-        out[:, cols] = mixed.astype(traces.dtype, copy=False)
+            cols = np.array(sorted(col_w))
+            weight = np.stack([col_w[c] for c in cols], axis=1)
+            x = traces[s0 - start_frame:s1 - start_frame]
+            mixed = x[:, cols].astype(np.float32) * (1.0 - weight)
+            if self.mode == "noise":
+                mixed += weight * self._noise(s0, s1, all_ch[cols], weight > 0)
+            out[s0 - start_frame:s1 - start_frame, cols] = mixed.astype(traces.dtype, copy=False)
+            j = k
         return out
 
 

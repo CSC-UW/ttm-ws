@@ -83,7 +83,11 @@ the sorter wrappers need.
 
 A masked 60 s read of the TTM-003 binary in which eight tetrodes are masked
 takes about 4 s, most of it reading the binary; chunks without an interval
-cost nothing extra.
+cost nothing extra. Within a read the fill is computed only over each run
+of overlapping intervals and their fades, so a long read costs in proportion
+to its flagged time: one tetrode's 1800 s window takes 4.6 s masked against
+4.5 s unmasked for TT16 in window 30 (49 s flagged), and 6.9 s for TT4 in
+window 1 (409 s flagged).
 
 ## Why it matters to tetrodes without bad periods
 
