@@ -54,3 +54,131 @@ of 5 and 6 MAD, whose half-size spikes no rule could find; it was replaced.
   per window on the ground truth and on proxies for the real units.
 
 Paths are literal tononi-2 paths.
+
+## Results on the 12 windows
+
+Numbers are measurements on the hybrid binary. Recall is the share of a
+ground-truth unit's spikes that the unit seeded from it found within
+0.33 ms; precision is the share of that unit's spikes that are its own.
+"Small" pools the units with a trough of 6 MAD or less (11 units), "large"
+the others (10). Bulk products are under
+`sortings_seed42_pcafix/carry_bakeoff/v2/` on the session's volume, figures in
+its `figures/` (`ladder.png`, `template_scale.png`, `laser.png`).
+
+### Stage A: what each matcher admits on frozen templates
+
+`admission.py`, window 0 (clean apart from laser train 1) and window 1 (the
+2287 to 2696 s event on seven tetrodes). Per-tetrode rules are applied to the
+permissive per-tetrode fits; "snr" is the matched-filter signal-to-noise, `a`
+the fit amplitude, `cos_pl` the cosine of the peeled snippet, and every
+per-tetrode rule includes the refractory rule (1.5 ms).
+
+| window 0 | small recall | small precision | large recall | large precision | burst tails, large | half-size laser, large |
+|---|---|---|---|---|---|---|
+| joint, a >= 0.8 (June) | 0.66 | 0.70 | 0.73 | 0.86 | 0.40 | 0.05 |
+| joint masked | 0.66 | 0.70 | 0.73 | 0.87 | 0.40 | 0.05 |
+| per tetrode, a >= 0.8 | 0.82 | 0.52 | 0.84 | 0.82 | 0.52 | 0.06 |
+| per tetrode, snr >= 4, a >= 0.5, cos_pl >= 0.6 | 0.63 | 0.80 | 0.87 | 0.83 | 0.72 | 0.21 |
+| per tetrode, whitened, snr >= 4.5, a >= 0.5, cos_pl >= 0.5 | 0.85 | 0.93 | 0.96 | 0.93 | 0.89 | 0.62 |
+| per tetrode, whitened, the same with cos_pl >= 0.6 | 0.68 | 0.99 | 0.89 | 0.98 | 0.74 | 0.24 |
+
+| window 1 | small recall | small precision | large recall | large precision | recall on TT5 to TT12 inside the event |
+|---|---|---|---|---|---|
+| joint | 0.43 | 0.17 | 0.54 | 0.61 | 0.08 |
+| joint masked | 0.46 | 0.52 | 0.63 | 0.81 | 0.64 |
+| per tetrode, a >= 0.8 | 0.72 | 0.09 | 0.82 | 0.25 | 0.75 |
+| per tetrode, snr >= 4, a >= 0.5, cos_pl >= 0.6 | 0.41 | 0.43 | 0.82 | 0.76 | 0.53 |
+| per tetrode, whitened, snr >= 4.5, a >= 0.5, cos_pl >= 0.5 | 0.65 | 0.72 | 0.93 | 0.85 | 0.77 |
+
+On tetrodes with one or two units the joint matcher finds few of the
+ground-truth spikes even in clean time (TT1: 0 and 20 %; TT16: 0 and 53 %),
+where per tetrode finds 96 to 98 % of the larger ones
+(`admission_units.py`). Matching per tetrode with its own bad periods dropped
+needs no mask: counted outside each unit's own bad periods, window 1 gives
+large-unit recall 0.84 to 0.88 per tetrode against 0.71 joint masked
+(`admission_badperiods.py`).
+
+Spatial whitening per tetrode (a 4x4 ZCA matrix from the spike-excised noise
+of the first 300 s) raised precision more than any rule did. The
+matched-filter signal-to-noise of the seed templates rose only 1.1 to 1.5
+times on Gaussian-noise grounds (`whitening_drift.py` and the shrinkage
+estimates), so the gain is mostly in what the false fits were. Conjecture:
+they were signals common to the four wires (far-field spikes, artifacts),
+which whitening removes.
+
+### June's carry on the ground truth
+
+Over 12 windows joint masked matching with June's re-estimation (mean of 500
+random spikes taken at a >= 0.8) lost ground-truth recall from 0.66 to 0.30
+(small) and 0.73 to 0.24 (large), and precision with it. Three mechanisms,
+per unit (`score.py` tables):
+
+- Templates of units near the floor creep up: the rebuild averages spikes
+  that the template's own floor already cut below, the larger template
+  raises the floor, and the unit's spikes drop out (GT20 to 1.8 times its
+  injected size, GT0 1.6, GT8 1.7).
+- Small units on busy tetrodes are captured by background spikes (GT16 on
+  TT10 at precision 0.01 by window 2 with 37,000 spikes).
+- Unmasked, the window-1 event rebuilt the templates of the event tetrodes'
+  units from artifact (2 to 13 times their size); they took nothing again
+  and were never rebuilt (recall 0 from window 2 on).
+
+### Re-estimation
+
+Every rebuild recipe tried (all spikes or lead spikes only, raw or peeled
+snippets, mean or median, replace or blend, laser pulses and bad periods
+left out) did worse than freezing the templates when admission depended on
+the template's scale.
+- A truncated-normal correction of the scale shrank real units' templates to
+  its clip, because their signal-to-noise distributions are mixtures.
+- A band symmetric about the mode of the signal-to-noise left most real
+  units with no band.
+
+Admission was then made independent of the template's scale. The relative
+floor is measured against the median fit amplitude of the unit's lead
+spikes in the window, alongside the matched-filter signal-to-noise and the
+peeled cosine. Means over the 12 windows (`compare_carries.py`,
+`results/carries_summary_final.csv`):
+
+| arm | small R / P | large R / P | small F1 | large F1 | half-size laser | event recall, large |
+|---|---|---|---|---|---|---|
+| joint masked, June | 0.38 / 0.38 | 0.46 / 0.64 | 0.38 | 0.53 | 0.02 | 0.56 |
+| joint masked, whitened, June | 0.62 / 0.79 | 0.78 / 0.95 | 0.69 | 0.86 | 0.02 | 0.77 |
+| per tetrode, plain, frozen | 0.54 / 0.67 | 0.80 / 0.78 | 0.60 | 0.79 | 0.53 | 0.70 |
+| per tetrode, plain, rebuilt (lead, no laser, no bad periods, peeled) | 0.46 / 0.42 | 0.72 / 0.68 | 0.43 | 0.69 | 0.53 | 0.63 |
+| per tetrode, whitened, frozen | 0.72 / 0.89 | 0.93 / 0.91 | 0.79 | 0.92 | 0.60 | 0.90 |
+| per tetrode, whitened, blend 0.2 | 0.72 / 0.87 | 0.93 / 0.90 | 0.79 | 0.91 | 0.61 | 0.90 |
+| per tetrode, whitened, blend 0.5 | 0.71 / 0.81 | 0.93 / 0.89 | 0.76 | 0.91 | 0.61 | 0.90 |
+| per tetrode, whitened, full replace | 0.70 / 0.74 | 0.93 / 0.89 | 0.72 | 0.91 | 0.60 | 0.89 |
+| per tetrode, whitened, confident spikes, blend 0.5 | 0.70 / 0.77 | 0.93 / 0.91 | 0.73 | 0.92 | 0.60 | 0.90 |
+
+The per-tetrode rows use snr >= 4 (plain) or 4.5 (whitened), cos_pl >= 0.6
+(plain) or 0.5 (whitened), a >= 0.5 of the median fit, refractory 1.5 ms,
+fits in the tetrode's own bad periods dropped, and the in-pulse rule below.
+
+On the whitened carries most units' templates stay at cosine 0.98 or more to
+the injected ones under every recipe; the difference between recipes is in a
+few units. GT20 (6 MAD, shrinking to 0.6 of its size) is captured under full
+replacement (cosine 0.62, precision 0.02 by window 6) and not under blend 0.2
+or frozen. The ground-truth drift (size down to 0.6, a step to 0.75, wire
+gains by up to 20 % over 6 h) did not need the templates to track it
+closely; real units over 48 h may.
+
+### Laser pulses
+
+Inside each delivered pulse (onset to offset plus 100 ms), units that fire
+through the pulses at twice their rate outside them get a relaxed rule (snr >=
+2.5, a >= 0.3 of the median fit, cos_pl >= 0.5). On the frozen-template fits
+of window 0 (`pulse_rules.py`), plain space:
+
+| in-pulse rule | GT6 half-size | GT13 half-size | false in-pulse spikes on silent ground-truth units | real units' in/out rate, median |
+|---|---|---|---|---|
+| as outside | 0.29 | 0.13 | 2.9 /s | 0.31 |
+| relaxed, every unit | 0.63 | 0.60 | 11.3 /s | 2.46 |
+| relaxed, units that fire through the pulses | 0.63 | 0.60 | 3.6 /s | 0.31 |
+
+The test first counted both rates under the standard rule. On the real 48 h
+it then missed the TT6 cell (29 Hz outside the pulses, 1.6 times that inside
+under the standard rule, its half-size train below the standard floor). The
+test now counts both rates under the relaxed rule. The 12-window carries ran
+with the first version.
