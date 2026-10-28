@@ -99,6 +99,14 @@ ARMS = {a.name: a for a in [
                      (0.5, "conf"), (0.5, "conf_b5"))
 ] + [
     Arm("W_joint_masked_june", per_tetrode=False, masked=True, whiten=True),
+] + [
+    # The 48 h of the original binary, unmasked, with June's re-seeding every 12 windows from
+    # mp_baseline's MountainSort5 re-seed sorts (run with --bank <BAKE_ROOT>/bank0.npz --windows 0-95)
+    Arm("R48_W_s45_c50_lnb_b2", hybrid=False, amp_rel=0.5, snr_floor=4.5, gate=("cos_pl", 0.5), refractory_ms=1.5,
+        recipe=RECIPES["lnb_b2"], match_floor=(0.2, 2.5), pulse_rule=(2.5, 0.3, 0.5), drop_bad=True, amp_ref="median",
+        whiten=True, reseed_every=12, reseed_sorts=str(bk.SORTINGS / "mp_baseline" / "reseed_sorts")),
+    Arm("R48_W_joint_masked_june", per_tetrode=False, hybrid=False, masked=True, whiten=True, reseed_every=12,
+        reseed_sorts=str(bk.SORTINGS / "mp_baseline_masked" / "reseed_sorts")),
 ]}
 
 
