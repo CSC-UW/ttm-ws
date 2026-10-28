@@ -259,6 +259,8 @@ class Recipe:
     max_spikes: int = 500
     min_spikes: int = 100
     scale: str = "mean"
+    conf_snr: float | None = None
+    conf_cos: float | None = None
     lead_ms: float = 10.0
     post_ms: float = 100.0
     iso_ms: float = 1.5
@@ -485,6 +487,12 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
             continue
         sel = select_spikes(recipe, frames_abs, np.where(acc, labels, -1), amps, k_u, pulses, g)
         sel = sel[(fl[sel] >= NB) & (fl[sel] + NA <= x.shape[0])]
+        conf_snr, conf_cos = getattr(recipe, "conf_snr", None), getattr(recipe, "conf_cos", None)
+        if conf_snr is not None:
+            # learn only from confident spikes: snr this far above the admission floor
+            sel = sel[sc["snr"][sel] >= (admission.get("snr_floor") or 0.0) + conf_snr]
+        if conf_cos is not None:
+            sel = sel[sc["cos_pl"][sel] >= conf_cos]
         if sel.size < min(recipe.min_spikes, 50):
             continue
         scale = getattr(recipe, "scale", "mean")
