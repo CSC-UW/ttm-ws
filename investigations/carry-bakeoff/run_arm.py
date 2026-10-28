@@ -39,6 +39,7 @@ RECIPES = {
     # bad periods of the tetrode excluded from re-estimation ("match but don't learn")
     "lnb": Recipe(select="lead_nostim_nobad", snippet="peeled"),
     "lnb_b5": Recipe(select="lead_nostim_nobad", snippet="peeled", blend=0.5),
+    "lnb_b2": Recipe(select="lead_nostim_nobad", snippet="peeled", blend=0.2),
     # and the spikes kept in a band symmetric about the mode of their snr, so the admission floors' cut of
     # the amplitude distribution does not raise the template (a truncated-normal fit, scale="trunc",
     # shrank real units' templates to the 0.5 clip: their snr is not one truncated normal)
@@ -83,7 +84,17 @@ ARMS = {a.name: a for a in [
     # pulses, and re-estimation from lead spikes outside pulses and bad periods (peeled, mean)
     Arm(f"D_{adm}_{rname}", amp_rel=0.5, snr_floor=k, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=RECIPES[rname],
         match_floor=(0.2, 2.5), pulse_rule=(2.5, 0.3, 0.5), drop_bad=True, amp_ref="median")
-    for adm, k in (("s4", 4.0), ("s45", 4.5)) for rname in ("lnb", "lnb_b5", "june", "frozen")
+    for adm, k in (("s4", 4.0), ("s45", 4.5)) for rname in ("lnb", "lnb_b5", "lnb_b2", "june", "frozen")
+    if adm == "s4" or rname != "lnb_b2"
+] + [
+    # Stage W: the same on traces whitened per tetrode (4x4 ZCA from spike-excised noise of the first
+    # 300 s), where stage A put the peeled-cosine gate at 0.5
+    Arm(f"W_s45_c{int(c * 100)}_{rname}", amp_rel=0.5, snr_floor=4.5, gate=("cos_pl", c), refractory_ms=1.5,
+        recipe=RECIPES[rname], match_floor=(0.2, 2.5), pulse_rule=(2.5, 0.3, 0.5), drop_bad=True, amp_ref="median",
+        whiten=True)
+    for c, rname in ((0.5, "lnb"), (0.5, "lnb_b5"), (0.5, "lnb_b2"), (0.5, "june"), (0.5, "frozen"), (0.55, "lnb"))
+] + [
+    Arm("W_joint_masked_june", per_tetrode=False, masked=True, whiten=True),
 ]}
 
 
