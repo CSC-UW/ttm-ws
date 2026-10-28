@@ -40,8 +40,10 @@ def near(ref: np.ndarray, other: np.ndarray, tol: int = TOL) -> np.ndarray:
     """Whether each of ``ref`` has an element of sorted ``other`` within ``tol``."""
     if other.size == 0:
         return np.zeros(ref.size, bool)
-    j = np.clip(np.searchsorted(other, ref), 1, max(other.size - 1, 1))
-    d = np.minimum(np.abs(other[j] - ref), np.abs(other[np.maximum(j - 1, 0)] - ref))
+    j = np.searchsorted(other, ref)
+    hi = other[np.clip(j, 0, other.size - 1)]
+    lo = other[np.clip(j - 1, 0, other.size - 1)]
+    d = np.minimum(np.abs(hi - ref), np.abs(lo - ref))
     return d <= tol
 
 

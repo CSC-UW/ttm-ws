@@ -36,7 +36,7 @@ HERE = pathlib.Path(__file__).parent
 
 
 def pooled(g: pd.DataFrame, members) -> pd.Series:
-    d = g[g.gt.isin(members)]
+    d = g[g["gt"].isin(members)]
     found = (d.recall * d.n_true).sum()
     hits = (d.precision.fillna(0) * d.n_unit).sum()
     return pd.Series({"recall": found / max(d.n_true.sum(), 1), "precision": hits / max(d.n_unit.sum(), 1),
@@ -62,8 +62,8 @@ def main():
         for w, gw in g.groupby("window"):
             row = {"arm": a, "window": w}
             for cname, mem in (("small", small), ("large", large)):
-                row.update({f"{k}_{cname}": v for k, v in pooled(gw[~gw.gt.isin(leaves) | (w < 6)], mem).items()})
-            row["left_collected"] = int(gw[gw.gt.isin(leaves)].n_unit.sum()) if w >= 6 else 0
+                row.update({f"{k}_{cname}": v for k, v in pooled(gw[~gw["gt"].isin(leaves) | (w < 6)], mem).items()})
+            row["left_collected"] = int(gw[gw["gt"].isin(leaves)].n_unit.sum()) if w >= 6 else 0
             rw = r[r.window == w]
             row.update({"real_n": int(rw.n.sum()), "real_short_isi": rw.short_isi.median(),
                         "real_small": rw.small.median(), "real_energy": rw.energy_rel.median(),
@@ -79,11 +79,12 @@ def main():
     figdir = bk.BAKE / "figures"
     figdir.mkdir(exist_ok=True)
     n = len(plan)
-    fig, axes = plt.subplots(4, 10, figsize=(30, 11), sharex=True)
+    nr = int(np.ceil(n / 10))
+    fig, axes = plt.subplots(2 * nr, 10, figsize=(30, 5.5 * nr), sharex=True)
     for i, p in enumerate(plan):
         ax_s, ax_r = axes[2 * (i // 10), i % 10], axes[2 * (i // 10) + 1, i % 10]
         for a in arms:
-            g = gts[a][gts[a].gt == i]
+            g = gts[a][gts[a]["gt"] == i]
             ax_s.plot(g.window, g.tmpl_scale, marker=".", label=a)
             ax_r.plot(g.window, g.recall, marker=".", label=a)
             ax_r.plot(g.window, g.precision, ls=":", color=ax_r.lines[-1].get_color())
@@ -91,7 +92,7 @@ def main():
         ax_s.set_title(f"GT{i} {p['tetrode']} {p['trough_mad']} MAD {p['course']} {p['kind']}", fontsize=8)
         ax_s.set_ylim(0, 1.6)
         ax_r.set_ylim(0, 1.02)
-    for j in range(n, 20):
+    for j in range(n, 10 * nr):
         axes[2 * (j // 10), j % 10].axis("off")
         axes[2 * (j // 10) + 1, j % 10].axis("off")
     axes[0, 0].set_ylabel("template scale / truth")

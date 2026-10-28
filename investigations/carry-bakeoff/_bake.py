@@ -258,14 +258,67 @@ class Recipe:
     blend: float = 1.0
     max_spikes: int = 500
     min_spikes: int = 100
+    scale: str = "mean"
     lead_ms: float = 10.0
     post_ms: float = 100.0
     iso_ms: float = 1.5
     seed: int = 0
 
 
+_BAD = {}
+
+
+def bad_intervals() -> dict:
+    """``{group: [(start, end), ...]}`` frames of the session's bad-period table (cached)."""
+    if not _BAD:
+        from ttm.bad_periods import group_intervals, read_table
+
+        _BAD.update(group_intervals(read_table(BAD_PERIODS), FS, 10 ** 12))
+        _BAD.setdefault(-1, [])
+    return _BAD
+
+
+def light_driven(fr, un, on, off, dur_s, *, start_ms=15.0, min_ratio=2.0, p_max=1e-4, min_spikes=20):
+    """Labels that keep firing through the pulses: spikes from ``start_ms`` after onset to offset at
+    least ``min_ratio`` times their rate outside pulses and onset to offset plus 100 ms (Poisson,
+    p < ``p_max``). Frames and pulses in the same frame of reference; ``dur_s`` the span's length."""
+    from scipy.stats import poisson
+
+    out = []
+    st = on + int(start_ms * 1e-3 * FS)
+    span = (off - st).sum() / FS
+    out_s = dur_s - ((off + int(0.1 * FS)) - on).sum() / FS
+    for u in np.unique(un):
+        f = fr[un == u]
+        n_in = int(in_intervals(f, st, off).sum())
+        rate = (~in_intervals(f, on, off + int(0.1 * FS))).sum() / out_s
+        if n_in >= min_spikes and n_in >= min_ratio * rate * span and poisson.sf(n_in - 1, rate * span) < p_max:
+            out.append(int(u))
+    return out
+
+
+def truncated_mean(x: np.ndarray, c: float) -> float:
+    """Maximum-likelihood mean of a normal truncated below at ``c`` (sd at least 1, the noise), from
+    the samples ``x >= c`` that survived the truncation."""
+    from scipy.optimize import minimize
+    from scipy.stats import norm
+
+    x = x[np.isfinite(x) & (x >= c)]
+    if x.size < 20:
+        return float(np.mean(x)) if x.size else np.nan
+
+    def nll(th):
+        mu, ls = th
+        sd = 1.0 + np.exp(ls)
+        return -(norm.logpdf(x, mu, sd).sum() - x.size * norm.logsf(c, mu, sd))
+
+    m0, s0 = float(np.mean(x)), max(float(np.std(x)) - 1.0, 0.1)
+    r = minimize(nll, [m0, np.log(s0)], method="Nelder-Mead", options={"xatol": 1e-3, "fatol": 1e-3})
+    return float(r.x[0])
+
+
 def select_spikes(recipe: Recipe, frames_abs: np.ndarray, labels: np.ndarray, amps: np.ndarray, u: int,
-                  pulses: tuple[np.ndarray, np.ndarray] | None) -> np.ndarray:
+                  pulses: tuple[np.ndarray, np.ndarray] | None, group: int = -1) -> np.ndarray:
     """Indices (into the tetrode's spikes) of unit ``u``'s spikes a template is rebuilt from."""
     idx = np.flatnonzero(labels == u)
     if idx.size == 0 or recipe.select == "all":
@@ -278,6 +331,11 @@ def select_spikes(recipe: Recipe, frames_abs: np.ndarray, labels: np.ndarray, am
     if "nostim" in recipe.select and pulses is not None:
         on, off = pulses
         keep &= ~in_intervals(f, on, off + int(recipe.post_ms * 1e-3 * FS))
+    if "nobad" in recipe.select:
+        iv = bad_intervals().get(int(group), [])
+        if iv:
+            st, en = np.array(iv).T
+            keep &= ~in_intervals(f, st, en)
     if recipe.select == "full":
         keep &= amps[idx] >= 0.8
     if recipe.select == "isolated":
@@ -309,7 +367,8 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
     """Scores, admission and re-estimation for tetrode ``g`` in frames [a, b).
 
     ``labels`` index ``T`` / ``unit_ids`` (this tetrode's units). Returns per-spike arrays, the
-    accepted mask, the reason codes (0 accepted, 1 snr, 2 shape, 3 refractory), and the
+    accepted mask, the reason codes (0 accepted, 1 snr or relative floor, 2 shape, 3 refractory, 5 in a bad
+    period of the tetrode), and the
     re-estimated templates (NaN where a unit was not re-estimated)."""
     x = cp.load_tetrode_traces(rec, g, a, b)
     noise, _ = cp.noise_mad_excised(x)
@@ -318,10 +377,24 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
     fl = frames_abs - a
     sc = spike_scores(x, fl, labels, amps, T, noise, sigma)
     resid = sc.pop("residual_traces")
+    if admission.get("sigma_from") == "resid":
+        # the projection noise of each template on what the window's fits leave
+        nblk = int(10 * FS)
+        starts = np.linspace(0, max(x.shape[0] - nblk, 0), 6).astype(np.int64)
+        sig_r = mf_noise(np.concatenate([resid[s0:s0 + nblk] for s0 in starts]), T, block_s=60, n_blocks=1)
+        sc["snr"] = sc["snr"] * sigma[labels] / sig_r[labels]
+        sigma = sig_r
     reason = np.zeros(fl.size, np.int8)
     k = admission.get("snr_floor")
     if k is not None:
         reason[(reason == 0) & ~(sc["snr"] >= k)] = 1
+    if admission.get("amp_rel") is not None:
+        reason[(reason == 0) & ~(amps >= admission["amp_rel"])] = 1
+    if admission.get("drop_bad"):
+        iv = bad_intervals().get(int(g), [])
+        if iv:
+            st, en = np.array(iv).T
+            reason[(reason == 0) & in_intervals(frames_abs, st, en)] = 5
     gate = admission.get("gate")
     if gate is not None:
         kind, thr = gate
@@ -336,15 +409,34 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
             bad = ~(sc[kind] >= thr)
         reason[(reason == 0) & bad] = 2
     refr = admission.get("refractory_ms")
-    if refr is not None:
+    score = np.nan_to_num(sc["snr"], nan=-np.inf)
+
+    def refractory(units):
+        if refr is None:
+            return
         rf = int(refr * 1e-3 * FS)
-        score = np.nan_to_num(sc["snr"], nan=-np.inf) if "snr" in sc else amps
-        for k_u in range(len(unit_ids)):
+        for k_u in units:
             idx = np.flatnonzero((labels == k_u) & (reason == 0))
             if idx.size > 1:
                 o = idx[np.argsort(fl[idx], kind="stable")]
                 keep = cp.resolve_refractory(fl[o], score[o], rf)
                 reason[o[~keep]] = 3
+
+    refractory(range(len(unit_ids)))
+    driven = []
+    pr = admission.get("pulse_rule")
+    if pr is not None and pulses is not None:
+        on, off = pulses
+        m = (on >= a) & (on < b)
+        if m.any():
+            on, off = on[m] - a, off[m] - a
+            near_p = in_intervals(fl, on, off + int(0.1 * FS))
+            driven = light_driven(fl[reason == 0], labels[reason == 0], on, off, (b - a) / FS)
+            kp, ap, cp_ = pr
+            relax = (np.isin(labels, driven) & near_p & (reason != 0) & (reason != 5) & (sc["snr"] >= kp) & (amps >= ap)
+                     & (sc["cos_pl"] >= cp_))
+            reason[relax] = 0
+            refractory(driven)
     acc = reason == 0
     newT = np.full_like(T, np.nan)
     n_used = np.zeros(len(unit_ids), np.int64)
@@ -357,7 +449,7 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
     for k_u in range(len(unit_ids)):
         if acc[labels == k_u].sum() < recipe.min_spikes:
             continue
-        sel = select_spikes(recipe, frames_abs, np.where(acc, labels, -1), amps, k_u, pulses)
+        sel = select_spikes(recipe, frames_abs, np.where(acc, labels, -1), amps, k_u, pulses, g)
         sel = sel[(fl[sel] >= NB) & (fl[sel] + NA <= x.shape[0])]
         if sel.size < min(recipe.min_spikes, 50):
             continue
@@ -368,9 +460,19 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
         else:
             sn = cp.snippets(x, fl[sel])
         est = estimate(sn.astype(np.float64), recipe.estimator)
+        if getattr(recipe, "scale", "mean") == "trunc":
+            # the admission floors cut the unit's amplitude distribution below; rescale the estimate by
+            # the truncated-normal mean of the selected spikes' snr over their plain mean
+            tn_u = float(np.sqrt((T[k_u].astype(np.float64) ** 2).sum()))
+            c = max(admission.get("snr_floor") or 0.0, admission.get("amp_rel", 0.0) * tn_u / sigma[k_u])
+            x_sel = sc["snr"][sel]
+            mu = truncated_mean(x_sel, c)
+            if np.isfinite(mu) and np.nanmean(x_sel) > 0:
+                est = est * float(np.clip(mu / np.nanmean(x_sel), 0.5, 1.2))
         newT[k_u] = (1 - recipe.blend) * T[k_u] + recipe.blend * est
         n_used[k_u] = sel.size
-    return {"scores": sc, "reason": reason, "newT": newT, "n_used": n_used, "noise": noise, "sigma": sigma}
+    return {"scores": sc, "reason": reason, "newT": newT, "n_used": n_used, "noise": noise, "sigma": sigma,
+            "driven": [int(unit_ids[k_u]) for k_u in driven]}
 
 
 # --- the carry ----------------------------------------------------------------------------------
@@ -388,6 +490,12 @@ class Arm:
     hybrid: bool = True
     method: str = "circus-omp"
     whiten: bool = False
+    reseed_every: int = 0
+    reseed_sorts: str | None = None
+    sigma_from: str = "raw"
+    match_floor: tuple | None = None
+    pulse_rule: tuple | None = None
+    drop_bad: bool = False
 
     def to_json(self) -> dict:
         d = dataclasses.asdict(self)
@@ -437,10 +545,13 @@ def whiten_bank(bank: Bank, W: np.ndarray, groups: np.ndarray) -> Bank:
 
 
 def amplitude_bounds(bank: Bank, sigma: np.ndarray, arm: Arm) -> np.ndarray | list:
-    if arm.snr_floor is None:
-        return [arm.amp_rel, float("inf")]
+    a_rel, k = getattr(arm, "match_floor", None) or (arm.amp_rel, arm.snr_floor)
+    if k is None:
+        return [a_rel, float("inf")]
     tn = np.sqrt((bank.T.astype(np.float64) ** 2).sum(axis=(1, 2)))
-    lo = np.maximum(arm.amp_rel, arm.snr_floor * sigma / tn)
+    # with the noise taken from the residual the binding floor is applied after matching
+    k = k * (0.7 if arm.sigma_from == "resid" else 1.0)
+    lo = np.maximum(a_rel, k * sigma / tn)
     return np.stack([lo, np.full_like(lo, np.inf)], axis=1)
 
 
@@ -502,12 +613,68 @@ def run_carry(arm: Arm, bank0: Bank, out_dir: pathlib.Path, *, windows: range, n
         o = np.argsort(arrays["frame"], kind="stable")
         np.savez(f_sp, **{k: v[o] for k, v in arrays.items()})
         bank.save(f_bk.with_name(f"bankin_w{w:02d}.npz"), sigma=sigma)
-        newbank.save(f_bk, n_used=n_used, noise=np.stack([noise[g] for g in groups]), noise_groups=np.array(groups))
+        driven = np.array(sorted(u for r in res for u in r.get("driven", [])), np.int64)
+        newbank.save(f_bk, n_used=n_used, noise=np.stack([noise[g] for g in groups]), noise_groups=np.array(groups),
+                     driven=driven)
         acc = arrays["reason"] == 0
-        log(f"{arm.name} w{w:02d}: {acc.sum():,} accepted of {acc.size:,} fits; "
+        log(f"{arm.name} w{w:02d}: {acc.sum():,} accepted of {acc.size:,} fits; driven {driven.tolist()}; "
             f"{(n_used > 0).sum()}/{len(n_used)} templates re-estimated; match {t_match / 60:.1f} min, "
             f"total {(time.time() - t0) / 60:.1f} min")
+        if arm.reseed_every and w > 0 and w % arm.reseed_every == 0:
+            newbank = reseed(rec, newbank, a, b, pathlib.Path(arm.reseed_sorts) / f"reseed_w{w}", n_jobs=n_jobs)
+            newbank.save(f_bk, n_used=np.r_[n_used, np.zeros(len(newbank.ids) - len(n_used), np.int64)],
+                         noise=np.stack([noise[g] for g in groups]), noise_groups=np.array(groups))
         bank = newbank
+
+
+def reseed(rec, bank: Bank, a: int, b: int, sort_dir: pathlib.Path, *, n_jobs: int, add_cos: float = 0.8,
+           min_snr: float = 5.0, min_spikes: int = 100) -> Bank:
+    """June's re-seed (``_mp_common.windowed_carry_forward_reseed``): MountainSort5 on window [a, b)
+    (read from ``sort_dir`` when it holds a sort of that window), and every cluster with snr 5 or more
+    and 100 spikes or more whose template has shift-cosine under ``add_cos`` to every template of its
+    tetrode joins the bank (ids from 2000 up)."""
+    import sys
+
+    import spikeinterface.sorters as ss
+
+    sys.path.insert(0, str(pathlib.Path(__file__).parents[1] / "spike-sorting"))
+    from _mp_common import build_templates_object
+    from ttm.tracking import cosine_from_templates, sort_chunk, to_int_numpy_sorting
+
+    win = rec.frame_slice(a, b)
+    win.reset_times()
+    if (sort_dir / "by_group").exists():
+        parts = []
+        for g in sorted(int(p.name) for p in (sort_dir / "by_group").iterdir()):
+            sg = ss.read_sorter_folder(sort_dir / "by_group" / str(g), register_recording=False)
+            sg.set_property("group", np.full(sg.get_num_units(), g))
+            parts.append(sg)
+        rs = to_int_numpy_sorting(si.aggregate_units(parts))
+    else:
+        rs = to_int_numpy_sorting(sort_chunk(win, sort_dir))
+    _, raz = build_templates_object(rs, win, with_snr=True, n_jobs=n_jobs)
+    snr = raz.get_extension("quality_metrics").get_data()["snr"].to_numpy()
+    from spikeinterface.core.template_tools import get_dense_templates_array
+
+    dense = get_dense_templates_array(raz, return_in_uV=False)
+    groups = np.asarray(rec.get_property("group")).astype(int)
+    rgrp = np.asarray(rs.get_property("group")).astype(int)
+    out = bank.copy()
+    next_id = max(2000, int(bank.ids.max()) + 1)
+    added = []
+    for j, cu in enumerate(rs.unit_ids):
+        if snr[j] < min_snr or len(rs.get_unit_spike_train(cu)) < min_spikes:
+            continue
+        g = rgrp[j]
+        t = dense[j][:, groups == g]
+        best = max((cosine_from_templates(t, bt, max_shift_samples=10) for bt in out.T[out.group == g]),
+                   default=-1.0)
+        if best < add_cos:
+            out = Bank(np.r_[out.ids, next_id], np.r_[out.group, g], np.concatenate([out.T, t[None].astype(np.float32)]))
+            added.append((next_id, int(g), round(float(best), 3)))
+            next_id += 1
+    log(f"reseed after window {a // WIN}: +{len(added)} units {added}")
+    return out
 
 
 def _sigma(rec, g, a, b, T, *, block_s: float = 10.0, n_blocks: int = 6):
@@ -524,7 +691,9 @@ def _tetrode_job(arm, g, a, b, frames_abs, ci, amps, bank, pulses, sigma):
     o = np.argsort(frames_abs, kind="stable")
     inv = np.empty_like(o)
     inv[o] = np.arange(o.size)
-    adm = {"snr_floor": arm.snr_floor, "gate": arm.gate, "refractory_ms": arm.refractory_ms}
+    adm = {"snr_floor": arm.snr_floor, "gate": arm.gate, "refractory_ms": arm.refractory_ms,
+           "sigma_from": getattr(arm, "sigma_from", "raw"), "amp_rel": arm.amp_rel,
+           "pulse_rule": getattr(arm, "pulse_rule", None), "drop_bad": getattr(arm, "drop_bad", False)}
     r = tetrode_window(rec, g, a, b, frames_abs[o], local[o], amps[o], bank.T[gi], bank.ids[gi], adm,
                        arm.recipe, pulses, sigma)
     r["scores"] = {k: v[inv] for k, v in r["scores"].items()}

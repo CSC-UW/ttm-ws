@@ -35,6 +35,12 @@ RECIPES = {
     "full": Recipe(select="full"),                                    # a >= 0.8 only (Track G's w35a)
     "iso": Recipe(select="isolated"),                                 # no other unit's spike within 1.5 ms
     "frozen": FROZEN,
+    # bad periods of the tetrode excluded from re-estimation ("match but don't learn")
+    "lnb": Recipe(select="lead_nostim_nobad", snippet="peeled"),
+    # and the scale corrected for the truncation the admission floors make (truncated-normal mean of snr)
+    "lnbt": Recipe(select="lead_nostim_nobad", snippet="peeled", scale="trunc"),
+    "lnbt_b5": Recipe(select="lead_nostim_nobad", snippet="peeled", scale="trunc", blend=0.5),
+    "t": Recipe(scale="trunc"),
 }
 ARMS = {a.name: a for a in [
     # Stage A, windows 0 and 1 on the starting bank, templates frozen: what each matcher admits.
@@ -53,10 +59,27 @@ ARMS = {a.name: a for a in [
     # admission from stage A (snr floor, relative floor 0.5, peeled cosine 0.6, refractory 1.5 ms) x recipe
     Arm(f"pt_{adm}_{rname}", amp_rel=0.5, snr_floor=k, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=r)
     for adm, k in (("s4", 4.0), ("s45", 4.5)) for rname, r in RECIPES.items()
-    if adm == "s4" or rname in ("june", "ln", "ln_b5")
+    if (adm == "s4" and rname not in ("t",)) or rname in ("june", "ln", "ln_b5", "lnbt")
 ] + [
     Arm("pt_june_ln", recipe=RECIPES["ln"]),
+    # the snr floor against the projection noise of the window's residual (busy tetrodes' own spikes removed)
+    Arm("pt_s4r_ln", amp_rel=0.5, snr_floor=4.0, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=RECIPES["ln"],
+        sigma_from="resid"),
+    Arm("pt_s45r_ln", amp_rel=0.5, snr_floor=4.5, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=RECIPES["ln"],
+        sigma_from="resid"),
     Arm("joint_june_masked_ln", per_tetrode=False, masked=True, recipe=RECIPES["ln"]),
+    Arm("joint_june_masked_t", per_tetrode=False, masked=True, recipe=RECIPES["t"]),
+    Arm("joint_june_masked_lnbt", per_tetrode=False, masked=True, recipe=RECIPES["lnbt"]),
+    Arm("pt_s4r_lnbt", amp_rel=0.5, snr_floor=4.0, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=RECIPES["lnbt"],
+        sigma_from="resid"),
+] + [
+    # Stage D, the candidates: permissive matcher (a >= 0.3, snr >= 2.5), admission afterwards (snr floor,
+    # a >= 0.5, peeled cosine 0.6, refractory 1.5 ms, fits in the tetrode's own bad periods dropped), the
+    # relaxed in-pulse rule for units that fire through the pulses, and re-estimation from lead spikes
+    # outside pulses and bad periods with the scale corrected for truncation
+    Arm(f"D_{adm}_{rname}", amp_rel=0.5, snr_floor=k, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=RECIPES[rname],
+        match_floor=(0.3, 2.5), pulse_rule=(2.5, 0.3, 0.5), drop_bad=True)
+    for adm, k in (("s4", 4.0), ("s45", 4.5)) for rname in ("lnbt", "lnbt_b5", "frozen")
 ]}
 
 
