@@ -55,7 +55,9 @@ not been confirmed by the user.
   re-seed; masked, no unit stops. Pooled clean-time coverage at 10 MAD or more is 90.3 % masked,
   88.3 % baseline and 88.0 % control, and the masked run is at or above the
   control on every tetrode but TT5 (83.3 against 85.6 %), where the cause is
-  not settled.
+  not settled. After the production stage the masked sorting has 71 single
+  units against 84, none of them mostly in flagged time (baseline 19), and
+  claims 91.1 against 89.1 %.
 - The one baseline unit the masked run lacks, on TT15, fires like every
   TT15 unit of both runs at a fixed phase of a 300-sample cycle, the period
   of a signal on CH22 that is locked to the acquisition clock. In the 48 h
@@ -400,6 +402,29 @@ Of the single units, 11 in the baseline and 7 masked are clock-locked
 and 53, which have most of their spikes in flagged time; masked, all seven
 on TT15. The masked run's TT15 has fewer clean spikes (11.7 M against
 14.5 M) and claims more of its events (73.4 against 67.7 %).
+
+The production stage (CCG-guarded merge, residual single-unit pass,
+per-tetrode multi-unit units; `assembled_prod`,
+`results/bad_periods_*_assembled_prod.*`) keeps these differences. The
+baseline's production sorting has 84 single units, 1,291,429 single-unit
+spikes in flagged time and 19 units with most of their spikes there; the
+masked one has 71, none and none. Clean-time coverage at 10 MAD or more is
+91.1 % masked against 89.1 %, at or above the baseline on 14 tetrodes; TT5
+(84.3 against 86.5 %) and TT7 (96.3 against 96.5 %) are below. In seconds
+when five to eight other tetrodes are flagged, 93.1 against 56.7 %. The
+production scoreboard (`production_scoreboard.json`, each run scored on the
+binary it was sorted from) flags four of the baseline's single units as
+cross-contaminated, 5 on TT4 and 51, 63 and 68 on TT15, each with more
+spikes in flagged time than in clean time, and none of the masked run's.
+Spike-weighted purity is 0.952 masked against 0.953 (tight window 0.814
+against 0.826). The scoreboard's axis A counts each run's own detected
+events, and the masked run's are detected on the masked binary, without the
+artifacts, so axis A cannot be compared between the runs (above 24 MAD 92.2
+against 32.4 %). The masked production stage took 13.2 h against the
+baseline's 2.9 h. Its per-window reads went through the mask, which before
+commit 70e9f5c filled the whole read whenever an interval touched it (4 to
+5 times the unmasked read time for such a window); the machine also ran
+other jobs, and the split between the two was not measured.
 
 ## 9. What this does not do, and what is next
 
