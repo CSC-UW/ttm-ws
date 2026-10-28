@@ -182,3 +182,27 @@ it then missed the TT6 cell (29 Hz outside the pulses, 1.6 times that inside
 under the standard rule, its half-size train below the standard floor). The
 test now counts both rates under the relaxed rule. The 12-window carries ran
 with the first version.
+
+### Real units in the same carries
+
+The real units cannot be scored against ground truth. Refractory conflicts
+are the one direct sign. Per accepted spike, pairs of a unit's candidate
+spikes 0.5 to 1.5 ms apart, before the per-tetrode carries' refractory rule
+removes one of each pair, over the 12 windows (unit-windows with 200 spikes
+or more):
+
+| arm | median | 90th percentile |
+|---|---|---|
+| joint masked, June | 0.007 | 0.033 |
+| joint masked, whitened | 0.010 | 0.075 |
+| per tetrode, whitened, frozen | 0.025 | 0.191 |
+| per tetrode, whitened, blend 0.2 | 0.027 | 0.210 |
+
+The high ratios sit on the single units of the few-unit tetrodes (TT16
+unit 44, TT15 units 42 and 43, TT13 unit 39, TT1 unit 0, TT14 unit 40, TT3
+unit 3, TT2 unit 1). These already have 8 to 18 % under whitened joint
+matching; per tetrode doubles both their spike counts and their ratios
+(TT15 unit 42: 151,510 spikes joint, 1,615,428 per tetrode). The
+ground-truth units on the same tetrodes keep precision 0.9 to 1.0 per
+tetrode. Conjecture: those real units are multi-unit, and per-tetrode
+matching gives them more of the activity they already collect.
