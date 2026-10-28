@@ -466,11 +466,12 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
         if m.any():
             on, off = on[m] - a, off[m] - a
             near_p = in_intervals(fl, on, off + int(0.1 * FS))
-            driven = light_driven(fl[reason == 0], labels[reason == 0], on, off, (b - a) / FS)
             kp, ap, cp_ = pr
-            relax = (np.isin(labels, driven) & near_p & (reason != 0) & (reason != 5) & (sc["snr"] >= kp)
-                     & (amps >= ap * amp_ref[labels])
-                     & (sc["cos_pl"] >= cp_))
+            # fits that pass the relaxed rule; a unit that fires through the pulses at twice its rate
+            # outside them, both counted under this rule, gets them inside the pulses
+            ok = (reason != 5) & (sc["snr"] >= kp) & (amps >= ap * amp_ref[labels]) & (sc["cos_pl"] >= cp_)
+            driven = light_driven(fl[ok], labels[ok], on, off, (b - a) / FS)
+            relax = np.isin(labels, driven) & near_p & (reason != 0) & ok
             reason[relax] = 0
             refractory(driven)
     acc = reason == 0
