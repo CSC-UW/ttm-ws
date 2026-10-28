@@ -67,7 +67,8 @@ def main():
             rw = r[r.window == w]
             row.update({"real_n": int(rw.n.sum()), "real_short_isi": rw.short_isi.median(),
                         "real_small": rw.small.median(), "real_energy": rw.energy_rel.median(),
-                        "real_energy_min": rw.energy_rel.min(), "real_took_gt": int(rw.took_gt.sum())})
+                        "real_energy_min": rw.energy_rel.min(), "real_took_gt": int(rw.took_gt.sum()),
+                        "real_xtet_excess": rw.xtet_excess.median() if "xtet_excess" in rw else np.nan})
             rows.append(row)
     df = pd.DataFrame(rows)
     (HERE / "results").mkdir(exist_ok=True)

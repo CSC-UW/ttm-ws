@@ -297,6 +297,21 @@ def light_driven(fr, un, on, off, dur_s, *, start_ms=15.0, min_ratio=2.0, p_max=
     return out
 
 
+def snr_mode(x: np.ndarray, bw: float = 0.5) -> float:
+    """Mode of ``x`` from a histogram (bins of 0.1) smoothed with a Gaussian of width ``bw``."""
+    from scipy.ndimage import gaussian_filter1d
+
+    x = x[np.isfinite(x)]
+    if x.size == 0:
+        return np.nan
+    lo, hi = np.quantile(x, [0.0, 0.99])
+    edges = np.arange(lo, hi + 0.1, 0.1)
+    if edges.size < 3:
+        return float(np.median(x))
+    h = gaussian_filter1d(np.histogram(x, edges)[0].astype(float), bw / 0.1)
+    return float(edges[np.argmax(h)] + 0.05)
+
+
 def truncated_mean(x: np.ndarray, c: float) -> float:
     """Maximum-likelihood mean of a normal truncated below at ``c`` (sd at least 1, the noise), from
     the samples ``x >= c`` that survived the truncation."""
@@ -388,7 +403,8 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
     k = admission.get("snr_floor")
     if k is not None:
         reason[(reason == 0) & ~(sc["snr"] >= k)] = 1
-    if admission.get("amp_rel") is not None:
+    by_median = admission.get("amp_ref") == "median"
+    if admission.get("amp_rel") is not None and not by_median:
         reason[(reason == 0) & ~(amps >= admission["amp_rel"])] = 1
     if admission.get("drop_bad"):
         iv = bad_intervals().get(int(g), [])
@@ -408,6 +424,23 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
         else:
             bad = ~(sc[kind] >= thr)
         reason[(reason == 0) & bad] = 2
+    amp_ref = np.ones(len(unit_ids))
+    if by_median:
+        # the relative floor against the unit's typical fit in this window (median amplitude of its lead
+        # spikes outside pulses that pass the other rules), not against the template's own scale
+        outside = np.ones(fl.size, bool)
+        if pulses is not None:
+            outside = ~in_intervals(frames_abs, pulses[0], pulses[1] + int(0.1 * FS))
+        for k_u in range(len(unit_ids)):
+            idx = np.flatnonzero((labels == k_u) & (reason == 0))
+            if idx.size < 30:
+                continue
+            idx = idx[np.argsort(fl[idx], kind="stable")]
+            lead = np.r_[True, np.diff(fl[idx]) > int(0.010 * FS)] & outside[idx]
+            if lead.sum() >= 30:
+                amp_ref[k_u] = float(np.median(amps[idx[lead]]))
+        if admission.get("amp_rel") is not None:
+            reason[(reason == 0) & ~(amps >= admission["amp_rel"] * amp_ref[labels])] = 1
     refr = admission.get("refractory_ms")
     score = np.nan_to_num(sc["snr"], nan=-np.inf)
 
@@ -433,7 +466,8 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
             near_p = in_intervals(fl, on, off + int(0.1 * FS))
             driven = light_driven(fl[reason == 0], labels[reason == 0], on, off, (b - a) / FS)
             kp, ap, cp_ = pr
-            relax = (np.isin(labels, driven) & near_p & (reason != 0) & (reason != 5) & (sc["snr"] >= kp) & (amps >= ap)
+            relax = (np.isin(labels, driven) & near_p & (reason != 0) & (reason != 5) & (sc["snr"] >= kp)
+                     & (amps >= ap * amp_ref[labels])
                      & (sc["cos_pl"] >= cp_))
             reason[relax] = 0
             refractory(driven)
@@ -453,6 +487,24 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
         sel = sel[(fl[sel] >= NB) & (fl[sel] + NA <= x.shape[0])]
         if sel.size < min(recipe.min_spikes, 50):
             continue
+        scale = getattr(recipe, "scale", "mean")
+        shape_only = False
+        if scale == "sym":
+            # the admission floors cut the unit's amplitude distribution below; keep the spikes in a band
+            # symmetric about the mode of their snr so the cut does not raise the mean. A mode within
+            # 1.5 of the floor leaves no such band: update the shape and keep the old scale
+            tn_u = float(np.sqrt((T[k_u].astype(np.float64) ** 2).sum()))
+            c = max(admission.get("snr_floor") or 0.0, admission.get("amp_rel", 0.0) * tn_u / sigma[k_u])
+            mode = snr_mode(sc["snr"][sel])
+            h = min(mode - c, 3.0)
+            if h >= 1.5:
+                band = sel[np.abs(sc["snr"][sel] - mode) <= h]
+                if band.size >= 50:
+                    sel = band
+                else:
+                    shape_only = True
+            else:
+                shape_only = True
         if sel.size > recipe.max_spikes:
             sel = np.sort(rng.choice(sel, recipe.max_spikes, replace=False))
         if recipe.snippet == "peeled":
@@ -469,6 +521,8 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
             mu = truncated_mean(x_sel, c)
             if np.isfinite(mu) and np.nanmean(x_sel) > 0:
                 est = est * float(np.clip(mu / np.nanmean(x_sel), 0.5, 1.2))
+        if shape_only:
+            est = est * (np.linalg.norm(T[k_u]) / max(np.linalg.norm(est), 1e-12))
         newT[k_u] = (1 - recipe.blend) * T[k_u] + recipe.blend * est
         n_used[k_u] = sel.size
     return {"scores": sc, "reason": reason, "newT": newT, "n_used": n_used, "noise": noise, "sigma": sigma,
@@ -496,6 +550,7 @@ class Arm:
     match_floor: tuple | None = None
     pulse_rule: tuple | None = None
     drop_bad: bool = False
+    amp_ref: str = "template"
 
     def to_json(self) -> dict:
         d = dataclasses.asdict(self)
@@ -693,7 +748,8 @@ def _tetrode_job(arm, g, a, b, frames_abs, ci, amps, bank, pulses, sigma):
     inv[o] = np.arange(o.size)
     adm = {"snr_floor": arm.snr_floor, "gate": arm.gate, "refractory_ms": arm.refractory_ms,
            "sigma_from": getattr(arm, "sigma_from", "raw"), "amp_rel": arm.amp_rel,
-           "pulse_rule": getattr(arm, "pulse_rule", None), "drop_bad": getattr(arm, "drop_bad", False)}
+           "pulse_rule": getattr(arm, "pulse_rule", None), "drop_bad": getattr(arm, "drop_bad", False),
+           "amp_ref": getattr(arm, "amp_ref", "template")}
     r = tetrode_window(rec, g, a, b, frames_abs[o], local[o], amps[o], bank.T[gi], bank.ids[gi], adm,
                        arm.recipe, pulses, sigma)
     r["scores"] = {k: v[inv] for k, v in r["scores"].items()}

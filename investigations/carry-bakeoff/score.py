@@ -47,6 +47,16 @@ def near(ref: np.ndarray, other: np.ndarray, tol: int = TOL) -> np.ndarray:
     return d <= tol
 
 
+def xtet_excess(f: np.ndarray, others: np.ndarray, tol: int = 6) -> float:
+    """Share of ``f`` with a spike of ``others`` (sorted) within ``tol`` samples, minus the mean share at
+    offsets of 2, 3, -2 and -3 ms (chance at the same rates)."""
+    if f.size == 0 or others.size == 0:
+        return np.nan
+    obs = near(f, others, tol).mean()
+    chance = np.mean([near(f + int(d * 1e-3 * bk.FS), others, tol).mean() for d in (2, 3, -2, -3)])
+    return float(obs - chance)
+
+
 def inpulse_rate(f: np.ndarray, on: np.ndarray, off: np.ndarray, a: int, b: int) -> float:
     """Spikes per second from 10 ms after each pulse onset to its offset, over the pulses in [a, b)."""
     m = (on >= a) & (on < b)
@@ -110,6 +120,7 @@ def score_arm(arm_dir) -> tuple[pd.DataFrame, pd.DataFrame]:
             row["tmpl_scale"] = float((est * true).sum() / (true * true).sum())
             row["tmpl_cos"] = float((est * true).sum() / np.sqrt((est * est).sum() * (true * true).sum()))
             rows_gt.append(row)
+        all_fr = {g: np.sort(fr[np.isin(un, b0.ids[b0.group != g])]) for g in np.unique(b0.group)}
         for u in b0.ids[b0.ids < 1000]:
             m = un == u
             f = np.sort(fr[m])
@@ -126,6 +137,7 @@ def score_arm(arm_dir) -> tuple[pd.DataFrame, pd.DataFrame]:
                 "snr": float(np.nanmedian(sp["snr"][sel])) if f.size else np.nan,
                 "took_gt": int(near(f, gi).sum()) if f.size else 0,
                 "inpulse_hz": inpulse_rate(f, on, off, a, b),
+                "xtet_excess": xtet_excess(f, all_fr[g]),
                 "energy_rel": float((bank.T[k].astype(np.float64) ** 2).sum() / e0[int(u)])})
         w += 1
     return pd.DataFrame(rows_gt), pd.DataFrame(rows_real)

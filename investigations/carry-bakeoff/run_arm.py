@@ -13,6 +13,7 @@ Run: .venv/bin/python investigations/carry-bakeoff/run_arm.py NAME [--windows 0-
 from __future__ import annotations
 
 import argparse
+import pathlib
 import sys
 
 import numpy as np
@@ -37,10 +38,13 @@ RECIPES = {
     "frozen": FROZEN,
     # bad periods of the tetrode excluded from re-estimation ("match but don't learn")
     "lnb": Recipe(select="lead_nostim_nobad", snippet="peeled"),
-    # and the scale corrected for the truncation the admission floors make (truncated-normal mean of snr)
-    "lnbt": Recipe(select="lead_nostim_nobad", snippet="peeled", scale="trunc"),
-    "lnbt_b5": Recipe(select="lead_nostim_nobad", snippet="peeled", scale="trunc", blend=0.5),
-    "t": Recipe(scale="trunc"),
+    "lnb_b5": Recipe(select="lead_nostim_nobad", snippet="peeled", blend=0.5),
+    # and the spikes kept in a band symmetric about the mode of their snr, so the admission floors' cut of
+    # the amplitude distribution does not raise the template (a truncated-normal fit, scale="trunc",
+    # shrank real units' templates to the 0.5 clip: their snr is not one truncated normal)
+    "lnbs": Recipe(select="lead_nostim_nobad", snippet="peeled", scale="sym"),
+    "lnbs_b5": Recipe(select="lead_nostim_nobad", snippet="peeled", scale="sym", blend=0.5),
+    "s": Recipe(scale="sym"),
 }
 ARMS = {a.name: a for a in [
     # Stage A, windows 0 and 1 on the starting bank, templates frozen: what each matcher admits.
@@ -59,7 +63,7 @@ ARMS = {a.name: a for a in [
     # admission from stage A (snr floor, relative floor 0.5, peeled cosine 0.6, refractory 1.5 ms) x recipe
     Arm(f"pt_{adm}_{rname}", amp_rel=0.5, snr_floor=k, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=r)
     for adm, k in (("s4", 4.0), ("s45", 4.5)) for rname, r in RECIPES.items()
-    if (adm == "s4" and rname not in ("t",)) or rname in ("june", "ln", "ln_b5", "lnbt")
+    if (adm == "s4" and rname not in ("s",)) or rname in ("june", "ln", "ln_b5", "lnbs")
 ] + [
     Arm("pt_june_ln", recipe=RECIPES["ln"]),
     # the snr floor against the projection noise of the window's residual (busy tetrodes' own spikes removed)
@@ -68,18 +72,18 @@ ARMS = {a.name: a for a in [
     Arm("pt_s45r_ln", amp_rel=0.5, snr_floor=4.5, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=RECIPES["ln"],
         sigma_from="resid"),
     Arm("joint_june_masked_ln", per_tetrode=False, masked=True, recipe=RECIPES["ln"]),
-    Arm("joint_june_masked_t", per_tetrode=False, masked=True, recipe=RECIPES["t"]),
-    Arm("joint_june_masked_lnbt", per_tetrode=False, masked=True, recipe=RECIPES["lnbt"]),
-    Arm("pt_s4r_lnbt", amp_rel=0.5, snr_floor=4.0, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=RECIPES["lnbt"],
+    Arm("joint_june_masked_s", per_tetrode=False, masked=True, recipe=RECIPES["s"]),
+    Arm("joint_june_masked_lnbs", per_tetrode=False, masked=True, recipe=RECIPES["lnbs"]),
+    Arm("pt_s4r_lnbs", amp_rel=0.5, snr_floor=4.0, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=RECIPES["lnbs"],
         sigma_from="resid"),
 ] + [
-    # Stage D, the candidates: permissive matcher (a >= 0.3, snr >= 2.5), admission afterwards (snr floor,
-    # a >= 0.5, peeled cosine 0.6, refractory 1.5 ms, fits in the tetrode's own bad periods dropped), the
-    # relaxed in-pulse rule for units that fire through the pulses, and re-estimation from lead spikes
-    # outside pulses and bad periods with the scale corrected for truncation
+    # Stage D, the candidates: permissive matcher (a >= 0.2, snr >= 2.5), admission afterwards (snr floor,
+    # peeled cosine 0.6, a >= 0.5 of the unit's median fit amplitude in the window, refractory 1.5 ms, fits
+    # in the tetrode's own bad periods dropped), the relaxed in-pulse rule for units that fire through the
+    # pulses, and re-estimation from lead spikes outside pulses and bad periods (peeled, mean)
     Arm(f"D_{adm}_{rname}", amp_rel=0.5, snr_floor=k, gate=("cos_pl", 0.6), refractory_ms=1.5, recipe=RECIPES[rname],
-        match_floor=(0.3, 2.5), pulse_rule=(2.5, 0.3, 0.5), drop_bad=True)
-    for adm, k in (("s4", 4.0), ("s45", 4.5)) for rname in ("lnbt", "lnbt_b5", "frozen")
+        match_floor=(0.2, 2.5), pulse_rule=(2.5, 0.3, 0.5), drop_bad=True, amp_ref="median")
+    for adm, k in (("s4", 4.0), ("s45", 4.5)) for rname in ("lnb", "lnb_b5", "june", "frozen")
 ]}
 
 
@@ -109,18 +113,21 @@ def main():
     ap.add_argument("--windows", default="0-11")
     ap.add_argument("--n-jobs", type=int, default=16)
     ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--bank", default=None, help="starting bank (default <BAKE>/bank_start.npz)")
+    ap.add_argument("--root", default=None, help="output root (default <BAKE>/arms)")
     a = ap.parse_args()
     if a.make_bank:
         make_bank()
         return
     lo, hi = (int(v) for v in a.windows.split("-"))
     arm = ARMS[a.name]
-    bank = bk.Bank.load(bk.BAKE / "bank_start.npz")
+    bank = bk.Bank.load(a.bank or bk.BAKE / "bank_start.npz")
     if arm.whiten:
         groups = np.asarray(si.load(bk.HYBRID if arm.hybrid else bk.BINARY).get_property("group")).astype(int)
         bank = bk.whiten_bank(bank, bk.whitening_matrix(arm.hybrid), groups)
     bk.log(f"{arm.name}: {arm}")
-    bk.run_carry(arm, bank, bk.BAKE / "arms" / arm.name, windows=range(lo, hi + 1), n_jobs=a.n_jobs,
+    root = pathlib.Path(a.root) if a.root else bk.BAKE / "arms"
+    bk.run_carry(arm, bank, root / arm.name, windows=range(lo, hi + 1), n_jobs=a.n_jobs,
                  workers=a.workers)
 
 
