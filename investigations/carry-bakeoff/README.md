@@ -250,8 +250,22 @@ production's spikes (TT1: 33,747 against 2,840,246; TT3: 11,391 against
 1,300,739; TT14: 33,531 against 610,502; TT16: 134,280 against
 3,557,807; TT13: 246,950 against 2,313,880). TT1 unit 0 goes from 0.11 Hz
 at a median 10.1 MAD to 12.3 Hz at 5.3 MAD, with median cosine 0.82 against
-0.55. Whether these are the units' own small spikes or multi-unit activity
-is not settled by any measure here.
+0.55.
+
+`refractory_pairs.py` asks whether the per-tetrode procedure makes
+refractory pairs or the units have them. On the hybrid in window 0 the rule
+removes 0.00 to 0.04 of the fits of the ground-truth units put on TT1, TT3,
+TT13, TT14 and TT16, and 0.25 to 0.38 of the fits of the real units on the
+same tetrodes (TT1 unit 0, TT3 unit 3, TT13 unit 39, TT14 unit 40, TT16
+unit 44; on the eight busy tetrodes most real units lose 0.01 to 0.08). On
+the real 48 h the removed fits lie 0.3 to 1.5 ms from the kept spike, spread
+over that range rather than under 0.3 ms as double fits of one event would
+be. With `--shapes`, these units' spikes of snr 4.5 to 6 have the same
+waveform as their spikes of snr 12 or more (cosine 0.96 to 0.99 on plain
+traces, the same ratios between wires), and even among the latter 0.07 to
+0.34 are removed. Conjecture: each of these units is several cells with one
+footprint on its tetrode, which joint matching mostly suppressed and
+per-tetrode matching admits.
 
 ### Spike times against the waveform
 
