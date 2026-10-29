@@ -8,7 +8,8 @@ laser first spikes, laser half-size). Precision is the share of the unit's
 accepted spikes that have a ground-truth spike of that unit within 10
 samples. Template tracking is the bank's template after the window against
 the injected template at the window's middle: its scale (projection on the
-truth over the truth's energy) and cosine.
+truth over the truth's energy) and cosine. A re-whitened arm's templates are
+moved to the fixed whitening's space first.
 
 Real units (the seed bank): accepted spikes, share with an interval under
 1.5 ms to the previous spike, share with a peeled trough under 3.5 excised
@@ -65,27 +66,36 @@ def inpulse_rate(f: np.ndarray, on: np.ndarray, off: np.ndarray, a: int, b: int)
     return float(bk.in_intervals(f, on[m], off[m]).sum() / ((off[m] - on[m]).sum() / bk.FS))
 
 
+def to_fixed(bank: bk.Bank, arm_dir, w: int, W: np.ndarray | None) -> bk.Bank:
+    """A re-whitened arm's bank of window ``w`` moved to the space of the fixed whitening ``W``."""
+    f = arm_dir / f"whiten_w{w:02d}.npy"
+    if W is None or not f.exists():
+        return bank
+    return bk.whiten_bank(bank, np.linalg.inv(np.load(f).astype(np.float64)) @ W, np.repeat(np.arange(16), 4))
+
+
 def score_arm(arm_dir) -> tuple[pd.DataFrame, pd.DataFrame]:
-    gt = np.load(bk.BAKE / "gt.npz")
-    b0 = bk.Bank.load(bk.BAKE / "bank_start.npz")
-    first = bk.Bank.load(arm_dir / "bankin_w00.npz") if (arm_dir / "bankin_w00.npz").exists() else b0
-    e0 = {u: float((t.astype(np.float64) ** 2).sum()) for u, t in zip(first.ids, first.T)}
-    grp = dict(zip(b0.ids.tolist(), b0.group.tolist()))
-    rows_gt, rows_real = [], []
     import json
 
+    gt = np.load(bk.BAKE / "gt.npz")
+    b0 = bk.Bank.load(bk.BAKE / "bank_start.npz")
     cfg = json.loads((arm_dir / "arm.json").read_text())
-    Wb = None
+    W, Wb = None, None
     if cfg.get("whiten"):
         W = bk.whitening_matrix(cfg.get("hybrid", True))
         groups = np.repeat(np.arange(16), 4)
         Wb = {g: W[np.ix_(groups == g, groups == g)] for g in range(16)}
+    first = bk.Bank.load(arm_dir / "bankin_w00.npz") if (arm_dir / "bankin_w00.npz").exists() else b0
+    first = to_fixed(first, arm_dir, 0, W)
+    e0 = {u: float((t.astype(np.float64) ** 2).sum()) for u, t in zip(first.ids, first.T)}
+    grp = dict(zip(b0.ids.tolist(), b0.group.tolist()))
+    rows_gt, rows_real = [], []
     on, off = bk.laser_pulses()
     on = on + int(0.010 * bk.FS)
     w = 0
     while (arm_dir / f"spikes_w{w:02d}.npz").exists():
         sp = np.load(arm_dir / f"spikes_w{w:02d}.npz")
-        bank = bk.Bank.load(arm_dir / f"bank_w{w:02d}.npz")
+        bank = to_fixed(bk.Bank.load(arm_dir / f"bank_w{w:02d}.npz"), arm_dir, w, W)
         acc = sp["reason"] == 0
         fr, un = sp["frame"][acc], sp["unit"][acc]
         a, b = w * bk.WIN, (w + 1) * bk.WIN

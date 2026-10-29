@@ -560,13 +560,14 @@ class Arm:
     pulse_rule: tuple | None = None
     drop_bad: bool = False
     amp_ref: str = "template"
+    rewhiten: bool = False
 
     def to_json(self) -> dict:
         d = dataclasses.asdict(self)
         return d
 
 
-def open_recording(arm: Arm):
+def open_recording(arm: Arm, W: np.ndarray | None = None):
     rec = si.load(HYBRID if arm.hybrid else BINARY)
     if arm.masked:
         from ttm.bad_periods import mask_bad_periods, read_table
@@ -575,7 +576,8 @@ def open_recording(arm: Arm):
     if arm.whiten:
         from spikeinterface.preprocessing import whiten
 
-        rec = whiten(rec, W=whitening_matrix(arm.hybrid), M=None, apply_mean=False, dtype="float32")
+        rec = whiten(rec, W=whitening_matrix(arm.hybrid) if W is None else W, M=None, apply_mean=False,
+                     dtype="float32")
     return rec
 
 
@@ -597,6 +599,36 @@ def whitening_matrix(hybrid: bool = True) -> np.ndarray:
         ch = np.flatnonzero(groups == g)
         W[np.ix_(ch, ch)] = V @ np.diag(ev ** -0.5) @ V.T
     np.savez(path, W=W)
+    return W
+
+
+def window_whitening(hybrid: bool, a: int, b: int, *, n_blocks: int = 30, block_s: float = 10.0) -> np.ndarray:
+    """``whitening_matrix`` from ``n_blocks`` blocks of ``block_s`` spread over frames [a, b) instead of
+    the first 300 s; each tetrode's blocks avoid its own bad periods and the laser pulses (onset to
+    offset plus 100 ms)."""
+    rec = si.load(HYBRID if hybrid else BINARY)
+    groups = np.asarray(rec.get_property("group")).astype(int)
+    nblk = int(block_s * FS)
+    starts = np.arange(a, b - nblk + 1, nblk)
+    on, off = laser_pulses()
+    pulses = np.c_[on, off + int(0.1 * FS)]
+    picks = {}
+    for g in np.unique(groups):
+        iv = np.concatenate([np.asarray(bad_intervals().get(int(g), []), np.int64).reshape(-1, 2), pulses])
+        iv = iv[(iv[:, 1] > a) & (iv[:, 0] < b)]
+        clear = ~((iv[None, :, 0] < starts[:, None] + nblk) & (iv[None, :, 1] > starts[:, None])).any(axis=1)
+        s = starts[clear]
+        picks[g] = np.unique(s[np.linspace(0, s.size - 1, min(n_blocks, s.size)).astype(int)]) if s.size else s
+    blocks = {int(s): rec.get_traces(start_frame=int(s), end_frame=int(s) + nblk)
+              for s in np.unique(np.concatenate(list(picks.values())))}
+    W = np.zeros((len(groups), len(groups)), np.float32)
+    for g, s in picks.items():
+        ch = np.flatnonzero(groups == g)
+        x = np.concatenate([blocks[int(k)][:, ch] for k in s]).astype(np.float64)
+        noise, _ = cp.noise_mad_excised(x)
+        keep = cp.excision_mask(x, noise, detect_mad=4.0, pad_frames=30)
+        ev, V = np.linalg.eigh(np.cov(x[keep].T))
+        W[np.ix_(ch, ch)] = V @ np.diag(ev ** -0.5) @ V.T
     return W
 
 
@@ -630,13 +662,26 @@ def run_carry(arm: Arm, bank0: Bank, out_dir: pathlib.Path, *, windows: range, n
     rec = open_recording(arm)
     pulses = laser_pulses()
     bank = bank0.copy()
+    chan_groups = np.asarray(rec.get_property("group")).astype(int)
+    W_prev = whitening_matrix(arm.hybrid) if arm.whiten else None
+    W = None
     for w in windows:
         f_sp, f_bk = out_dir / f"spikes_w{w:02d}.npz", out_dir / f"bank_w{w:02d}.npz"
+        f_W = out_dir / f"whiten_w{w:02d}.npy"
         if f_sp.exists() and f_bk.exists():
             bank = Bank.load(f_bk)
+            if arm.rewhiten:
+                W_prev = np.load(f_W)
             continue
         t0 = time.time()
         a, b = w * WIN, min((w + 1) * WIN, rec.get_num_frames())
+        if arm.rewhiten:
+            # the bank is in the previous window's whitened space; move it to this window's
+            W = window_whitening(arm.hybrid, a, b)
+            np.save(f_W, W)
+            bank = whiten_bank(bank, np.linalg.inv(W_prev.astype(np.float64)) @ W, chan_groups)
+            W_prev = W
+            rec = open_recording(arm, W)
         win = rec.frame_slice(a, b)
         groups = sorted(set(bank.group.tolist()))
         # matched-filter noise per template, measured on this window before matching
@@ -653,7 +698,7 @@ def run_carry(arm: Arm, bank0: Bank, out_dir: pathlib.Path, *, windows: range, n
         amp = sp["amplitude"].astype(np.float64)
         res = Parallel(n_jobs=workers)(
             delayed(_tetrode_job)(arm, g, a, b, fr[bank.group[ci] == g], ci[bank.group[ci] == g], amp[bank.group[ci] == g],
-                                  bank, pulses, sigma[bank.group == g])
+                                  bank, pulses, sigma[bank.group == g], W)
             for g in groups)
         cols = {k: [] for k in ("frame", "unit", "a", "snr", "cos_raw", "cos_pl", "resid", "trough", "reason")}
         newbank = bank.copy()
@@ -748,8 +793,8 @@ def _sigma(rec, g, a, b, T, *, block_s: float = 10.0, n_blocks: int = 6):
     return mf_noise(x, T, block_s=block_s * n_blocks, n_blocks=1)
 
 
-def _tetrode_job(arm, g, a, b, frames_abs, ci, amps, bank, pulses, sigma):
-    rec = open_recording(arm)
+def _tetrode_job(arm, g, a, b, frames_abs, ci, amps, bank, pulses, sigma, W=None):
+    rec = open_recording(arm, W)
     gi = np.flatnonzero(bank.group == g)
     local = np.searchsorted(gi, ci)
     o = np.argsort(frames_abs, kind="stable")
