@@ -206,3 +206,101 @@ matching; per tetrode doubles both their spike counts and their ratios
 ground-truth units on the same tetrodes keep precision 0.9 to 1.0 per
 tetrode. Conjecture: those real units are multi-unit, and per-tetrode
 matching gives them more of the activity they already collect.
+
+## The 48 h
+
+Two carries ran over the 96 windows of `mp_baseline/binary`
+(`run_arm.py --bank <BAKE_ROOT>/bank0.npz --windows 0-95 --root
+<BAKE_ROOT>/real48`), from mp_baseline's seed bank, with June's re-seed
+every 12 windows read from the MountainSort5 sorts June's runs had already
+made:
+- `R48_W_s45_c50_lnb_b2`: per tetrode, whitened, blend 0.2, the rules of the
+  12-window carries, unmasked, the driven test counting both rates under the
+  relaxed rule;
+- `R48_W_joint_masked_june`: joint, masked, whitened, June's re-estimation.
+
+`export_sorting.py` assembled each into a sorting under the session's
+`sortings_seed42_pcafix/` (`carry_R48_pt/assembled_reseed_c12`, 68 units and
+161.6 M spikes; `carry_R48_joint/assembled_reseed_c12`, 100 units and 90.5 M
+spikes). Production is `mp_baseline_masked/assembled_reseed_c12` (73 units,
+82.8 M spikes). Re-seeding added 23 units per tetrode and 55 joint. Matching
+took 4.6 to 5.3 min per 1800 s window per tetrode when the run had the
+machine to itself and 1.2 min joint.
+
+`subjects/ttm-003/scripts/bad_periods_compare.py` (tags `carry48_pt` and
+`carry48_jw_pt`, results in `subjects/ttm-003/results/`):
+
+| | production | joint, whitened | per tetrode, whitened |
+|---|---|---|---|
+| single units | 73 | 100 | 68 |
+| units present after window 1 | 71 | 88 | 68 |
+| spikes in the tetrode's own bad periods | 0 | 77,897 | 64 |
+| units with most spikes in bad periods | 0 | 16 | 0 |
+| clean events over threshold claimed by a unit | 55.0 % | | 84.0 % |
+| the same, events of 10 MAD or more | 90.4 % | | 98.9 % |
+
+The joint whitened carry's bad-period spikes are on TT16 (76,830) and TT14
+(1,067): the probe-wide mask leaves out each tetrode's own bad periods, and
+re-seeding there adds units that live in them. The per-tetrode sorting's
+refractory measures in that script read 0 by construction, since its
+refractory rule removes one spike of each pair.
+
+On the tetrodes with few units the per-tetrode sorting has 10 to 100 times
+production's spikes (TT1: 33,747 against 2,840,246; TT3: 11,391 against
+1,300,739; TT14: 33,531 against 610,502; TT16: 134,280 against
+3,557,807; TT13: 246,950 against 2,313,880). TT1 unit 0 goes from 0.11 Hz
+at a median 10.1 MAD to 12.3 Hz at 5.3 MAD, with median cosine 0.82 against
+0.55. Whether these are the units' own small spikes or multi-unit activity
+is not settled by any measure here.
+
+### Spike times against the waveform
+
+`stamp_drift.py` takes the mean of up to 300 of each unit's spikes on the
+plain binary, with the spike time at sample 30, and finds the trough on the
+deepest wire. In window 0 every sorting puts its spikes on the trough. Later
+they move off it (`results/stamp_drift.csv`):
+
+| units 5 samples or more off the trough | window 24 | window 48 | window 72 | window 94 |
+|---|---|---|---|---|
+| production | 2 | 4 | 5 | 11 |
+| joint, whitened | 1 | 6 | 9 | 17 |
+| per tetrode, whitened | 1 | 2 | 2 | 4 |
+
+The 90th percentile of the offset in window 94 is 15 samples in production,
+11 joint whitened and 3 per tetrode. Production's TT4 unit 5 stamps its
+spikes 11 to 13 samples (0.4 ms) before its trough from window 24 on; TT11
+unit 28 drifts by 9. Both carries that drift rebuild their templates June's
+way (mean of 500 accepted spikes, full replacement), and nothing in that
+rebuild keeps the trough at sample 30. A unit's spike times then carry its
+drift, and a comparison between sortings at 0.33 ms finds fewer shared spikes
+than there are.
+
+### Light-driven cells
+
+`tagged_units.py` reads the per-block tables of
+`subjects/ttm-003/scripts/tagged_cells_blocks.py` and lists, per tetrode,
+the units that answer the pulse onsets (1 to 10 ms) in some block at 50 Hz
+or more (`results/tagged_units_onset.csv`). In window 0 all three sortings
+start from the same seed bank and their units agree by id (TT4 units 4 to
+7 share 61 to 100 % of production's spikes within 10 samples). Onset rates
+per block, Hz, for the units that carry the response:
+
+| tetrode | production | joint, whitened | per tetrode, whitened |
+|---|---|---|---|
+| TT4 | 6 and 7 in blocks 1 and 2 (310, 205), then 5 (124 to 203) | 6 to block 27 (138 to 324), then re-seeded 2010 | 7 in every block (187 to 425); re-seeded 2007 from block 28 |
+| TT10 | 24 in blocks 1 to 4 (103 to 134), then 26, then re-seeded 52 | 25 in every block (57 to 172) | 25 in every block (100 to 224) |
+| TT11 | 28, falling from 159 to under 30 by block 37 | 28 to block 3, then 29 | 28 in every block (119 to 222) |
+| TT6 | 16 at 19 and 13 in blocks 1 and 2, then 0 | 16 at 31 in block 1, then under 15 | 16 at 176 to 238 in blocks 1 to 4, then 7 to 76 |
+
+On TT4 in window 0 the mean of the spikes after the onsets matches unit 7's
+spontaneous waveform in every sorting (cosine 0.75 to 0.89; `tagged_units.py
+--waveforms`); production's unit 5 has 9 such spikes there. Production's
+unit 5 takes the response from block 3, while its spike times move 0.4 ms
+off its trough. Conjecture: June's rebuild let unit 5's template move onto
+the driven cell. The per-tetrode carry keeps each driven response on one
+unit through the 48 h. Its in-pulse rates use the relaxed in-pulse rule, so
+part of them can be false fits.
+
+The template lookup of `tagged_cells_blocks.py` (cosine to the OPTO2
+session's templates) picks other units in the whitened sortings (TT4 unit
+4 and TT10 unit 24 per tetrode), so its `tagged` summaries understate them.
