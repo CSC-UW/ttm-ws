@@ -230,7 +230,11 @@ def main() -> None:
     df.round(4).to_csv(RESULTS / f"tagged_blocks_{exp.experiment}_{a.name}.csv", index=False)
 
     # summary
-    summary = {"name": a.name, "sorting": a.sorting, "n_units": len(units), "n_blocks": int(len(blocks)), "tagged": {}}
+    sorting_path = pathlib.Path(a.sorting).absolute()
+    if sorting_path.is_relative_to(data_root):
+        sorting_path = sorting_path.relative_to(data_root)
+    summary = {"name": a.name, "sorting": str(sorting_path), "n_units": len(units), "n_blocks": int(len(blocks)),
+               "tagged": {}}
     for role, d in tagged_units.items():
         sub = df[df.unit == d["unit"]]
         summary["tagged"][role] = d | {

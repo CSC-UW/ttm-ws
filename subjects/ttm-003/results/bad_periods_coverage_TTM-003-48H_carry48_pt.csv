@@ -1,0 +1,41 @@
+scope,tetrode,n_events,n_events_10mad,joint_masked_pct,joint_masked_pct_10mad,per_tetrode_whitened_pct,per_tetrode_whitened_pct_10mad
+clean,all,96453413,9697248,55.03,90.43,84.03,98.86
+flagged,all,12,0,0.0,,0.0,
+clean,TT1,1177853,74124,2.79,26.71,70.07,90.27
+flagged,TT1,0,0,,,,
+clean,TT2,705280,23273,4.59,52.74,65.75,94.99
+flagged,TT2,0,0,,,,
+clean,TT3,311799,6787,3.29,40.86,64.04,88.39
+flagged,TT3,7,0,0.0,,0.0,
+clean,TT4,9686790,2837643,66.82,91.27,91.16,99.85
+flagged,TT4,0,0,,,,
+clean,TT5,9471901,1376238,52.11,83.55,86.49,99.63
+flagged,TT5,0,0,,,,
+clean,TT6,11103894,1444495,48.34,94.32,93.71,99.7
+flagged,TT6,0,0,,,,
+clean,TT7,2644788,89621,72.58,96.42,81.72,99.07
+flagged,TT7,0,0,,,,
+clean,TT8,8740054,745205,67.03,99.36,86.97,99.47
+flagged,TT8,0,0,,,,
+clean,TT9,494642,487,64.81,80.29,57.3,60.78
+flagged,TT9,0,0,,,,
+clean,TT10,12497370,999523,62.26,98.73,75.04,96.2
+flagged,TT10,0,0,,,,
+clean,TT11,7097385,559473,44.91,83.44,82.59,98.85
+flagged,TT11,0,0,,,,
+clean,TT12,9912793,965337,69.25,98.62,86.42,99.63
+flagged,TT12,1,0,0.0,,0.0,
+clean,TT13,739005,34734,29.03,94.93,77.48,93.58
+flagged,TT13,0,0,,,,
+clean,TT14,929214,16284,3.0,43.77,18.04,80.96
+flagged,TT14,0,0,,,,
+clean,TT15,19066428,329631,52.16,87.44,85.74,99.47
+flagged,TT15,1,0,0.0,,0.0,
+clean,TT16,1874217,194393,5.73,36.4,63.67,85.95
+flagged,TT16,3,0,0.0,,0.0,
+"clean, 0 other tetrodes flagged",all,86243135,8694195,55.25,90.79,84.29,98.95
+"clean, 1 other tetrodes flagged",all,8746184,837230,52.91,87.18,82.46,98.43
+"clean, 2 other tetrodes flagged",all,651068,67121,54.42,88.59,83.05,97.63
+"clean, 3-4 other tetrodes flagged",all,281519,33161,51.04,76.69,77.42,90.45
+"clean, 5-8 other tetrodes flagged",all,529277,65184,57.73,92.5,73.01,98.41
+"clean, 9-16 other tetrodes flagged",all,2230,357,51.66,75.91,77.8,88.24
