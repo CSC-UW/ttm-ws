@@ -8,8 +8,8 @@ removed):
   to the nearest accepted spike of its unit, in 0.1 ms bins (double fits of one event would sit
   under 0.3 ms).
 
-``--shapes`` adds, for the units with most removals, the cosine of the mean waveform of their
-accepted spikes in four snr bins to that of their spikes of snr 12 or more, and the trough of
+``--shapes`` adds, for the units with most removals, the share removed and the cosine of the mean
+waveform of their accepted spikes in four snr bins to that of their spikes of snr 12 or more, and the trough of
 each wire over the deepest (plain traces).
 
 Run: .venv/bin/python investigations/carry-bakeoff/refractory_pairs.py [--shapes]
@@ -83,6 +83,7 @@ def shapes() -> None:
             g = grp[u]
             x = xs.setdefault(g, cp.load_tetrode_traces(rec, g, a, a + bk.WIN))
             acc = (sp["unit"] == u) & (sp["reason"] == 0)
+            rem_snr = sp["snr"][(sp["unit"] == u) & (sp["reason"] == 3)]
             f, snr = sp["frame"][acc] - a, sp["snr"][acc]
             ok = (f > bk.NB) & (f < bk.WIN - bk.NA)
             f, snr = f[ok], snr[ok]
@@ -94,8 +95,9 @@ def shapes() -> None:
                     continue
                 T = cp.snippets(x, np.sort(rng.choice(fb, min(2000, fb.size), replace=False))).mean(0)
                 pk = -T.min(0)
+                n_rem = int(((rem_snr >= lo) & (rem_snr < hi)).sum())
                 rows.append({"window": w, "unit": u, "tetrode": f"TT{g + 1}", "snr": f"{lo:g} to {hi:g}",
-                             "n": int(fb.size),
+                             "n": int(fb.size), "removed": round(n_rem / (n_rem + fb.size), 3),
                              "cos_to_top": round(float((T * T_top).sum() / np.sqrt((T * T).sum() * (T_top * T_top).sum())), 3),
                              "wire_troughs": "/".join(f"{v:.2f}" for v in pk / pk.max())})
     pd.set_option("display.width", 200)

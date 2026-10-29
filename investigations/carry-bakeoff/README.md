@@ -262,7 +262,7 @@ the real 48 h the removed fits lie 0.3 to 1.5 ms from the kept spike, spread
 over that range rather than under 0.3 ms as double fits of one event would
 be. With `--shapes`, these units' spikes of snr 4.5 to 6 have the same
 waveform as their spikes of snr 12 or more (cosine 0.96 to 0.99 on plain
-traces, the same ratios between wires), and even among the latter 0.07 to
+traces, the same ratios between wires), and even among the latter 0.03 to
 0.34 are removed. Conjecture: each of these units is several cells with one
 footprint on its tetrode, which joint matching mostly suppressed and
 per-tetrode matching admits.
