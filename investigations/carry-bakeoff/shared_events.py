@@ -8,6 +8,13 @@ Window 48 of the per-tetrode whitened carry (``R48_W_s45_c50_lnb_b2``):
   against the same share with the spikes shifted by 2 and 3 ms either way (chance), and the
   tetrodes that share most.
 
+Then, for the same units against every unit of another tetrode with 1000 or more accepted spikes, the
+counts of that unit's spikes at each lag within 2 ms, and for the three partners with the largest
+excess within 0.2 ms over the counts at 1 to 2 ms: the lag of the peak, the share of the excess
+within one sample of it, and the correlation across paired events (nearest within 0.2 ms) of the
+two fits' snr. One source seen on two tetrodes keeps its lag to the sample and scales both fits
+together; two cells that fire together need neither.
+
 Then, per tetrode, the variance after the first 300 s' whitening of noise that is independent
 across wires at each wire's own level, which is what ``ttm.bad_periods.mask_bad_periods`` puts in
 place of a bad period (real noise comes out at 1).
@@ -72,6 +79,43 @@ def coincidence(sp, grp) -> None:
               + ", ".join(f"TT{h + 1} {v:.2f}" for h, v in top))
 
 
+def lags(sp, grp) -> None:
+    acc = sp["reason"] == 0
+    fr, un, snr = sp["frame"][acc], sp["unit"][acc], sp["snr"][acc]
+    big = [u for u, n in zip(*np.unique(un, return_counts=True)) if n >= 1000]
+    print("partners within 0.2 ms: lag of the peak (samples), share of the excess within 1 sample of it, "
+          "snr correlation of paired events (n pairs)")
+    D = 60
+    for u in UNITS:
+        f = np.sort(fr[un == u])
+        s_u = snr[un == u][np.argsort(fr[un == u])]
+        res = []
+        for v in big:
+            if grp[int(v)] == grp[u]:
+                continue
+            o = np.argsort(fr[un == v])
+            g_, s_v = fr[un == v][o], snr[un == v][o]
+            lo, hi = np.searchsorted(g_, f - D), np.searchsorted(g_, f + D + 1)
+            d = np.concatenate([g_[i:j] - x for i, j, x in zip(lo, hi, f)])
+            c = np.bincount(d + D, minlength=2 * D + 1)
+            base = np.r_[c[:D - 30], c[D + 31:]].mean()
+            core = c[D - 6:D + 7] - base
+            excess = core.sum()
+            if excess <= 0:
+                continue
+            pk = int(core.argmax())
+            sharp = core[max(pk - 1, 0):pk + 2].sum() / excess
+            j = np.clip(np.searchsorted(g_, f), 1, g_.size - 1)
+            pick = np.where(np.abs(g_[j - 1] - f) <= np.abs(g_[j] - f), j - 1, j)
+            m = np.abs(g_[pick] - f) <= 6
+            r = np.corrcoef(s_u[m], s_v[pick[m]])[0, 1] if m.sum() > 30 else np.nan
+            res.append((excess / f.size, v, pk - 6, sharp, r, int(m.sum())))
+        top = sorted(res, reverse=True)[:3]
+        print(f"u{u:<3d} TT{grp[u] + 1:<3d} " + "; ".join(
+            f"u{v} TT{grp[int(v)] + 1} excess {e:.2f} lag {lag:+d} sharp {sh:.2f} r {r:.2f} (n {n})"
+            for e, v, lag, sh, r, n in top))
+
+
 def mask_noise() -> None:
     Wm = bk.whitening_matrix(False).astype(np.float64)
     print("variance after whitening of noise independent across wires at each wire's level (real noise: 1)")
@@ -90,6 +134,7 @@ def main():
     grp = dict(zip(b.ids.tolist(), b.group.tolist()))
     footprints(sp, grp)
     coincidence(sp, grp)
+    lags(sp, grp)
     mask_noise()
 
 
