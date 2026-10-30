@@ -1,6 +1,6 @@
 ---
 title: TTM-003 48 h, carry-forward matching per tetrode and the rebuild of templates
-updated: 2026-10-29
+updated: 2026-10-30
 status: needs_verification
 ---
 

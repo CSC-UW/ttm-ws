@@ -1,6 +1,6 @@
 ---
 title: Carry-forward bake-off on hybrid ground truth, TTM-003 48 h
-updated: 2026-10-28
+updated: 2026-10-30
 status: needs_verification
 ---
 
