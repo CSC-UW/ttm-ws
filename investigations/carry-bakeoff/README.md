@@ -322,24 +322,40 @@ needs a test across tetrodes to do the same.
 ### Spike times against the waveform
 
 `stamp_drift.py` takes the mean of up to 300 of each unit's spikes on the
-plain binary, with the spike time at sample 30, and finds the trough on the
-deepest wire. In window 0 every sorting puts its spikes on the trough. Later
-they move off it (`results/stamp_drift.csv`):
+plain binary, with the spike time at sample 30, in windows 0, 24, 48, 72 and
+94, and finds the lag that best aligns it (all four wires) with the unit's
+mean in its first window (`results/stamp_drift.csv`):
 
-| units 5 samples or more off the trough | window 24 | window 48 | window 72 | window 94 |
+| units shifted 5 samples or more | window 24 | window 48 | window 72 | window 94 |
 |---|---|---|---|---|
-| production | 2 | 4 | 5 | 11 |
-| joint, whitened | 1 | 6 | 9 | 17 |
-| per tetrode, whitened | 1 | 2 | 2 | 4 |
+| production | 1 | 2 | 6 | 9 |
+| joint, whitened | 0 | 1 | 3 | 8 |
+| per tetrode, whitened | 0 | 0 | 0 | 0 |
 
-The 90th percentile of the offset in window 94 is 15 samples in production,
-11 joint whitened and 3 per tetrode. Production's TT4 unit 5 stamps its
-spikes 11 to 13 samples (0.4 ms) before its trough from window 24 on; TT11
-unit 28 drifts by 9. Both carries that drift rebuild their templates June's
-way (mean of 500 accepted spikes, full replacement), and nothing in that
-rebuild keeps the trough at sample 30. A unit's spike times then carry its
-drift, and a comparison between sortings at 0.33 ms finds fewer shared spikes
-than there are.
+In window 94 the 90th percentile of the shift is 6 samples in production, 3
+joint whitened and 1 per tetrode, and the largest 30, 40 and 3. Production's
+largest are TT16 unit 43 (30 samples), TT11 unit 32 (21), TT5 unit 11 (20,
+a 790 uV unit), TT7 unit 19 (16) and TT4 unit 5 (11 from window 24 on, 0.4
+ms). Both carries that drift rebuild their templates June's way (mean of
+500 accepted spikes, full replacement), and nothing in that rebuild keeps
+the waveform in place. A unit's spike times then carry its drift, and a
+comparison between sortings at 0.33 ms finds fewer shared spikes than there
+are.
+
+The first version of this table measured the offset of the trough on the
+deepest wire from sample 30, which misreads positive-going units (TT16 unit
+44, TT15 unit 43, TT3 unit 3 and TT2 unit 2 in the per-tetrode carry, whose
+maximum is more than twice their trough's depth): their trough is a small,
+variable lobe. That measure gave production 11 units, joint whitened 17 and
+per tetrode 4 in window 94, and a largest offset of 54 samples, for a unit
+that appears only in window 94. Seeds and re-seeds come from MountainSort5
+with `detect_sign=-1`, so positive-going units are stamped on their trough.
+On TT16 unit 44 in window 48 the trough is -10.6 uV at sample 30 and the
+peak +29.5 uV at sample 42; across spikes the trough's position has an
+interquartile range of 11 samples and the peak's of 2 (`review_units.py`).
+`Recipe.recenter` shifts each rebuilt template back so that its reference
+extremum stays at sample 30, and moves a positive-going unit to its peak
+once.
 
 ### Light-driven cells
 

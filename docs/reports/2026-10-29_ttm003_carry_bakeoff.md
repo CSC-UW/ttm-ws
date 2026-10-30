@@ -49,9 +49,9 @@ user.
   (90.4 %) in production, puts 64 spikes in the tetrodes' own bad periods,
   keeps all 68 units present, and keeps each light-driven cell's response on
   one unit for 48 h, where production hands it from unit to unit.
-  Production's rebuild also moves its units' spike times off their troughs
-  (by window 94, 11 units by 5 samples or more, 90th percentile 0.5 ms,
-  the largest 1.8 ms).
+  Production's rebuild also moves its units' spike times along their
+  waveforms (by window 94, 9 units by 5 samples or more, the largest by 30
+  samples, 1.0 ms); the per-tetrode carry's move by 3 samples at most.
 - On the tetrodes with few units the per-tetrode carry has 10 to 100 times
   production's spikes. These units follow events seen on many tetrodes at
   once: at their spike times the busy tetrodes TT4, TT8 and TT12 show
@@ -255,12 +255,15 @@ against 96 to 99.9 %, and TT9 80.3 against 60.8 %.
 
 ### Spike times
 
-In window 0 every sorting stamps its spikes on the trough of the unit's mean
-waveform. By window 94 production has 11 units stamped 5 samples or more
-off it (90th percentile 15 samples), joint whitened 17 (11), per tetrode 4
-(3). Production's TT4 unit 5 sits 11 to 13 samples (0.4 ms) before its
-trough from window 24 on. Both carries that drift rebuild templates June's
-way, and nothing in that rebuild keeps the trough in place. Latencies read
+Against each unit's mean waveform in its first window, by window 94
+production has 9 units whose spike times have moved 5 samples or more along
+the waveform (90th percentile 6 samples, largest 30), joint whitened 8 (3,
+40), per tetrode none (1, 3). Production's TT4 unit 5 sits 11 samples (0.4
+ms) off from window 24 on. Both carries that drift rebuild templates June's
+way, and nothing in that rebuild keeps the waveform in place. An earlier
+version of these numbers measured the trough's offset from sample 30, which
+misreads positive-going units and overstated every carry's drift (production
+11 units, joint whitened 17, per tetrode 4). Latencies read
 from production's spike times carry this drift, and comparisons between
 sortings at 0.33 ms undercount their shared spikes.
 
