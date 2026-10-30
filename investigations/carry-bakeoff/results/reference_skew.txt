@@ -1,0 +1,82 @@
+tau (samples, wire after the median): range -0.568 to 1.033, spread across blocks (median sd) 0.007
+g: range 0.787 to 1.031
+by channel number: CH tau_us g
+  CH1   TT12     20.4 us  g 1.006
+  CH2   TT13     17.5 us  g 0.938
+  CH3   TT12     26.3 us  g 0.983
+  CH4   TT13     11.3 us  g 1.004
+  CH5   TT12     19.9 us  g 0.976
+  CH6   TT13     16.6 us  g 0.996
+  CH7   TT12     10.7 us  g 1.019
+  CH8   TT13     16.7 us  g 0.963
+  CH9   TT11      7.5 us  g 1.028
+  CH10  TT14      4.5 us  g 1.009
+  CH11  TT11      4.0 us  g 1.029
+  CH12  TT14      3.5 us  g 0.992
+  CH13  TT11      4.6 us  g 1.013
+  CH14  TT14      0.9 us  g 1.011
+  CH15  TT11     -1.7 us  g 1.021
+  CH16  TT14     -0.9 us  g 1.013
+  CH17  TT10     -1.4 us  g 0.988
+  CH18  TT15     -5.5 us  g 1.012
+  CH19  TT10     -4.4 us  g 1.015
+  CH20  TT15     -5.9 us  g 1.015
+  CH21  TT10     -5.2 us  g 0.981
+  CH22  TT15     -8.7 us  g 1.031
+  CH23  TT10     -2.6 us  g 0.955
+  CH24  TT15    -12.7 us  g 0.999
+  CH25  TT9      -4.6 us  g 0.990
+  CH26  TT16    -13.3 us  g 1.026
+  CH27  TT9      -2.8 us  g 0.964
+  CH28  TT16    -15.7 us  g 0.999
+  CH29  TT9      -5.4 us  g 0.984
+  CH30  TT16    -17.5 us  g 1.027
+  CH31  TT9      -9.2 us  g 0.990
+  CH32  TT16    -18.9 us  g 1.026
+  CH33  TT8      27.4 us  g 0.963
+  CH34  TT1       9.6 us  g 1.019
+  CH35  TT8      14.7 us  g 1.017
+  CH36  TT1       7.8 us  g 0.997
+  CH37  TT8      14.0 us  g 1.004
+  CH38  TT1       4.0 us  g 1.023
+  CH39  TT8      34.4 us  g 0.922
+  CH40  TT1       4.5 us  g 1.000
+  CH41  TT7      16.0 us  g 0.954
+  CH42  TT2       1.3 us  g 1.012
+  CH43  TT7      15.5 us  g 0.959
+  CH44  TT2      -0.5 us  g 1.010
+  CH45  TT7       5.8 us  g 0.996
+  CH46  TT2      -4.1 us  g 0.995
+  CH47  TT7       4.4 us  g 1.011
+  CH48  TT2      -5.2 us  g 1.003
+  CH49  TT6       3.6 us  g 0.969
+  CH50  TT3      -6.4 us  g 1.030
+  CH51  TT6       4.2 us  g 0.991
+  CH52  TT3      -5.6 us  g 1.014
+  CH53  TT6      -2.8 us  g 1.003
+  CH54  TT3      -5.4 us  g 1.007
+  CH55  TT6      -1.4 us  g 0.987
+  CH56  TT3     -11.3 us  g 1.026
+  CH57  TT5      -8.6 us  g 0.982
+  CH58  TT4      -2.9 us  g 0.982
+  CH59  TT5     -12.5 us  g 1.001
+  CH60  TT4     -10.4 us  g 0.992
+  CH61  TT5     -16.6 us  g 1.006
+  CH62  TT4       0.3 us  g 0.935
+  CH63  TT5     -12.3 us  g 0.991
+  CH64  TT4      14.4 us  g 0.787
+correlation of tau with channel number -0.35
+  CH1-CH32: correlation -0.93, slope -1.17 us per channel
+  CH33-CH64: correlation -0.68, slope -0.85 us per channel
+own tetrode, min and max of the mean at the unit's spikes, after subtracting:
+unit                median of 64 |     median of other 60 |             g * median | g * median + b * slope |        median, shifted |    shifted, g * median | median, shifted the wrong way
+u0   TT1           -21.5      6.5 |         -22.9      7.0 |         -19.6      4.3 |          -9.7      3.0 |         -12.2      5.4 |          -8.8      2.8 |         -32.7      8.8
+u3   TT3           -14.2     22.2 |         -15.2     23.8 |          -9.5     22.3 |          -3.7      5.7 |          -8.8      7.2 |          -3.1      4.4 |         -20.6     39.2
+u39  TT13          -28.3     20.2 |         -29.9     21.0 |         -28.2      9.8 |          -7.4      1.8 |         -15.7     13.9 |          -7.0      1.7 |         -50.9     28.5
+u40  TT14          -14.2      5.3 |         -15.8      5.6 |         -12.7      4.3 |          -4.5      2.3 |          -6.3      3.8 |          -3.6      1.9 |         -23.7      7.8
+u43  TT15          -10.6     29.0 |         -11.6     30.9 |          -9.8     29.1 |          -2.9      7.6 |          -5.1      7.4 |          -2.8      5.9 |         -18.6     53.7
+u44  TT16          -10.6     28.5 |         -11.4     30.0 |          -7.9     27.6 |          -1.9      4.6 |          -6.1      8.3 |          -1.7      3.8 |         -16.3     52.0
+u2   TT2            -7.2     20.0 |          -8.0     21.9 |          -7.0     19.8 |          -4.7     15.4 |          -4.9     15.2 |          -4.5     14.3 |         -10.0     25.8
+u5   TT4           -72.3     43.8 |         -72.9     44.3 |         -53.2     19.8 |         -43.9     18.7 |         -62.0     46.0 |         -44.0     19.2 |         -82.6     42.0
+u16  TT6          -101.9     29.3 |        -102.6     29.7 |        -101.9     29.3 |        -101.8     29.2 |        -101.7     29.3 |        -101.7     29.3 |        -101.9     29.2
+u4   TT4          -131.0     42.0 |        -131.7     42.3 |        -131.0     42.0 |        -131.0     42.0 |        -130.9     41.9 |        -130.9     41.9 |        -130.8     42.0
