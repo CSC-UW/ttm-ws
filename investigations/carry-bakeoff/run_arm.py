@@ -49,6 +49,9 @@ RECIPES = {
     "lnbs": Recipe(select="lead_nostim_nobad", snippet="peeled", scale="sym"),
     "lnbs_b5": Recipe(select="lead_nostim_nobad", snippet="peeled", scale="sym", blend=0.5),
     "s": Recipe(scale="sym"),
+    # rebuilt templates shifted back so their reference extremum stays at sample 30
+    "lnb_b2_rc": Recipe(select="lead_nostim_nobad", snippet="peeled", blend=0.2, recenter=True),
+    "june_rc": Recipe(recenter=True),
 }
 ARMS = {a.name: a for a in [
     # Stage A, windows 0 and 1 on the starting bank, templates frozen: what each matcher admits.
@@ -128,6 +131,16 @@ ARMS = {a.name: a for a in [
     Arm("R48_W_s45_c50_lnb_b2_rw", hybrid=False, amp_rel=0.5, snr_floor=4.5, gate=("cos_pl", 0.5),
         refractory_ms=1.5, recipe=RECIPES["lnb_b2"], match_floor=(0.2, 2.5), pulse_rule=(2.5, 0.3, 0.5),
         drop_bad=True, amp_ref="median", whiten=True, rewhiten=True, reseed_every=12,
+        reseed_sorts=str(bk.SORTINGS / "mp_baseline" / "reseed_sorts")),
+] + [
+    # re-centring the rebuilt templates
+    Arm("W_s45_c50_lnb_b2_rc", amp_rel=0.5, snr_floor=4.5, gate=("cos_pl", 0.5), refractory_ms=1.5,
+        recipe=RECIPES["lnb_b2_rc"], match_floor=(0.2, 2.5), pulse_rule=(2.5, 0.3, 0.5), drop_bad=True,
+        amp_ref="median", whiten=True),
+    Arm("W_joint_masked_june_rc", per_tetrode=False, masked=True, whiten=True, recipe=RECIPES["june_rc"]),
+    Arm("R48_W_s45_c50_lnb_b2_rc", hybrid=False, amp_rel=0.5, snr_floor=4.5, gate=("cos_pl", 0.5),
+        refractory_ms=1.5, recipe=RECIPES["lnb_b2_rc"], match_floor=(0.2, 2.5), pulse_rule=(2.5, 0.3, 0.5),
+        drop_bad=True, amp_ref="median", whiten=True, reseed_every=12,
         reseed_sorts=str(bk.SORTINGS / "mp_baseline" / "reseed_sorts")),
 ]}
 

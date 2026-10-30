@@ -251,6 +251,8 @@ class Recipe:
     snippet: "raw" or "peeled" (every other fitted spike subtracted).
     estimator: "mean", "median" or "trimmed" (20 % trimmed mean per sample and wire).
     blend: weight of the new estimate; 1 replaces the template (June), 0 freezes it.
+    recenter: shift the rebuilt template by whole samples so its reference extremum stays at sample NB
+        (``recenter_template``).
     """
     select: str = "all"
     snippet: str = "raw"
@@ -265,6 +267,7 @@ class Recipe:
     post_ms: float = 100.0
     iso_ms: float = 1.5
     seed: int = 0
+    recenter: bool = False
 
 
 _BAD = {}
@@ -376,17 +379,42 @@ def estimate(snips: np.ndarray, estimator: str) -> np.ndarray:
     raise ValueError(estimator)
 
 
+def recenter_template(T_new: np.ndarray, T_old: np.ndarray, W_inv: np.ndarray | None, *, switch: float = 2.0,
+                      lo: int = 15, hi: int = 30) -> tuple[np.ndarray, int]:
+    """``T_new`` shifted by whole samples so that its reference extremum sits at sample ``NB``, read on
+    the plain template's largest wire within ``lo`` samples before and ``hi`` after ``NB``. The reference
+    is the sign ``T_old`` has at ``NB`` on that wire, or the other sign once its extremum is ``switch``
+    times larger. Samples shifted in at the edge are zero. Returns the template and the shift."""
+    P = T_new if W_inv is None else T_new @ W_inv
+    P_old = T_old if W_inv is None else T_old @ W_inv
+    c = int(np.abs(P).max(axis=0).argmax())
+    seg = P[NB - lo:NB + hi, c]
+    sign = 1.0 if P_old[NB, c] > 0 else -1.0
+    if (-sign * seg).max() > switch * (sign * seg).max():
+        sign = -sign
+    d = int((sign * seg).argmax()) - lo
+    if d == 0:
+        return T_new, 0
+    out = np.zeros_like(T_new)
+    if d > 0:
+        out[:-d] = T_new[d:]
+    else:
+        out[-d:] = T_new[:d]
+    return out, d
+
+
 # --- one window on one tetrode, after matching ---------------------------------------------------
 
 def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: np.ndarray, amps: np.ndarray,
                    T: np.ndarray, unit_ids: np.ndarray, admission: dict, recipe: Recipe,
-                   pulses, sigma: np.ndarray | None) -> dict:
+                   pulses, sigma: np.ndarray | None, W_g: np.ndarray | None = None) -> dict:
     """Scores, admission and re-estimation for tetrode ``g`` in frames [a, b).
 
     ``labels`` index ``T`` / ``unit_ids`` (this tetrode's units). Returns per-spike arrays, the
     accepted mask, the reason codes (0 accepted, 1 snr or relative floor, 2 shape, 3 refractory, 5 in a bad
     period of the tetrode), and the
-    re-estimated templates (NaN where a unit was not re-estimated)."""
+    re-estimated templates (NaN where a unit was not re-estimated). ``W_g`` is the tetrode's whitening
+    block when ``T`` is whitened (re-centring reads the template in plain space)."""
     x = cp.load_tetrode_traces(rec, g, a, b)
     noise, _ = cp.noise_mad_excised(x)
     if sigma is None:
@@ -534,8 +562,13 @@ def tetrode_window(rec, g: int, a: int, b: int, frames_abs: np.ndarray, labels: 
             est = est * (np.linalg.norm(T[k_u]) / max(np.linalg.norm(est), 1e-12))
         newT[k_u] = (1 - recipe.blend) * T[k_u] + recipe.blend * est
         n_used[k_u] = sel.size
+    shift = np.zeros(len(unit_ids), np.int64)
+    if getattr(recipe, "recenter", False):
+        W_inv = None if W_g is None else np.linalg.inv(W_g.astype(np.float64))
+        for k_u in np.flatnonzero(n_used > 0):
+            newT[k_u], shift[k_u] = recenter_template(newT[k_u], T[k_u].astype(np.float64), W_inv)
     return {"scores": sc, "reason": reason, "newT": newT, "n_used": n_used, "noise": noise, "sigma": sigma,
-            "driven": [int(unit_ids[k_u]) for k_u in driven]}
+            "driven": [int(unit_ids[k_u]) for k_u in driven], "shift": shift}
 
 
 # --- the carry ----------------------------------------------------------------------------------
@@ -703,6 +736,7 @@ def run_carry(arm: Arm, bank0: Bank, out_dir: pathlib.Path, *, windows: range, n
         cols = {k: [] for k in ("frame", "unit", "a", "snr", "cos_raw", "cos_pl", "resid", "trough", "reason")}
         newbank = bank.copy()
         n_used = np.zeros(len(bank.ids), np.int64)
+        shift = np.zeros(len(bank.ids), np.int64)
         noise = {}
         for g, r in zip(groups, res):
             gi = np.flatnonzero(bank.group == g)
@@ -717,6 +751,7 @@ def run_carry(arm: Arm, bank0: Bank, out_dir: pathlib.Path, *, windows: range, n
                 if np.isfinite(r["newT"][j]).all():
                     newbank.T[k_u] = r["newT"][j].astype(np.float32)
                     n_used[k_u] = r["n_used"][j]
+                    shift[k_u] = r["shift"][j]
             noise[g] = r["noise"]
         arrays = {k: np.concatenate(v) for k, v in cols.items()}
         o = np.argsort(arrays["frame"], kind="stable")
@@ -724,15 +759,18 @@ def run_carry(arm: Arm, bank0: Bank, out_dir: pathlib.Path, *, windows: range, n
         bank.save(f_bk.with_name(f"bankin_w{w:02d}.npz"), sigma=sigma)
         driven = np.array(sorted(u for r in res for u in r.get("driven", [])), np.int64)
         newbank.save(f_bk, n_used=n_used, noise=np.stack([noise[g] for g in groups]), noise_groups=np.array(groups),
-                     driven=driven)
+                     driven=driven, shift=shift)
         acc = arrays["reason"] == 0
         log(f"{arm.name} w{w:02d}: {acc.sum():,} accepted of {acc.size:,} fits; driven {driven.tolist()}; "
-            f"{(n_used > 0).sum()}/{len(n_used)} templates re-estimated; match {t_match / 60:.1f} min, "
+            f"{(n_used > 0).sum()}/{len(n_used)} templates re-estimated"
+            + (f", {(shift != 0).sum()} re-centred" if arm.recipe.recenter else "")
+            + f"; match {t_match / 60:.1f} min, "
             f"total {(time.time() - t0) / 60:.1f} min")
         if arm.reseed_every and w > 0 and w % arm.reseed_every == 0:
             newbank = reseed(rec, newbank, a, b, pathlib.Path(arm.reseed_sorts) / f"reseed_w{w}", n_jobs=n_jobs)
-            newbank.save(f_bk, n_used=np.r_[n_used, np.zeros(len(newbank.ids) - len(n_used), np.int64)],
-                         noise=np.stack([noise[g] for g in groups]), noise_groups=np.array(groups))
+            pad = np.zeros(len(newbank.ids) - len(n_used), np.int64)
+            newbank.save(f_bk, n_used=np.r_[n_used, pad], noise=np.stack([noise[g] for g in groups]),
+                         noise_groups=np.array(groups), shift=np.r_[shift, pad])
         bank = newbank
 
 
@@ -804,8 +842,12 @@ def _tetrode_job(arm, g, a, b, frames_abs, ci, amps, bank, pulses, sigma, W=None
            "sigma_from": getattr(arm, "sigma_from", "raw"), "amp_rel": arm.amp_rel,
            "pulse_rule": getattr(arm, "pulse_rule", None), "drop_bad": getattr(arm, "drop_bad", False),
            "amp_ref": getattr(arm, "amp_ref", "template")}
+    W_g = None
+    if arm.whiten:
+        ch = np.flatnonzero(np.asarray(rec.get_property("group")).astype(int) == g)
+        W_g = (whitening_matrix(arm.hybrid) if W is None else W)[np.ix_(ch, ch)]
     r = tetrode_window(rec, g, a, b, frames_abs[o], local[o], amps[o], bank.T[gi], bank.ids[gi], adm,
-                       arm.recipe, pulses, sigma)
+                       arm.recipe, pulses, sigma, W_g)
     r["scores"] = {k: v[inv] for k, v in r["scores"].items()}
     r["reason"] = r["reason"][inv]
     return r
