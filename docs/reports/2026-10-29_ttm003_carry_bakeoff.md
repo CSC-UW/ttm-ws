@@ -30,9 +30,8 @@ user.
   F1 (0.78 and 0.92 joint) and trade recall for precision: per tetrode has
   the higher recall on all 21 ground-truth units and on the driven units'
   half-size in-pulse spikes (0.61 against 0.50), joint the higher precision
-  (0.93 against 0.87 on the small units). A stricter cosine gate moves per
-  tetrode to joint's point. Per tetrode needs no probe-wide mask and costs
-  about four times joint's matching time.
+  (0.93 against 0.87 on the small units). Per tetrode needs no mask of the
+  bad periods and costs about four times joint's matching time.
 - Whitening is the largest single gain and helps the joint matcher too. It
   raises the matched-filter signal-to-noise of the seed templates only 1.1
   to 1.5 times; most of the gain is in which false fits survive.
@@ -50,13 +49,16 @@ user.
   (90.4 %) in production, puts 64 spikes in the tetrodes' own bad periods,
   keeps all 68 units present, and keeps each light-driven cell's response on
   one unit for 48 h, where production hands it from unit to unit.
-  Production's rebuild also moves its units' spike times up to 0.5 ms off
-  their troughs.
+  Production's rebuild also moves its units' spike times off their troughs
+  (by window 94, 11 units by 5 samples or more, 90th percentile 0.5 ms,
+  the largest 1.8 ms).
 - On the tetrodes with few units the per-tetrode carry has 10 to 100 times
-  production's spikes. The 1.5 ms rule removes 0.25 to 0.38 of these units'
-  fits and 0.00 to 0.04 of the ground-truth units' on the same tetrodes.
-  Conjecture: they are several cells with one footprint, which joint
-  matching mostly suppressed.
+  production's spikes. These units follow events seen on many tetrodes at
+  once: at their spike times the busy tetrodes TT4, TT8 and TT12 show
+  troughs two to five times their own, and 61 to 94 % of their spikes
+  coincide with a spike on another tetrode (chance about 40 %). Joint
+  matching's competition across tetrodes kept these out; per tetrode needs
+  a test across tetrodes that does the same.
 - Open: whether joint matching with the same rules also keeps the driven
   cells on one unit and the spike times on the trough over 48 h (running);
   the relaxed rule inside laser pulses admits some false fits. A whitening
@@ -238,9 +240,13 @@ whitened, June's rebuild (100 units, 90.5 M). Production
 
 Detected events are negative peaks beyond 5.5 MAD on the tetrode
 (production's `spike_coverage.npz`); one is claimed when a single unit of
-that tetrode has a spike within 0.5 ms. Whitened joint matching re-seeds
-units inside TT16's 12,399 s of bad time,
-which the probe-wide mask does not cover. Per tetrode drops them.
+that tetrode has a spike within 0.5 ms. The mask puts noise independent
+across wires in place of a tetrode's bad periods; whitened with a matrix
+built for correlated wires, that noise has 1.6 to 5.0 times the variance of
+real whitened noise on TT16 and 2.1 to 5.8 on TT14 (`shared_events.py`).
+The joint whitened carry with June's rules fits it there and re-seeds units
+in TT16's 12,399 s of bad time. Per tetrode reads the real traces and drops
+its fits in the tetrode's own bad periods.
 
 Coverage at 10 MAD or more per tetrode, production against per tetrode:
 TT1 26.7 and 90.3 %, TT2 52.7 and 95.0 %, TT3 40.9 and 88.4 %, TT14 43.8
@@ -294,10 +300,19 @@ the real units' fits on the same tetrodes (most units of the busy tetrodes:
 kept spike, not under 0.3 ms as double fits would; the units' small spikes
 have the waveform and wire ratios of their large ones (cosine 0.96 to
 0.99), and 0.03 to 0.34 of even their spikes of snr 12 or more are removed
-(`refractory_pairs.py`). Conjecture: each is several cells with one
-footprint, which joint matching mostly suppressed and per-tetrode matching
-admits. A per-unit share of refractory removals would mark them as
-multi-unit at export (ground-truth units 0.04 or less, these 0.25 or more).
+(`refractory_pairs.py`).
+
+They are not local cells (`shared_events.py`, window 48). At their spike
+times the mean trace has troughs on other tetrodes as large as or larger
+than on their own: TT14 unit 40 is -14 uV on TT14 and -69, -71 and -52 uV on
+TT4, TT8 and TT12; TT1 unit 0 is -21 on TT1, -44 on TT4 and -39 on TT8.
+Well-isolated units are about -1 uV off their own tetrode. 61 to 94 % of
+these units' spikes have an accepted spike on another tetrode within 0.2 ms
+(chance 39 to 46 %), most often on the other few-unit tetrodes; the
+well-isolated units are at chance. These units follow events seen on many
+tetrodes at once, and the joint matcher's competition across tetrodes kept
+most of them out. Production's units on these tetrodes show the same
+footprint across tetrodes, with far fewer spikes.
 
 ### Cost
 
@@ -321,11 +336,16 @@ over the 12 windows of the hybrid:
 | per tetrode | 0.72 / 0.87 | 0.93 / 0.90 | 0.79 | 0.91 | 0.61 | 0.93 | 0.90 |
 | per tetrode, cosine >= 0.55, full replacement | 0.65 / 0.81 | 0.90 / 0.94 | 0.72 | 0.92 | 0.61 | | 0.88 |
 
+The stricter gate was run only with full replacement; it lands on joint's
+point for the large units, and for the small units the rebuild confounds
+the comparison.
+
 Per tetrode has the higher recall on every ground-truth unit (by up to 0.11,
 most on GT5 on TT9, GT18 on TT12 and GT15 on TT7). Joint keeps the higher precision, most on GT1 on TT1 (0.88 against
 0.75), GT4 on TT9 (0.94 against 0.77) and the two units mixed with a
 neighbour. Conjecture: the competition across tetrodes still removes false
-fits that the rules let through, and with them true small spikes.
+fits that the rules let through (section 9 shows such fits on the real
+data), and with them true small spikes.
 
 ### Driven test
 
@@ -366,7 +386,10 @@ These are the analyst's reading, for the user to confirm.
   and speed. The per-tetrode carry's real-data advantages so far (driven
   cells, spike times) may come from the rebuild rather than the matcher;
   the 48 h joint run decides it.
-- Units whose fits the refractory rule removes at 0.10 or more would be
-  marked multi-unit at export (ground-truth units 0.04 or less).
+- Per tetrode needs a test across tetrodes in place of the joint
+  matcher's competition: drop a fit when the same event is larger on
+  another tetrode, or when many tetrodes fit it at once. On the hybrid this
+  should recover joint's precision on GT1 and GT4 without its loss of
+  recall; not yet tested.
 - One whitening for clustering and matching (one matrix for the
   MountainSort5 seed and re-seed sorts and for the carry) is a follow-on.

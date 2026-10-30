@@ -231,8 +231,9 @@ per tetrode, and F1 is the same. Per tetrode has the higher recall on all
 21 ground-truth units (by 0.0001 to 0.11) and on the half-size in-pulse
 spikes of all three driven units; joint has the higher precision, most on
 GT1 on TT1 (0.88 against 0.75), GT4 on TT9 (0.94 against 0.77) and the two
-mixed units. A stricter gate per tetrode (cos_pl >= 0.55) moves it to
-about joint's point. Most of the gain over June's carry comes from
+mixed units. A stricter gate per tetrode (cos_pl >= 0.55, run only with
+full replacement) lands on joint's point for the large units; for the small
+units the comparison is confounded by the rebuild. Most of the gain over June's carry comes from
 whitening, scale-free admission and the rebuild, which the joint matcher
 takes as well as per tetrode does. The driven test that counts both rates
 under the relaxed rule leaves the ground-truth measures unchanged; it flags
@@ -271,8 +272,13 @@ machine to itself and 1.2 min joint.
 | the same, events of 10 MAD or more | 90.4 % | | 98.9 % |
 
 The joint whitened carry's bad-period spikes are on TT16 (76,830) and TT14
-(1,067): the probe-wide mask leaves out each tetrode's own bad periods, and
-re-seeding there adds units that live in them. The per-tetrode sorting's
+(1,067). The mask replaces a tetrode's four channels inside its bad periods
+with noise independent across wires at each wire's clean level; whitened
+with a matrix built for correlated wires, that noise has 1.6 to 5.0 times
+the variance of real whitened noise on TT16 and 2.1 to 5.8 on TT14, whose
+wires are the most correlated (`shared_events.py`), and the joint whitened
+carry with June's rules fits it and re-seeds units in it. The per-tetrode
+sorting is not masked. Its
 refractory measures in that script read 0 by construction, since its
 refractory rule removes one spike of each pair.
 
@@ -294,9 +300,24 @@ over that range rather than under 0.3 ms as double fits of one event would
 be. With `--shapes`, these units' spikes of snr 4.5 to 6 have the same
 waveform as their spikes of snr 12 or more (cosine 0.96 to 0.99 on plain
 traces, the same ratios between wires), and even among the latter 0.03 to
-0.34 are removed. Conjecture: each of these units is several cells with one
-footprint on its tetrode, which joint matching mostly suppressed and
-per-tetrode matching admits.
+0.34 are removed.
+
+`shared_events.py` looks across tetrodes in window 48. At these units'
+spike times the mean trace has a trough on other tetrodes as large as or
+larger than on their own: TT14 unit 40 is -14 uV on TT14 and -69, -71 and
+-52 uV on TT4, TT8 and TT12; TT1 unit 0 -21 on TT1, -44 on TT4, -39 on TT8.
+Well-isolated units (TT4 unit 4, TT6 units 12 and 16, TT10 unit 26) are
+about -1 uV off their own tetrode. 61 to 94 % of the few-unit tetrodes'
+units' spikes have an accepted spike on another tetrode within 0.2 ms
+(chance 39 to 46 %), mostly on the other few-unit tetrodes (TT15 unit 43
+with TT16 at 0.86, TT14 unit 40 with TT13 at 0.71); the well-isolated
+units are at chance. These units follow events seen on many tetrodes at
+once, larger on the busy ones, and not local cells; the same footprint at
+every size and the pairs under 1.5 ms come with that. The earlier
+conjecture that each is several local cells with one footprint is
+replaced by this. Joint matching's competition across tetrodes kept most
+of these events out (production's units there are small); per tetrode
+needs a test across tetrodes to do the same.
 
 ### Spike times against the waveform
 
