@@ -44,7 +44,7 @@ def main():
     for w in range(48, 60):
         if not (RW / f"spikes_w{w:02d}.npz").exists():
             break
-        sp = {k: np.load(d / f"spikes_w{w:02d}.npz") for k, d in (("fixed", FIXED), ("rw", RW))}
+        sp = {k: dict(np.load(d / f"spikes_w{w:02d}.npz")) for k, d in (("fixed", FIXED), ("rw", RW))}
         bf = plain(bk.Bank.load(FIXED / f"bank_w{w:02d}.npz"), W_fixed)
         br = plain(bk.Bank.load(RW / f"bank_w{w:02d}.npz"), np.load(RW / f"whiten_w{w:02d}.npy"))
         for k_f, u in enumerate(bf.ids):

@@ -116,6 +116,10 @@ ARMS = {a.name: a for a in [
     Arm("W_joint_masked_s45_c50_lnb_b2", per_tetrode=False, masked=True, amp_rel=0.5, snr_floor=4.5,
         gate=("cos_pl", 0.5), refractory_ms=1.5, recipe=RECIPES["lnb_b2"], match_floor=(0.2, 2.5),
         pulse_rule=(2.5, 0.3, 0.5), drop_bad=True, amp_ref="median", whiten=True),
+    Arm("R48_W_joint_masked_s45_c50_lnb_b2", per_tetrode=False, hybrid=False, masked=True, amp_rel=0.5,
+        snr_floor=4.5, gate=("cos_pl", 0.5), refractory_ms=1.5, recipe=RECIPES["lnb_b2"], match_floor=(0.2, 2.5),
+        pulse_rule=(2.5, 0.3, 0.5), drop_bad=True, amp_ref="median", whiten=True, reseed_every=12,
+        reseed_sorts=str(bk.SORTINGS / "mp_baseline_masked" / "reseed_sorts")),
     # A whitening matrix per window instead of the first 300 s'. The hybrid arm runs windows 0-11; the
     # real one runs windows 48-59 from R48's bank after window 47 (--bank of that bank unwhitened).
     Arm("W_s45_c50_lnb_b2_rw", amp_rel=0.5, snr_floor=4.5, gate=("cos_pl", 0.5), refractory_ms=1.5,

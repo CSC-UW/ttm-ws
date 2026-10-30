@@ -207,6 +207,37 @@ ground-truth units on the same tetrodes keep precision 0.9 to 1.0 per
 tetrode. Conjecture: those real units are multi-unit, and per-tetrode
 matching gives them more of the activity they already collect.
 
+### Matcher against recipe
+
+`W_joint_masked_s45_c50_lnb_b2` runs joint matching, masked, on whitened
+traces with every rule of the per-tetrode blend 0.2 carry (matching floor,
+admission, in-pulse rule, the tetrode's own bad periods dropped, blend 0.2).
+`W_s45_c50_lnb_b2_dt2` is the per-tetrode carry again under the driven test
+that counts both rates under the relaxed rule, and `W_s45_c50_lnb_b2_rw` the
+same with a whitening matrix per window. Means over the 12 windows
+(`results/carries_summary_followup.csv`):
+
+| arm | small R / P | large R / P | small F1 | large F1 | half-size laser | burst tails, large | event recall, large |
+|---|---|---|---|---|---|---|---|
+| joint masked, whitened, June's rebuild | 0.62 / 0.79 | 0.78 / 0.95 | 0.69 | 0.86 | 0.02 | 0.39 | 0.77 |
+| joint masked, whitened, per-tetrode rules | 0.67 / 0.93 | 0.90 / 0.94 | 0.78 | 0.92 | 0.50 | 0.89 | 0.88 |
+| per tetrode, whitened, blend 0.2 | 0.72 / 0.87 | 0.93 / 0.90 | 0.79 | 0.91 | 0.61 | 0.93 | 0.90 |
+| the same, current driven test | 0.72 / 0.87 | 0.93 / 0.90 | 0.79 | 0.91 | 0.61 | 0.93 | 0.90 |
+| the same, whitening per window | 0.71 / 0.84 | 0.93 / 0.89 | 0.77 | 0.91 | 0.64 | 0.93 | 0.90 |
+| per tetrode, cos_pl >= 0.55, full replacement | 0.65 / 0.81 | 0.90 / 0.94 | 0.72 | 0.92 | 0.61 | | 0.88 |
+
+With the same rules, joint matching gives up recall for precision against
+per tetrode, and F1 is the same. Per tetrode has the higher recall on all
+21 ground-truth units (by 0.0001 to 0.11) and on the half-size in-pulse
+spikes of all three driven units; joint has the higher precision, most on
+GT1 on TT1 (0.88 against 0.75), GT4 on TT9 (0.94 against 0.77) and the two
+mixed units. A stricter gate per tetrode (cos_pl >= 0.55) moves it to
+about joint's point. Most of the gain over June's carry comes from
+whitening, scale-free admission and the rebuild, which the joint matcher
+takes as well as per tetrode does. The driven test that counts both rates
+under the relaxed rule leaves the ground-truth measures unchanged; it flags
+GT1, which is silent in pulses, in some windows.
+
 ## The 48 h
 
 Two carries ran over the 96 windows of `mp_baseline/binary`
@@ -318,3 +349,27 @@ part of them can be false fits.
 The template lookup of `tagged_cells_blocks.py` (cosine to the OPTO2
 session's templates) picks other units in the whitened sortings (TT4 unit
 4 and TT10 unit 24 per tetrode), so its `tagged` summaries understate them.
+
+### Whitening per window
+
+`R48_W_s45_c50_lnb_b2_rw` reran windows 48 to 59 from the per-tetrode
+carry's bank after window 47 with a whitening matrix per window (30 blocks
+of 10 s spread over the window, clear of the tetrode's bad periods and the
+pulses). `rewhiten_real.py` compares it with the same windows of the 48 h
+run (`results/rewhiten_real.csv`). On the busy tetrodes it accepts 2 to 5 %
+more spikes, at a lower median cos_pl (TT8 0.684 against 0.717, TT12 0.626
+against 0.647); on TT14, whose residual correlation under the first 300 s'
+matrix is highest, it accepts 16 % fewer (91,755 against 109,454) and
+removes fewer by the refractory rule (0.17 against 0.21). The two runs
+share 55 to 95 % of each other's spikes per tetrode, and their templates
+stay at cosine 0.98 or more. On the hybrid it lowers small-unit precision
+from 0.87 to 0.84. Nothing here asks for re-whitening every window; TT14
+may be a case for re-whitening when the residual correlation crosses a
+threshold, not tested.
+
+### Joint matching with the per-tetrode rules over the 48 h
+
+`R48_W_joint_masked_s45_c50_lnb_b2` (run 2026-10-30) asks whether the
+per-tetrode carry's real-data behaviour (driven cells on one unit, spike
+times on the trough, the few-unit tetrodes' units) comes from the matcher
+or from the rules and the rebuild.
