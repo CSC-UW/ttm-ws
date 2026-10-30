@@ -315,9 +315,42 @@ units are at chance. These units follow events seen on many tetrodes at
 once, larger on the busy ones, and not local cells; the same footprint at
 every size and the pairs under 1.5 ms come with that. The earlier
 conjecture that each is several local cells with one footprint is
-replaced by this. Joint matching's competition across tetrodes kept most
-of these events out (production's units there are small); per tetrode
-needs a test across tetrodes to do the same.
+replaced by this. Joint matching kept most of these events out
+(production's units there are small); per tetrode fits them.
+
+Before the reference is subtracted these events are on every wire
+(`reference_check.py`: five blocks of 60 s of window 48, bandpassed 300 to
+6000 Hz from the Zarr store without the reference). At the spike times of
+TT1 unit 0, TT2 unit 2, TT3 unit 3, TT13 unit 39, TT14 unit 40, TT15 unit
+43 and TT16 unit 44 the mean has a trough of -160 to -320 uV on all 64
+wires, the median wire within 7 % of the deepest, and the median of all
+wires, which the sorted binary subtracts, carries it at the same size.
+What the subtraction leaves on the unit's own tetrode is -7 to -28 uV and
++5 to +29 uV; TT16 unit 44's positive-going waveform is that remainder.
+The median trace has 61 troughs per second below 5 of its MAD (108 uV),
+and 76 to 96 % of these units' spikes (68 % of TT4 unit 5's) fall within
+1 ms of one, against 11 to 16 % (chance) for well-isolated units.
+Subtracting each wire's least-squares gain on the median (0.94 to 1.03)
+times the median leaves the remainders nearly as they are. Subtracting the
+median through a 7-tap filter fitted per wire cuts them by 60 to 90 %
+(TT16 unit 44 to -1.5 and +4.3 uV, TT14 unit 40 to -3.4 and +2.0 uV) and
+leaves well-isolated units' waveforms unchanged. These remainders are
+measured at times chosen because they looked like spikes, so they overstate
+what is left. Where the common event comes from is not established; one
+possibility is the reference electrode's own signal.
+
+`joint_competition.py` measures what joint matching's selection costs on
+the hybrid. In each pass over a 1 s chunk circus-omp takes, within 3 ms
+either way, only the best template score over the whole probe as a
+candidate; a template on another tetrode is unchanged by that fit, so a
+coincident spike there can be taken in a later pass, and is lost only if
+the chunk stops first (five passes in a row with no new fit inside the
+amplitude bounds). 98 % of ground-truth spikes have an accepted spike of
+the per-tetrode arm on another tetrode within 3 ms. With the same rules,
+joint matching's recall is within 0.01 of per tetrode's when none of those
+is larger, and lower by 0.05 when one is (large units 0.84 against 0.89,
+small 0.60 against 0.65); GT5 on TT9 drops from 0.59 to 0.48 and GT18 on
+TT12 from 0.76 to 0.65.
 
 ### Spike times against the waveform
 

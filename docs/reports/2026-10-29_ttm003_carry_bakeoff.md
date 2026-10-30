@@ -105,16 +105,24 @@ spikes that have a ground-truth spike within 10 samples.
 ## 4. What the joint matcher does that per tetrode does not
 
 Read from spikeinterface 0.105.2's circus-omp:
-- Candidate times are chosen across the probe: within about 3 ms, only the
-  sample with the best template score over all channels is a candidate, and
-  a fit is kept if its amplitude is above 0.25 of the template's.
-- The rule that stops a chunk after a number of failed fits is shared by the
-  whole probe.
+- In each pass over a 1 s chunk, within 3 ms either way only the sample
+  with the best template score over all channels is a candidate (amplitude
+  above 0.25 of the template's). A later pass can take the next best once
+  that one is fitted, and a template on another tetrode is unchanged by the
+  fit, so a coincident spike there waits for a later pass.
+- The passes stop when five in a row add no fit inside the amplitude
+  bounds anywhere in the chunk, a rule shared by the whole probe; a spike
+  still waiting then is lost.
 - Fits outside the amplitude bounds are still subtracted.
 
 The joint matcher's precision on clean data (`investigations/per-tetrode-matching/`)
 therefore comes partly from an early stop and from competition across
 tetrodes, which also hide spikes on tetrodes with few or small units. On
+the hybrid with the same admission rules in both (`joint_competition.py`),
+98 % of ground-truth spikes have a spike on another tetrode within 3 ms;
+joint matching's recall is within 0.01 of per tetrode's when none of those
+is larger and 0.05 lower when one is (large units 0.84 against 0.89, small
+0.60 against 0.65). On
 TT1 and TT16 joint matching found 0 and 20 %, and 0 and 53 %, of two
 ground-truth units' spikes in clean time, where per tetrode found 96 to
 98 % of the larger ones.
