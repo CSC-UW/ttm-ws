@@ -12,9 +12,9 @@ far the window-to-window shifts move.
 
 ``--binary`` then writes ``mp_aligned/binary_w00_11``: the first 12 windows (6 h) of the store,
 bandpassed and referenced with ``preprocess_for_sorting(cmr="global_aligned")``, float32, the same
-frames as ``mp_baseline/binary``.
+frames as ``mp_baseline/binary``. ``--full`` writes all 96 windows to ``mp_aligned/binary`` instead.
 
-Run: .venv/bin/python investigations/common-reference/aligned_binary.py [--binary] [--jobs 64]
+Run: .venv/bin/python investigations/common-reference/aligned_binary.py [--binary [--full]] [--jobs 64]
 """
 from __future__ import annotations
 
@@ -53,6 +53,7 @@ def one_window(start: int):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--binary", action="store_true")
+    ap.add_argument("--full", action="store_true")
     ap.add_argument("--jobs", type=int, default=64)
     a = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
@@ -87,11 +88,11 @@ def main():
         d = np.abs(sh[:, groups == g] - sh[0, groups == g])
         print(f"  TT{g + 1:<3d} {d.max():5.1f}  {d[:N_WIN_BINARY].max():5.1f}")
     if a.binary:
-        out = OUT / "binary_w00_11"
+        out = OUT / ("binary" if a.full else "binary_w00_11")
         raw = si.read_zarr(str(STORE))
         raw.reset_times()
         pp = preprocess_for_sorting(raw, cmr="global_aligned", wire_timing=timing)
-        crop = pp.frame_slice(0, N_WIN_BINARY * WIN)
+        crop = pp if a.full else pp.frame_slice(0, N_WIN_BINARY * WIN)
         t0 = time.time()
         crop.save(format="binary", folder=str(out), dtype="float32", n_jobs=a.jobs, chunk_duration="1s",
                   progress_bar=False, overwrite=True)

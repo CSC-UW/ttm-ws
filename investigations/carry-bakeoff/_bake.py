@@ -49,9 +49,14 @@ SORTINGS = SESSION / "sortings_seed42_pcafix"
 BAKE_ROOT = SORTINGS / "carry_bakeoff"
 # BAKE_REFERENCE=aligned reads the first 12 windows referenced with ttm.reference's aligned median
 # (investigations/common-reference/aligned_binary.py) and keeps the hybrid, whitening and arms in v2_aligned;
-# aligned_seed uses the same hybrid with the seed bank re-sorted on it (seed_aligned.py), arms in v2_aligned_seed
+# aligned_seed uses the same hybrid with the seed bank re-sorted on it (seed_aligned.py), arms in v2_aligned_seed;
+# aligned48 reads the 96 windows referenced the same way (aligned_binary.py --full), arms in aligned48
 REFERENCE = os.environ.get("BAKE_REFERENCE", "global")
-if REFERENCE in ("aligned", "aligned_seed"):
+if REFERENCE == "aligned48":
+    BINARY = SORTINGS / "mp_aligned" / "binary"
+    BAKE = BAKE_ROOT / "aligned48"
+    HYBRID = BAKE_ROOT / "v2_aligned" / "hybrid_binary"
+elif REFERENCE in ("aligned", "aligned_seed"):
     BINARY = SORTINGS / "mp_aligned" / "binary_w00_11"
     BAKE = BAKE_ROOT / ("v2_aligned" if REFERENCE == "aligned" else "v2_aligned_seed")
     HYBRID = BAKE_ROOT / "v2_aligned" / "hybrid_binary"

@@ -142,6 +142,17 @@ ARMS = {a.name: a for a in [
         refractory_ms=1.5, recipe=RECIPES["lnb_b2_rc"], match_floor=(0.2, 2.5), pulse_rule=(2.5, 0.3, 0.5),
         drop_bad=True, amp_ref="median", whiten=True, reseed_every=12,
         reseed_sorts=str(bk.SORTINGS / "mp_baseline" / "reseed_sorts")),
+] + [
+    # R48_W_s45_c50_lnb_b2 and R48_W_joint_masked_s45_c50_lnb_b2 on the aligned-reference 48 h binary
+    # (BAKE_REFERENCE=aligned48, --bank <BAKE_ROOT>/v2_aligned/bank0_aligned.npz --windows 0-95), re-seeded
+    # from MountainSort5 sorts of that binary (reseed_aligned.py), the joint arm's from the masked binary
+    Arm("A48_W_s45_c50_lnb_b2", hybrid=False, amp_rel=0.5, snr_floor=4.5, gate=("cos_pl", 0.5), refractory_ms=1.5,
+        recipe=RECIPES["lnb_b2"], match_floor=(0.2, 2.5), pulse_rule=(2.5, 0.3, 0.5), drop_bad=True, amp_ref="median",
+        whiten=True, reseed_every=12, reseed_sorts=str(bk.SORTINGS / "mp_aligned" / "reseed_sorts")),
+    Arm("A48_W_joint_masked_s45_c50_lnb_b2", per_tetrode=False, hybrid=False, masked=True, amp_rel=0.5,
+        snr_floor=4.5, gate=("cos_pl", 0.5), refractory_ms=1.5, recipe=RECIPES["lnb_b2"], match_floor=(0.2, 2.5),
+        pulse_rule=(2.5, 0.3, 0.5), drop_bad=True, amp_ref="median", whiten=True, reseed_every=12,
+        reseed_sorts=str(bk.SORTINGS / "mp_aligned_masked" / "reseed_sorts")),
 ]}
 
 
