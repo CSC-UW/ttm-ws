@@ -153,6 +153,56 @@ well-isolated units 99 to 100 % (cosine 0.997 or more). The carry
 bake-off on that binary is in `investigations/carry-bakeoff/README.md`,
 "The aligned reference on the hybrid".
 
+`gain_choice.py` (`results/gain_choice.txt`) fits windows 0 and 5 twice,
+on all samples of the block with the fewest event samples and on the
+event samples of the others, and applies each to the other blocks. Within
+0.5 ms of events the all-sample fit leaves more than the global median on
+the wires where the two gains differ most (window 5: CH64 52.7 against
+24.5 uV, CH22 38.7 against 19.2, CH39 34.4 against 21.2), the event fit
+less (22.3, 19.0, 18.7). Over all wires the median RMS at events changes
+little (14.2 to 14.1 uV), since local activity and noise dominate it.
+
+## How often the events occur
+
+`common_events.py` (`results/common_events.csv`) counts excursions of the
+median beyond 5 of its MAD in the six blocks of each window:
+
+| | TTM-003 48H | TTM-001 NOD | TTM-002 SD |
+|---|---|---|---|
+| windows | 96 | 96 | 24 |
+| events per s, median over windows | 40 | 25 | 27 |
+| range | 1.7 to 87 | 0.7 to 53 | 2.6 to 65 |
+| events beyond 100 uV per s, median | 26 | 7 | 16 |
+| 99th percentile of size | 438 uV | 225 uV | 332 uV |
+| windows under 1 event per s | none | 8, 9, 17 | none |
+
+The rate changes by tens per second between neighbouring windows. In
+TTM-003 and TTM-001 it is highest through windows 48 to 57, the sleep
+deprivation (09:00 to 14:00 on the second day, forced wake with novel
+objects and the experimenter's hands in and out of the Faraday cage).
+
+`event_state.py` (`results/event_state.csv`) compares the rate per window
+with the synthetic EMG and slow-wave activity over the same blocks:
+
+| | TTM-003 48H | TTM-001 NOD |
+|---|---|---|
+| Spearman with EMG | +0.88 | +0.88 |
+| Spearman with slow-wave activity | -0.83 | -0.84 |
+| the same outside the deprivation | +0.86 / -0.84 | +0.88 / -0.82 |
+| events per s, lowest to highest quarter of slow-wave activity | 65, 46, 33, 18 | 41, 29, 20, 8 |
+
+The EMG is not an independent measure: it is the correlation of 300 to
+600 Hz between single unreferenced wires, which a signal common to all
+wires raises. Slow-wave activity is in another band. The rate follows
+state outside the deprivation as closely as across it, so the deprivation
+has more events because it has more wake. Conjecture: the events are
+muscle activity of the neck that the cerebellar screw records, which is
+also why the synthetic EMG works on these recordings. Units fitted to the
+remainder of the events would fire more in wake than in sleep.
+
+The hybrid's windows 0 to 11 range from 1.7 to 80.7 events per s (median
+30); two of the 96 windows have more.
+
 This is not adaptive gain control: the gain is a fixed number per wire
 and window, and spikeinterface's `highpass_spatial_filter`, which
 assumes a dense line of sites, does not fit tetrodes. Not done: the 48 h
