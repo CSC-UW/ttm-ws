@@ -436,6 +436,8 @@ of matching per window):
 | units shifted 5 samples or more by window 94 | 0 | 0 |
 | spikes, TT1 / TT9 / TT14 | 1.60 M / 0.49 M / 0.20 M | 2.84 M / 1.26 M / 0.61 M |
 | spikes, busy tetrodes | 9 to 33 % fewer | |
+| detected events in clean time claimed (10 MAD or more) | 79.2 % (98.5 %) | 84.0 % (98.9 %) |
+| the same on TT9, 10 MAD or more | 46.8 % | 60.8 % |
 
 Onset rates of the driven units, joint against per tetrode: TT4 unit 7 117
 to 352 Hz against 187 to 425; TT6 unit 16 90 to 180 against 176 to 238 in

@@ -487,7 +487,11 @@ most on the few-unit tetrodes and TT9: TT1 1.60 M against 2.84 M, TT2
 1.36 M against 2.48 M, TT3 0.73 M against 1.30 M, TT9 0.49 M against 1.26
 M, TT14 0.20 M against 0.61 M, TT16 2.93 M against 3.56 M; on the busy
 tetrodes 9 to 33 % fewer (TT10 10.9 M against 16.3 M, TT6 17.0 M against
-18.6 M). Its spike times do not drift (previous section).
+18.6 M). Its spike times do not drift (previous section). Against
+production (tag `carry48_jr`) it claims 79.2 % of the detected events in
+clean time and 98.5 % of those of 10 MAD or more (per tetrode 84.0 and
+98.9 %, production 55.0 and 90.4 %); on TT9 it claims 46.8 % of the
+large events, against 80.3 % in production and 60.8 % per tetrode.
 
 Onset rates (1 to 10 ms, Hz) of the units that carry the light-driven
 responses (`tagged_units.py`), per tetrode against joint with the same
