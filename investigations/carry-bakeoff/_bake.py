@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import os
 import pathlib
 import time
 
@@ -45,9 +46,16 @@ NB, NA = 30, 60
 N_SAMP = NB + NA
 SESSION = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-10-20_09-02-12")
 SORTINGS = SESSION / "sortings_seed42_pcafix"
-BINARY = SORTINGS / "mp_baseline" / "binary"
 BAKE_ROOT = SORTINGS / "carry_bakeoff"
-BAKE = BAKE_ROOT / "v2"
+# BAKE_REFERENCE=aligned reads the first 12 windows referenced with ttm.reference's aligned median
+# (investigations/common-reference/aligned_binary.py) and keeps the hybrid, whitening and arms in v2_aligned
+REFERENCE = os.environ.get("BAKE_REFERENCE", "global")
+if REFERENCE == "aligned":
+    BINARY = SORTINGS / "mp_aligned" / "binary_w00_11"
+    BAKE = BAKE_ROOT / "v2_aligned"
+else:
+    BINARY = SORTINGS / "mp_baseline" / "binary"
+    BAKE = BAKE_ROOT / "v2"
 HYBRID = BAKE / "hybrid_binary"
 BAD_PERIODS = SESSION / "bad_periods" / "bad_periods.csv"
 RESULTS = pathlib.Path("/Users/gfindlay@ad.wisc.edu/projects/ttm-ws/subjects/ttm-003/results")
