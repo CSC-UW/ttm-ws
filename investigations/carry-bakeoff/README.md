@@ -1,6 +1,6 @@
 ---
 title: Carry-forward bake-off on hybrid ground truth, TTM-003 48 h
-updated: 2026-10-30
+updated: 2026-11-02
 status: needs_verification
 ---
 
@@ -315,8 +315,10 @@ units are at chance. These units follow events seen on many tetrodes at
 once, larger on the busy ones, and not local cells; the same footprint at
 every size and the pairs under 1.5 ms come with that. The earlier
 conjecture that each is several local cells with one footprint is
-replaced by this. Joint matching kept most of these events out
-(production's units there are small); per tetrode fits them.
+replaced by this. Production's units there are small; joint matching with
+the per-tetrode rules fits these events too (TT1 1.60 M spikes against
+2.84 M per tetrode and 33,747 in production), so June's rules, not the
+joint matcher, kept most of them out.
 
 Before the reference is subtracted these events are on every wire
 (`reference_check.py`: five blocks of 60 s of window 48, bandpassed 300 to
@@ -331,13 +333,24 @@ The median trace has 61 troughs per second below 5 of its MAD (108 uV),
 and 76 to 96 % of these units' spikes (68 % of TT4 unit 5's) fall within
 1 ms of one, against 11 to 16 % (chance) for well-isolated units.
 Subtracting each wire's least-squares gain on the median (0.94 to 1.03)
-times the median leaves the remainders nearly as they are. Subtracting the
-median through a 7-tap filter fitted per wire cuts them by 60 to 90 %
-(TT16 unit 44 to -1.5 and +4.3 uV, TT14 unit 40 to -3.4 and +2.0 uV) and
-leaves well-isolated units' waveforms unchanged. These remainders are
-measured at times chosen because they looked like spikes, so they overstate
-what is left. Where the common event comes from is not established; one
-possibility is the reference electrode's own signal.
+times the median leaves the remainders nearly as they are. These
+remainders are measured at times chosen because they looked like spikes,
+so they overstate what is left. Reference and ground are shorted together
+on a cerebellar skull screw (from the user); conjecture: the event is the
+screw's own signal.
+
+The median leaves part of it because each wire records it at its own
+time offset from the median (`reference_skew.py`,
+`results/reference_skew.txt`; across animals,
+`investigations/common-reference/`): about 1 us later per channel number
+within each bank of 32, plus electrode-specific offsets, -19 to +35 us in
+all. Shifting each wire by its offset with spikeinterface's `phase_shift`
+and subtracting its gain times the shifted median removes 70 to 90 % of
+the remainder on TT1, TT3, TT13, TT14, TT15 and TT16 (TT16 unit 44 from
+-10.6 and +28.5 uV to -1.7 and +3.8) and leaves well-isolated units
+unchanged; TT2 unit 2 keeps most of its positive lobe. The median of the
+other 60 wires leaves slightly more than the global median. Every result
+here on the few-unit tetrodes is on the median-referenced binary.
 
 `joint_competition.py` measures what joint matching's selection costs on
 the hybrid. In each pass over a 1 s chunk circus-omp takes, within 3 ms
@@ -361,19 +374,23 @@ mean in its first window (`results/stamp_drift.csv`):
 
 | units shifted 5 samples or more | window 24 | window 48 | window 72 | window 94 |
 |---|---|---|---|---|
-| production | 1 | 2 | 6 | 9 |
-| joint, whitened | 0 | 1 | 3 | 8 |
+| production | 1 | 2 | 7 | 9 |
+| joint, whitened | 1 | 1 | 3 | 8 |
+| joint, per-tetrode rules | 0 | 0 | 0 | 0 |
 | per tetrode, whitened | 0 | 0 | 0 | 0 |
+| per tetrode, re-centred | 1 | 4 | 6 | 6 |
 
 In window 94 the 90th percentile of the shift is 6 samples in production, 3
-joint whitened and 1 per tetrode, and the largest 30, 40 and 3. Production's
-largest are TT16 unit 43 (30 samples), TT11 unit 32 (21), TT5 unit 11 (20,
+joint whitened and 1 per tetrode, and the largest 31, 41 and 3; joint with
+the per-tetrode rules has 1 and 3. Production's
+largest are TT16 unit 43 (31 samples), TT11 unit 32 (21), TT5 unit 11 (19,
 a 790 uV unit), TT7 unit 19 (16) and TT4 unit 5 (11 from window 24 on, 0.4
 ms). Both carries that drift rebuild their templates June's way (mean of
 500 accepted spikes, full replacement), and nothing in that rebuild keeps
-the waveform in place. A unit's spike times then carry its drift, and a
-comparison between sortings at 0.33 ms finds fewer shared spikes than there
-are.
+the waveform in place; joint matching with the blend 0.2 rebuild does not
+drift, so the drift comes from the rebuild and not the matcher. A unit's
+spike times then carry its drift, and a comparison between sortings at
+0.33 ms finds fewer shared spikes than there are.
 
 The first version of this table measured the offset of the trough on the
 deepest wire from sample 30, which misreads positive-going units (TT16 unit
@@ -388,7 +405,18 @@ peak +29.5 uV at sample 42; across spikes the trough's position has an
 interquartile range of 11 samples and the peak's of 2 (`review_units.py`).
 `Recipe.recenter` shifts each rebuilt template back so that its reference
 extremum stays at sample 30, and moves a positive-going unit to its peak
-once.
+once. It gains nothing (`results/carries_summary_rc.csv`). On the hybrid
+it moves 1 to 3 templates per window per tetrode and changes no pooled
+measure by more than 0.003. Joint with June's rebuild it moves 7 to 9 per
+window, and ground-truth units 0 and 20 are lost with or without it
+(template cosine 0.3 to 0.6 by window 11), with small-unit precision 0.02
+to 0.05 lower from window 8. Over the real 48 h (`R48_W_s45_c50_lnb_b2_rc`,
+`carry_R48_pt_rc`) it moves 0 to 3 templates per window, the light-driven
+responses are those of the run without it, and it adds lags that the run
+without it does not have: four units moved from trough to peak (TT2 unit
+2, TT15 units 43 and 2005, TT16 unit 44; 8 to 30 samples) and two TT15
+units whose trough stays at sample 30 while the rest of the waveform
+changes (unit 42 by 13 samples, 2009 by 12).
 
 ### Light-driven cells
 
@@ -442,4 +470,75 @@ threshold, not tested.
 `R48_W_joint_masked_s45_c50_lnb_b2` (run 2026-10-30) asks whether the
 per-tetrode carry's real-data behaviour (driven cells on one unit, spike
 times on the trough, the few-unit tetrodes' units) comes from the matcher
-or from the rules and the rebuild.
+or from the rules and the rebuild. It is the hybrid arm of the same name
+over the 96 windows: joint, masked, whitened, with every rule of the
+per-tetrode carry and the blend 0.2 rebuild, from the same seed bank and
+re-seeds. `export_sorting.py` assembled it as
+`carry_R48_joint_rules/assembled_reseed_c12` (77 units, 133.5 M spikes).
+Matching took 1.9 to 2.0 min per window, against 9 to 10 min per tetrode
+for `R48_W_s45_c50_lnb_b2_rc`, which ran beside it.
+
+`bad_periods_compare.py` against the per-tetrode carry (tag
+`carry48_jr_pt`): 71 single units against 68, no spike in the tetrodes'
+own bad periods against 64, no unit mostly in them, refractory
+contamination median 0 in both, 7 clock-locked units in both. Joint has
+fewer spikes on every tetrode but TT15 (36,976,353 against 36,881,610),
+most on the few-unit tetrodes and TT9: TT1 1.60 M against 2.84 M, TT2
+1.36 M against 2.48 M, TT3 0.73 M against 1.30 M, TT9 0.49 M against 1.26
+M, TT14 0.20 M against 0.61 M, TT16 2.93 M against 3.56 M; on the busy
+tetrodes 9 to 33 % fewer (TT10 10.9 M against 16.3 M, TT6 17.0 M against
+18.6 M). Its spike times do not drift (previous section).
+
+Onset rates (1 to 10 ms, Hz) of the units that carry the light-driven
+responses (`tagged_units.py`), per tetrode against joint with the same
+rules:
+
+| tetrode | per tetrode | joint, per-tetrode rules |
+|---|---|---|
+| TT4 | unit 7, 187 to 425 in every block | unit 7, 117 to 352 in every block |
+| TT6 | unit 16, 176 to 238 in blocks 1 to 4 | unit 16, 90 to 180 in blocks 1 to 4 |
+| TT10 | unit 25, 100 to 224 in every block | unit 25, 61 to 181 in every block |
+| TT11 | unit 28, 119 to 222 in every block | unit 28, 96 to 117 in blocks 1 to 4, 22 to 50 from block 37; unit 29 at 83 to 106 in blocks 41 to 44 |
+
+`driven_spikes.py` (`results/driven_spikes.txt`) follows TT11 unit 28's
+25,519 in-pulse spikes of the per-tetrode carry into the joint carry: 31 %
+accepted on unit 28, 11 % fitted by unit 28 and rejected (mostly by the
+snr or relative floor), 28 % accepted on another TT11 unit (unit 29 for 97
+% of them), 30 % not fitted. Accepted on unit 28 fall from 63 % in windows
+0 to 23 to 5 % in windows 72 to 95, while unit 29's share rises from 3 to
+47 % and the unfitted from 18 to 38 %. Unit 28's and 29's templates stay
+at cosine 0.90 to 0.97 with their window-0 templates in both carries. A
+larger accepted spike on another tetrode within 3 ms is there for 97 % of
+the unfitted spikes and 91 % of those joint accepts, so competition across
+tetrodes does not separate them.
+
+In windows 60, 72 and 84 the mean of the spikes joint leaves unfitted has
+cosine 0.959 with the OPTO2 template of the TT11 cell (unit 39) and 0.887
+with unit 29's OPTO2 match (unit 41), and troughs -41, -38, -12 and -13 uV
+against unit 28's -75, -58, -35 and -46 uV outside the pulses. The spikes
+joint gives to unit 29 have cosine 0.951 and 0.910, troughs -51, -52, -23
+and -18 uV, between unit 28 (-75, -58) and unit 29 (-36, -65) on the first
+two wires. Per spike in window 84 (`review_driven.py`'s analyzer), a
+spike's shape is closer to unit 28's than to unit 29's for 0.98 of unit
+28's spikes outside the pulses and 0.10 of unit 29's, and for 0.49 of the
+spikes joint gives to unit 29 and 0.61 of those it leaves unfitted. Their
+scale on unit 28's template is 0.61 and 0.42, and the former falls from
+0.69 in the first tenth of the 207 ms pulse to 0.57 in its second half.
+The user reviewed the analyzer: the unfitted spikes are not obviously
+multi-unit and could all be one unit, they shrink across the pulse, and
+the spikes joint gives to unit 29 look like a mixture, on the whole closer
+to unit 28 by the CH9 waveform, while in the principal components all
+three groups mostly overlap.
+
+On the hybrid, where the driven units' half-size in-pulse spikes are
+known, joint with the per-tetrode rules finds 0.50 of them against 0.61
+per tetrode (means over the 12 windows; medians over the windows with
+pulses 0.40 and 0.52), and the first spike of each pulse 0.85 against
+0.98 (medians).
+
+With the same rules and rebuild the two matchers are equally free of bad
+periods and drift, and both fit the few-unit tetrodes' common-mode events.
+What separates them on real data is that joint finds fewer spikes,
+including small in-pulse spikes of the driven cells. Conjecture: these
+are the driven cells' spikes shrunk by adaptation at 100 to 200 Hz, as the
+hybrid's half-size spikes are; why joint misses them is not established.

@@ -1,0 +1,37 @@
+1. per-tetrode in-pulse unit 28 spikes: 25519
+   fitted, rejected: refractory          37
+   fitted, rejected: shape              196
+   fitted, rejected: snr or floor      2677
+   kept                                7816
+   not fitted                          7701
+   on another TT11 unit                7092
+   kept                   with a larger other-tetrode spike within 3 ms 0.91
+   not fitted             with a larger other-tetrode spike within 3 ms 0.97
+   on another TT11 unit   with a larger other-tetrode spike within 3 ms 0.89
+   share by quarter of the session (windows):
+    0-23 (n=5462): fitted, rejected: refractory 0.00, fitted, rejected: shape 0.03, fitted, rejected: snr or floor 0.13, kept 0.63, not fitted 0.18, on another TT11 unit 0.03
+   24-47 (n=6154): fitted, rejected: refractory 0.00, fitted, rejected: shape 0.00, fitted, rejected: snr or floor 0.12, kept 0.41, not fitted 0.27, on another TT11 unit 0.19
+   48-71 (n=7179): fitted, rejected: refractory 0.00, fitted, rejected: shape 0.00, fitted, rejected: snr or floor 0.07, kept 0.21, not fitted 0.35, on another TT11 unit 0.36
+   72-95 (n=6724): fitted, rejected: refractory 0.00, fitted, rejected: shape 0.00, fitted, rejected: snr or floor 0.10, kept 0.05, not fitted 0.38, on another TT11 unit 0.47
+
+2. windows 60, 72, 84: cosine of each class's mean; troughs (uV) on the four wires
+                                       n   OPTO2 39   OPTO2 41 28 outside 29 outside
+   in pulse, 28 in both              383      0.934      0.844      0.979      0.858    -53.8  -50.3  -28.4  -29.3
+   in pulse, 28 pt / 29 joint       1496      0.951      0.910      0.920      0.933    -51.1  -52.4  -22.6  -17.6
+   in pulse, 28 pt / none joint     1755      0.959      0.887      0.917      0.895    -40.8  -37.6  -12.1  -13.4
+   outside, 28 in both              9000      0.957      0.836      1.000      0.846    -74.6  -58.1  -35.1  -46.0
+   outside, 29 in both              9000      0.871      0.975      0.846      1.000    -36.1  -64.6  -28.7   -9.0
+
+3. window 84, per spike against the two units' means outside the pulses
+   group                  n closer to 28 scale on 28 scale on 29
+   u28_in_both           76         0.99        0.86        1.06
+   u28pt_u29joint       599         0.49        0.61        0.87
+   u28pt_jointnone      599         0.61        0.42        0.58
+   u29_in_both          175         0.13        0.53        0.83
+   u28_out_both        1000         0.98        0.95        1.11
+   u29_out_both        1000         0.10        0.56        0.95
+   in-pulse groups: median scale on 28 by position in the pulse
+   u28_in_both        0.00-0.10 0.85 (n 21), 0.10-0.25 0.88 (n 14), 0.25-0.50 0.85 (n 18), 0.50-1.00 0.85 (n 23)
+   u28pt_u29joint     0.00-0.10 0.69 (n 82), 0.10-0.25 0.66 (n 101), 0.25-0.50 0.61 (n 145), 0.50-1.00 0.57 (n 271)
+   u28pt_jointnone    0.00-0.10 0.42 (n 117), 0.10-0.25 0.43 (n 127), 0.25-0.50 0.44 (n 136), 0.50-1.00 0.41 (n 219)
+   u29_in_both        0.00-0.10 0.57 (n 45), 0.10-0.25 0.53 (n 39), 0.25-0.50 0.49 (n 28), 0.50-1.00 0.53 (n 63)
