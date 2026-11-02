@@ -16,6 +16,8 @@ Common median reference (`preprocess_for_sorting(..., cmr=...)`):
 - "cross_tetrode": per tetrode, the median of every channel on the OTHER
   tetrodes, via `common_reference(groups=..., ref_channel_ids="out_of_group")`
   (spikeinterface >= 0.105, PR #4601).
+- "global_aligned": each wire shifted in time by its offset from the median
+  before its gain times the median is subtracted (`ttm.reference`).
 
 All variants preserve the ProbeGroup and group/tetrode properties needed for
 split + sort.
@@ -47,6 +49,7 @@ def preprocess_for_sorting(
     freq_min: float = 300.0,
     freq_max: float = 6000.0,
     dtype: str = "float32",
+    wire_timing: dict | None = None,
 ):
     """Bandpass + common median reference (full recording, lazy).
 
@@ -61,6 +64,9 @@ def preprocess_for_sorting(
       for a robust median). Recommended.
     - ``"cross_tetrode"``: median of all channels on OTHER tetrodes, per tetrode,
       from the ``group`` property (``ref_channel_ids="out_of_group"``).
+    - ``"global_aligned"``: each wire shifted by its offset from the median and its gain on the
+      median subtracted (``ttm.reference``), from ``wire_timing`` as returned by
+      ``ttm.reference.estimate_wire_timing_windows`` on the bandpassed, unreferenced recording.
     - ``"none"``: bandpass only.
     """
     rec_f = spre.bandpass_filter(
@@ -70,6 +76,12 @@ def preprocess_for_sorting(
         return rec_f
     if cmr == "global":
         return spre.common_reference(rec_f, reference="global", operator="median", dtype=dtype)
+    if cmr == "global_aligned":
+        from ttm.reference import aligned_median_reference
+
+        if wire_timing is None:
+            raise ValueError("cmr='global_aligned' needs wire_timing (ttm.reference.estimate_wire_timing_windows)")
+        return aligned_median_reference(rec_f, wire_timing, dtype=dtype)
     if cmr == "cross_tetrode":
         groups = np.asarray(rec_f.get_property("group"))
         cids = np.asarray(rec_f.get_channel_ids())
@@ -78,7 +90,7 @@ def preprocess_for_sorting(
             rec_f, reference="global", operator="median",
             groups=group_ids, ref_channel_ids="out_of_group", dtype=dtype,
         )
-    raise ValueError(f"Unknown cmr={cmr!r}; use 'global', 'cross_tetrode', or 'none'.")
+    raise ValueError(f"Unknown cmr={cmr!r}; use 'global', 'cross_tetrode', 'global_aligned', or 'none'.")
 
 
 def materialize_preprocessed(
