@@ -1,0 +1,127 @@
+reference,matcher,gt,tetrode,recall,precision
+global,per tetrode,0,TT1,0.286,0.835
+global,per tetrode,1,TT1,0.963,0.714
+global,per tetrode,2,TT3,0.973,0.97
+global,per tetrode,3,TT3,0.951,0.984
+global,per tetrode,4,TT9,0.963,0.772
+global,per tetrode,5,TT9,0.614,0.993
+global,per tetrode,6,TT13,0.962,0.917
+global,per tetrode,7,TT13,0.995,0.995
+global,per tetrode,8,TT14,0.91,0.998
+global,per tetrode,9,TT14,0.968,0.999
+global,per tetrode,10,TT16,0.903,0.999
+global,per tetrode,11,TT16,0.923,1.0
+global,per tetrode,12,TT4,0.69,0.643
+global,per tetrode,13,TT6,0.966,0.987
+global,per tetrode,14,TT6,0.866,0.895
+global,per tetrode,15,TT7,0.437,0.918
+global,per tetrode,16,TT10,0.918,0.986
+global,per tetrode,17,TT11,0.963,0.598
+global,per tetrode,18,TT12,0.781,0.994
+global,per tetrode,19,TT5,0.997,1.0
+global,per tetrode,20,TT8,0.297,0.592
+global,joint,0,TT1,0.248,0.948
+global,joint,1,TT1,0.947,0.864
+global,joint,2,TT3,0.972,0.978
+global,joint,3,TT3,0.945,0.988
+global,joint,4,TT9,0.929,0.948
+global,joint,5,TT9,0.506,0.997
+global,joint,6,TT13,0.946,0.972
+global,joint,7,TT13,0.994,0.995
+global,joint,8,TT14,0.886,1.0
+global,joint,9,TT14,0.966,1.0
+global,joint,10,TT16,0.879,1.0
+global,joint,11,TT16,0.923,1.0
+global,joint,12,TT4,0.654,0.695
+global,joint,13,TT6,0.944,0.995
+global,joint,14,TT6,0.797,0.929
+global,joint,15,TT7,0.35,0.963
+global,joint,16,TT10,0.845,0.999
+global,joint,17,TT11,0.948,0.709
+global,joint,18,TT12,0.681,0.998
+global,joint,19,TT5,0.997,1.0
+global,joint,20,TT8,0.237,0.745
+aligned,per tetrode,0,TT1,0.322,0.939
+aligned,per tetrode,1,TT1,0.965,0.833
+aligned,per tetrode,2,TT3,0.975,0.998
+aligned,per tetrode,3,TT3,0.951,0.999
+aligned,per tetrode,4,TT9,0.966,0.786
+aligned,per tetrode,5,TT9,0.612,0.993
+aligned,per tetrode,6,TT13,0.967,0.911
+aligned,per tetrode,7,TT13,0.996,0.995
+aligned,per tetrode,8,TT14,0.916,0.998
+aligned,per tetrode,9,TT14,0.968,1.0
+aligned,per tetrode,10,TT16,0.907,1.0
+aligned,per tetrode,11,TT16,0.923,1.0
+aligned,per tetrode,12,TT4,0.724,0.721
+aligned,per tetrode,13,TT6,0.967,0.985
+aligned,per tetrode,14,TT6,0.866,0.891
+aligned,per tetrode,15,TT7,0.479,0.971
+aligned,per tetrode,16,TT10,0.917,0.987
+aligned,per tetrode,17,TT11,0.963,0.591
+aligned,per tetrode,18,TT12,0.796,0.994
+aligned,per tetrode,19,TT5,0.998,1.0
+aligned,per tetrode,20,TT8,0.299,0.635
+aligned,joint,0,TT1,0.283,0.99
+aligned,joint,1,TT1,0.952,0.928
+aligned,joint,2,TT3,0.975,0.999
+aligned,joint,3,TT3,0.95,0.999
+aligned,joint,4,TT9,0.939,0.942
+aligned,joint,5,TT9,0.514,0.997
+aligned,joint,6,TT13,0.959,0.959
+aligned,joint,7,TT13,0.996,0.994
+aligned,joint,8,TT14,0.9,1.0
+aligned,joint,9,TT14,0.966,1.0
+aligned,joint,10,TT16,0.889,1.0
+aligned,joint,11,TT16,0.923,1.0
+aligned,joint,12,TT4,0.688,0.759
+aligned,joint,13,TT6,0.947,0.994
+aligned,joint,14,TT6,0.805,0.925
+aligned,joint,15,TT7,0.389,0.984
+aligned,joint,16,TT10,0.85,0.999
+aligned,joint,17,TT11,0.95,0.693
+aligned,joint,18,TT12,0.71,0.997
+aligned,joint,19,TT5,0.998,1.0
+aligned,joint,20,TT8,0.243,0.755
+"aligned, re-seeded",per tetrode,0,TT1,0.321,0.948
+"aligned, re-seeded",per tetrode,1,TT1,0.964,0.913
+"aligned, re-seeded",per tetrode,2,TT3,0.975,0.998
+"aligned, re-seeded",per tetrode,3,TT3,0.951,0.998
+"aligned, re-seeded",per tetrode,4,TT9,0.959,0.871
+"aligned, re-seeded",per tetrode,5,TT9,0.626,0.992
+"aligned, re-seeded",per tetrode,6,TT13,0.967,0.906
+"aligned, re-seeded",per tetrode,7,TT13,0.996,0.995
+"aligned, re-seeded",per tetrode,8,TT14,0.913,1.0
+"aligned, re-seeded",per tetrode,9,TT14,0.968,1.0
+"aligned, re-seeded",per tetrode,10,TT16,0.908,1.0
+"aligned, re-seeded",per tetrode,11,TT16,0.923,1.0
+"aligned, re-seeded",per tetrode,12,TT4,0.718,0.696
+"aligned, re-seeded",per tetrode,13,TT6,0.968,0.987
+"aligned, re-seeded",per tetrode,14,TT6,0.869,0.89
+"aligned, re-seeded",per tetrode,15,TT7,0.477,0.971
+"aligned, re-seeded",per tetrode,16,TT10,0.917,0.988
+"aligned, re-seeded",per tetrode,17,TT11,0.962,0.595
+"aligned, re-seeded",per tetrode,18,TT12,0.797,0.995
+"aligned, re-seeded",per tetrode,19,TT5,0.998,1.0
+"aligned, re-seeded",per tetrode,20,TT8,0.285,0.555
+"aligned, re-seeded",joint,0,TT1,0.268,0.989
+"aligned, re-seeded",joint,1,TT1,0.946,0.971
+"aligned, re-seeded",joint,2,TT3,0.974,0.999
+"aligned, re-seeded",joint,3,TT3,0.946,0.998
+"aligned, re-seeded",joint,4,TT9,0.914,0.961
+"aligned, re-seeded",joint,5,TT9,0.501,0.998
+"aligned, re-seeded",joint,6,TT13,0.952,0.957
+"aligned, re-seeded",joint,7,TT13,0.994,0.994
+"aligned, re-seeded",joint,8,TT14,0.874,1.0
+"aligned, re-seeded",joint,9,TT14,0.966,1.0
+"aligned, re-seeded",joint,10,TT16,0.88,1.0
+"aligned, re-seeded",joint,11,TT16,0.923,1.0
+"aligned, re-seeded",joint,12,TT4,0.679,0.754
+"aligned, re-seeded",joint,13,TT6,0.943,0.995
+"aligned, re-seeded",joint,14,TT6,0.8,0.924
+"aligned, re-seeded",joint,15,TT7,0.387,0.984
+"aligned, re-seeded",joint,16,TT10,0.838,0.998
+"aligned, re-seeded",joint,17,TT11,0.943,0.702
+"aligned, re-seeded",joint,18,TT12,0.697,0.998
+"aligned, re-seeded",joint,19,TT5,0.997,1.0
+"aligned, re-seeded",joint,20,TT8,0.229,0.747

@@ -1,0 +1,7 @@
+reference,matcher,small_recall,small_precision,small_f1,large_recall,large_precision,large_f1,laser_half
+global,per tetrode,0.719,0.866,0.786,0.927,0.896,0.911,0.507
+global,joint,0.673,0.933,0.782,0.902,0.938,0.92,0.392
+aligned,per tetrode,0.735,0.898,0.808,0.928,0.901,0.914,0.525
+aligned,joint,0.691,0.95,0.8,0.906,0.937,0.921,0.426
+"aligned, re-seeded",per tetrode,0.732,0.909,0.811,0.929,0.905,0.917,0.523
+"aligned, re-seeded",joint,0.681,0.953,0.794,0.903,0.941,0.921,0.442
