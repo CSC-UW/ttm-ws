@@ -88,7 +88,9 @@ def main():
         print(f"  TT{g + 1:<3d} {d.max():5.1f}  {d[:N_WIN_BINARY].max():5.1f}")
     if a.binary:
         out = OUT / "binary_w00_11"
-        pp = preprocess_for_sorting(si.read_zarr(str(STORE)), cmr="global_aligned", wire_timing=timing)
+        raw = si.read_zarr(str(STORE))
+        raw.reset_times()
+        pp = preprocess_for_sorting(raw, cmr="global_aligned", wire_timing=timing)
         crop = pp.frame_slice(0, N_WIN_BINARY * WIN)
         t0 = time.time()
         crop.save(format="binary", folder=str(out), dtype="float32", n_jobs=a.jobs, chunk_duration="1s",
