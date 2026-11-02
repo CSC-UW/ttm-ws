@@ -1,0 +1,10 @@
+== window 0: quiet block 1 with 724 event samples; other blocks 226406
+  wires with the largest gain difference: CH64 1.71 against 0.78, CH39 1.46 against 0.91, CH22 1.47 against 1.03, CH62 1.30 against 0.92, CH3 1.31 against 0.98
+  global median                                RMS at events median   14.2 uV, worst wires   24.5   22.6   18.4   18.4   20.3; between events median  13.3
+  aligned, all-sample fit on the quiet block   RMS at events median   14.8 uV, worst wires   45.0   30.8   27.2   24.5   23.7; between events median  13.3
+  aligned, event-sample fit                    RMS at events median   14.1 uV, worst wires   22.5   20.3   18.1   18.1   19.0; between events median  13.3
+== window 5: quiet block 0 with 1382 event samples; other blocks 287322
+  wires with the largest gain difference: CH64 1.91 against 0.77, CH22 1.79 against 1.02, CH39 1.58 against 0.91, CH16 1.43 against 0.95, CH10 1.43 against 0.95
+  global median                                RMS at events median   13.2 uV, worst wires   24.5   19.2   21.2   10.7   11.1; between events median  12.3
+  aligned, all-sample fit on the quiet block   RMS at events median   15.4 uV, worst wires   52.7   38.7   34.4   22.9   22.4; between events median  12.3
+  aligned, event-sample fit                    RMS at events median   13.1 uV, worst wires   22.3   19.0   18.7    9.6    9.4; between events median  12.3
