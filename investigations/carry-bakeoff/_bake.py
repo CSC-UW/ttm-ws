@@ -48,15 +48,17 @@ SESSION = pathlib.Path("/nvme/neuropixels/tetrode_data/2026-10-20_09-02-12")
 SORTINGS = SESSION / "sortings_seed42_pcafix"
 BAKE_ROOT = SORTINGS / "carry_bakeoff"
 # BAKE_REFERENCE=aligned reads the first 12 windows referenced with ttm.reference's aligned median
-# (investigations/common-reference/aligned_binary.py) and keeps the hybrid, whitening and arms in v2_aligned
+# (investigations/common-reference/aligned_binary.py) and keeps the hybrid, whitening and arms in v2_aligned;
+# aligned_seed uses the same hybrid with the seed bank re-sorted on it (seed_aligned.py), arms in v2_aligned_seed
 REFERENCE = os.environ.get("BAKE_REFERENCE", "global")
-if REFERENCE == "aligned":
+if REFERENCE in ("aligned", "aligned_seed"):
     BINARY = SORTINGS / "mp_aligned" / "binary_w00_11"
-    BAKE = BAKE_ROOT / "v2_aligned"
+    BAKE = BAKE_ROOT / ("v2_aligned" if REFERENCE == "aligned" else "v2_aligned_seed")
+    HYBRID = BAKE_ROOT / "v2_aligned" / "hybrid_binary"
 else:
     BINARY = SORTINGS / "mp_baseline" / "binary"
     BAKE = BAKE_ROOT / "v2"
-HYBRID = BAKE / "hybrid_binary"
+    HYBRID = BAKE / "hybrid_binary"
 BAD_PERIODS = SESSION / "bad_periods" / "bad_periods.csv"
 RESULTS = pathlib.Path("/Users/gfindlay@ad.wisc.edu/projects/ttm-ws/subjects/ttm-003/results")
 PULSES = RESULTS / "stimulation_pulses_2026-10-20_09-02-12.csv"

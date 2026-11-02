@@ -145,9 +145,9 @@ ARMS = {a.name: a for a in [
 ]}
 
 
-def make_bank() -> None:
+def make_bank(seed_path=None, out_path=None) -> None:
     rec = si.load(bk.HYBRID)
-    seed = bk.Bank.load(bk.BAKE_ROOT / "bank0.npz")
+    seed = bk.Bank.load(seed_path or bk.BAKE_ROOT / "bank0.npz")
     gt = np.load(bk.BAKE / "gt.npz")
     rng = np.random.default_rng(0)
     ids, group, T = list(seed.ids), list(seed.group), list(seed.T)
@@ -161,13 +161,16 @@ def make_bank() -> None:
         group.append(int(g))
         print(f"GT {i} TT{g + 1}: {fr.size} spikes, cosine to truth "
               f"{cp.template_cosine(T[-1], gt['T_win'][i, 0] * gt['size_win'][i, 0], max_shift=0):.3f}")
-    bk.Bank(np.array(ids, np.int64), np.array(group), np.stack(T).astype(np.float32)).save(bk.BAKE / "bank_start.npz")
+    bk.Bank(np.array(ids, np.int64), np.array(group), np.stack(T).astype(np.float32)).save(
+        out_path or bk.BAKE / "bank_start.npz")
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("name", nargs="?")
     ap.add_argument("--make-bank", action="store_true")
+    ap.add_argument("--seed-bank", default=None, help="with --make-bank: seed bank (default <BAKE_ROOT>/bank0.npz)")
+    ap.add_argument("--bank-out", default=None, help="with --make-bank: output (default <BAKE>/bank_start.npz)")
     ap.add_argument("--windows", default="0-11")
     ap.add_argument("--n-jobs", type=int, default=16)
     ap.add_argument("--workers", type=int, default=8)
@@ -175,7 +178,7 @@ def main():
     ap.add_argument("--root", default=None, help="output root (default <BAKE>/arms)")
     a = ap.parse_args()
     if a.make_bank:
-        make_bank()
+        make_bank(a.seed_bank, a.bank_out)
         return
     lo, hi = (int(v) for v in a.windows.split("-"))
     arm = ARMS[a.name]
