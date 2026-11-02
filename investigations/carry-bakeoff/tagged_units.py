@@ -1,7 +1,7 @@
-"""Which unit carries each light-driven cell's response, block by block, in the three 48 h sortings.
+"""Which unit carries each light-driven cell's response, block by block, in the 48 h sortings.
 
 Reads the per-block tables of ``subjects/ttm-003/scripts/tagged_cells_blocks.py`` (tags
-``masked_c12``, ``carry48_joint``, ``carry48_pt``) and prints, per tetrode with a tagged cell, the
+``masked_c12``, ``carry48_joint``, ``carry48_pt``, ``carry48_joint_rules``, ``carry48_pt_rc``) and prints, per tetrode with a tagged cell, the
 spikes per second 1 to 10 ms after onset of every unit that reaches 50 Hz in some block. Writes
 ``results/tagged_units_onset.csv``.
 
@@ -24,8 +24,10 @@ import _bake as bk  # noqa: E402
 
 HERE = pathlib.Path(__file__).parent
 RESULTS = HERE.parents[1] / "subjects" / "ttm-003" / "results"
-TAGS = {"production": "masked_c12", "joint_whitened": "carry48_joint", "per_tetrode": "carry48_pt"}
-SORTS = {"production": "mp_baseline_masked", "joint_whitened": "carry_R48_joint", "per_tetrode": "carry_R48_pt"}
+TAGS = {"production": "masked_c12", "joint_whitened": "carry48_joint", "per_tetrode": "carry48_pt",
+        "joint_rules": "carry48_joint_rules", "per_tetrode_rc": "carry48_pt_rc"}
+SORTS = {"production": "mp_baseline_masked", "joint_whitened": "carry_R48_joint", "per_tetrode": "carry_R48_pt",
+         "joint_rules": "carry_R48_joint_rules", "per_tetrode_rc": "carry_R48_pt_rc"}
 TETRODES = ("TT4", "TT6", "TT10", "TT11")
 
 
