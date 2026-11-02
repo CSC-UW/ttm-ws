@@ -60,8 +60,12 @@ user.
   30 uV remain where the noise is 4 to 5 uV. Joint matching with the
   per-tetrode rules fits them too; June's rules kept them out. Shifting
   each wire by its offset before subtracting its gain times the median
-  removes 70 to 90 % of the remainder (`investigations/common-reference/`);
-  a binary built that way is not tested.
+  removes 70 to 90 % of the remainder (`investigations/common-reference/`).
+  On the hybrid rebuilt with that reference (same ground truth), per-tetrode
+  small-unit precision rises from 0.866 to 0.909 and F1 from 0.786 to
+  0.811, joint's precision from 0.933 to 0.953 (F1 0.794); per tetrode then
+  has the higher small-unit F1 and ties joint on the large units, and the
+  units on TT3, TT13 and TT14 disappear. The 48 h on it is not run.
 - Over the 48 h, joint matching with the per-tetrode rules and rebuild is
   as clean as per tetrode (no spike in bad periods, spike times within 3
   samples) but finds fewer spikes on every tetrode but TT15 and 20 to 35 %
@@ -472,6 +476,28 @@ two ground-truth units that rebuild loses. Over the real 48 h it leaves
 the driven responses as they were and adds lags of 8 to 30 samples on six
 units, four of them positive-going units moved from trough to peak.
 
+### The aligned reference on the hybrid
+
+The first 12 windows referenced with `ttm.reference` (each wire shifted by
+its offset per window, then its gain times the median subtracted), the
+same injected ground truth added, and both matchers rerun from the same
+seed bank and from a seed bank re-sorted on the new binary (no units on
+TT3, TT13 and TT14). Means over the 12 windows:
+
+| reference | matcher | small R / P | small F1 | large F1 | half-size laser |
+|---|---|---|---|---|---|
+| global | per tetrode | 0.719 / 0.866 | 0.786 | 0.911 | 0.51 |
+| global | joint | 0.673 / 0.933 | 0.782 | 0.920 | 0.39 |
+| aligned, re-seeded | per tetrode | 0.732 / 0.909 | 0.811 | 0.917 | 0.52 |
+| aligned, re-seeded | joint | 0.681 / 0.953 | 0.794 | 0.921 | 0.44 |
+
+Per tetrode's precision on GT1 goes from 0.71 to 0.91. It stays below
+joint's on the two units mixed with a neighbour (GT17 0.59 against 0.70,
+GT12 0.70 against 0.75) and on GT20 on TT8 (0.56 against 0.75). The real
+units on TT3, TT13 and TT14 go from 102,113 to 160,472 spikes over the
+12 windows to none, and on TT16 from 280,456 to 32,564. Writing the
+binary with the aligned reference took 4.8 min for 6 h with 64 jobs.
+
 ## 11. What this suggests
 
 These are the analyst's reading, for the user to confirm.
@@ -491,8 +517,8 @@ These are the analyst's reading, for the user to confirm.
   tetrodes; the copies of one event on several tetrodes are that
   remainder, not one cell seen twice. GT1's precision deficit may also
   shrink with it, since the hybrid is built on the referenced binary.
-  Building that binary and rebuilding seeds, hybrid and carries on it is
-  the next test.
+  On the hybrid it does what this predicts (section 10); the 48 h on the
+  aligned binary is the next test.
 - Template re-centring is not needed.
 - One whitening for clustering and matching (one matrix for the
   MountainSort5 seed and re-seed sorts and for the carry) is a follow-on.

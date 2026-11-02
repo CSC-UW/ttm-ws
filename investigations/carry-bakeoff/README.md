@@ -546,3 +546,48 @@ What separates them on real data is that joint finds fewer spikes,
 including small in-pulse spikes of the driven cells. Conjecture: these
 are the driven cells' spikes shrunk by adaptation at 100 to 200 Hz, as the
 hybrid's half-size spikes are; why joint misses them is not established.
+
+## The aligned reference on the hybrid
+
+`ttm.reference` (cmr `"global_aligned"`) shifts each wire by its time
+offset from the median before subtracting its gain times the median, with
+offsets and gains estimated per window from samples near the median's
+large excursions (`investigations/common-reference/`). The first 12
+windows were written with it (`mp_aligned/binary_w00_11`, 4.8 min with
+64 jobs against 0.765 h for the 48 h global binary with 96). On it the
+few-unit tetrodes' units keep 3 to 27 % of their mean's energy at the
+same spike times, well-isolated units all of it
+(`investigations/common-reference/results/aligned_check.txt`).
+
+`hybrid_aligned.py` adds the same injected signal (old hybrid minus old
+binary) to it, so the ground truth is identical. `BAKE_REFERENCE=aligned`
+runs the arms on it from mp_baseline's seed bank; `aligned_seed` from the
+seed bank re-sorted on the aligned binary (`seed_aligned.py`: 46 units,
+none on TT3, TT13 and TT14). `compare_reference.py`
+(`results/compare_reference.txt`), means over the 12 windows:
+
+| reference | matcher | small R / P | small F1 | large R / P | large F1 | half-size laser |
+|---|---|---|---|---|---|---|
+| global | per tetrode | 0.719 / 0.866 | 0.786 | 0.927 / 0.896 | 0.911 | 0.51 |
+| global | joint | 0.673 / 0.933 | 0.782 | 0.902 / 0.938 | 0.920 | 0.39 |
+| aligned | per tetrode | 0.735 / 0.898 | 0.808 | 0.928 / 0.901 | 0.914 | 0.53 |
+| aligned | joint | 0.691 / 0.950 | 0.800 | 0.906 / 0.937 | 0.921 | 0.43 |
+| aligned, re-seeded | per tetrode | 0.732 / 0.909 | 0.811 | 0.929 / 0.905 | 0.917 | 0.52 |
+| aligned, re-seeded | joint | 0.681 / 0.953 | 0.794 | 0.903 / 0.941 | 0.921 | 0.44 |
+
+Per ground-truth unit, per tetrode's precision on GT1 (TT1) goes from 0.71
+to 0.83 and 0.91, on GT0 (TT1) from 0.83 to 0.94 and on GT4 (TT9) from 0.77
+to 0.79 and 0.87; joint's on GT1 from 0.86 to 0.97. Per tetrode keeps
+lower precision than joint on GT17 (TT11, 0.59 against 0.70) and GT12
+(TT4, 0.70 against 0.75), the units mixed with a neighbour, and on GT20
+(TT8, 0.56 against 0.75), and higher recall on every unit. The real units'
+accepted spikes over the 12 windows on the few-unit tetrodes, per tetrode,
+global / aligned / re-seeded: TT3 128,843 / 2,470 / 0, TT13 160,472 /
+10,855 / 0, TT14 102,113 / 4,801 / 0, TT16 280,456 / 23,429 / 32,564, TT1
+158,043 / 45,953 / 66,625, TT2 177,012 / 106,970 / 123,857. TT1, TT2 and
+TT16 keep small units in the re-seeded bank (troughs -21 to -29 uV); what
+they are is not established.
+
+With the aligned reference per tetrode has the higher small-unit F1
+(0.811 against 0.794 re-seeded) and half-size in-pulse recall, and ties
+joint on the large units. Not run: the 48 h on the aligned binary.
