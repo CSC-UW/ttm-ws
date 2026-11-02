@@ -128,13 +128,32 @@ against earlier cross-tetrode code that took 64 separate medians, replaced
 on 2026-10-19 by spikeinterface's `out_of_group`. The cost of `phase_shift`
 in the chain is not measured.
 
-## Not done
+## The aligned reference
 
-A binary built with the shift and per-wire gain, and the seeds, hybrid and
-carries rebuilt on it. Open choices for it: re-estimate the offsets per
-window (they drift by up to 13 us over 48 h, and a 10 us error brings back
-about half the remainder) or keep a fixed table for the ramp and estimate
-each electrode's departure per window. This is not adaptive gain control:
-the gain is a fixed number per wire (piecewise constant if re-estimated
-per window), and spikeinterface's `highpass_spatial_filter`, which assumes
-a dense line of sites, does not fit tetrodes.
+`ttm.reference` and `preprocess_for_sorting(cmr="global_aligned")`
+estimate each wire's offset and gain per 1800 s window and apply them:
+the wire is shifted by its offset, then its gain times the median of the
+shifted wires is subtracted. The fit uses only samples within 0.5 ms of
+the median's excursions beyond 5 MAD; on all samples, quiet blocks gave
+gains up to 1.9, since between the large events the median follows
+smaller common signals with another spread across wires. A window's row
+is the per-wire median over six blocks of 20 s with at least 3000 such
+samples; a single block at the middle of window 1 fell in the 2287 to
+2696 s event on seven tetrodes and gave offsets up to 119 us off. Window
+4 had no such block and takes window 5's row.
+
+`aligned_binary.py` estimated TTM-003's 96 windows in 12 min
+(`results/wire_timing_ttm003.csv`: shifts -40 to +20 us, gains 0.76 to
+1.11, median change between windows 0.42 us; over the 48 h the wires of
+TT13 and TT14 move up to 11 and 13.5 us, most others under 8) and wrote
+the first 12 windows with it in 4.8 min with 64 jobs. `aligned_check.py`
+(`results/aligned_check.txt`): at the same spike times the few-unit
+tetrodes' units keep 3 to 27 % of their mean's energy, TT4 unit 5 44 %,
+well-isolated units 99 to 100 % (cosine 0.997 or more). The carry
+bake-off on that binary is in `investigations/carry-bakeoff/README.md`,
+"The aligned reference on the hybrid".
+
+This is not adaptive gain control: the gain is a fixed number per wire
+and window, and spikeinterface's `highpass_spatial_filter`, which
+assumes a dense line of sites, does not fit tetrodes. Not done: the 48 h
+on the aligned binary, and the same estimate on TTM-001 and TTM-002.
