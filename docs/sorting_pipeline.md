@@ -103,7 +103,10 @@ ttm-sort all --subject TTM-003 --experiment TTM-003-48H \
   default `main`). Its stages (`binary`, `seed`, `carry`, `export`) can
   be run one at a time. `--binary` sorts an existing preprocessed binary
   instead of writing one in step 2.
-- End to end on TTM-003-48H: about 17 h, almost all of it step 5.
+- End to end on TTM-003-48H: about 19 to 20 h (estimated from the
+  steps' measured times): the offset fit 13 min, the binary 40 min, the
+  seed sort 30 min, the 96 windows about 14.5 h, and the seven re-seed
+  sorts about 3.5 h, run one after another.
 
 ## 0. Before sorting
 
@@ -284,11 +287,13 @@ sections 6 and 10.
 - Templates: the mean of up to 500 randomly chosen spikes (seeded) of
   each unit, from the preprocessed binary (not whitened), on its
   tetrode's wires. Step 5 whitens them (T W).
-- Units with template snr 5 or more and 100 spikes or more are kept.
+- Units with template snr 5 or more and 100 spikes or more are kept
+  (TTM-003-48H: 54 of 59).
 - Units of one tetrode whose templates have cosine 0.95 or more (at the
   best shift up to 10 samples) are merged: their spike trains are pooled,
   spikes within 0.3 ms of each other counted once, merging is
-  transitive, and the merged unit's template is recomputed.
+  transitive, and the merged unit's template is recomputed (TTM-003-48H:
+  46 units after merging).
 
 <details>
 <summary>Why</summary>
@@ -316,7 +321,8 @@ separately, with the bank as it stands (window 0 uses the seed bank):
    spaced through the window.
 2. Matching: circus-omp (SpikeInterface 0.105.2) on the tetrode's
    whitened wires with only its own templates, other parameters at
-   their defaults. A fit's amplitude is its scale relative to the
+   their defaults (stop after 5 consecutive failed passes, `omp_min_sps`
+   0.1, `relative_error` 5e-5, `rank` 5, `vicinity` 2), in 1 s chunks. A fit's amplitude is its scale relative to the
    template (1 is template size). The lower bound is
    max(0.2, 2.5 x noise / the template's L2 norm), with no upper bound,
    so matching is permissive and the rules below decide.
@@ -331,7 +337,8 @@ separately, with the bank as it stands (window 0 uses the seed bank):
       a spike needs an amplitude of at least 0.5 times their median
       amplitude; with fewer, at least 0.5 (half the template's size);
    5. refractory period 1.5 ms per unit: a run of spikes each closer than
-      1.5 ms to the previous one keeps only its highest-snr spike.
+      1.5 ms to the previous one keeps only its highest-snr spike, however
+      long the run.
 4. Laser pulses (only with a pulse table, only in windows with pulses).
    Candidates are fits outside bad intervals with matched-filter snr 2.5
    or more, amplitude at least 0.3 times the median of rule 3.4 (0.3
@@ -351,8 +358,9 @@ separately, with the bank as it stands (window 0 uses the seed bank):
    It is used from the next window.
 
 Windows do not overlap, and matching does not read across a window's
-edges, so a spike within a few milliseconds of a window edge can be
-missed. Cost: 8.4 to 9.8 min per window (16 jobs), about 15 h for 48 h.
+edges. Fits in the first 30 or the last 60 samples of a window have no
+complete snippet and are never accepted, so about 3 ms around each window
+boundary is lost. Cost: 8.4 to 9.8 min per window (16 jobs), about 15 h for 48 h.
 
 <details>
 <summary>Why</summary>
@@ -448,7 +456,8 @@ re-seeds added 19.
   keeps its id for the whole recording, including units that stop
   firing.
 - The sorting does not contain new units' spikes in the window that
-  found them (step 6), or spikes missed at window edges (step 5).
+  found them (step 6), or spikes within about 3 ms of a window boundary
+  (step 5).
 - Bad intervals are not attached to the sorting. A tetrode is
   unobserved during its bad intervals, so firing rates and presence must
   be computed with `bad_periods/bad_periods.csv`.
