@@ -56,8 +56,12 @@ def preprocess_for_sorting(
     timing_window_s: float = 1800.0,
     timing_block_s: float = 20.0,
     timing_n_jobs: int = 16,
+    bad_channel_ids=None,
 ):
     """Bandpass + common median reference (full recording, lazy apart from the wire timing).
+
+    ``bad_channel_ids`` are removed first, so they are neither in the median nor in the output
+    (``bad_channel_ids`` resolves an experiment's bad channels and tetrodes to ids).
 
     Returns the referenced recording (still all tetrodes, `group` property intact);
     whitening is applied per group AFTER `split_by("group")`.
@@ -77,6 +81,8 @@ def preprocess_for_sorting(
       from the ``group`` property (``ref_channel_ids="out_of_group"``).
     - ``"none"``: bandpass only.
     """
+    if bad_channel_ids is not None and len(bad_channel_ids):
+        recording = recording.remove_channels(list(bad_channel_ids))
     rec_f = spre.bandpass_filter(
         recording, freq_min=freq_min, freq_max=freq_max, dtype=dtype
     )
@@ -100,6 +106,31 @@ def preprocess_for_sorting(
             groups=group_ids, ref_channel_ids="out_of_group", dtype=dtype,
         )
     raise ValueError(f"Unknown cmr={cmr!r}; use 'global', 'cross_tetrode', 'global_aligned', or 'none'.")
+
+
+def bad_channel_ids(recording, channels=(), tetrodes=(), *, missing: str = "raise") -> list:
+    """Ids of the channels of ``recording`` named in ``channels`` or on a tetrode named in ``tetrodes``.
+
+    Tetrodes are matched on the ``tetrode`` property, else on ``TT<group + 1>``. A name that matches
+    nothing raises ValueError with ``missing="raise"`` and is skipped with ``"ignore"`` (for a
+    recording from which the channels were already removed).
+    """
+    ids = np.asarray(recording.channel_ids)
+    keys = recording.get_property_keys()
+    if "tetrode" in keys:
+        tet = np.asarray(recording.get_property("tetrode")).astype(str)
+    else:
+        tet = np.array([f"TT{int(g) + 1}" for g in recording.get_property("group")])
+    out, unknown = [], []
+    for c in channels:
+        hit = ids[ids.astype(str) == str(c)]
+        (out.extend(hit.tolist()) if hit.size else unknown.append(str(c)))
+    for t in tetrodes:
+        hit = ids[tet == str(t)]
+        (out.extend(hit.tolist()) if hit.size else unknown.append(str(t)))
+    if unknown and missing == "raise":
+        raise ValueError(f"bad channels or tetrodes not in the recording: {unknown}")
+    return list(dict.fromkeys(out))
 
 
 def estimate_recording_wire_timing(

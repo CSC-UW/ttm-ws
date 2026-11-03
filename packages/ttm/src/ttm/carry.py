@@ -115,7 +115,11 @@ def read_bad_periods(path, fs: float) -> dict[int, list[tuple[int, int]]]:
 
 @dataclasses.dataclass
 class Bank:
-    """Templates of one carry: ``T[k]`` is unit ``ids[k]``'s (n_samples, 4) template on tetrode ``group[k]``."""
+    """Templates of one carry: ``T[k]`` is unit ``ids[k]``'s template on tetrode ``group[k]``.
+
+    ``T`` is (n_units, n_samples, width) with ``width`` the most channels of any tetrode; a tetrode
+    with fewer (a bad wire removed) uses the first columns, in its channel order, and the rest are zero.
+    """
 
     ids: np.ndarray
     group: np.ndarray
@@ -127,7 +131,8 @@ class Bank:
     def templates(self, recording, nbefore: int) -> Templates:
         groups = np.asarray(recording.get_property("group")).astype(int)
         mask = np.stack([groups == g for g in self.group])
-        return Templates(templates_array=self.T.astype(np.float32), sampling_frequency=recording.get_sampling_frequency(),
+        width = int(mask.sum(axis=1).max())
+        return Templates(templates_array=self.T[:, :, :width].astype(np.float32), sampling_frequency=recording.get_sampling_frequency(),
                          nbefore=nbefore, is_in_uV=False, sparsity_mask=mask,
                          channel_ids=np.asarray(recording.channel_ids), unit_ids=self.ids.copy(), probe=None,
                          check_for_consistent_sparsity=True)
@@ -137,8 +142,13 @@ class Bank:
         out = self.copy()
         for k, g in enumerate(self.group):
             ch = np.flatnonzero(groups == g)
-            out.T[k] = self.T[k] @ W[np.ix_(ch, ch)]
+            out.T[k, :, :ch.size] = self.T[k, :, :ch.size] @ W[np.ix_(ch, ch)]
         return out
+
+    def select_groups(self, groups) -> Bank:
+        """The units on the tetrodes in ``groups``."""
+        keep = np.isin(self.group, list(groups))
+        return Bank(self.ids[keep], self.group[keep], self.T[keep])
 
     def save(self, path, **extra) -> None:
         np.savez(path, ids=self.ids, group=self.group, T=self.T, **extra)
@@ -169,6 +179,25 @@ def whitening_matrix(recording, params: CarryParams = CarryParams()) -> np.ndarr
         ch = np.flatnonzero(groups == g)
         W[np.ix_(ch, ch)] = V @ np.diag(ev ** -0.5) @ V.T
     return W
+
+
+def _pad(t: np.ndarray, width: int) -> np.ndarray:
+    out = np.zeros((t.shape[0], width), np.float32)
+    out[:, :t.shape[1]] = t
+    return out
+
+
+def _n_channels(recording) -> dict[int, int]:
+    groups = np.asarray(recording.get_property("group")).astype(int)
+    return {int(g): int((groups == g).sum()) for g in np.unique(groups)}
+
+
+def open_sorting_recording(binary, drop_channel_ids=()):
+    """The preprocessed binary at ``binary`` without ``drop_channel_ids`` (those it holds)."""
+    rec = si.load(binary)
+    names = {str(c) for c in drop_channel_ids}
+    drop = [c for c in rec.channel_ids if str(c) in names]
+    return rec.remove_channels(drop) if drop else rec
 
 
 def whitened_recording(recording, W: np.ndarray):
@@ -274,7 +303,8 @@ def seed_bank(recording, sort_dir: pathlib.Path, params: CarryParams = CarryPara
                        max_shift_samples=params.max_shift_samples, seed=params.template_seed)
     dense, _ = unit_templates(seed, win0, n_jobs=n_jobs, with_snr=False, seed=params.template_seed)
     groups = np.asarray(seed.get_property("group")).astype(int)
-    T = np.stack([dense[i][:, cp.tetrode_channel_indices(recording, g)] for i, g in enumerate(groups)])
+    width = max(_n_channels(recording).values())
+    T = np.stack([_pad(dense[i][:, cp.tetrode_channel_indices(recording, g)], width) for i, g in enumerate(groups)])
     log(f"seed: {ref0.get_num_units()} units -> {len(conf)} with snr >= {params.seed_min_snr} and "
         f">= {params.seed_min_spikes} spikes -> {seed.get_num_units()} after merging at cosine {params.seed_dedup_cos}")
     return Bank(np.arange(len(groups), dtype=np.int64), groups, T.astype(np.float32))
@@ -303,10 +333,11 @@ def reseed(plain, whitened, bank: Bank, a: int, b: int, sort_dir: pathlib.Path, 
             continue
         g = rgrp[j]
         t = dense[j][:, groups == g]
-        best = max((cosine_from_templates(t, bt, max_shift_samples=params.max_shift_samples)
+        best = max((cosine_from_templates(t, bt[:, :t.shape[1]], max_shift_samples=params.max_shift_samples)
                     for bt in out.T[out.group == g]), default=-1.0)
         if best < params.reseed_add_cos:
-            out = Bank(np.r_[out.ids, next_id], np.r_[out.group, g], np.concatenate([out.T, t[None].astype(np.float32)]))
+            t = _pad(t, out.T.shape[2])
+            out = Bank(np.r_[out.ids, next_id], np.r_[out.group, g], np.concatenate([out.T, t[None]]))
             added.append((next_id, int(g), round(float(best), 3)))
             next_id += 1
     log(f"reseed after window {a // int(params.window_s * plain.get_sampling_frequency())}: "
@@ -525,13 +556,13 @@ def tetrode_window(x: np.ndarray, a: int, frames_abs: np.ndarray, labels: np.nda
 
 # --- the carry ---------------------------------------------------------------------------------------
 
-def _open(binary, W):
-    rec = si.load(binary)
+def _open(binary, W, drop_channel_ids=()):
+    rec = open_sorting_recording(binary, drop_channel_ids)
     return rec, whitened_recording(rec, W)
 
 
-def _tetrode_job(binary, W, g, a, b, frames_abs, local, amps, T, sigma, params, pulses, bad, window_index):
-    _, rec = _open(binary, W)
+def _tetrode_job(binary, W, drop, g, a, b, frames_abs, local, amps, T, sigma, params, pulses, bad, window_index):
+    _, rec = _open(binary, W, drop)
     x = cp.load_tetrode_traces(rec, g, a, b)
     o = np.argsort(frames_abs, kind="stable")
     inv = np.empty_like(o)
@@ -545,8 +576,12 @@ def _tetrode_job(binary, W, g, a, b, frames_abs, local, amps, T, sigma, params, 
 
 def run_carry(binary, W: np.ndarray, bank0: Bank, out_dir: pathlib.Path, *, params: CarryParams = CarryParams(),
               windows: range | None = None, pulses=None, bad_periods: dict | None = None,
-              reseed_dir: pathlib.Path | None = None, n_jobs: int = 16, workers: int = 8) -> None:
+              reseed_dir: pathlib.Path | None = None, drop_channel_ids=(), n_jobs: int = 16,
+              workers: int = 8) -> None:
     """Carry ``bank0`` (whitened templates) over the windows of the binary at ``binary`` whitened with ``W``.
+
+    ``drop_channel_ids`` are left out of the binary before whitening (``W`` is over the channels that
+    remain); units of ``bank0`` on a tetrode with no channel left are not carried.
 
     Per window ``w`` writes ``spikes_wNN.npz`` (frame, unit, a, snr, cos_raw, cos_pl, resid, trough,
     reason), ``bankin_wNN.npz`` (the bank matched, with each template's noise ``sigma``) and
@@ -559,14 +594,18 @@ def run_carry(binary, W: np.ndarray, bank0: Bank, out_dir: pathlib.Path, *, para
     out_dir = pathlib.Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     reseed_dir = pathlib.Path(reseed_dir) if reseed_dir is not None else out_dir / "reseed_sorts"
-    plain, rec = _open(binary, W)
+    drop = list(drop_channel_ids)
+    plain, rec = _open(binary, W, drop)
+    nch = _n_channels(rec)
     fs = rec.get_sampling_frequency()
     win_frames = int(params.window_s * fs)
     n_frames = rec.get_num_frames()
     if windows is None:
         windows = range(int(np.ceil(n_frames / win_frames)))
     bad_periods = bad_periods or {}
-    bank = bank0.copy()
+    bank = bank0.select_groups(nch)
+    if len(bank.ids) < len(bank0.ids):
+        log(f"not carried (no channel left on their tetrode): {sorted(set(bank0.ids.tolist()) - set(bank.ids.tolist()))}")
     for w in windows:
         f_sp, f_bk = out_dir / f"spikes_w{w:02d}.npz", out_dir / f"bank_w{w:02d}.npz"
         if f_sp.exists() and f_bk.exists():
@@ -576,7 +615,7 @@ def run_carry(binary, W: np.ndarray, bank0: Bank, out_dir: pathlib.Path, *, para
         a, b = w * win_frames, min((w + 1) * win_frames, n_frames)
         groups = sorted(set(bank.group.tolist()))
         sig = Parallel(n_jobs=workers)(
-            delayed(window_noise)(rec, g, a, b, bank.T[bank.group == g], params) for g in groups)
+            delayed(window_noise)(rec, g, a, b, bank.T[bank.group == g][:, :, :nch[g]], params) for g in groups)
         sigma = np.zeros(len(bank.ids))
         for g, s in zip(groups, sig):
             sigma[bank.group == g] = s
@@ -590,8 +629,9 @@ def run_carry(binary, W: np.ndarray, bank0: Bank, out_dir: pathlib.Path, *, para
         for g in groups:
             gi = np.flatnonzero(bank.group == g)
             m = bank.group[ci] == g
-            jobs.append(delayed(_tetrode_job)(binary, W, g, a, b, fr[m], np.searchsorted(gi, ci[m]), amp[m],
-                                              bank.T[gi], sigma[gi], params, pulses, bad_periods.get(int(g), []), w))
+            jobs.append(delayed(_tetrode_job)(binary, W, drop, g, a, b, fr[m], np.searchsorted(gi, ci[m]), amp[m],
+                                              bank.T[gi][:, :, :nch[g]], sigma[gi], params, pulses,
+                                              bad_periods.get(int(g), []), w))
         res = Parallel(n_jobs=workers)(jobs)
         cols = {k: [] for k in ("frame", "unit", "a", "snr", "cos_raw", "cos_pl", "resid", "trough", "reason")}
         newbank = bank.copy()
@@ -608,7 +648,7 @@ def run_carry(binary, W: np.ndarray, bank0: Bank, out_dir: pathlib.Path, *, para
             cols["reason"].append(r["reason"])
             for j, k_u in enumerate(gi):
                 if np.isfinite(r["newT"][j]).all():
-                    newbank.T[k_u] = r["newT"][j].astype(np.float32)
+                    newbank.T[k_u, :, :nch[g]] = r["newT"][j].astype(np.float32)
                     n_used[k_u] = r["n_used"][j]
             noise[g] = r["noise"]
             driven += [int(bank.ids[gi[k]]) for k in r["driven"]]
@@ -617,7 +657,10 @@ def run_carry(binary, W: np.ndarray, bank0: Bank, out_dir: pathlib.Path, *, para
         np.savez(f_sp, **{k: v[o] for k, v in arrays.items()})
         bank.save(out_dir / f"bankin_w{w:02d}.npz", sigma=sigma)
         driven = np.array(sorted(driven), np.int64)
-        extra = dict(noise=np.stack([noise[g] for g in groups]), noise_groups=np.array(groups), driven=driven)
+        noise_arr = np.full((len(groups), bank.T.shape[2]), np.nan)
+        for i, g in enumerate(groups):
+            noise_arr[i, :noise[g].size] = noise[g]
+        extra = dict(noise=noise_arr, noise_groups=np.array(groups), driven=driven)
         acc = arrays["reason"] == 0
         if params.reseed_every and w > 0 and w % params.reseed_every == 0:
             newbank = reseed(plain, rec, newbank, a, b, reseed_dir / f"reseed_w{w}", params, n_jobs=n_jobs)

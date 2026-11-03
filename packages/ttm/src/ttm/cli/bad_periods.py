@@ -11,8 +11,10 @@ common median reference) in 0.1 s bins, builds 1 s features, and writes into
   bad_periods.png         the intervals over the session, one row per tetrode
 
 ``--binary`` reads an already materialized preprocessed binary instead of
-filtering the store, which is much faster. Detector thresholds are the
-library defaults unless given.
+filtering the store, which is much faster. The manifest's ``badChannels`` and
+every channel of its ``badTetrodes`` are removed before the reference (and
+from a ``--binary`` that still holds them) unless ``--keep-bad-channels``.
+Detector thresholds are the library defaults unless given.
 """
 
 from __future__ import annotations
@@ -27,14 +29,26 @@ from ttm import bad_periods as bp
 from ttm.cli._common import add_experiment_args, experiment_from_args, line_buffered
 
 
-def _recording(exp, binary):
+def _bad_channels(exp, a) -> list:
+    import spikeinterface as si
+
+    from ttm.sorting import bad_channel_ids
+
+    if a.keep_bad_channels:
+        return []
+    return bad_channel_ids(si.read_zarr(str(exp.store_path())), exp.badChannels, exp.badTetrodes)
+
+
+def _recording(exp, binary, drop):
     import spikeinterface as si
 
     if binary is not None:
-        return si.load(binary)
+        rec = si.load(binary)
+        present = [c for c in rec.channel_ids if str(c) in {str(d) for d in drop}]
+        return rec.remove_channels(present) if present else rec
     from ttm.sorting import preprocess_for_sorting
 
-    return preprocess_for_sorting(si.read_zarr(str(exp.store_path())), cmr="global")
+    return preprocess_for_sorting(si.read_zarr(str(exp.store_path())), cmr="global", bad_channel_ids=drop)
 
 
 def _plot(table: pd.DataFrame, names: dict, duration_s: float, out_png, title: str) -> None:
@@ -71,8 +85,12 @@ def main() -> None:
     ap.add_argument("--n-jobs", type=int, default=48)
     ap.add_argument("--wire-loud", type=float, default=None)
     ap.add_argument("--common-corr-excess", type=float, default=None)
+    ap.add_argument("--keep-bad-channels", action="store_true",
+                    help="keep the manifest's badChannels and badTetrodes in the reference and the scan")
     a = ap.parse_args()
     exp = experiment_from_args(a)
+    drop = _bad_channels(exp, a)
+    print(f"bad channels left out: {[str(c) for c in drop] or 'none'}")
     out = exp.bad_periods_dir
     out.mkdir(parents=True, exist_ok=True)
 
@@ -81,7 +99,7 @@ def main() -> None:
         stats = dict(np.load(stats_path))
         print(f"scan: reuse {stats_path.name}")
     else:
-        rec = _recording(exp, a.binary)
+        rec = _recording(exp, a.binary, drop)
         t0 = time.time()
         stats = bp.bin_stats(rec, bin_s=0.1, n_jobs=a.n_jobs)
         np.savez(stats_path, **stats)
@@ -91,7 +109,7 @@ def main() -> None:
     base = bp.baselines(feats)
     np.savez(out / "features_1s.npz", **feats, **base)
     names = {}
-    for g, name in zip(feats["groups"], _group_names(a, exp, feats)):
+    for g, name in zip(feats["groups"], _group_names(a, exp, feats, drop)):
         names[int(g)] = name
     kw = {k: v for k, v in dict(wire_loud=a.wire_loud, common_corr_excess=a.common_corr_excess).items()
           if v is not None}
@@ -115,12 +133,15 @@ def main() -> None:
     print(f"{len(table)} intervals -> {out / 'bad_periods.csv'}")
 
 
-def _group_names(a, exp, feats) -> list[str]:
+def _group_names(a, exp, feats, drop=()) -> list[str]:
     """Tetrode names per channel from the store's ``tetrode`` property, else ``TT<group + 1>``."""
     try:
         import spikeinterface as si
 
         rec = si.load(a.binary) if a.binary is not None else si.read_zarr(str(exp.store_path()))
+        present = [c for c in rec.channel_ids if str(c) in {str(d) for d in drop}]
+        if present:
+            rec = rec.remove_channels(present)
         if "tetrode" in rec.get_property_keys():
             return [str(v) for v in rec.get_property("tetrode")]
     except Exception:

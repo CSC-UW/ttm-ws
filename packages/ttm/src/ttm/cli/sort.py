@@ -11,7 +11,9 @@ Stages, each resumable, in ``<session>/sortings_carry/<run>/``:
   all       the four in order
 
 ``carry_params.json`` records the parameters, inputs and package versions. Bad periods are read from
-the experiment's ``bad_periods/bad_periods.csv`` when it exists (``ttm-bad-periods``). Laser pulses are
+the experiment's ``bad_periods/bad_periods.csv`` when it exists (``ttm-bad-periods``). The manifest's
+``badChannels`` and every channel of its ``badTetrodes`` are removed before the reference and are not
+sorted (also from a ``--binary`` that holds them), unless ``--keep-bad-channels``. Laser pulses are
 read from ``--pulses`` (CSV with ``onset_s`` and ``offset_s`` in session seconds); without it the rule
 for pulses is not applied.
 
@@ -46,10 +48,13 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--pulses", default=None, help="CSV of laser pulses (onset_s, offset_s)")
     ap.add_argument("--bad-periods", default=None, help="bad-period table (default: the experiment's)")
     ap.add_argument("--no-bad-periods", action="store_true", help="sort without a bad-period table")
-    ap.add_argument("--bank", default=None, help="starting bank (plain templates) instead of bank0.npz")
+    ap.add_argument("--bank", default=None,
+                    help="starting bank (plain templates, made on the same channels) instead of bank0.npz")
     ap.add_argument("--whitening", default=None, help="whitening npz (key W) instead of whitening.npz")
     ap.add_argument("--reseed-sorts", default=None, help="directory of re-seed sorts instead of reseed_sorts/")
     ap.add_argument("--windows", default=None, help="carry only windows A-B (inclusive)")
+    ap.add_argument("--keep-bad-channels", action="store_true",
+                    help="keep the manifest's badChannels and badTetrodes in the reference and the sort")
     ap.add_argument("--n-jobs", type=int, default=16)
     ap.add_argument("--workers", type=int, default=8)
     a = ap.parse_args(argv)
@@ -57,8 +62,12 @@ def main(argv: list[str] | None = None) -> None:
     import spikeinterface as si
 
     from ttm import carry as cr
+    from ttm.sorting import bad_channel_ids
 
     exp = experiment_from_args(a)
+    store = si.read_zarr(str(exp.store_path()))
+    drop = [] if a.keep_bad_channels else bad_channel_ids(store, exp.badChannels, exp.badTetrodes)
+    cr.log(f"bad channels left out: {[str(c) for c in drop] or 'none'}")
     run_dir = exp.sorting_dir(a.run, subdir="sortings_carry")
     run_dir.mkdir(parents=True, exist_ok=True)
     params = cr.CarryParams()
@@ -72,6 +81,7 @@ def main(argv: list[str] | None = None) -> None:
     whitening = pathlib.Path(a.whitening) if a.whitening else run_dir / "whitening.npz"
     bank_path = pathlib.Path(a.bank) if a.bank else run_dir / "bank0.npz"
     cr.write_run_info(run_dir / "carry_params.json", params, store=exp.store_path(), binary=binary,
+                      dropped_channels=[str(c) for c in drop],
                       bad_periods=bad_path, pulses=a.pulses, bank=bank_path, whitening=whitening,
                       reseed_sorts=a.reseed_sorts or run_dir / "reseed_sorts")
     stages = ["binary", "seed", "carry", "export"] if a.stage == "all" else [a.stage]
@@ -79,8 +89,8 @@ def main(argv: list[str] | None = None) -> None:
     if "binary" in stages and not (binary / "binary.json").exists():
         from ttm.sorting import estimate_recording_wire_timing, preprocess_for_sorting
 
-        raw = si.read_zarr(str(exp.store_path()))
-        raw.reset_times()
+        store.reset_times()
+        raw = store.remove_channels(drop) if drop else store
         t0 = time.time()
         timing = estimate_recording_wire_timing(raw)
         np.savez(run_dir / "wire_timing.npz", **timing, channel_ids=np.asarray(raw.channel_ids).astype(str))
@@ -93,7 +103,7 @@ def main(argv: list[str] | None = None) -> None:
         cr.log(f"binary in {(time.time() - t0) / 60:.1f} min -> {binary}")
 
     if "seed" in stages:
-        rec = si.load(binary)
+        rec = cr.open_sorting_recording(binary, drop)
         if not whitening.exists():
             np.savez(whitening, W=cr.whitening_matrix(rec, params))
             cr.log(f"whitening -> {whitening}")
@@ -102,7 +112,7 @@ def main(argv: list[str] | None = None) -> None:
             cr.log(f"seed bank -> {bank_path}")
 
     if "carry" in stages:
-        rec = si.load(binary)
+        rec = cr.open_sorting_recording(binary, drop)
         W = np.load(whitening)["W"]
         groups = np.asarray(rec.get_property("group")).astype(int)
         bank = cr.Bank.load(bank_path).whitened(W, groups)
@@ -112,7 +122,8 @@ def main(argv: list[str] | None = None) -> None:
         cr.log(f"carry {len(bank.ids)} units; pulses {0 if pulses is None else pulses[0].size}; "
                f"bad periods {'none' if bad_path is None else bad_path}")
         cr.run_carry(binary, W, bank, run_dir / "carry", params=params, windows=_windows(a.windows), pulses=pulses,
-                     bad_periods=bad, reseed_dir=a.reseed_sorts or run_dir / "reseed_sorts", n_jobs=a.n_jobs,
+                     bad_periods=bad, reseed_dir=a.reseed_sorts or run_dir / "reseed_sorts", drop_channel_ids=drop,
+                     n_jobs=a.n_jobs,
                      workers=a.workers)
 
     if "export" in stages:

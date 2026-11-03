@@ -39,3 +39,14 @@ def test_cross_tetrode_differs_from_global_and_unknown_cmr_raises() -> None:
     assert not np.allclose(cross, glob)
     with pytest.raises(ValueError, match="Unknown cmr"):
         preprocess_for_sorting(rec, cmr="local")
+
+
+def test_bad_channels_are_left_out_of_the_median_and_the_output() -> None:
+    rec = _grouped_recording()
+    bad = [rec.channel_ids[1], rec.channel_ids[6]]
+    bp = spre.bandpass_filter(rec, freq_min=300.0, freq_max=6000.0, dtype="float32").get_traces()
+    keep = ~np.isin(rec.channel_ids, bad)
+    got = preprocess_for_sorting(rec, cmr="global", bad_channel_ids=bad)
+    assert list(got.channel_ids) == list(np.asarray(rec.channel_ids)[keep])
+    expected = bp[:, keep] - np.median(bp[:, keep], axis=1, keepdims=True)
+    np.testing.assert_allclose(got.get_traces(), expected, rtol=0, atol=1e-4)

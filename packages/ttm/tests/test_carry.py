@@ -149,3 +149,49 @@ def test_run_info_refuses_other_parameters(tmp_path) -> None:
     cr.write_run_info(path, P, binary="b")
     with pytest.raises(ValueError, match="different parameters"):
         cr.write_run_info(path, dataclasses.replace(P, blend=0.5))
+
+
+@pytest.mark.parametrize("drop", [["5"], ["0", "1", "2", "3"]])
+def test_carry_with_a_bad_wire_or_a_bad_tetrode_removed(tmp_path, drop) -> None:
+    path, rec, bank = _binary(tmp_path)
+    params = dataclasses.replace(P, window_s=2.0, whiten_s=2.0, reseed_every=0, rebuild_min_accepted=20,
+                                 rebuild_min_selected=10, rel_min_lead=10)
+    sub = cr.open_sorting_recording(path, drop)
+    assert sub.get_num_channels() == 8 - len(drop)
+    groups = np.asarray(sub.get_property("group")).astype(int)
+    keep = [str(c) not in drop for c in rec.channel_ids]
+    T = np.zeros_like(bank.T)
+    for k, g in enumerate(bank.group):
+        ch = np.flatnonzero(np.asarray(keep)[4 * g:4 * g + 4])
+        T[k, :, :ch.size] = bank.T[k][:, ch]
+    W = cr.whitening_matrix(sub, params)
+    assert W.shape == (sub.get_num_channels(),) * 2
+    for g in np.unique(groups):
+        ch = np.flatnonzero(groups == g)
+        blk = W[np.ix_(ch, ch)]
+        assert blk.shape == (ch.size, ch.size)
+    bank_w = cr.Bank(bank.ids, bank.group, T).whitened(W, groups)
+    out = tmp_path / "carry"
+    cr.run_carry(path, W, bank_w, out, params=params, windows=range(0, 2), drop_channel_ids=drop, n_jobs=1,
+                 workers=1)
+    z = np.load(out / "spikes_w00.npz")
+    units = set(z["unit"][z["reason"] == 0].tolist())
+    last = cr.Bank.load(out / "bank_w01.npz")
+    if len(drop) == 4:
+        assert units == {1} and last.ids.tolist() == [1]
+    else:
+        assert units == {0, 1}
+        k = int(np.flatnonzero(last.ids == 1)[0])
+        assert np.abs(last.T[k, :, 3]).max() == 0
+        assert np.abs(last.T[k, :, :3]).max() > 0
+
+
+def test_bad_channel_ids_resolve_channels_and_tetrodes() -> None:
+    from ttm.sorting import bad_channel_ids
+
+    rec = si.NumpyRecording(np.zeros((100, 8), np.float32), sampling_frequency=FS)
+    rec.set_property("group", np.repeat([0, 1], 4))
+    assert [str(c) for c in bad_channel_ids(rec, ["2"], ["TT2"])] == ["2", "4", "5", "6", "7"]
+    with pytest.raises(ValueError, match="CH99"):
+        bad_channel_ids(rec, ["CH99"])
+    assert bad_channel_ids(rec, ["CH99"], missing="ignore") == []
