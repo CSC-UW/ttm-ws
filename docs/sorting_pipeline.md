@@ -72,7 +72,7 @@ Run times are for TTM-003-48H on one server (Intel Xeon Platinum 8276M,
 |---|---|---|---|
 | 0 | [Before sorting](#0-before-sorting) | `ttm-convert`, `ttm-experiment-params` | Zarr store, `experiment_params.json` |
 | 1 | [Bad periods](#1-bad-periods) | `ttm-bad-periods` | table of bad intervals per tetrode |
-| 2 | [Filter and reference](#2-filter-and-reference) | `ttm-sort binary` | preprocessed binary (1.3 TB) |
+| 2 | [Filter and reference](#2-filter-and-reference) | `ttm-sort binary` | preprocessed binary, int16 (about 660 GB) |
 | 3 | [Whitening](#3-whitening) | `ttm-sort seed` | one matrix per tetrode |
 | 4 | [Seed templates](#4-seed-templates) | `ttm-sort seed` | the starting bank |
 | 5 | [Carry-forward matching](#5-carry-forward-matching) | `ttm-sort carry` | accepted spikes and updated bank per window |
@@ -182,7 +182,7 @@ Details and checks of the thresholds:
 
 ## 2. Filter and reference
 
-Written once to a float32 binary:
+Written once to a binary of int16 ADC counts:
 
 - The manifest's bad channels, and every channel of its bad tetrodes,
   are removed first: they are neither in the reference nor sorted. A
@@ -213,6 +213,10 @@ Written once to a float32 binary:
   window without 3 takes the estimate of the nearest window that has
   them; if no window has them, the plain median is used (shift 0, gain
   1). Every window of TTM-003-48H had its own estimate.
+- The result is clipped to the int16 range and rounded to the nearest
+  ADC count (0.195 uV). The largest value on TTM-003-48H is about
+  29,000 counts, inside the range of plus or minus 32,767.
+  `--binary-dtype float32` keeps float32 instead.
 - Cost: the offset and gain fit 13 min (16 threads); the binary about
   40 min (64 jobs).
 
@@ -252,12 +256,26 @@ left their worst wire with more remainder than the plain median would
 have (1.5 times in TTM-003, 2.7 times in TTM-002); with pooling, no
 window did worse than 1.03 and 1.11 times.
 
+The binary is int16 because float32 doubles its size (1.33 TB against
+663 GB for TTM-003-48H) for precision the sort does not use. Rounding
+moves a sample by at most 0.5 counts (rms 0.29), where the spike-band
+noise is about 23 counts. The first four windows were carried on an
+int16 copy and compared with the float32 run, next to a float32 rerun
+that changed only the random seed used to pick spikes for the template
+updates. By the fourth window, 94.5 % (int16) and 94.3 % (other seed)
+of the float32 run's accepted spikes were identical, templates were
+within 4.0 and 4.8 % of their peak, and the largest change of a unit
+with over 10,000 spikes was 2.8 and 3.4 %. The spikes that differ are
+borderline admissions: in the first window, those accepted by only one
+of the runs have a median matched-filter snr of 5.3, against 6.4 for
+spikes both accept.
+
 Studies:
 [`investigations/common-reference/`](../investigations/common-reference/README.md)
 (the remainder, the estimator, held-out validation, pooling);
 [`investigations/carry-bakeoff/`](../investigations/carry-bakeoff/README.md),
-sections "The aligned reference on the hybrid" and "The aligned
-reference over the 48 h".
+sections "The aligned reference on the hybrid", "The aligned
+reference over the 48 h" and "An int16 binary".
 
 </details>
 

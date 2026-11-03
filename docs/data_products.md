@@ -54,7 +54,7 @@ flowchart LR
     end
 
     subgraph RUN["sorting run directory"]
-        BIN["<b>aligned-median binary</b><br/>binary, float32<br/>1.3 TB<br/>ttm-sort binary"]:::temp
+        BIN["<b>aligned-median binary</b><br/>binary, int16<br/>about 660 GB<br/>ttm-sort binary"]:::temp
         WT["<b>wire timing</b><br/>npz<br/>0.1 MB<br/>ttm-sort binary"]:::keep
         SEED["<b>seed sort, bank, whitening</b><br/>sorter folder, npz<br/>20 MB<br/>ttm-sort seed"]:::keep
         CW["<b>per-window spikes, banks</b><br/>npz<br/>51 GB<br/>ttm-sort carry"]:::temp
@@ -112,9 +112,6 @@ flowchart LR
     VIZ -- "scored in ttm-loupe" --> HYP
 ```
 
-The aligned-median binary is float32; writing it as int16 (about 660 GB)
-is being tested.
-
 ## Products
 
 | Product | Path | Format | Made by | From | Size | Kept |
@@ -132,14 +129,14 @@ is being tested.
 | Figures | `<experiment>/figures/` | PNG | `ttm-swa plot`, `ttm-emg` | the above | 160 MB | regenerable |
 | Bad periods | `<session>/bad_periods/` | CSV table; JSON of its input and thresholds; npz cache of the scan | `ttm-bad-periods` | store (aligned median, lazily), manifest; or a binary | 0.2 MB table, 2 GB cache | the table yes; the cache only to rerun thresholds |
 | Global-median binary | `<session>/sortings_seed42_pcafix/mp_baseline/binary/` | binary, float32 (ADC counts) | `mp_baseline.py` | store | 1.3 TB | only while sortings made on it are in use; the pipeline no longer reads it |
-| Aligned-median binary | `<run>/binary/` (TTM-003: `sortings_seed42_pcafix/mp_aligned/binary/`) | binary, float32 (ADC counts); int16 under test | `ttm-sort binary` | store, manifest | 1.3 TB | while its sorting is analysed or curated; 40 min to rewrite |
+| Aligned-median binary | `<run>/binary/` | binary, int16 (ADC counts, rounded) | `ttm-sort binary` | store, manifest | about 660 GB | while its sorting is analysed or curated; 40 min to rewrite |
 | Wire timing | `<run>/wire_timing.npz` | npz, float64 | `ttm-sort binary` | store | 0.1 MB | yes; the binary is reproducible from it |
 | Seed sort, bank, whitening | `<run>/seed_sort/`, `bank0.npz`, `whitening.npz` | MountainSort5 folder; npz, float32 | `ttm-sort seed` | binary | 20 MB | yes |
 | Per-window spikes and banks | `<run>/carry/` | npz | `ttm-sort carry` | binary, bank, bad periods, pulses | 51 GB | until the sorting is final; resume and re-export read it |
 | Re-seed sorts | `<run>/reseed_sorts/` | MountainSort5 folders | `ttm-sort carry` | binary | 130 MB | yes |
 | Sorting | `<run>/sorting/` | SpikeInterface folder (npy) | `ttm-sort export` | per-window spikes | 3.3 GB | yes |
 | Viz bundle | `<session>/viz_bundle/` | Zarr, Parquet, JSON | `ttm-viz-bundle` | EMG, 125 Hz LFP, a sorting | 2.0 GB | regenerable |
-| Investigation products | `<session>/sortings_seed42_pcafix/` (hybrids, arms, the first 6 h binaries, earlier sorts) | various | `investigations/` |  | 1.1 TB besides the two 48 h binaries | until the user decides |
+| Investigation products | `<session>/sortings_seed42_pcafix/` (hybrids, arms, the first 6 h binaries, earlier sorts) | various | `investigations/` |  | 1.1 TB besides the two 48 h float32 binaries (global and aligned median, `mp_baseline/` and `mp_aligned/`, 1.3 TB each) | until the user decides |
 
 Not yet produced: the SortingAnalyzer of the new sorting (built on the
 binary it was sorted from; June production's was 0.5 GB), the hypnogram
