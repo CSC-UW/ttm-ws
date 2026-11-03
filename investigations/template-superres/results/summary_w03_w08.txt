@@ -1,0 +1,43 @@
+fits scored 2,585,260; accepted 584,973; units 67 (21 gt)
+
+Accepted fits: median [p90, p99] of the gain at the best delay
+       group      n  units                    dsnr                dsnr_rel                    dcos       resid_drop_vs_ls0    resid_drop_vs_stored   |d|
+ gt/large/fp   8089     13 0.0162 [0.0877, 0.1886] 0.0029 [0.0149, 0.0295] 0.0016 [0.0085, 0.0165] 0.0026 [0.0146, 0.0302] 0.0035 [0.0173, 0.0404] 0.293
+gt/large/hit 151625     16 0.0345 [0.1819, 0.4561] 0.0026 [0.0118, 0.0246] 0.0022 [0.0096, 0.0204] 0.0113 [0.0769, 0.2233] 0.0115 [0.0771, 0.2234] 0.246
+ gt/small/fp   1061      6 0.0130 [0.0708, 0.1531] 0.0024 [0.0132, 0.0293] 0.0013 [0.0071, 0.0152] 0.0020 [0.0124, 0.0243] 0.0043 [0.0171, 0.0515] 0.310
+gt/small/hit  20775      7 0.0206 [0.1243, 0.2690] 0.0029 [0.0176, 0.0390] 0.0019 [0.0110, 0.0244] 0.0042 [0.0244, 0.0595] 0.0058 [0.0267, 0.0610] 0.242
+real/large/- 386445     40 0.0164 [0.1035, 0.3073] 0.0023 [0.0137, 0.0307] 0.0016 [0.0092, 0.0215] 0.0044 [0.0307, 0.1076] 0.0059 [0.0342, 0.1133] 0.218
+real/small/-  16978     11 0.0172 [0.0870, 0.1573] 0.0030 [0.0150, 0.0266] 0.0018 [0.0087, 0.0152] 0.0031 [0.0152, 0.0306] 0.0052 [0.0206, 0.0489] 0.261
+
+Threshold crossings (fits scored, reason 0-2): share of scored fits that pass both snr>=4.5 and cos_pl>=0.5 at the best delay but not at the integer one, against the accepted count
+       group  n_scored  accepted  pass_int  new_pass new/pass_int  new_by_snr  new_by_cos
+ gt/large/fp    375717      8089      8818       431       0.0489          90         364
+gt/large/hit    158073    151625    151890       185       0.0012          33         156
+ gt/small/fp    210530      1061      1102        69       0.0626          18          56
+gt/small/hit     29470     20775     20774       208       0.0100          74         143
+real/large/-   1484780    386445    388173      5847       0.0151        2893        3191
+real/small/-    326690     16978     16985       465       0.0274         165         325
+
+Ground-truth hits: delay estimate against the injected sub-sample offset
+                 n   sd_true      corr  rmse_est
+trough_mad                                      
+large       2912.0  0.393310  0.723710  0.293725
+small       1697.0  0.596746  0.501904  0.524937
+
+Large-unit residual peaks (accepted, real and gt): stored fit vs best-delay LS fit, noise units
+  share with residual peak >= 4: stored 0.4061, best 0.3417 (n 181,679, units 18)
+  share with residual peak >= 5: stored 0.1525, best 0.1225 (n 181,679, units 18)
+  resid energy drop vs stored, trough>=10: 0.0124 [0.0936, 0.2216]; vs ls0 0.0109 [0.0920, 0.2204]
+
+Template blur: energy of the fractionally aligned mean over the integer mean (E1/E0 - 1); same procedure on template + noise at the integer time (control); oracle on gt
+                gain  gain_ctrl  gain_excess  trough_gain  gain_oracle  dcos_est  dcos_oracle
+kind size                                                                                    
+gt   large  0.009051   0.007113     0.001722     0.010848     0.011448 -0.000338     0.001844
+     small  0.008891   0.009588    -0.002583     0.009808     0.004322  0.000265    -0.002185
+real large  0.008112   0.011550    -0.003495     0.011404          NaN       NaN          NaN
+     small  0.008770   0.015438    -0.007149     0.010871          NaN       NaN          NaN
+kind  size 
+gt    large    30
+      small    11
+real  large    75
+      small    17
