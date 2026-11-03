@@ -25,7 +25,8 @@ environment. There is no default.
 `<session>` is `<data_root>/<session>/`, `<subject>/<experiment>` is
 `<data_root>/<subject>/<experiment>/`. Steps 1 to 6 run on the server; 7 and
 8 are hand-offs to a laptop. The library functions behind each step are in
-`packages/ttm/README.md`.
+`packages/ttm/README.md`. `docs/data_products.md` draws every product,
+what makes it and its size.
 
 ## Observations
 
