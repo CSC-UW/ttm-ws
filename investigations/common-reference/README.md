@@ -32,6 +32,9 @@ order.
   median of all wires, in TTM-003's 48 h session, TTM-001's NOD session and
   TTM-002's SD session, at three to five time points
   (`results/sampling_offsets.csv`).
+- `aligned_binary.py`, `aligned_check.py`, `gain_choice.py`,
+  `common_events.py`, `event_state.py`, `timing_validation.py`,
+  `timing_pooling.py`: the aligned reference, described below.
 - In `investigations/carry-bakeoff/`: `reference_check.py` (the event
   before referencing) and `reference_skew.py` (what each reference leaves
   at the few-unit tetrodes' units' spikes, `results/reference_skew.txt`
@@ -203,7 +206,51 @@ remainder of the events would fire more in wake than in sleep.
 The hybrid's windows 0 to 11 range from 1.7 to 80.7 events per s (median
 30); two of the 96 windows have more.
 
+## The estimate on held-out data, three animals
+
+`timing_validation.py` (`results/timing_validation.csv`, per-block fits
+in `mp_aligned/timing_validation_blocks.npz` under TTM-003's sortings) fits each of the six blocks of
+every window on its own, then applies the per-wire median of the
+qualifying blocks among 0, 2 and 4 to blocks 1, 3 and 5. The measure is
+each wire's RMS within the event mask, aligned over global; it is diluted
+by local activity and noise, as in `gain_choice.py`, so it changes by a
+few per cent where the unit-triggered remainders above change several
+fold.
+
+| | TTM-003 48H | TTM-001 NOD | TTM-002 SD |
+|---|---|---|---|
+| windows with no qualifying block | 1 (window 4) | 3 (8, 9, 17) | 0 of 24 |
+| a wire's offset between blocks, median spread | 0.29 us | 0.46 us | 0.38 us |
+| median wire, own window | 0.948 | 0.984 | 0.958 |
+| median wire, estimate of the window before | 0.948 | 0.985 | 0.961 |
+| median wire, estimate of 8 windows (4 h) before | 0.948 | 0.985 | 0.955 |
+
+An estimate from 4 h earlier does as well as the window's own. Where one
+block decides the estimate it can be far off: in TTM-002 window 84 only
+block 0 qualifies, and it gives CH24, CH28 and CH58 gains of 0.15 to 0.39
+and offsets of -90 to -180 us where the other blocks give 0.93 to 1.0 and
+-10 us; those wires end 2.2 to 2.7 times worse than with the global
+median. TTM-003 window 18 leaves CH22, the wire with the 400 Hz comb,
+1.5 times worse (block gains 1.0 to 1.7).
+
+`timing_pooling.py` (`results/timing_pooling.csv`) takes the median over
+the qualifying blocks of the window and of the two windows on each side
+instead:
+
+| | own window: worst wire, largest over windows | pooled over 5 windows | windows with a wire 5 % worse, own / pooled |
+|---|---|---|---|
+| TTM-003 48H | 1.504 | 1.028 | 6 / 0 |
+| TTM-001 NOD | 1.007 | 1.004 | 0 / 0 |
+| TTM-002 SD | 2.653 | 1.107 | 3 / 1 |
+
+The median wire is unchanged (0.945 against 0.948, 0.984, 0.959 against
+0.958), and every window has an estimate. The TTM-003 rows the 48 h
+aligned binary was written with depart from a rolling median over five
+windows by at most 5 us and 0.1 of gain (windows 0, 2, 18, 29 and 63).
+Not yet in `ttm.reference`: pooling over neighbouring windows, and the
+global median as the fallback when a recording has no qualifying block.
+
 This is not adaptive gain control: the gain is a fixed number per wire
 and window, and spikeinterface's `highpass_spatial_filter`, which
 assumes a dense line of sites, does not fit tetrodes. Not done: the 48 h
-on the aligned binary, and the same estimate on TTM-001 and TTM-002.
+on the aligned binary.
