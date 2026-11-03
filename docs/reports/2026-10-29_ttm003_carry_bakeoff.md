@@ -1,6 +1,6 @@
 ---
 title: TTM-003 48 h, carry-forward matching per tetrode and the rebuild of templates
-updated: 2026-11-02
+updated: 2026-11-03
 status: needs_verification
 ---
 
@@ -498,6 +498,29 @@ units on TT3, TT13 and TT14 go from 102,113 to 160,472 spikes over the
 12 windows to none, and on TT16 from 280,456 to 32,564. Writing the
 binary with the aligned reference took 4.8 min for 6 h with 64 jobs.
 
+### The aligned reference over the 48 h
+
+Both matchers over the 96 windows of the aligned binary, from the aligned
+seed bank and re-seeds, each scored on that binary
+(`investigations/carry-bakeoff/README.md`, "The aligned reference over
+the 48 h"):
+
+| | global, joint | global, per tetrode | aligned, joint | aligned, per tetrode |
+|---|---|---|---|---|
+| single units | 71 | 68 | 59 | 65 |
+| spikes in bad periods | 0 | 64 | 0 | 53 |
+| spikes on TT3, TT13, TT14, TT16 (M) | 5.45 | 7.78 | 0.32 | 0.73 |
+| all spikes (M) | 133.5 | 161.6 | 117.8 | 147.0 |
+
+Per tetrode on the aligned binary keeps the driven cells as on the global
+one (TT4 202 to 429 Hz at onset, TT10 98 to 226, TT11 130 to 215, in
+every block); joint again finds fewer of their onset spikes and splits
+TT11's cell between two units. No unit's spike times drift, apart from
+TT15 unit 42, whose mean snippet follows a bursting 4.7 kHz line on CH20
+and CH22 in every sorting, production included. During the recording the
+user saw no spikes on TT1, TT2, TT3, TT13 and TT16, and TT14 and TT15 had
+poor signal.
+
 ## 11. What this suggests
 
 These are the analyst's reading, for the user to confirm.
@@ -517,8 +540,13 @@ These are the analyst's reading, for the user to confirm.
   tetrodes; the copies of one event on several tetrodes are that
   remainder, not one cell seen twice. GT1's precision deficit may also
   shrink with it, since the hybrid is built on the referenced binary.
-  On the hybrid it does what this predicts (section 10); the 48 h on the
-  aligned binary is the next test.
+  On the hybrid it does what this predicts (section 10), and over the
+  48 h it removes most of the few-unit tetrodes' spikes without
+  changing the driven cells or the spike times. On 2026-11-03 the user
+  adopted it, with the timing pooled over two windows on each side, as
+  the default reference (`ttm.sorting.preprocess_for_sorting`), and
+  declined the overlap rule (`investigations/carry-bakeoff/`, "Where per
+  tetrode loses precision").
 - Template re-centring is not needed.
 - One whitening for clustering and matching (one matrix for the
   MountainSort5 seed and re-seed sorts and for the carry) is a follow-on.
