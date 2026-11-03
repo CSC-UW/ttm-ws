@@ -36,8 +36,12 @@ acquisition clock.
 ``--max-windows N`` restricts both sortings to the first N windows (for a
 carry-forward run made with ``mp_baseline.py --max-windows``).
 
+``--binary-run`` names the run whose ``binary`` scores both sortings (default ``mp_baseline``);
+both must have been sorted from it.
+
 Usage: python subjects/ttm-003/scripts/bad_periods_compare.py --subject TTM-003 --experiment TTM-003-48H
            [--a mp_baseline --b mp_baseline_masked --sorting assembled_prod] [--max-windows N]
+           [--binary-run RUN] [--coverage NPZ]
            [--tag T] [--workers 48] [--no-coverage]
 """
 
@@ -285,9 +289,13 @@ def main() -> None:
     ap.add_argument("--table", default=None, help="bad-period table (default <session>/bad_periods/bad_periods.csv)")
     ap.add_argument("--workers", type=int, default=48)
     ap.add_argument("--no-coverage", action="store_true", help="skip the detected-event coverage")
+    ap.add_argument("--binary-run", default="mp_baseline",
+                    help="run directory whose binary both sortings are scored on (the one they were sorted from)")
+    ap.add_argument("--coverage", default=None,
+                    help="detected events (default <session sortings>/<a>/spike_coverage.npz)")
     a = ap.parse_args()
     exp = experiment_from_args(a)
-    binary = str(exp.sorting_dir("mp_baseline") / "binary")
+    binary = str(exp.sorting_dir(a.binary_run) / "binary")
     table = bp.read_table(a.table or exp.bad_periods_dir / "bad_periods.csv")
     nfr_all = si.load(binary).get_num_frames()
     nfr = nfr_all if a.max_windows is None else min(nfr_all, int(a.max_windows * WIN_S * FS))
@@ -362,7 +370,7 @@ def main() -> None:
             "presence_median": float(t.presence.median()),
             "units_present_after_window_1": int((t.last_window > 1).sum()),
             "units_clock_locked": int((t.clock_lock > CLOCK_LOCKED).sum())}
-    peaks_npz = exp.sorting_dir(a.a) / "spike_coverage.npz"
+    peaks_npz = pathlib.Path(a.coverage) if a.coverage else exp.sorting_dir(a.a) / "spike_coverage.npz"
     if not a.no_coverage and peaks_npz.exists():
         cov, series, den, n_flag = coverage(peaks_npz, runs, names, table, nfr)
         cov.to_csv(RESULTS / f"bad_periods_coverage_{exp.experiment}_{tag}.csv", index=False)
