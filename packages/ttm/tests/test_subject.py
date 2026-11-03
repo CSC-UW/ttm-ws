@@ -36,15 +36,15 @@ def _write_subject(root: pathlib.Path, sid="TTM-009", exp="EXP", **extra) -> pat
 def test_committed_manifests_load() -> None:
     subjects = sj.list_subjects()
     assert {s.id for s in subjects} >= {"TTM-001", "TTM-002"}
-    nod = sj.find_subject("ttm-001").experiment("TTM-NOD")
+    nod = sj.find_subject("ttm-001").experiment("TTM-001-48H")
     assert nod.session == "2026-05-27_09-07-52"
     assert len(nod.lightsOn) == 3 and len(nod.lightsOff) == 2
-    assert nod.experiment_dir.parts[-2:] == ("TTM-001", "TTM-NOD")
+    assert nod.experiment_dir.parts[-2:] == ("TTM-001", "TTM-001-48H")
     assert nod.lfp_path.name == "2026-05-27_09-07-52.lfp.zarr"
     assert nod.store_path("wavpack", 2.25).name == "2026-05-27_09-07-52.wavpack-bps2.25.zarr"
     assert nod.acquisition == "TTM1/2026-05-27_09-07-52"
     assert nod.acquisition_dir == pathlib.Path(config.get().remote("archive")) / "TTM1" / "2026-05-27_09-07-52"
-    sd = sj.find_subject("TTM-002").experiment("TTM-002-SD")
+    sd = sj.find_subject("TTM-002").experiment("TTM-002-48H")
     assert sd.acquisition == "TTM2/2026-09-24_09-03-22"
 
 

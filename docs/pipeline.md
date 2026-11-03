@@ -18,7 +18,7 @@ environment. There is no default.
 | 3. LFP | `ttm-make-lfp [--subsample 125] [--check-plot]` | blosc-zstd store | `<session>.lfp.zarr` (625 Hz), `<session>.lfp.125hz.zarr` (tetrode leads) |
 | 4. SWA | `ttm-swa all` (or `inst`, `stft`, `plot`) | 625 Hz LFP, params | `delta.idelta.zarr`, `stft_bandpowers.zarr`, `figures/swa_*.png` |
 | 5. EMG | `ttm-emg --full` (default: 30 min window, plot only) | blosc-zstd store, `slice_table.csv`, `delta.idelta.zarr` | `synthetic_emg_methods.zarr`, `figures/emg_*.png` |
-| 6. Sort | steps and parameters in `docs/sorting_pipeline.md`; runs from `investigations/carry-bakeoff/run_aligned48.sh` until it becomes an entry point | store, bad periods | `<session>/sortings_seed42_pcafix/<sorting>/` |
+| 6. Sort | `ttm-sort all [--pulses CSV] [--run NAME]` (steps and parameters in `docs/sorting_pipeline.md`) | store, bad periods, laser pulses | `<session>/sortings_carry/<run>/` |
 | 7. Curate | `ttm-curation-manifest`, `ttm-fetch-bundle curation`, `ttm-curate` | analyzer + the recording it was sorted from | `curation_bundles/<sorting>.manifest.json` |
 | 8. View | `ttm-viz-bundle`, `ttm-fetch-bundle viz`, `ttm-loupe` | EMG, 125 Hz LFP, sorting | `<session>/viz_bundle/` |
 
@@ -90,7 +90,7 @@ the analyzer's relative link to its recording keeps resolving after the copy.
 Then on the laptop:
 
 ```bash
-ttm-fetch-bundle curation --subject TTM-001 --experiment TTM-NOD --dest /Volumes/Drive/2026-05-27_09-07-52
+ttm-fetch-bundle curation --subject TTM-001 --experiment TTM-001-48H --dest /Volumes/Drive/2026-05-27_09-07-52
 ttm-curate --bundle /Volumes/Drive/2026-05-27_09-07-52 --mode desktop --style grahams_curation
 ```
 
@@ -116,7 +116,7 @@ pass over the whole spike vector), the loupe `state_definitions.json`, and a
 is `blosc-43200s-train3600s`; override with `--sorting`.
 
 ```bash
-ttm-fetch-bundle viz --subject TTM-001 --experiment TTM-NOD --dest /Volumes/Drive/ttm_nod_viz
+ttm-fetch-bundle viz --subject TTM-001 --experiment TTM-001-48H --dest /Volumes/Drive/ttm_nod_viz
 ttm-loupe --data-dir /Volumes/Drive/ttm_nod_viz
 ```
 

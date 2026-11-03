@@ -128,7 +128,7 @@ def test_production_sub_lfp_shape() -> None:
     from ttm import config, subject
 
     try:
-        SUB_LFP = subject.find_subject("TTM-001").experiment("TTM-NOD").subsampled_lfp_path(125)
+        SUB_LFP = subject.find_subject("TTM-001").experiment("TTM-001-48H").subsampled_lfp_path(125)
     except (config.ConfigError, subject.ManifestError) as e:
         pytest.skip(str(e))
     if not SUB_LFP.exists():

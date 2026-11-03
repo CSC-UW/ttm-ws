@@ -12,7 +12,7 @@ after re-running an entry point, to see what moved:
 
 ```bash
 uv run python scripts/snapshot_derived.py snapshot \
-    --subject TTM-001 --experiment TTM-NOD -o docs/baselines/<name>.json
+    --subject TTM-001 --experiment TTM-001-48H -o docs/baselines/<name>.json
 uv run python scripts/snapshot_derived.py compare a.json b.json [--rtol 1e-5]
 ```
 

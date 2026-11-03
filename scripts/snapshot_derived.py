@@ -9,7 +9,7 @@ difference. Both are cheap enough to run before and after a change to
 the library or a re-run of an entry point.
 
     uv run python scripts/snapshot_derived.py snapshot \
-        --subject TTM-001 --experiment TTM-NOD -o docs/baselines/x.json
+        --subject TTM-001 --experiment TTM-001-48H -o docs/baselines/x.json
     uv run python scripts/snapshot_derived.py compare a.json b.json
 """
 

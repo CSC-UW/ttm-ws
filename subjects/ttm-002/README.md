@@ -5,7 +5,7 @@ updated: 2026-10-21
 
 # TTM-002
 
-`experiments/TTM-002-SD.toml` describes the session `2026-09-24_09-03-22` at
+`experiments/TTM-002-48H.toml` (named `TTM-002-SD` until 2026-11-03) describes the session `2026-09-24_09-03-22` at
 `/Volumes/tetrode/TTM2/2026-09-24_09-03-22/Record Node 102` (moved there on
 2026-10-19 from the old share, where it sat one directory deeper, next to
 TTM2's October sessions). The session carries three streams (IMU, the
@@ -19,6 +19,6 @@ channels with a blank string (an Acquisition Board plugin bug, documented
 in `docs/developer_notes/openephys_blank_channel_names.md`); it was repaired
 in place on 2026-10-21 with the original kept as `structure.oebin.orig`, and
 spikeinterface now reads the session. The products currently under
-`<data_root>/2026-09-24_09-03-22/` and `<data_root>/TTM-002/TTM-002-SD/` were
+`<data_root>/2026-09-24_09-03-22/` and `<data_root>/TTM-002/TTM-002-48H/` were
 made outside this repository from a renamed mirror and are not inputs to
 anything here; they will be superseded when the session is re-processed.

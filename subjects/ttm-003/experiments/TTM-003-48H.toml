@@ -5,7 +5,7 @@
 # results/stimulation_blocks_2026-10-20_09-02-12.csv. Lights 12 h/12 h,
 # on at 09:00 and off at 21:00; sleep deprivation with novel objects from
 # 09:00 to 14:00 on 2026-10-21 (experimenter, 2026-10-23), the same design
-# as TTM-002-SD. Bad channels from scripts/channel_qc.py on this recording
+# as TTM-002-48H. Bad channels from scripts/channel_qc.py on this recording
 # (results/channel_qc_TTM-003-48H_summary.csv, 2026-10-22): CH22 on TT15
 # carries the 400 Hz comb at 80 to 260 times its flanks with 150 to 200
 # threshold crossings per second in most windows; CH18 and CH20 carry it
@@ -46,3 +46,9 @@ date = "2026-11-03"
 source = "experimenter"
 scope = ["TT14", "TT15"]
 note = "No spikes seen during the live recording, and obvious signal quality problems. A good unit from TT15 was never expected."
+
+[[observations]]
+date = "2026-11-03"
+source = "experimenter"
+note = "Estimated depth below the cortical surface of each tetrode with obvious spikes, before histology (rough guesses): TT4 400 um, TT5 150 to 300 um, TT6 400 to 450 um, TT7 150 um, TT8 600 um, TT9 200 um, TT10 500 um, TT11 250 um, TT12 either 150 um or 550 um, probably not in between."
+scope = ["TT4", "TT5", "TT6", "TT7", "TT8", "TT9", "TT10", "TT11", "TT12"]

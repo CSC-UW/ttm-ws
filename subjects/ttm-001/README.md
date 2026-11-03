@@ -15,7 +15,7 @@ name it).
 
 | Experiment | Session | What exists on the server |
 |---|---|---|
-| `TTM-NOD` | `2026-05-27_09-07-52` (48.3 h, two Open Ephys experiments with a 58 s gap) | blosc-zstd and WavPack stores, 625 Hz and 125 Hz LFPs, `experiment_params.json`, SWA stores and figures, EMG store and figures, the MountainSort5 and Kilosort4 sortings and the matching-pursuit production sort under `sortings_seed42_pcafix/`, viz bundle, curation manifests |
+| `TTM-001-48H` (named `TTM-NOD` until 2026-11-03) | `2026-05-27_09-07-52` (48.3 h, two Open Ephys experiments with a 58 s gap) | blosc-zstd and WavPack stores, 625 Hz and 125 Hz LFPs, `experiment_params.json`, SWA stores and figures, EMG store and figures, the MountainSort5 and Kilosort4 sortings and the matching-pursuit production sort under `sortings_seed42_pcafix/`, viz bundle, curation manifests |
 | `TTM-Test` | `2026-05-19_18-09-51` (three 60 s recordings) | `slice_table.csv`, `experiment_params.json` |
 
 Everything under `sortings_seed42_pcafix/` and the method findings are
