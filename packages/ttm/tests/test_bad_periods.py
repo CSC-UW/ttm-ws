@@ -114,3 +114,20 @@ def test_mask_with_overlapping_and_nearby_periods():
     assert np.std(whole[10000:16000, :4]) == pytest.approx(3.0, rel=0.05)
     assert np.std(whole[12000:14000, 4:]) == pytest.approx(3.0, rel=0.05)
     assert np.all(whole[16000:16010, :4] != x[16000:16010, :4])
+
+
+def test_cached_scan_is_reused_only_for_the_same_input(tmp_path):
+    import json
+    import types
+
+    from ttm.cli.bad_periods import cached_key, scan_key
+
+    exp = types.SimpleNamespace(store_path=lambda: tmp_path / "s.zarr")
+    key = scan_key(exp, None, "global_aligned", ["CH22"])
+    np.savez(tmp_path / "new.npz", ss=np.zeros(3), scan_key=json.dumps(key))
+    np.savez(tmp_path / "old.npz", ss=np.zeros(3))
+    assert cached_key(dict(np.load(tmp_path / "new.npz"))) == key
+    assert cached_key(dict(np.load(tmp_path / "old.npz"))) is None
+    assert scan_key(exp, None, "global", ["CH22"]) != key
+    assert scan_key(exp, None, "global_aligned", []) != key
+    assert scan_key(exp, tmp_path / "binary", "global_aligned", ["CH22"])["cmr"] == "binary"
