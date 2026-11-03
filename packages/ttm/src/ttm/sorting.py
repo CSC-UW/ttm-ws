@@ -10,14 +10,17 @@ Pipeline (lazy SpikeInterface preprocessing, per the MountainSort5 README):
 
 Common median reference (`preprocess_for_sorting(..., cmr=...)`):
 
-- "global" (default): median across all channels. Benchmarked to change mean
-  spike waveforms by only ~0.25% of peak (`benchmark_cmr.py`); the production
-  TTM-001 sorts used it.
+- "global_aligned" (default): each wire shifted in time by its offset from the
+  median before its gain times the median is subtracted (`ttm.reference`), with
+  the offsets and gains estimated per 1800 s window and pooled over the two
+  windows on each side. Adopted 2026-11-03 from the 48 h bake-off
+  (`investigations/carry-bakeoff/`, `investigations/common-reference/`).
+- "global": median across all channels. Benchmarked to change mean spike
+  waveforms by only ~0.25% of peak (`benchmark_cmr.py`); the production TTM-001
+  sorts and the TTM-003 sorts before 2026-11-03 used it.
 - "cross_tetrode": per tetrode, the median of every channel on the OTHER
   tetrodes, via `common_reference(groups=..., ref_channel_ids="out_of_group")`
   (spikeinterface >= 0.105, PR #4601).
-- "global_aligned": each wire shifted in time by its offset from the median
-  before its gain times the median is subtracted (`ttm.reference`).
 
 All variants preserve the ProbeGroup and group/tetrode properties needed for
 split + sort.
@@ -45,28 +48,33 @@ if not hasattr(BaseRecording, "_recording_segments"):
 def preprocess_for_sorting(
     recording,
     *,
-    cmr: str = "global",
+    cmr: str = "global_aligned",
     freq_min: float = 300.0,
     freq_max: float = 6000.0,
     dtype: str = "float32",
     wire_timing: dict | None = None,
+    timing_window_s: float = 1800.0,
+    timing_block_s: float = 20.0,
+    timing_n_jobs: int = 16,
 ):
-    """Bandpass + common median reference (full recording, lazy).
+    """Bandpass + common median reference (full recording, lazy apart from the wire timing).
 
     Returns the referenced recording (still all tetrodes, `group` property intact);
     whitening is applied per group AFTER `split_by("group")`.
 
     ``cmr`` selects the reference:
 
-    - ``"global"`` (default): median across ALL channels. Single SI pass, ~20x
-      faster to materialize than the cross-tetrode variants; benchmarked to alter
-      mean spike waveforms by ~0.25% of peak (the 4/64 self-inclusion is negligible
-      for a robust median). Recommended.
+    - ``"global_aligned"`` (default): each wire shifted by its offset from the median and its
+      gain on the median subtracted (``ttm.reference``), from ``wire_timing`` as returned by
+      ``ttm.reference.estimate_wire_timing_windows`` on the bandpassed, unreferenced recording.
+      When ``wire_timing`` is None it is estimated here, on windows of ``timing_window_s`` with
+      six blocks of ``timing_block_s`` each and that function's pooling defaults, ``timing_n_jobs``
+      windows at a time (about 90 s per window on one thread). To reference a crop, estimate on
+      the whole recording and pass ``ttm.reference.slice_wire_timing`` of it.
+    - ``"global"``: median across ALL channels. Single SI pass, benchmarked to alter
+      mean spike waveforms by ~0.25% of peak.
     - ``"cross_tetrode"``: median of all channels on OTHER tetrodes, per tetrode,
       from the ``group`` property (``ref_channel_ids="out_of_group"``).
-    - ``"global_aligned"``: each wire shifted by its offset from the median and its gain on the
-      median subtracted (``ttm.reference``), from ``wire_timing`` as returned by
-      ``ttm.reference.estimate_wire_timing_windows`` on the bandpassed, unreferenced recording.
     - ``"none"``: bandpass only.
     """
     rec_f = spre.bandpass_filter(
@@ -80,7 +88,8 @@ def preprocess_for_sorting(
         from ttm.reference import aligned_median_reference
 
         if wire_timing is None:
-            raise ValueError("cmr='global_aligned' needs wire_timing (ttm.reference.estimate_wire_timing_windows)")
+            wire_timing = estimate_recording_wire_timing(
+                rec_f, bandpassed=True, window_s=timing_window_s, block_s=timing_block_s, n_jobs=timing_n_jobs)
         return aligned_median_reference(rec_f, wire_timing, dtype=dtype)
     if cmr == "cross_tetrode":
         groups = np.asarray(rec_f.get_property("group"))
@@ -93,11 +102,33 @@ def preprocess_for_sorting(
     raise ValueError(f"Unknown cmr={cmr!r}; use 'global', 'cross_tetrode', 'global_aligned', or 'none'.")
 
 
+def estimate_recording_wire_timing(
+    recording,
+    *,
+    bandpassed: bool = False,
+    freq_min: float = 300.0,
+    freq_max: float = 6000.0,
+    window_s: float = 1800.0,
+    block_s: float = 20.0,
+    n_jobs: int = 16,
+) -> dict:
+    """Wire timing for ``cmr="global_aligned"``: ``ttm.reference.estimate_wire_timing_windows`` on
+    the recording bandpassed as ``preprocess_for_sorting`` does (unless ``bandpassed``), on windows
+    of ``window_s`` from frame 0 with six blocks of ``block_s`` each and that function's pooling
+    defaults."""
+    from ttm.reference import estimate_wire_timing_windows
+
+    rec_f = recording if bandpassed else spre.bandpass_filter(
+        recording, freq_min=freq_min, freq_max=freq_max, dtype="float32")
+    fs = rec_f.get_sampling_frequency()
+    return estimate_wire_timing_windows(rec_f, int(window_s * fs), int(block_s * fs), n_jobs=n_jobs)
+
+
 def materialize_preprocessed(
     store_zarr: str | pathlib.Path,
     cache_dir: str | pathlib.Path,
     *,
-    cmr: str = "global",
+    cmr: str = "global_aligned",
     test_duration_s: float | None = None,
     materialize_n_jobs: int = 96,
     materialize_dtype: str = "float32",
@@ -106,7 +137,7 @@ def materialize_preprocessed(
     binary cache (resume if the cache already exists).
 
     Shared by ``sort_store`` (MountainSort5) and ``sort_store_ks4`` (Kilosort4):
-    both sorters consume the SAME bandpass(300-6000 Hz) + global-CMR float32 binary,
+    both sorters consume the SAME bandpass(300-6000 Hz) + CMR float32 binary,
     so a sort of one store can reuse the other's cache byte-for-byte (an
     apples-to-apples sorter input). Returns the loaded materialized recording (all
     channels, ``group``/``tetrode`` properties + ProbeGroup intact).
@@ -149,7 +180,7 @@ def sort_store(
     *,
     scheme: str = "3",
     scheme3_block_duration_sec: float = 1800.0,
-    cmr: str = "global",
+    cmr: str = "global_aligned",
     detect_threshold: float = 5.5,
     detect_sign: int = -1,
     whitening_seed: int | None = None,
@@ -179,7 +210,7 @@ def sort_store(
     ``test_duration_s`` limits to the first N seconds for a quick check.
 
     ``cmr_cache_dir`` overrides the default per-output ``_cmr_cache`` location with
-    a shared, external one. Because bandpass + global CMR + materialize is
+    a shared, external one. Because bandpass + CMR + materialize is
     deterministic, repeated sorts of the SAME store (e.g. determinism replicates)
     can point at one shared cache and skip re-materializing it; an external cache
     is owned by the caller and is never auto-deleted (``keep_cmr_cache`` is moot).
@@ -233,7 +264,7 @@ def sort_store_ks4(
     store_zarr: str | pathlib.Path,
     output_dir: str | pathlib.Path,
     *,
-    cmr: str = "global",
+    cmr: str = "global_aligned",
     test_duration_s: float | None = None,
     materialize_n_jobs: int = 96,
     materialize_dtype: str = "float32",
@@ -259,7 +290,7 @@ def sort_store_ks4(
     """Sort one tetrode Zarr store with Kilosort4, by tetrode group (the default),
     mirroring the MountainSort5 preprocessing.
 
-    Same lazy preprocessing as ``sort_store``: bandpass(300-6000 Hz) + global CMR,
+    Same lazy preprocessing as ``sort_store``: bandpass(300-6000 Hz) + CMR,
     **materialized once** (via ``materialize_preprocessed``, default float32, all 64
     channels) so the per-tetrode sorts read their 4 channels cheaply. Returns the
     aggregated sorting (one ``UnitsAggregationSorting`` with a ``group`` property per
@@ -267,7 +298,7 @@ def sort_store_ks4(
 
     KS4 differences from MS5, and why:
 
-    - ``do_CAR=False`` -- global CMR is already applied to all 64 channels BEFORE the
+    - ``do_CAR=False`` -- the CMR is already applied to all 64 channels BEFORE the
       per-group split, so a second 4-channel common-average reference would
       re-reference each tetrode to itself. KS4's internal whitening
       (``skip_kilosort_preprocessing=False``) is kept as the analog of MS5's
@@ -326,7 +357,7 @@ def sort_store_ks4(
 
     params = dict(
         batch_size=batch_size,
-        do_CAR=do_CAR,            # global CMR already applied before the split
+        do_CAR=do_CAR,            # CMR already applied before the split
         do_correction=do_correction,  # SI wrapper -> ops["nblocks"]=0 when False
         nblocks=nblocks,         # explicit no-drift guard
         skip_kilosort_preprocessing=skip_kilosort_preprocessing,  # keep KS4 whitening

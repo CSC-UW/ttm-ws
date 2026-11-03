@@ -23,6 +23,8 @@ applies the row of the window each sample falls in.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+
 import numpy as np
 from spikeinterface.core import get_chunk_with_margin
 from spikeinterface.preprocessing.basepreprocessor import BasePreprocessor, BasePreprocessorSegment
@@ -82,9 +84,12 @@ def estimate_wire_timing_blocks(
 
     ``n_blocks`` blocks of ``block_frames`` centred at (i + 1) / (n_blocks + 1) of the window, each
     fitted with ``estimate_wire_timing``; returns (k, channels) arrays for the k blocks with at least
-    ``min_event_samples`` event samples (k may be 0). ``recording`` is bandpassed and unreferenced.
+    ``min_event_samples`` event samples (k may be 0). A window shorter than ``n_blocks`` blocks gets
+    as many as fit, at least one, so copies of one span do not count as several blocks.
+    ``recording`` is bandpassed and unreferenced.
     """
     span = end_frame - start_frame
+    n_blocks = min(n_blocks, max(1, span // block_frames))
     taus, gains = [], []
     for i in range(n_blocks):
         c = start_frame + span * (i + 1) // (n_blocks + 1)
@@ -148,29 +153,54 @@ def fill_missing_windows(timing: dict, if_none: str = "raise") -> dict:
 
 
 def estimate_wire_timing_windows(
-    recording, window_frames: int, block_frames: int, *, n_blocks: int = 6, pool_windows: int = 0,
-    min_blocks: int = 1, if_none: str = "raise", segment_index: int = 0,
+    recording, window_frames: int, block_frames: int, *, n_blocks: int = 6, pool_windows: int = 2,
+    min_blocks: int = 3, if_none: str = "identity", segment_index: int = 0, n_jobs: int = 1,
 ) -> dict:
     """Wire timing for each window of ``window_frames`` from frame 0, with ``fill_missing_windows``.
 
     Each window's row is the per-wire median over the qualifying blocks
     (``estimate_wire_timing_blocks``) of the window and of the ``pool_windows`` windows on each
-    side, NaN (then filled from the nearest window) when fewer than ``min_blocks`` qualify. The
-    default (0, 1) uses the window's own blocks only. Offsets change little over hours, and pooling
-    keeps one block inside an artefact from deciding a window that has no other qualifying block.
+    side, NaN (then filled from the nearest window) when fewer than ``min_blocks`` qualify, and
+    shift 0 and gain 1 everywhere when no window has enough (``if_none``). Offsets change little
+    over hours, and pooling keeps one block inside an artefact from deciding a window that has no
+    other qualifying block. ``pool_windows=0, min_blocks=1`` uses the window's own blocks only.
+    ``n_jobs`` windows are fitted at a time, on threads.
 
     Returns ``{"starts", "shifts", "gains", "filled"}``: the window start frames and, per window,
     each wire's shift to apply (samples), gain, and whether the row was taken from another window.
     """
     n = recording.get_num_frames(segment_index)
     starts = np.arange(0, n, window_frames, dtype=np.int64)
-    blocks = [estimate_wire_timing_blocks(recording, int(s), int(min(s + window_frames, n)), block_frames,
-                                          n_blocks=n_blocks, segment_index=segment_index) for s in starts]
+
+    def fit(s):
+        return estimate_wire_timing_blocks(recording, int(s), int(min(s + window_frames, n)), block_frames,
+                                           n_blocks=n_blocks, segment_index=segment_index)
+
+    if n_jobs > 1:
+        with ThreadPoolExecutor(n_jobs) as ex:
+            blocks = list(ex.map(fit, starts))
+    else:
+        blocks = [fit(s) for s in starts]
     rows = [pool_blocks(blocks[max(0, w - pool_windows):w + pool_windows + 1], min_blocks)
             for w in range(starts.size)]
     return fill_missing_windows(
         {"starts": starts, "shifts": np.array([r[0] for r in rows]), "gains": np.array([r[1] for r in rows])},
         if_none=if_none)
+
+
+def slice_wire_timing(timing: dict, start_frame: int, end_frame: int) -> dict:
+    """The rows of ``timing`` that cover frames ``start_frame`` to ``end_frame``, with starts from the slice's frame 0.
+
+    For referencing a crop of the recording with the timing estimated on all of it, so pooling over
+    neighbouring windows still sees the windows outside the crop.
+    """
+    starts = np.asarray(timing["starts"])
+    w0 = int(np.searchsorted(starts, start_frame, side="right") - 1)
+    w1 = int(np.searchsorted(starts, end_frame, side="left"))
+    rows = slice(max(w0, 0), max(w1, w0 + 1))
+    out = {k: np.asarray(v)[rows].copy() for k, v in timing.items() if k in ("starts", "shifts", "gains", "filled")}
+    out["starts"] = np.maximum(out["starts"] - start_frame, 0)
+    return out
 
 
 class AlignedMedianReferenceRecording(BasePreprocessor):

@@ -44,7 +44,8 @@ from spikeinterface.core import ChannelSparsity
 
 # Importing sorting also applies its MountainSort5 `_recording_segments` shim and
 # gives us the shared, deterministic preprocessing.
-from ttm.sorting import create_group_sparse_analyzer, preprocess_for_sorting
+from ttm.reference import slice_wire_timing
+from ttm.sorting import create_group_sparse_analyzer, estimate_recording_wire_timing, preprocess_for_sorting
 
 __all__ = [
     "Chunk",
@@ -145,11 +146,18 @@ def materialize_chunk(
     chunk: Chunk,
     out_binary_dir: str | pathlib.Path,
     *,
-    cmr: str = "global",
+    cmr: str = "global_aligned",
     materialize_dtype: str = "float32",
     n_jobs: int = 96,
+    wire_timing: dict | None = None,
 ):
     """Materialize bandpass+CMR for ONE chunk as a small genuine-crop binary.
+
+    With ``cmr="global_aligned"`` the chunk is referenced with ``wire_timing`` estimated on the
+    whole store (``ttm.sorting.estimate_recording_wire_timing``), sliced to the chunk, so the
+    pooling over neighbouring windows is the same as for an uncropped binary. When it is None it
+    is estimated here on the whole store; a caller materializing several chunks should estimate
+    it once and pass it.
 
     Must slice the *source zarr* (not a saved binary) and ``reset_times()`` to
     avoid the ``frame_slice`` time-vector memory pitfall -- the pitfall only bites
@@ -160,7 +168,12 @@ def materialize_chunk(
     rec = si.read_zarr(str(store_zarr))
     crop = rec.frame_slice(chunk.start_frame, chunk.end_frame)
     crop.reset_times()  # in-place: drop the (sliced) time vector before saving
-    pp = preprocess_for_sorting(crop, cmr=cmr)
+    timing = None
+    if cmr == "global_aligned":
+        if wire_timing is None:
+            wire_timing = estimate_recording_wire_timing(rec)
+        timing = slice_wire_timing(wire_timing, chunk.start_frame, chunk.end_frame)
+    pp = preprocess_for_sorting(crop, cmr=cmr, wire_timing=timing)
     return pp.save(
         format="binary",
         folder=str(out_binary_dir),
@@ -757,7 +770,7 @@ def track_span(
     cosine_min: float = 0.9,
     match_score: float = 0.5,
     delta_time: float = 0.4,
-    cmr: str = "global",
+    cmr: str = "global_aligned",
     materialize_n_jobs: int = 96,
     sort_n_jobs: int = 5,
     sorter: str = "ms5",
@@ -793,6 +806,7 @@ def track_span(
     gci = {g: group_channel_indices(rec, g) for g in groups}
 
     log(f"[track_span] {len(chunks)} chunks x {len(groups)} groups | chunk_s={chunk_s} overlap={overlap_frac}")
+    wire_timing = estimate_recording_wire_timing(rec) if cmr == "global_aligned" else None
 
     chunk_sortings: dict[int, "si.BaseSorting"] = {}
     edges: list[dict] = []
@@ -801,7 +815,7 @@ def track_span(
         t0 = time.perf_counter()
         bin_dir = work_dir / f"chunk{ch.index:03d}_bin"
         sort_dir = work_dir / f"chunk{ch.index:03d}_sort"
-        cb = materialize_chunk(store_zarr, ch, bin_dir, cmr=cmr, n_jobs=materialize_n_jobs)
+        cb = materialize_chunk(store_zarr, ch, bin_dir, cmr=cmr, n_jobs=materialize_n_jobs, wire_timing=wire_timing)
         if sorter == "ks4":
             srt = sort_chunk_ks4(cb, sort_dir, **(ks4_kwargs or {}))
         else:

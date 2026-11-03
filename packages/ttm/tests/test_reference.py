@@ -9,8 +9,9 @@ from ttm.reference import (
     AlignedMedianReferenceRecording,
     estimate_wire_timing,
     estimate_wire_timing_windows,
+    slice_wire_timing,
 )
-from ttm.sorting import preprocess_for_sorting
+from ttm.sorting import estimate_recording_wire_timing, preprocess_for_sorting
 
 FS = 30000.0
 
@@ -46,7 +47,8 @@ def test_estimate_wire_timing_recovers_relative_offsets() -> None:
 def test_aligned_reference_removes_more_of_the_common_signal_than_the_median() -> None:
     x, _, _ = _skewed()
     rec = si.NumpyRecording(x, sampling_frequency=FS)
-    timing = estimate_wire_timing_windows(rec, window_frames=x.shape[0], block_frames=x.shape[0], n_blocks=1)
+    timing = estimate_wire_timing_windows(rec, window_frames=x.shape[0], block_frames=x.shape[0], n_blocks=1,
+                                          pool_windows=0, min_blocks=1)
     aligned = AlignedMedianReferenceRecording(rec, timing["starts"], timing["shifts"], timing["gains"])
     y = aligned.get_traces()[5000:-5000]
     plain = (x - np.median(x, axis=1, keepdims=True))[5000:-5000]
@@ -73,11 +75,48 @@ def test_window_boundary_and_chunking_do_not_change_the_traces() -> None:
     np.testing.assert_allclose(sub, whole[100:200, 2:4], atol=1e-3)
 
 
-def test_global_aligned_needs_wire_timing() -> None:
-    x, _, _ = _skewed(n=6000, n_ch=4)
+def test_global_aligned_is_the_default_and_estimates_its_own_timing() -> None:
+    x, _, _ = _skewed(n=270000)
     rec = si.NumpyRecording(x, sampling_frequency=FS)
-    with pytest.raises(ValueError, match="wire_timing"):
-        preprocess_for_sorting(rec, cmr="global_aligned")
+    kw = dict(timing_window_s=3.0, timing_block_s=3.0, timing_n_jobs=2)
+    timing = estimate_recording_wire_timing(rec, window_s=3.0, block_s=3.0)
+    assert not timing["filled"].any() and np.abs(timing["shifts"]).max() > 0.1
+    auto = preprocess_for_sorting(rec, **kw).get_traces()
+    given = preprocess_for_sorting(rec, cmr="global_aligned", wire_timing=timing).get_traces()
+    np.testing.assert_allclose(auto, given, atol=1e-4)
+    glob = preprocess_for_sorting(rec, cmr="global").get_traces()
+    assert np.std(auto[5000:-5000]) < 0.5 * np.std(glob[5000:-5000])
+
+
+def test_too_few_blocks_with_events_fall_back_to_the_global_median() -> None:
+    x, _, _ = _skewed(n=60000, n_ch=4)
+    rec = si.NumpyRecording(x, sampling_frequency=FS)
+    timing = estimate_recording_wire_timing(rec)
+    np.testing.assert_allclose(timing["shifts"], 0.0)
+    np.testing.assert_allclose(timing["gains"], 1.0)
+    np.testing.assert_allclose(preprocess_for_sorting(rec).get_traces(),
+                               preprocess_for_sorting(rec, cmr="global").get_traces(), atol=1e-3)
+
+
+def test_slice_wire_timing_takes_the_rows_of_the_crop() -> None:
+    timing = {"starts": np.array([0, 10, 20, 30]), "shifts": np.arange(8.0).reshape(4, 2),
+              "gains": np.ones((4, 2)), "filled": np.zeros(4, bool)}
+    out = slice_wire_timing(timing, 15, 32)
+    assert out["starts"].tolist() == [0, 5, 15]
+    np.testing.assert_allclose(out["shifts"], timing["shifts"][1:])
+    out = slice_wire_timing(timing, 10, 20)
+    assert out["starts"].tolist() == [0] and out["shifts"].tolist() == [[2.0, 3.0]]
+
+
+def test_a_crop_with_the_sliced_timing_matches_the_whole_recording() -> None:
+    x, _, _ = _skewed(n=270000)
+    rec = si.NumpyRecording(x, sampling_frequency=FS)
+    timing = estimate_recording_wire_timing(rec, window_s=3.0, block_s=3.0)
+    timing["shifts"][1] += 0.4
+    whole = preprocess_for_sorting(rec, wire_timing=timing).get_traces()
+    a, b = 60000, 150000
+    crop = preprocess_for_sorting(rec.frame_slice(a, b), wire_timing=slice_wire_timing(timing, a, b)).get_traces()
+    np.testing.assert_allclose(crop[6000:-6000], whole[a + 6000:b - 6000], atol=1e-2)
 
 
 def test_windows_without_events_take_the_nearest_estimate() -> None:
@@ -118,9 +157,10 @@ def test_no_window_with_events_falls_back_to_the_global_median_when_asked() -> N
 def test_pooled_windows_match_the_single_window_estimate_on_steady_offsets() -> None:
     x, tau, _ = _skewed(n=135000)
     rec = si.NumpyRecording(x, sampling_frequency=FS)
-    own = estimate_wire_timing_windows(rec, window_frames=45000, block_frames=45000, n_blocks=1)
+    own = estimate_wire_timing_windows(rec, window_frames=45000, block_frames=45000, n_blocks=1,
+                                       pool_windows=0, min_blocks=1)
     pooled = estimate_wire_timing_windows(rec, window_frames=45000, block_frames=45000, n_blocks=1,
-                                          pool_windows=1)
+                                          pool_windows=1, min_blocks=1)
     assert not pooled["filled"].any()
     for t in (own, pooled):
         est = -t["shifts"]
