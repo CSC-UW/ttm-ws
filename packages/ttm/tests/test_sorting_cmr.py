@@ -50,3 +50,17 @@ def test_bad_channels_are_left_out_of_the_median_and_the_output() -> None:
     assert list(got.channel_ids) == list(np.asarray(rec.channel_ids)[keep])
     expected = bp[:, keep] - np.median(bp[:, keep], axis=1, keepdims=True)
     np.testing.assert_allclose(got.get_traces(), expected, rtol=0, atol=1e-4)
+
+
+def test_quantize_int16_rounds_and_clips() -> None:
+    import numpy as np
+    import spikeinterface as si
+
+    from ttm.sorting import quantize_int16
+
+    x = np.array([[1.4, 1.6, -1.4, -1.6, 2.5, 40000.0, -40000.0, 32767.4]], np.float32).T
+    rec = si.NumpyRecording(x.repeat(4, axis=1), sampling_frequency=30000.0)
+    q = quantize_int16(rec)
+    assert q.get_dtype() == np.int16
+    got = q.get_traces()[:, 0].tolist()
+    assert got == [1, 2, -1, -2, 2, 32767, -32768, 32767]

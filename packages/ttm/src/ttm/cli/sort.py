@@ -2,8 +2,9 @@
 
 Stages, each resumable, in ``<session>/sortings_carry/<run>/``:
 
-  binary    bandpass and aligned median reference (``preprocess_for_sorting`` defaults), written as a
-            float32 binary to ``binary/``, its wire timing to ``wire_timing.npz``
+  binary    bandpass and aligned median reference (``preprocess_for_sorting`` defaults), rounded to
+            int16 ADC counts (``quantize_int16``; ``--binary-dtype float32`` keeps float32) and
+            written to ``binary/``, its wire timing to ``wire_timing.npz``
   seed      MountainSort5 on window 0 (``seed_sort/``), the starting bank ``bank0.npz``, and the
             whitening ``whitening.npz``
   carry     the windows (``carry/spikes_wNN.npz``, ``bank_wNN.npz``), re-seed sorts in ``reseed_sorts/``
@@ -53,6 +54,8 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--whitening", default=None, help="whitening npz (key W) instead of whitening.npz")
     ap.add_argument("--reseed-sorts", default=None, help="directory of re-seed sorts instead of reseed_sorts/")
     ap.add_argument("--windows", default=None, help="carry only windows A-B (inclusive)")
+    ap.add_argument("--binary-dtype", choices=["int16", "float32"], default="int16",
+                    help="sample type of the binary stage's output")
     ap.add_argument("--keep-bad-channels", action="store_true",
                     help="keep the manifest's badChannels and badTetrodes in the reference and the sort")
     ap.add_argument("--n-jobs", type=int, default=16)
@@ -82,12 +85,13 @@ def main(argv: list[str] | None = None) -> None:
     bank_path = pathlib.Path(a.bank) if a.bank else run_dir / "bank0.npz"
     cr.write_run_info(run_dir / "carry_params.json", params, store=exp.store_path(), binary=binary,
                       dropped_channels=[str(c) for c in drop],
+                      binary_dtype=a.binary_dtype if not a.binary else "as given",
                       bad_periods=bad_path, pulses=a.pulses, bank=bank_path, whitening=whitening,
                       reseed_sorts=a.reseed_sorts or run_dir / "reseed_sorts")
     stages = ["binary", "seed", "carry", "export"] if a.stage == "all" else [a.stage]
 
     if "binary" in stages and not (binary / "binary.json").exists():
-        from ttm.sorting import estimate_recording_wire_timing, preprocess_for_sorting
+        from ttm.sorting import estimate_recording_wire_timing, preprocess_for_sorting, quantize_int16
 
         store.reset_times()
         raw = store.remove_channels(drop) if drop else store
@@ -97,10 +101,12 @@ def main(argv: list[str] | None = None) -> None:
         cr.log(f"wire timing in {(time.time() - t0) / 60:.1f} min; windows filled from a neighbour: "
                f"{np.flatnonzero(timing['filled']).tolist()}")
         pp = preprocess_for_sorting(raw, wire_timing=timing)
+        if a.binary_dtype == "int16":
+            pp = quantize_int16(pp)
         t0 = time.time()
-        pp.save(format="binary", folder=str(binary), dtype="float32", n_jobs=64, chunk_duration="1s",
+        pp.save(format="binary", folder=str(binary), dtype=a.binary_dtype, n_jobs=64, chunk_duration="1s",
                 progress_bar=False, overwrite=True)
-        cr.log(f"binary in {(time.time() - t0) / 60:.1f} min -> {binary}")
+        cr.log(f"{a.binary_dtype} binary in {(time.time() - t0) / 60:.1f} min -> {binary}")
 
     if "seed" in stages:
         rec = cr.open_sorting_recording(binary, drop)

@@ -155,6 +155,16 @@ def estimate_recording_wire_timing(
     return estimate_wire_timing_windows(rec_f, int(window_s * fs), int(block_s * fs), n_jobs=n_jobs)
 
 
+def quantize_int16(recording):
+    """``recording`` clipped to the int16 range and rounded to the nearest integer, as int16.
+
+    The clip comes first because a plain cast wraps out-of-range values; ``spre.astype`` rounds,
+    where ``save(dtype="int16")`` alone truncates. On a preprocessed recording in ADC counts the
+    error is at most half a count."""
+    info = np.iinfo(np.int16)
+    return spre.astype(spre.clip(recording, a_min=float(info.min), a_max=float(info.max)), dtype="int16")
+
+
 def materialize_preprocessed(
     store_zarr: str | pathlib.Path,
     cache_dir: str | pathlib.Path,
