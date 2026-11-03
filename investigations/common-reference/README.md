@@ -247,8 +247,8 @@ The median wire is unchanged (0.945 against 0.948, 0.984, 0.959 against
 0.958), and every window has an estimate. The TTM-003 rows the 48 h
 aligned binary was written with depart from a rolling median over five
 windows by at most 5 us and 0.1 of gain (windows 0, 2, 18, 29 and 63).
-Not yet in `ttm.reference`: pooling over neighbouring windows, and the
-global median as the fallback when a recording has no qualifying block.
+`estimate_wire_timing_windows(pool_windows=2, min_blocks=3,
+if_none="identity")` does this (not the default).
 
 This is not adaptive gain control: the gain is a fixed number per wire
 and window, and spikeinterface's `highpass_spatial_filter`, which
