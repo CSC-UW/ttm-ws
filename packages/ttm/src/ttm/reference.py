@@ -16,7 +16,8 @@ least-squares gain on that median times the median.
 Offsets drift over hours, so they are estimated per window and applied
 piecewise: ``estimate_wire_timing_windows`` returns the window starts with
 one row of shifts and gains per window (each the median over a few blocks
-spread across the window), and ``AlignedMedianReferenceRecording``
+spread across the window, optionally pooled with the neighbouring windows'
+blocks), and ``AlignedMedianReferenceRecording``
 applies the row of the window each sample falls in.
 """
 
@@ -73,16 +74,15 @@ def estimate_wire_timing(
     return tau, gain, n_event
 
 
-def estimate_wire_timing_window(
+def estimate_wire_timing_blocks(
     recording, start_frame: int, end_frame: int, block_frames: int, *, n_blocks: int = 6,
     min_event_samples: int = 3000, segment_index: int = 0,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Shifts to apply (``-tau``, samples) and gains for one window, or NaN rows.
+    """Offsets (``tau``, samples) and gains of the blocks of one window that have enough events.
 
-    ``n_blocks`` blocks of ``block_frames`` centred at (i + 1) / (n_blocks + 1) of the window; the
-    per-wire median over the blocks with at least ``min_event_samples`` event samples, so one block
-    inside an artefact does not decide the window. NaN when no block has enough events.
-    ``recording`` is bandpassed and unreferenced.
+    ``n_blocks`` blocks of ``block_frames`` centred at (i + 1) / (n_blocks + 1) of the window, each
+    fitted with ``estimate_wire_timing``; returns (k, channels) arrays for the k blocks with at least
+    ``min_event_samples`` event samples (k may be 0). ``recording`` is bandpassed and unreferenced.
     """
     span = end_frame - start_frame
     taus, gains = [], []
@@ -96,39 +96,81 @@ def estimate_wire_timing_window(
         if n_event >= min_event_samples:
             taus.append(tau)
             gains.append(gain)
-    if not taus:
-        nan = np.full(recording.get_num_channels(), np.nan)
+    n_ch = recording.get_num_channels()
+    return np.array(taus).reshape(-1, n_ch), np.array(gains).reshape(-1, n_ch)
+
+
+def estimate_wire_timing_window(
+    recording, start_frame: int, end_frame: int, block_frames: int, *, n_blocks: int = 6,
+    min_event_samples: int = 3000, segment_index: int = 0,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Shifts to apply (``-tau``, samples) and gains for one window, or NaN rows.
+
+    The per-wire median over the blocks of ``estimate_wire_timing_blocks``, so one block inside an
+    artefact does not decide the window when others qualify. NaN when no block has enough events.
+    """
+    taus, gains = estimate_wire_timing_blocks(recording, start_frame, end_frame, block_frames, n_blocks=n_blocks,
+                                              min_event_samples=min_event_samples, segment_index=segment_index)
+    return pool_blocks([(taus, gains)])
+
+
+def pool_blocks(blocks: list[tuple[np.ndarray, np.ndarray]], min_blocks: int = 1) -> tuple[np.ndarray, np.ndarray]:
+    """Shifts (``-tau``) and gains as the per-wire median over every block in ``blocks``.
+
+    ``blocks`` is a list of (taus, gains) pairs of (k, channels) arrays, as from
+    ``estimate_wire_timing_blocks``; NaN rows when fewer than ``min_blocks`` blocks are given.
+    """
+    taus = np.concatenate([t for t, _ in blocks])
+    gains = np.concatenate([g for _, g in blocks])
+    if taus.shape[0] < max(min_blocks, 1):
+        nan = np.full(taus.shape[1], np.nan)
         return nan, nan.copy()
     return -np.median(taus, axis=0), np.median(gains, axis=0)
 
 
-def fill_missing_windows(timing: dict) -> dict:
-    """Rows of NaN (windows without enough events) take the nearest window's row that has values."""
+def fill_missing_windows(timing: dict, if_none: str = "raise") -> dict:
+    """Rows of NaN (windows without enough events) take the nearest window's row that has values.
+
+    When no window has values, ``if_none="raise"`` raises ValueError and ``"identity"`` gives every
+    window shift 0 and gain 1 (the global median).
+    """
     shifts, gains = timing["shifts"].copy(), timing["gains"].copy()
-    ok = np.flatnonzero(~np.isnan(shifts).any(axis=1))
+    missing = np.isnan(shifts).any(axis=1)
+    ok = np.flatnonzero(~missing)
     if ok.size == 0:
-        raise ValueError("no window has enough common events to estimate the wire timing")
-    for w in np.flatnonzero(np.isnan(shifts).any(axis=1)):
+        if if_none != "identity":
+            raise ValueError("no window has enough common events to estimate the wire timing")
+        return {**timing, "shifts": np.zeros_like(shifts), "gains": np.ones_like(gains), "filled": missing}
+    for w in np.flatnonzero(missing):
         src = ok[np.argmin(np.abs(ok - w))]
         shifts[w], gains[w] = shifts[src], gains[src]
-    return {**timing, "shifts": shifts, "gains": gains, "filled": np.isnan(timing["shifts"]).any(axis=1)}
+    return {**timing, "shifts": shifts, "gains": gains, "filled": missing}
 
 
 def estimate_wire_timing_windows(
-    recording, window_frames: int, block_frames: int, *, n_blocks: int = 6, segment_index: int = 0
+    recording, window_frames: int, block_frames: int, *, n_blocks: int = 6, pool_windows: int = 0,
+    min_blocks: int = 1, if_none: str = "raise", segment_index: int = 0,
 ) -> dict:
-    """``estimate_wire_timing_window`` for each window of ``window_frames`` from frame 0, with
-    ``fill_missing_windows`` applied.
+    """Wire timing for each window of ``window_frames`` from frame 0, with ``fill_missing_windows``.
+
+    Each window's row is the per-wire median over the qualifying blocks
+    (``estimate_wire_timing_blocks``) of the window and of the ``pool_windows`` windows on each
+    side, NaN (then filled from the nearest window) when fewer than ``min_blocks`` qualify. The
+    default (0, 1) uses the window's own blocks only. Offsets change little over hours, and pooling
+    keeps one block inside an artefact from deciding a window that has no other qualifying block.
 
     Returns ``{"starts", "shifts", "gains", "filled"}``: the window start frames and, per window,
     each wire's shift to apply (samples), gain, and whether the row was taken from another window.
     """
     n = recording.get_num_frames(segment_index)
     starts = np.arange(0, n, window_frames, dtype=np.int64)
-    rows = [estimate_wire_timing_window(recording, int(s), int(min(s + window_frames, n)), block_frames,
-                                        n_blocks=n_blocks, segment_index=segment_index) for s in starts]
+    blocks = [estimate_wire_timing_blocks(recording, int(s), int(min(s + window_frames, n)), block_frames,
+                                          n_blocks=n_blocks, segment_index=segment_index) for s in starts]
+    rows = [pool_blocks(blocks[max(0, w - pool_windows):w + pool_windows + 1], min_blocks)
+            for w in range(starts.size)]
     return fill_missing_windows(
-        {"starts": starts, "shifts": np.array([r[0] for r in rows]), "gains": np.array([r[1] for r in rows])})
+        {"starts": starts, "shifts": np.array([r[0] for r in rows]), "gains": np.array([r[1] for r in rows])},
+        if_none=if_none)
 
 
 class AlignedMedianReferenceRecording(BasePreprocessor):

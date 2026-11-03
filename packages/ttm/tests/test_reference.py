@@ -87,3 +87,42 @@ def test_windows_without_events_take_the_nearest_estimate() -> None:
     out = fill_missing_windows({"starts": np.arange(5) * 10, "shifts": shifts, "gains": np.where(np.isnan(shifts), np.nan, 1.0)})
     np.testing.assert_allclose(out["shifts"][:, 0], [0.1, 0.1, 0.1, 0.5, 0.5])
     assert out["filled"].tolist() == [True, False, True, True, False]
+
+
+def test_pooling_over_windows_outvotes_a_single_outlier_block() -> None:
+    from ttm.reference import pool_blocks
+
+    good = (np.full((3, 2), -0.3), np.ones((3, 2)))
+    bad = (np.full((1, 2), -3.0), np.full((1, 2), 0.3))
+    empty = (np.zeros((0, 2)), np.zeros((0, 2)))
+    shift, gain = pool_blocks([bad])
+    np.testing.assert_allclose(shift, 3.0)
+    shift, gain = pool_blocks([good, bad, empty, good])
+    np.testing.assert_allclose(shift, 0.3)
+    np.testing.assert_allclose(gain, 1.0)
+    assert np.isnan(pool_blocks([bad, empty], min_blocks=3)[0]).all()
+
+
+def test_no_window_with_events_falls_back_to_the_global_median_when_asked() -> None:
+    from ttm.reference import fill_missing_windows
+
+    timing = {"starts": np.arange(3) * 10, "shifts": np.full((3, 2), np.nan), "gains": np.full((3, 2), np.nan)}
+    with pytest.raises(ValueError):
+        fill_missing_windows(timing)
+    out = fill_missing_windows(timing, if_none="identity")
+    np.testing.assert_allclose(out["shifts"], 0.0)
+    np.testing.assert_allclose(out["gains"], 1.0)
+    assert out["filled"].all()
+
+
+def test_pooled_windows_match_the_single_window_estimate_on_steady_offsets() -> None:
+    x, tau, _ = _skewed(n=135000)
+    rec = si.NumpyRecording(x, sampling_frequency=FS)
+    own = estimate_wire_timing_windows(rec, window_frames=45000, block_frames=45000, n_blocks=1)
+    pooled = estimate_wire_timing_windows(rec, window_frames=45000, block_frames=45000, n_blocks=1,
+                                          pool_windows=1)
+    assert not pooled["filled"].any()
+    for t in (own, pooled):
+        est = -t["shifts"]
+        np.testing.assert_allclose(est - est.mean(axis=1, keepdims=True), np.tile(tau - tau.mean(), (3, 1)),
+                                   atol=0.05)
