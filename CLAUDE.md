@@ -29,7 +29,7 @@
   Zarr. Do not loosen any of them without reading `docs/SETUP.md`, "Pinned
   packages". Before adding a fork pin, check whether the change is already
   upstream: the spikeinterface-gui and mountainsort5 forks both were.
-- `spikeinterface` comes from PyPI (0.105.2), not the editable upstream clone
+- `spikeinterface` comes from PyPI (0.105.4), not the editable upstream clone
   `gfys_workspace` uses. `set_probegroup` is in place and returns `None` there.
 - Every Zarr write goes through zarr 2 here: spikeinterface stores, and the
   xarray stores (`to_zarr`/`open_zarr`) that depend on the xarray pin.

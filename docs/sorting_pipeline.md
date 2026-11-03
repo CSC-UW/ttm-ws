@@ -319,7 +319,7 @@ separately, with the bank as it stands (window 0 uses the seed bank):
 1. Noise: for each template, the MAD noise of the whitened traces
    projected on the unit-length template, over six 10 s blocks evenly
    spaced through the window.
-2. Matching: circus-omp (SpikeInterface 0.105.2) on the tetrode's
+2. Matching: circus-omp (SpikeInterface 0.105.4) on the tetrode's
    whitened wires with only its own templates, other parameters at
    their defaults (stop after 5 consecutive failed passes, `omp_min_sps`
    0.1, `relative_error` 5e-5, `rank` 5, `vicinity` 2), in 1 s chunks. A fit's amplitude is its scale relative to the

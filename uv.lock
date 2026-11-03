@@ -4353,7 +4353,7 @@ wheels = [
 
 [[package]]
 name = "spikeinterface"
-version = "0.105.2"
+version = "0.105.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "neo" },
@@ -4366,9 +4366,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "zarr" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/92/dc/ea68d1fa883eac6102fdc764dab305c2a5ed8eb845e53c0dc9f52e99c348/spikeinterface-0.105.2.tar.gz", hash = "sha256:d4ca6e6366562f883f11cd0845281b7bd5ee42413ddd628d50a4d23d61d419ea", size = 979762, upload-time = "2026-10-14T10:36:51.381Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/70/ae/5e1ba4d0cd471aa90486fa34d53baa6bad38fc0ca6fb65c24d262282ae02/spikeinterface-0.105.4.tar.gz", hash = "sha256:7d6f3778988f2ee1bce43a4427db41d0a6f3b6580fb5c78668f37ebb400e94bd", size = 979504, upload-time = "2026-10-27T14:04:10.47Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/e8/f5bcd519df7f4a42007d92755a163a17f4250568a111480bc51c2f66fdc1/spikeinterface-0.105.2-py3-none-any.whl", hash = "sha256:5526e090d2fa4e3744fb8d1c47711e5c64009e59e66fe446f0088f568eb02909", size = 1204279, upload-time = "2026-10-14T10:36:49.379Z" },
+    { url = "https://files.pythonhosted.org/packages/4c/fd/78e289f738c869109f3bc7e081e583fc6487731d2d6d00293922687bf3fc/spikeinterface-0.105.4-py3-none-any.whl", hash = "sha256:96a996105cb9a4e9c9e0a8d20083d1172e03ae439fa952f0b15b9314b94fd3d0", size = 1203870, upload-time = "2026-10-27T14:04:08.663Z" },
 ]
 
 [package.optional-dependencies]
@@ -4777,7 +4777,7 @@ requires-dist = [
     { name = "probeinterface" },
     { name = "scikit-learn", marker = "extra == 'advisory'" },
     { name = "seaborn", marker = "extra == 'analysis'" },
-    { name = "spikeinterface", specifier = ">=0.105.2" },
+    { name = "spikeinterface", specifier = ">=0.105.4" },
     { name = "spikeinterface-gui", extras = ["desktop", "web"], marker = "extra == 'curation'", specifier = ">=0.14.0" },
     { name = "wavpack-numcodecs", marker = "extra == 'lossy-compression'" },
     { name = "xarray" },

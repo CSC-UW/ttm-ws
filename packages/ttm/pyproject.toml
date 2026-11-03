@@ -14,7 +14,7 @@ dependencies = [
     "pandas",
     "xarray",
     "probeinterface",
-    "spikeinterface>=0.105.2",
+    "spikeinterface>=0.105.4",
     "zarr>=2.18",
 ]
 
