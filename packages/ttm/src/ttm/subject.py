@@ -64,6 +64,9 @@ class Subject:
         return Experiment.from_toml(path, subject=self)
 
 
+OBSERVATION_KEYS = frozenset({"date", "source", "scope", "start", "end", "note"})
+
+
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class Experiment:
     """One experiment of one subject, as declared in its manifest.
@@ -72,6 +75,14 @@ class Experiment:
     ``acquisition`` is the Open Ephys session directory relative to the
     ``archive`` remote (``<SUBJECT>/<session>``). Datetime fields are naive
     ISO-8601 strings in ``timezone``, the encoding WNE uses.
+
+    ``observations`` are notes on the recording's quality and conditions, as
+    ``[[observations]]`` tables: ``note``, ``source`` (who or what made it,
+    e.g. "experimenter" or a script), ``date`` (when it was recorded), and
+    optionally ``scope`` (tetrodes or channels, e.g. ["TT14", "CH22"]) and
+    ``start``/``end`` (the interval it concerns, in the same encoding as the
+    other datetimes). ``ttm-experiment-params`` copies them to
+    ``experiment_params.json`` beside the session's derived data.
     """
 
     subject: str
@@ -86,6 +97,7 @@ class Experiment:
     novel_objects_end: str | None = None
     badChannels: list[str] = dataclasses.field(default_factory=list)
     badTetrodes: list[str] = dataclasses.field(default_factory=list)
+    observations: list[dict] = dataclasses.field(default_factory=list)
     manifest_path: pathlib.Path | None = dataclasses.field(default=None, compare=False)
 
     @classmethod
@@ -109,6 +121,11 @@ class Experiment:
             raise ManifestError(f"{path}: missing keys {sorted(missing)}")
         if raw["subject"] != subject.id:
             raise ManifestError(f"{path}: subject {raw['subject']!r} != {subject.id!r}")
+        for i, ob in enumerate(raw.get("observations", [])):
+            bad = set(ob) - OBSERVATION_KEYS
+            if bad or not {"note", "source", "date"} <= set(ob):
+                raise ManifestError(f"{path}: observation {i} needs note, source and date and takes only "
+                                    f"{sorted(OBSERVATION_KEYS)} (got {sorted(ob)})")
         return cls(**raw, manifest_path=path)
 
     # --- paths on this machine (data_root from the per-machine config) ---------

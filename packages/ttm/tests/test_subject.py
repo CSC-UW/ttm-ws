@@ -118,3 +118,19 @@ def test_stream_index_key_is_rejected(tmp_path: pathlib.Path) -> None:
     path = _write_subject(tmp_path / "subjects", oe_stream_index=1)
     with pytest.raises(sj.ManifestError, match="oe_stream_index"):
         sj.Experiment.from_toml(path)
+
+
+def test_observations_load_validate_and_reach_experiment_params(tmp_path: pathlib.Path) -> None:
+    path = _write_subject(tmp_path / "subjects")
+    path.write_text(path.read_text() + '\n[[observations]]\ndate = "2026-11-03"\nsource = "experimenter"\n'
+                    'scope = ["TT14", "TT15"]\nnote = "No spikes seen live."\n')
+    exp = sj.Experiment.from_toml(path)
+    assert exp.observations == [{"date": "2026-11-03", "source": "experimenter", "scope": ["TT14", "TT15"],
+                                 "note": "No spikes seen live."}]
+    params = ep.ExperimentParams.from_experiment(exp, t0_unix=1767279600.0)
+    out = ep.save_experiment_params(params, exp.experiment_params_path)
+    assert ep.load_experiment_params(out).observations == exp.observations
+
+    path.write_text(path.read_text() + '\n[[observations]]\nnote = "no source"\nmood = "bad"\n')
+    with pytest.raises(sj.ManifestError, match="observation 1"):
+        sj.Experiment.from_toml(path)

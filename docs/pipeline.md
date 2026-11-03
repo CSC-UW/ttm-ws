@@ -1,6 +1,6 @@
 ---
 title: Per-subject pipeline and command-line tools
-updated: 2026-10-19
+updated: 2026-11-03
 ---
 
 # Per-subject pipeline
@@ -26,6 +26,17 @@ environment. There is no default.
 `<data_root>/<subject>/<experiment>/`. Steps 1 to 6 run on the server; 7 and
 8 are hand-offs to a laptop. The library functions behind each step are in
 `packages/ttm/README.md`.
+
+## Observations
+
+Each experiment manifest can carry `[[observations]]` tables: notes on the
+recording's quality and conditions (what the experimenter saw live, which
+wires were noisy, what happened when), each with `note`, `source`, `date`
+and optionally `scope` (tetrodes or channels) and `start`/`end`. They are
+the first thing to read before curating or interpreting a recording, and
+`ttm-experiment-params` copies them to `experiment_params.json` beside
+the derived data. `subjects/ttm-003/experiments/TTM-003-48H.toml` has
+examples.
 
 ## Conversion (step 1)
 

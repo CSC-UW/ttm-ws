@@ -21,3 +21,28 @@ novel_objects_start = "2026-10-21T09:00:00"
 novel_objects_end = "2026-10-21T14:00:00"
 badChannels = ["CH22"]
 badTetrodes = []
+
+# Observations on the recording's quality and conditions (ttm.subject.Experiment).
+[[observations]]
+date = "2026-10-30"
+source = "experimenter"
+note = "Open Ephys OEPS-6571 headstage, third-generation acquisition board. Reference and ground are shorted together and tied to a cerebellar skull screw, so what the screw picks up appears on all 64 channels."
+
+[[observations]]
+date = "2026-11-02"
+source = "experimenter"
+start = "2026-10-21T09:00:00"
+end = "2026-10-21T14:00:00"
+note = "Sleep deprivation: forced wake with exploration and movement, and the experimenter's hands going in and out of the Faraday cage. A different noise profile in this interval is expected."
+
+[[observations]]
+date = "2026-11-03"
+source = "experimenter"
+scope = ["TT1", "TT2", "TT3", "TT13", "TT16"]
+note = "No spikes seen during the live recording, although the channels were not obviously bad."
+
+[[observations]]
+date = "2026-11-03"
+source = "experimenter"
+scope = ["TT14", "TT15"]
+note = "No spikes seen during the live recording, and obvious signal quality problems. A good unit from TT15 was never expected."
