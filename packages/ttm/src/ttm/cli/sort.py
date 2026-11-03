@@ -1,0 +1,124 @@
+"""``ttm-sort``: the per-tetrode carry-forward sort of one experiment (``docs/sorting_pipeline.md``).
+
+Stages, each resumable, in ``<session>/sortings_carry/<run>/``:
+
+  binary    bandpass and aligned median reference (``preprocess_for_sorting`` defaults), written as a
+            float32 binary to ``binary/``, its wire timing to ``wire_timing.npz``
+  seed      MountainSort5 on window 0 (``seed_sort/``), the starting bank ``bank0.npz``, and the
+            whitening ``whitening.npz``
+  carry     the windows (``carry/spikes_wNN.npz``, ``bank_wNN.npz``), re-seed sorts in ``reseed_sorts/``
+  export    the accepted spikes as a sorting in ``sorting/``
+  all       the four in order
+
+``carry_params.json`` records the parameters, inputs and package versions. Bad periods are read from
+the experiment's ``bad_periods/bad_periods.csv`` when it exists (``ttm-bad-periods``). Laser pulses are
+read from ``--pulses`` (CSV with ``onset_s`` and ``offset_s`` in session seconds); without it the rule
+for pulses is not applied.
+
+Example: ttm-sort all --subject TTM-003 --experiment TTM-003-48H --pulses PULSES.csv
+"""
+
+from __future__ import annotations
+
+import argparse
+import pathlib
+import time
+
+import numpy as np
+
+from ttm.cli._common import add_experiment_args, experiment_from_args, line_buffered
+
+
+def _windows(spec: str | None):
+    if spec is None:
+        return None
+    lo, hi = (int(v) for v in spec.split("-"))
+    return range(lo, hi + 1)
+
+
+def main(argv: list[str] | None = None) -> None:
+    line_buffered()
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("stage", choices=["binary", "seed", "carry", "export", "all"])
+    add_experiment_args(ap)
+    ap.add_argument("--run", default="main", help="run directory name under <session>/sortings_carry/")
+    ap.add_argument("--binary", default=None, help="an existing preprocessed binary to sort instead of binary/")
+    ap.add_argument("--pulses", default=None, help="CSV of laser pulses (onset_s, offset_s)")
+    ap.add_argument("--bad-periods", default=None, help="bad-period table (default: the experiment's)")
+    ap.add_argument("--no-bad-periods", action="store_true", help="sort without a bad-period table")
+    ap.add_argument("--bank", default=None, help="starting bank (plain templates) instead of bank0.npz")
+    ap.add_argument("--whitening", default=None, help="whitening npz (key W) instead of whitening.npz")
+    ap.add_argument("--reseed-sorts", default=None, help="directory of re-seed sorts instead of reseed_sorts/")
+    ap.add_argument("--windows", default=None, help="carry only windows A-B (inclusive)")
+    ap.add_argument("--n-jobs", type=int, default=16)
+    ap.add_argument("--workers", type=int, default=8)
+    a = ap.parse_args(argv)
+
+    import spikeinterface as si
+
+    from ttm import carry as cr
+
+    exp = experiment_from_args(a)
+    run_dir = exp.sorting_dir(a.run, subdir="sortings_carry")
+    run_dir.mkdir(parents=True, exist_ok=True)
+    params = cr.CarryParams()
+    binary = pathlib.Path(a.binary) if a.binary else run_dir / "binary"
+    bad_path = None if a.no_bad_periods else (pathlib.Path(a.bad_periods) if a.bad_periods
+                                               else exp.bad_periods_dir / "bad_periods.csv")
+    if bad_path is not None and not bad_path.exists():
+        if a.bad_periods:
+            raise FileNotFoundError(bad_path)
+        bad_path = None
+    whitening = pathlib.Path(a.whitening) if a.whitening else run_dir / "whitening.npz"
+    bank_path = pathlib.Path(a.bank) if a.bank else run_dir / "bank0.npz"
+    cr.write_run_info(run_dir / "carry_params.json", params, store=exp.store_path(), binary=binary,
+                      bad_periods=bad_path, pulses=a.pulses, bank=bank_path, whitening=whitening,
+                      reseed_sorts=a.reseed_sorts or run_dir / "reseed_sorts")
+    stages = ["binary", "seed", "carry", "export"] if a.stage == "all" else [a.stage]
+
+    if "binary" in stages and not (binary / "binary.json").exists():
+        from ttm.sorting import estimate_recording_wire_timing, preprocess_for_sorting
+
+        raw = si.read_zarr(str(exp.store_path()))
+        raw.reset_times()
+        t0 = time.time()
+        timing = estimate_recording_wire_timing(raw)
+        np.savez(run_dir / "wire_timing.npz", **timing, channel_ids=np.asarray(raw.channel_ids).astype(str))
+        cr.log(f"wire timing in {(time.time() - t0) / 60:.1f} min; windows filled from a neighbour: "
+               f"{np.flatnonzero(timing['filled']).tolist()}")
+        pp = preprocess_for_sorting(raw, wire_timing=timing)
+        t0 = time.time()
+        pp.save(format="binary", folder=str(binary), dtype="float32", n_jobs=64, chunk_duration="1s",
+                progress_bar=False, overwrite=True)
+        cr.log(f"binary in {(time.time() - t0) / 60:.1f} min -> {binary}")
+
+    if "seed" in stages:
+        rec = si.load(binary)
+        if not whitening.exists():
+            np.savez(whitening, W=cr.whitening_matrix(rec, params))
+            cr.log(f"whitening -> {whitening}")
+        if not bank_path.exists():
+            cr.seed_bank(rec, run_dir / "seed_sort", params).save(bank_path)
+            cr.log(f"seed bank -> {bank_path}")
+
+    if "carry" in stages:
+        rec = si.load(binary)
+        W = np.load(whitening)["W"]
+        groups = np.asarray(rec.get_property("group")).astype(int)
+        bank = cr.Bank.load(bank_path).whitened(W, groups)
+        fs = rec.get_sampling_frequency()
+        pulses = cr.read_pulses(a.pulses, fs) if a.pulses else None
+        bad = cr.read_bad_periods(bad_path, fs) if bad_path is not None else {}
+        cr.log(f"carry {len(bank.ids)} units; pulses {0 if pulses is None else pulses[0].size}; "
+               f"bad periods {'none' if bad_path is None else bad_path}")
+        cr.run_carry(binary, W, bank, run_dir / "carry", params=params, windows=_windows(a.windows), pulses=pulses,
+                     bad_periods=bad, reseed_dir=a.reseed_sorts or run_dir / "reseed_sorts", n_jobs=a.n_jobs,
+                     workers=a.workers)
+
+    if "export" in stages:
+        rec = si.load(binary)
+        cr.export_sorting(run_dir / "carry", run_dir / "sorting", rec.get_sampling_frequency())
+
+
+if __name__ == "__main__":
+    main()

@@ -49,7 +49,11 @@ def group_templates(templates: Templates, units: np.ndarray, channels: np.ndarra
 
 
 class PerGroupMatching(BaseTemplateMatching):
-    """One ``method`` matcher per channel group, run on the same chunk; spikes in the full bank's indices."""
+    """One ``method`` matcher per channel group, run on the same chunk; spikes in the full bank's indices.
+
+    An ``amplitudes`` method kwarg given as an (n_templates, 2) array of per-template bounds over the
+    whole bank is sliced to each group's templates; any other form is passed to every group as is.
+    """
 
     def __init__(self, recording, templates, return_output=True, method="circus-omp", group_property="group",
                  **method_kwargs):
@@ -58,13 +62,17 @@ class PerGroupMatching(BaseTemplateMatching):
         if not np.array_equal(np.asarray(templates.channel_ids), np.asarray(recording.channel_ids)):
             raise ValueError("templates and recording must have the same channels in the same order")
         unit_group = template_groups(templates, groups)
+        amps = method_kwargs.pop("amplitudes", None)
         self.parts = []
         for g in np.unique(unit_group):
             channels = np.flatnonzero(groups == g)
             units = np.flatnonzero(unit_group == g)
             sub = recording.select_channels(np.asarray(recording.channel_ids)[channels])
-            node = matching_methods[method](sub, templates=group_templates(templates, units, channels),
-                                            **method_kwargs)
+            kw = dict(method_kwargs)
+            if amps is not None:
+                a = np.asarray(amps, dtype=np.float64)
+                kw["amplitudes"] = a[units] if a.ndim == 2 else amps
+            node = matching_methods[method](sub, templates=group_templates(templates, units, channels), **kw)
             self.parts.append((channels, units, node))
         self.margin = max(node.get_margin() for _, _, node in self.parts)
 
