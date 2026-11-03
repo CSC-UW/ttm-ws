@@ -1,6 +1,6 @@
 ---
 title: Subject TTM-003
-updated: 2026-10-23
+updated: 2026-11-03
 ---
 
 # TTM-003
@@ -169,3 +169,24 @@ low-amplitude spikes from the main sort's templates;
 `capture`) has the same layout as `asis`, so `opto_tag.py` and
 `opto_population.py` run on it with `--variant capture` once `--analyzer`
 has built the analyzer.
+
+## Curation notes
+
+For the 48 h sorting made on 2026-11-03 with the pipeline of
+`docs/sorting_pipeline.md` before bad channels were removed by default
+(`sortings_seed42_pcafix/carry_A48_pt/assembled_reseed_c12`, CH22 kept).
+Unit ids are that sorting's.
+
+- TT1, TT2, TT3, TT13 and TT16 showed no spikes during the live
+  recording, and TT14 and TT15 none and obvious signal problems (manifest
+  observations). TT1 and TT2 still carry units of 1 to 2 M spikes each;
+  what they are is not established.
+- TT15 unit 42 is suspected to follow an intermittent 4.7 kHz line on
+  CH20 and CH22 (conjecture: its mean waveform has 0.57 to 0.88 of its
+  energy between 4 and 5.5 kHz, `investigations/carry-bakeoff/README.md`,
+  "The aligned reference over the 48 h").
+- The TT6 light-driven cell may be split between units 16 and 17: both
+  respond at pulse onset.
+- The templates of TT2 units 2 and 3 and TT15 units 42 and 44 end the
+  recording at cosine 0.44 or less with their window-0 templates, and TT4
+  unit 5 at 0.58; whether each still follows one cell should be checked.
