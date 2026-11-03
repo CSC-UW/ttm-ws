@@ -95,6 +95,8 @@ def main_build(argv: list[str] | None = None) -> None:
     add_experiment_args(p)
     p.add_argument("--sorting", default=DEFAULT_SORTING)
     p.add_argument("--sortings-subdir", default=DEFAULT_SORTINGS_SUBDIR)
+    p.add_argument("--sorting-folder", default="aggregated",
+                   help="Saved sorting inside the sorting's directory (default aggregated)")
     p.add_argument("--source-compressor", default=DEFAULT_SOURCE_COMPRESSOR)
     p.add_argument("--bundle", type=pathlib.Path, default=None, help="Output dir (default <session>/viz_bundle)")
     p.add_argument("--overwrite", action="store_true")
@@ -102,7 +104,7 @@ def main_build(argv: list[str] | None = None) -> None:
     exp = experiment_from_args(a)
 
     sub_lfp = exp.subsampled_lfp_path(125)
-    aggregated_dir = exp.sorting_dir(a.sorting, a.sortings_subdir) / "aggregated"
+    aggregated_dir = exp.sorting_dir(a.sorting, a.sortings_subdir) / a.sorting_folder
     bundle = a.bundle or exp.viz_bundle_dir
     bundle.mkdir(parents=True, exist_ok=True)
     print(f"Bundle -> {bundle}")
@@ -136,7 +138,7 @@ def main_build(argv: list[str] | None = None) -> None:
         spikes.write_parquet(spikes_path, compression="zstd")
     tetrode_order, boundaries = tetrode_separators(spikes)
     if boundaries is None:
-        raise ValueError("unit_ids are not tetrode-contiguous; separators would be wrong")
+        print("  unit_ids are not tetrode-contiguous: no separators; ttm-loupe splits the raster by tetrode")
     n_units = int(spikes["unit_id"].n_unique())
     print(f"  {spikes.height} spikes, {n_units} units, {len(tetrode_order)} tetrodes -> {spikes_path}")
 
@@ -148,7 +150,7 @@ def main_build(argv: list[str] | None = None) -> None:
     print("[5/5] manifest")
     manifest = {
         "subject": exp.subject, "experiment": exp.experiment, "session": exp.session,
-        "sorting": a.sorting, "sortings_subdir": a.sortings_subdir,
+        "sorting": a.sorting, "sortings_subdir": a.sortings_subdir, "sorting_folder": a.sorting_folder,
         "source_compressor": a.source_compressor,
         "created": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
         "lfp": {"fs": float(da.attrs["fs"]), "n_samples": int(da.sizes["time"]),
