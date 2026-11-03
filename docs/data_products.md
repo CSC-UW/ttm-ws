@@ -42,7 +42,7 @@ flowchart LR
         ST["<b>slice table</b><br/>CSV<br/>under 1 KB<br/>ttm-convert"]:::keep
         LFP["<b>LFP, 625 Hz</b><br/>Zarr, float32, blosc-zstd<br/>21 GB<br/>ttm-make-lfp"]:::keep
         LFP125["<b>LFP, 125 Hz, 16 leads</b><br/>Zarr, float32, blosc-zstd<br/>1.1 GB<br/>ttm-make-lfp"]:::keep
-        BP["<b>bad periods</b><br/>CSV table, npz cache<br/>0.2 MB, 2 GB<br/>ttm-bad-periods"]:::keep
+        BP["<b>bad periods</b><br/>CSV, JSON, npz cache<br/>0.2 MB, 2 GB<br/>ttm-bad-periods"]:::keep
         GBIN["<b>global-median binary</b><br/>binary, float32<br/>1.3 TB<br/>mp_baseline.py"]:::temp
     end
 
@@ -85,8 +85,8 @@ flowchart LR
     SWA --> FIG
     EMG --> FIG
     STORE --> BP
+    MAN --> BP
     STORE --> GBIN
-    GBIN --> BP
     MAN --> BIN
     STORE --> BIN
     BIN --> WT
@@ -130,8 +130,8 @@ is being tested.
 | Delta, band powers | `<experiment>/delta.idelta.zarr`, `stft_bandpowers.zarr` | Zarr, float32, blosc-lz4 | `ttm-swa all` | 625 Hz LFP | 1.1 GB, 29 MB | yes |
 | Synthetic EMG | `<experiment>/synthetic_emg_methods.zarr` | Zarr, float64, blosc-lz4 | `ttm-emg --full` | store, slice table, delta | 42 MB | yes |
 | Figures | `<experiment>/figures/` | PNG | `ttm-swa plot`, `ttm-emg` | the above | 160 MB | regenerable |
-| Bad periods | `<session>/bad_periods/` | CSV table; npz cache of the scan | `ttm-bad-periods` | store (global median, lazily) or a binary | 0.2 MB table, 2 GB cache | the table yes; the cache only to rerun thresholds |
-| Global-median binary | `<session>/sortings_seed42_pcafix/mp_baseline/binary/` | binary, float32 (ADC counts) | `mp_baseline.py` | store | 1.3 TB | only while sortings made on it are in use |
+| Bad periods | `<session>/bad_periods/` | CSV table; JSON of its input and thresholds; npz cache of the scan | `ttm-bad-periods` | store (aligned median, lazily), manifest; or a binary | 0.2 MB table, 2 GB cache | the table yes; the cache only to rerun thresholds |
+| Global-median binary | `<session>/sortings_seed42_pcafix/mp_baseline/binary/` | binary, float32 (ADC counts) | `mp_baseline.py` | store | 1.3 TB | only while sortings made on it are in use; the pipeline no longer reads it |
 | Aligned-median binary | `<run>/binary/` (TTM-003: `sortings_seed42_pcafix/mp_aligned/binary/`) | binary, float32 (ADC counts); int16 under test | `ttm-sort binary` | store, manifest | 1.3 TB | while its sorting is analysed or curated; 40 min to rewrite |
 | Wire timing | `<run>/wire_timing.npz` | npz, float64 | `ttm-sort binary` | store | 0.1 MB | yes; the binary is reproducible from it |
 | Seed sort, bank, whitening | `<run>/seed_sort/`, `bank0.npz`, `whitening.npz` | MountainSort5 folder; npz, float32 | `ttm-sort seed` | binary | 20 MB | yes |

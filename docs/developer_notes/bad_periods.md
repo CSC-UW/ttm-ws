@@ -1,13 +1,14 @@
 ---
 title: Transient bad periods per tetrode (ttm.bad_periods, ttm-bad-periods)
-updated: 2026-10-27
+updated: 2026-11-03
 status: needs_verification
 ---
 
 What `ttm.bad_periods` measures, how it decides, how the table is used by
 the sorting, and what it does not do. The driver is `ttm-bad-periods`
 (`packages/ttm/src/ttm/cli/bad_periods.py`); the sorting that uses the table
-is `subjects/ttm-003/scripts/mp_baseline.py --bad-periods`; the comparison
+is `ttm-sort carry` (`ttm.carry`), and before it was
+`subjects/ttm-003/scripts/mp_baseline.py --bad-periods`; the comparison
 with the unmasked sorting is `subjects/ttm-003/scripts/bad_periods_compare.py`.
 
 ## Why a recording-level table and not valid periods
@@ -26,13 +27,24 @@ tetrode has no data there), which is what `valid_seconds` returns.
 ## The scan
 
 `bin_stats` reads the preprocessed recording (bandpass 300 to 6000 Hz plus
-global common median reference, the sorter's input) in 60 s chunks and keeps
+the aligned median reference, the sorter's input) in 60 s chunks and keeps
 per 0.1 s bin: each wire's sum of squares, the cross-product of every
 within-tetrode wire pair (from one batched 64 x 64 Gram matrix per bin),
 each wire's largest absolute value, and its count of excursions below -5
 times its noise level. Sums aggregate exactly to any coarser bin, so the
 scan runs once. On the 48 h TTM-003 binary (1.3 TB, 64 channels) it takes
-3 minutes with 48 workers when the binary is in the page cache.
+3 minutes with 48 workers when the binary is in the page cache; a scan
+of the aligned 48 h binary took 11 minutes.
+
+`ttm-bad-periods` keeps the scan in `bin_stats_0p1s.npz` with what it was
+made from (the store or a binary, the reference, the channels left out)
+and reuses it only for the same input. Without `--binary` it references
+the store as `preprocess_for_sorting` does, which first fits the wire
+offsets (13 min on TTM-003-48H). Tables made before 2026-11-03 were
+detected on the plain median of all channels (`--cmr global`); on
+TTM-003-48H the aligned reference cut TT16's flagged time from 12399 to
+1146 s and removed TT13's and TT1's shared-signal flags
+(`investigations/carry-bakeoff/`, "Bad periods on the aligned binary").
 
 `bin_features` makes 1 s features: rms per wire, correlation per pair and
 the median correlation per tetrode. `baselines` takes a centred 30 min

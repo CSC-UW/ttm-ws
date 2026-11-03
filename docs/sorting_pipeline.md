@@ -124,9 +124,11 @@ ttm-sort all --subject TTM-003 --experiment TTM-003-48H \
 (one row per tetrode and interval: tetrode, start and end in seconds,
 `kind`, the wires involved):
 
-- Input: the store bandpassed as in step 2 and referenced to the plain
-  median of all channels at each sample (global median), without the
-  manifest's bad channels and tetrodes.
+- Input: the store bandpassed and referenced as in step 2 (aligned
+  median, offsets fitted the same way), without the manifest's bad
+  channels and tetrodes, computed from the store as it is read. When
+  step 2's binary already exists, `--binary
+  <session>/sortings_carry/<run>/binary` scans it instead.
 - Per second: each wire's rms and the tetrode's median wire-to-wire
   correlation.
 - Baselines: a centred 30 min running median of each wire's rms and of
@@ -142,6 +144,12 @@ ttm-sort all --subject TTM-003 --experiment TTM-003-48H \
 - Flagged seconds of a tetrode join into one interval when less than
   5 s apart, or when every second between them has a wire at twice its
   baseline; intervals are padded 1 s on each side.
+- `bad_periods_params.json` records the input (store or binary,
+  reference, channels left out). The scan's sums are cached in
+  `bin_stats_0p1s.npz` and reused for the same input, so thresholds can
+  be changed without rescanning.
+- Cost: from the store, 57 min (the offset fit 13 min, the scan 43 min
+  with 48 workers); from step 2's binary, 11 min.
 
 <details>
 <summary>Why</summary>
@@ -152,15 +160,23 @@ and leaves those intervals out of the template updates, so templates do
 not learn the artefact. The table is per tetrode because groups of
 tetrodes fail together for minutes while the others stay clean: on
 TTM-003-48H the flagged time per tetrode is 0.01 to 1.3 % of the
-recording, except TT16 (7.2 %), and 16 s are flagged on every tetrode.
+recording, and 18 s are flagged on every tetrode.
 
-The detector was developed on the global median before the aligned
-reference of step 2 existed. Detection on the aligned reference, the
-data the sorter reads, is being compared with it.
+The scan reads the aligned reference because that is what the sorter
+reads. The detector was first run on the plain median of all channels.
+On TTM-003-48H the aligned reference cut TT16's flagged time from
+12,399 s (7.2 %) to 1,146 s, removed the shared-signal flags of TT13
+(97 s) and nearly all of TT1's (55 to 3 s), and changed the other
+tetrodes by 6 s or less; TT3's shared-signal flags (about 1,300 s)
+remain. Leaving out CH22 (a bad channel of TT15) changes only TT15,
+whose shared-signal flags on its three remaining wires rise from 6 to
+1,067 s.
 
 Details and checks of the thresholds:
 [`docs/developer_notes/bad_periods.md`](developer_notes/bad_periods.md),
-[`docs/reports/2026-10-26_ttm003_bad_periods.md`](reports/2026-10-26_ttm003_bad_periods.md).
+[`docs/reports/2026-10-26_ttm003_bad_periods.md`](reports/2026-10-26_ttm003_bad_periods.md),
+[`investigations/carry-bakeoff/`](../investigations/carry-bakeoff/README.md)
+("Bad periods on the aligned binary").
 
 </details>
 
