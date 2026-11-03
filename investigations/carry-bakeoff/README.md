@@ -1,6 +1,6 @@
 ---
 title: Carry-forward bake-off on hybrid ground truth, TTM-003 48 h
-updated: 2026-11-02
+updated: 2026-11-03
 status: needs_verification
 ---
 
@@ -637,3 +637,82 @@ together; its effect on in-pulse recall is not measured. Joint's
 remaining precision lead on the large units is mostly GT17, where the
 question is which of two similar templates takes a spike, not whether a
 weak fit is admitted.
+
+## The aligned reference over the 48 h
+
+`run_aligned48.sh` (run 2026-11-02 to 11-03) wrote the 48 h binary with
+the aligned median (`mp_aligned/binary`), re-sorted the re-seed windows on
+it (`reseed_aligned.py`) and ran the two arms of the previous 48 h runs on
+it from the aligned seed bank: per tetrode `A48_W_s45_c50_lnb_b2` (8.4 to
+9.8 min per window) and joint with the per-tetrode rules
+`A48_W_joint_masked_s45_c50_lnb_b2` (about 3 min). `export_sorting.py`
+assembled them as `carry_A48_pt/assembled_reseed_c12` (65 units, 147.0 M
+spikes) and `carry_A48_joint_rules/assembled_reseed_c12` (65 units, 117.8
+M). `compare_aligned48.sh` scores them on the aligned binary only: tags
+`carry48_aligned_jr_pt` (`bad_periods_compare.py`, events detected on the
+aligned binary by `aligned_peaks.py`), `carry48_aligned_pt` and
+`carry48_aligned_joint_rules` (`tagged_cells_blocks.py`).
+
+Single units and spikes in clean time (M), global binary (tag
+`carry48_jr_pt`) against aligned:
+
+| | global, joint | global, per tetrode | aligned, joint | aligned, per tetrode |
+|---|---|---|---|---|
+| single units | 71 | 68 | 59 | 65 |
+| spikes in the tetrodes' bad periods | 0 | 64 | 0 | 53 |
+| clock-locked units | 7 | 7 | 8 | 9 |
+| TT1 | 1.60 | 2.84 | 0.93 | 1.84 |
+| TT2 | 1.36 | 2.48 | 1.01 | 1.99 |
+| TT3 | 0.73 | 1.30 | 0 | 0.00005 |
+| TT9 | 0.49 | 1.26 | 0.48 | 1.37 |
+| TT13 | 1.59 | 2.31 | 0.07 | 0.01 |
+| TT14 | 0.20 | 0.61 | 0 | 0.09 |
+| TT15 | 36.98 | 36.88 | 30.74 | 30.74 |
+| TT16 | 2.93 | 3.56 | 0.25 | 0.63 |
+| all | 133.5 | 161.6 | 117.8 | 147.0 |
+
+On the other tetrodes (TT4 to TT8, TT10 to TT12) the counts change by 8 %
+or less, most of them down (joint on TT7 and TT10 7 to 8 % fewer). The aligned carries claim 79.3 % (joint) and 85.5 % (per
+tetrode) of the events detected in clean time, and 98.8 and 99.2 % of
+those of 10 MAD or more; the global carries 79.2 and 84.0 %, 98.5 and
+98.9 %, of events detected on the global binary, so the two pairs are not
+counted on the same events.
+
+Onset rates (1 to 10 ms, Hz) of the units that carry the light-driven
+responses (`tagged_units.py`, `results/tagged_units_onset.csv`). The
+two seed banks number their units differently.
+
+| tetrode | global, per tetrode | aligned, per tetrode | aligned, joint |
+|---|---|---|---|
+| TT4 | unit 7, 187 to 425 in every block | unit 6, 202 to 429 in every block | unit 6, 100 to 358 in every block |
+| TT10 | unit 25, 100 to 224 in every block | unit 26, 98 to 226 in every block | unit 26, 42 to 174, 23 of 24 blocks over 50 |
+| TT11 | unit 28, 119 to 222 in every block | unit 29, 130 to 215 in every block | units 29 and 30, each over 50 in 15 of 24 blocks |
+| TT6 | unit 16, up to 238, over 50 in 6 blocks | units 16 and 17, up to 151 and 128 | units 16 and 17, up to 128 and 84 |
+
+`stamp_drift.py` with `BAKE_REFERENCE=aligned48`
+(`results/stamp_drift_aligned48.csv`): the median lag that aligns a
+unit's mean snippet with its first window's is 0 in every window for both
+carries; at 5 samples or more are one joint unit (TT2 unit 2, 5 samples)
+and two per-tetrode units on TT15 in window 94. TT15 unit 42's lag flips
+between 0 and 32 samples from window 74 and stays at 32 from window 83.
+Its mean snippet rings at about 4.7 kHz (period about 6.4 samples), so
+the lag is ambiguous by whole periods. The same holds in every sorting:
+the TT15 unit 42 of production and of the four 48 h carries has 0.57 to
+0.88 of its mean snippet's energy above 300 Hz between 4 and 5.5 kHz
+from window 48 on, against 0.21 or less for the other TT15 units but one
+(unit 40 on the aligned binary, 0.38 to 0.47). CH22 and CH20 (TT15) carry
+a line at 4702 Hz on both binaries, coherent across TT15's wires
+(envelope correlation 0.87 to 0.98 with CH22) and in bursts: in window 94
+its envelope on CH22 is 20 uV at the median and 88 uV at the 95th
+percentile of 10 ms bins, against a broadband MAD of 54 uV, and its PSD
+peak grows from 59 to 66 times the 4 to 6 kHz median between windows 0
+and 94. Conjecture: TT15 unit 42 is fitted largely to this line, and
+TT15's 31 to 37 M spikes, 21 to 28 % of each of these carries' spikes,
+include them.
+
+With the aligned reference, the per-tetrode carry keeps the global
+carry's driven-cell recovery, spike-time stability and freedom from bad
+periods. The few-unit tetrodes (TT3, TT13, TT14, TT16) lose 80 to 100 % of
+their spikes, as the hybrid predicted, while TT1 keeps 58 to 65 %, TT2
+74 to 80 % and TT9 98 to 109 %. Joint with the same rules again finds fewer of the driven
+cells' onset spikes and splits TT11's cell between two units.

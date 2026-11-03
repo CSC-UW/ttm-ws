@@ -1,0 +1,54 @@
+{
+ "table": "2026-10-20_09-02-12/bad_periods/bad_periods.csv",
+ "n_windows": 96,
+ "sortings": {
+  "joint_rules": "2026-10-20_09-02-12/sortings_seed42_pcafix/carry_A48_joint_rules/assembled_reseed_c12",
+  "per_tetrode": "2026-10-20_09-02-12/sortings_seed42_pcafix/carry_A48_pt/assembled_reseed_c12"
+ },
+ "flagged_s_per_tetrode": {
+  "TT1": 1161.0,
+  "TT2": 471.0,
+  "TT3": 2166.0,
+  "TT4": 472.0,
+  "TT5": 39.0,
+  "TT6": 21.0,
+  "TT7": 36.0,
+  "TT8": 47.0,
+  "TT9": 27.0,
+  "TT10": 30.0,
+  "TT11": 27.0,
+  "TT12": 30.0,
+  "TT13": 488.0,
+  "TT14": 2124.0,
+  "TT15": 1280.0,
+  "TT16": 12399.0
+ },
+ "joint_rules": {
+  "n_single_units": 59,
+  "single_spikes_in_flagged_time": 0,
+  "units_mostly_in_flagged_time": 0,
+  "rp_contamination_median": 0.0,
+  "rv_frac_median": 0.0,
+  "cos_median_median": 0.6875,
+  "resid_median_median": 1.938,
+  "presence_median": 1.0,
+  "units_present_after_window_1": 59,
+  "units_clock_locked": 8,
+  "clean_events_claimed_pct": 79.27,
+  "clean_events_10mad_claimed_pct": 98.81
+ },
+ "per_tetrode": {
+  "n_single_units": 65,
+  "single_spikes_in_flagged_time": 53,
+  "units_mostly_in_flagged_time": 0,
+  "rp_contamination_median": 0.0,
+  "rv_frac_median": 0.0,
+  "cos_median_median": 0.6134,
+  "resid_median_median": 2.009,
+  "presence_median": 1.0,
+  "units_present_after_window_1": 64,
+  "units_clock_locked": 9,
+  "clean_events_claimed_pct": 85.47,
+  "clean_events_10mad_claimed_pct": 99.24
+ }
+}

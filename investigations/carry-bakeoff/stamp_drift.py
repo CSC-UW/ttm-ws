@@ -11,11 +11,12 @@ the mean snippet (all four wires) with the unit's mean snippet in its first wind
 which follows the waveform whatever its sign. The mean snippets are written to
 ``<BAKE_ROOT>/review/stamp_drift_means.npz``.
 
-Sortings that are not on disk are skipped.
+Sortings that are not on disk are skipped. With ``BAKE_REFERENCE=aligned48`` the binary is the aligned
+48 h binary and the sortings are the carries made on it (``carry_A48_pt``, ``carry_A48_joint_rules``).
 
-Writes ``results/stamp_drift.csv``.
+Writes ``results/stamp_drift.csv`` (``results/stamp_drift_aligned48.csv``).
 
-Run: .venv/bin/python investigations/carry-bakeoff/stamp_drift.py
+Run: [BAKE_REFERENCE=aligned48] .venv/bin/python investigations/carry-bakeoff/stamp_drift.py
 """
 from __future__ import annotations
 
@@ -33,6 +34,10 @@ from ttm import capture as cp  # noqa: E402
 HERE = pathlib.Path(__file__).parent
 SORTS = {"production": "mp_baseline_masked", "per_tetrode": "carry_R48_pt", "joint_whitened": "carry_R48_joint",
          "joint_rules": "carry_R48_joint_rules", "per_tetrode_rc": "carry_R48_pt_rc"}
+SUFFIX = ""
+if bk.REFERENCE == "aligned48":
+    SORTS = {"aligned_per_tetrode": "carry_A48_pt", "aligned_joint_rules": "carry_A48_joint_rules"}
+    SUFFIX = "_aligned48"
 WINDOWS = (0, 24, 48, 72, 94)
 
 
@@ -66,8 +71,8 @@ def main():
         print(f"window {w} done", flush=True)
     df = pd.DataFrame(rows)
     df["align"] = [align_shift(means, r.sorting, r.unit, r.window) for r in df.itertuples()]
-    df.to_csv(HERE / "results" / "stamp_drift.csv", index=False)
-    out = bk.BAKE_ROOT / "review" / "stamp_drift_means.npz"
+    df.to_csv(HERE / "results" / f"stamp_drift{SUFFIX}.csv", index=False)
+    out = bk.BAKE_ROOT / "review" / f"stamp_drift_means{SUFFIX}.npz"
     np.savez(out, keys=np.array([f"{n}|{u}|{w}" for n, u, w in means]), T=np.stack(list(means.values())))
     summarize(df)
 

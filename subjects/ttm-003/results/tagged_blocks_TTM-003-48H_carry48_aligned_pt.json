@@ -1,0 +1,80 @@
+{
+ "name": "carry48_aligned_pt",
+ "sorting": "2026-10-20_09-02-12/sortings_seed42_pcafix/carry_A48_pt/assembled_reseed_c12",
+ "n_units": 65,
+ "n_blocks": 24,
+ "tagged": {
+  "TT6_cell": {
+   "unit": 16,
+   "cosine": 0.9527,
+   "mutual_best": true,
+   "runner_up": 0.9445,
+   "blocks_present_10_spikes": 24,
+   "median_base_hz": 11.83,
+   "median_onset_hz": 13.89,
+   "median_in_pulse_hz": 0.08,
+   "median_post_0_50_hz": 0.0,
+   "in_pulse_over_base_median": 0.007,
+   "blocks_in_pulse_over_2x_base": 3,
+   "median_reliability": 0.125,
+   "median_first_spike_ms": 3.69
+  },
+  "TT10_driven": {
+   "unit": 25,
+   "cosine": 0.8866,
+   "mutual_best": false,
+   "runner_up": 0.8563,
+   "blocks_present_10_spikes": 24,
+   "median_base_hz": 8.67,
+   "median_onset_hz": 29.21,
+   "median_in_pulse_hz": 1.29,
+   "median_post_0_50_hz": 0.33,
+   "in_pulse_over_base_median": 0.134,
+   "blocks_in_pulse_over_2x_base": 0,
+   "median_reliability": 0.254,
+   "median_first_spike_ms": 4.8
+  },
+  "TT4_candidate": {
+   "unit": 4,
+   "cosine": 0.8017,
+   "mutual_best": true,
+   "runner_up": 0.8823,
+   "blocks_present_10_spikes": 24,
+   "median_base_hz": 4.83,
+   "median_onset_hz": 23.15,
+   "median_in_pulse_hz": 0.17,
+   "median_post_0_50_hz": 0.0,
+   "in_pulse_over_base_median": 0.043,
+   "blocks_in_pulse_over_2x_base": 0,
+   "median_reliability": 0.2,
+   "median_first_spike_ms": 2.56
+  },
+  "TT11_candidate": {
+   "unit": 29,
+   "cosine": 0.9824,
+   "mutual_best": true,
+   "runner_up": 0.8679,
+   "blocks_present_10_spikes": 24,
+   "median_base_hz": 4.41,
+   "median_onset_hz": 169.44,
+   "median_in_pulse_hz": 83.91,
+   "median_post_0_50_hz": 3.0,
+   "in_pulse_over_base_median": 18.67,
+   "blocks_in_pulse_over_2x_base": 24,
+   "median_reliability": 0.875,
+   "median_first_spike_ms": 4.47
+  }
+ },
+ "population": {
+  "units_present_in_all_blocks_10_spikes": 43,
+  "median_presence_fraction": 1.0,
+  "units_suppressed_median_ratio_under_0.5": 29,
+  "units_activated_median_ratio_over_2": 4,
+  "units_unchanged": 20,
+  "profile_stability": {
+   "silence_onset_ms_iqr_median": 6.2,
+   "in_pulse_frac_iqr_median": 0.09,
+   "silence_after_offset_ms_iqr_median": 72.5
+  }
+ }
+}
