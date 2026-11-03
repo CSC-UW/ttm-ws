@@ -133,6 +133,7 @@ environment, in this order:
 | Script | Writes |
 |---|---|
 | `stim_trains.py` | `results/stimulation_trains.csv`, `results/stimulation_pulses_<session>.csv`; `results/stimulation_blocks_<session>.csv` for a session without a hand log |
+| `laser_pulses.py` | `results/laser_pulses_<session>.csv`: delivered, non-glitch pulses for `ttm-sort --pulses` |
 | `opto_blocks.py --subject TTM-003 --experiment <E> [--blocks 24,25]` | per-block artifact and MUA suppression from windows around each train: `results/opto_blocks_<E>.{csv,json}`, `figures/blocks/opto_block<NN>.png`, `figures/opto_blocks_summary.png` |
 | `channel_qc.py ... [--n-windows 12]` | per-channel std, rail fraction, MAD, crossing rate and 400 Hz comb in 60 s windows: `results/channel_qc_<E>{,_summary}.csv`, `figures/channel_qc.png` |
 | `mp_baseline.py ... [--stages ...] [--max-windows N] [--tag T] [--bad-periods CSV] [--out NAME] [--template-seed N] [--per-tetrode-matching]` | the June TTM-001 production matching-pursuit pipeline unchanged: `<session>/sortings_seed42_pcafix/mp_baseline/{binary,assembled_reseed_c12,spike_coverage.npz,assembled_prod,analyzer_prod.zarr,production_scoreboard.json,baseline_timing.json}`; `--bad-periods` sorts the same binary with a `ttm-bad-periods` table's intervals masked, `--template-seed` changes only the random spikes its templates are built from, `--per-tetrode-matching` runs circus-omp on each tetrode's channels on their own (`ttm.matching`), and `--out` names the run directory beside `mp_baseline` |
