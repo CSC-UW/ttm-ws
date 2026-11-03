@@ -55,6 +55,7 @@ of 5 and 6 MAD, whose half-size spikes no rule could find; it was replaced.
 - `fp_anatomy.py`, `rule_sweep.py`: what per tetrode's extra false
   positives are, and stricter rules applied after the run.
 - `reseed_aligned.py`, `run_aligned48.sh`: the 48 h on the aligned binary.
+- `bad_periods_aligned.py`: bad periods detected on the aligned binary.
 
 Paths are literal tononi-2 paths.
 
@@ -716,3 +717,32 @@ periods. The few-unit tetrodes (TT3, TT13, TT14, TT16) lose 80 to 100 % of
 their spikes, as the hybrid predicted, while TT1 keeps 58 to 65 %, TT2
 74 to 80 % and TT9 98 to 109 %. Joint with the same rules again finds fewer of the driven
 cells' onset spikes and splits TT11's cell between two units.
+
+### Bad periods on the aligned binary
+
+`bad_periods_aligned.py` (run 2026-11-03) ran the bad-period detector
+with its default thresholds on `mp_aligned/binary` (CH22 kept, as in
+the table it is compared with) and compared the flagged seconds per
+tetrode with the table detected on the global median
+(`bad_periods/global_median/bad_periods.csv` since 2026-11-03).
+Scan 664 s with 48 workers. Results in `results/bad_periods_aligned.csv`
+(per tetrode and kind) and `results/bad_periods_aligned_table.csv` (the
+intervals).
+
+| tetrode | global median (s) | aligned (s) | common, global | common, aligned |
+|---|---|---|---|---|
+| TT1 | 1161 | 1107 | 55 | 3 |
+| TT3 | 2166 | 2226 | 1297 | 1339 |
+| TT13 | 488 | 388 | 97 | 0 |
+| TT14 | 2124 | 2121 | 152 | 131 |
+| TT15 | 1280 | 1195 | 12 | 6 |
+| TT16 | 12399 | 1146 | 4498 | 0 |
+
+TT16's `loud` seconds fall from 7892 to 1134. The other tetrodes (TT2,
+TT4 to TT12) change by 6 s or less, and the seconds counted as `global`
+are the same on every tetrode but TT16 (9 against 12 s). Conjecture:
+most of what the global median flagged on TT16, and the shared-signal
+flags on TT1 and TT13, were the remainder of the common events that the
+aligned reference removes, and TT3's shared signal is not such a
+remainder. `ttm-bad-periods` scans the aligned reference from
+2026-11-03.
