@@ -18,7 +18,7 @@ environment. There is no default.
 | 3. LFP | `ttm-make-lfp [--subsample 125] [--check-plot]` | blosc-zstd store | `<session>.lfp.zarr` (625 Hz), `<session>.lfp.125hz.zarr` (tetrode leads) |
 | 4. SWA | `ttm-swa all` (or `inst`, `stft`, `plot`) | 625 Hz LFP, params | `delta.idelta.zarr`, `stft_bandpowers.zarr`, `figures/swa_*.png` |
 | 5. EMG | `ttm-emg --full` (default: 30 min window, plot only) | blosc-zstd store, `slice_table.csv`, `delta.idelta.zarr` | `synthetic_emg_methods.zarr`, `figures/emg_*.png` |
-| 6. Sort | `investigations/spike-sorting/97_production_pipeline.py` (the production matching-pursuit sort; not yet an entry point) | store | `<session>/sortings_seed42_pcafix/<sorting>/` |
+| 6. Sort | steps and parameters in `docs/sorting_pipeline.md`; runs from `investigations/carry-bakeoff/run_aligned48.sh` until it becomes an entry point | store, bad periods | `<session>/sortings_seed42_pcafix/<sorting>/` |
 | 7. Curate | `ttm-curation-manifest`, `ttm-fetch-bundle curation`, `ttm-curate` | analyzer + the recording it was sorted from | `curation_bundles/<sorting>.manifest.json` |
 | 8. View | `ttm-viz-bundle`, `ttm-fetch-bundle viz`, `ttm-loupe` | EMG, 125 Hz LFP, sorting | `<session>/viz_bundle/` |
 
