@@ -52,6 +52,9 @@ of 5 and 6 MAD, whose half-size spikes no rule could find; it was replaced.
   per-tetrode fits on frozen templates, against the joint runs.
 - `score.py`, `compare_carries.py`: stage B. Carries over 12 windows, scored
   per window on the ground truth and on proxies for the real units.
+- `fp_anatomy.py`, `rule_sweep.py`: what per tetrode's extra false
+  positives are, and stricter rules applied after the run.
+- `reseed_aligned.py`, `run_aligned48.sh`: the 48 h on the aligned binary.
 
 Paths are literal tononi-2 paths.
 
@@ -590,4 +593,47 @@ they are is not established.
 
 With the aligned reference per tetrode has the higher small-unit F1
 (0.811 against 0.794 re-seeded) and half-size in-pulse recall, and ties
-joint on the large units. Not run: the 48 h on the aligned binary.
+joint on the large units. The 48 h on the aligned binary runs as
+`run_aligned48.sh` (arms `A48_*`).
+
+### Where per tetrode loses precision
+
+`fp_anatomy.py` (`results/fp_anatomy.csv`) classes the accepted spikes of
+the ground-truth units in the two re-seeded arms. Per tetrode accepts
+141,112 hits that joint does not and about 149,000 false positives that
+joint does not: 123,729 with nothing near them, 23,631 within 10 samples
+of a real unit's accepted spike on the tetrode, 1,808 second fits of a
+ground-truth spike. Those spikes are weak in both arms (median snr 5.2 to
+5.8, cos_pl 0.54 to 0.57, against 10.6 and 0.75 for the hits both arms
+share), and 95 to 98 % of them have a larger accepted spike on another
+tetrode within 3 ms, as do 97 % of per tetrode's own extra hits. Of the
+large units' extra false positives, about 31,600 are GT17's (TT11, the
+unit made to resemble a real neighbour), 8,600 GT14's (TT6), 6,200 GT6's
+(TT13) and 3,500 GT1's (TT1).
+
+`rule_sweep.py` (`results/rule_sweep.csv`) applies stricter rules to the
+per-tetrode arm's accepted spikes after the run (the carry's templates
+and peeling are those of the run): floors on snr (4.5 to 6), the
+relative amplitude (0.5 to 0.7) and cos_pl (0.5 to 0.6), a floor at a
+fraction (0.3 to 0.55) of the unit's median snr, and an overlap rule that
+drops a spike within 10 samples of a larger spike of another unit of the
+tetrode when its snr is under 6, 8 or any value. None of the 155 rules is
+at or above joint on all four of small and large recall and precision.
+
+| rule | small R / P | small F1 | large R / P | large F1 |
+|---|---|---|---|---|
+| joint as run | 0.681 / 0.953 | 0.794 | 0.903 / 0.941 | 0.921 |
+| per tetrode as run | 0.732 / 0.909 | 0.811 | 0.929 / 0.905 | 0.917 |
+| overlap, snr under 8 | 0.727 / 0.917 | 0.811 | 0.923 / 0.914 | 0.918 |
+| snr 5 | 0.685 / 0.932 | 0.790 | 0.920 / 0.928 | 0.924 |
+| snr 5, overlap under 8 | 0.681 / 0.940 | 0.790 | 0.916 / 0.935 | 0.925 |
+
+A higher snr floor moves per tetrode along joint's trade of recall for
+precision; the relative floor removes almost nothing, since the large
+units' false positives are not weak against their unit. The overlap rule
+gains about 0.01 of precision for 0.004 to 0.006 of recall, and would also
+drop coincident spikes of cells on one tetrode, which the light drives
+together; its effect on in-pulse recall is not measured. Joint's
+remaining precision lead on the large units is mostly GT17, where the
+question is which of two similar templates takes a spike, not whether a
+weak fit is admitted.
