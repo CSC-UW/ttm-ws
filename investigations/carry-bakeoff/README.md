@@ -746,3 +746,48 @@ flags on TT1 and TT13, were the remainder of the common events that the
 aligned reference removes, and TT3's shared signal is not such a
 remainder. `ttm-bad-periods` scans the aligned reference from
 2026-11-03.
+
+### An int16 binary
+
+The aligned binary is float32, twice the size of the raw int16 samples
+(1.33 TB against 697 GB for TTM-003-48H). `int16_binary.py` (run
+2026-11-03) wrote windows 0 to 3 of the same preprocessing as int16
+(`sortings_carry/int16test/binary`): clipped to the int16 range, then
+rounded to the nearest count by `spikeinterface.preprocessing.astype`
+(`save(dtype="int16")` alone truncates). The rounding error is at most
+0.5 counts (0.1 uV), rms 0.29 counts, against a spike-band noise of
+about 23 counts; the largest sampled value over the 48 h is 29238
+counts. Writing the 2 h took 1.6 min with 64 jobs.
+
+`ttm-sort carry --windows 0-3` then ran on it with the inputs of
+`A48_W_s45_c50_lnb_b2` (its seed bank and whitening, CH22 kept, the
+global-median bad-period table, the same pulses), and
+`int16_compare.py` compared it fit by fit with that run. As a yardstick,
+the float32 run was repeated with only the seed of the random spike
+selection in the template rebuild changed from 0 to 1
+(`seed1_carry.py`). Window 0 of the float32 run under spikeinterface
+0.105.4 is bit-identical to the original under 0.105.2, so the
+differences below come from the dtype and the seed alone. Results in
+`results/int16_vs_float32_*.csv` and `results/seed1_vs_seed0_*.csv`.
+
+| window 3, against the float32 run | int16 | float32, seed 1 |
+|---|---|---|
+| accepted spikes, same frame and unit | 94.5 % | 94.3 % |
+| within 1 sample | 95.7 % | 95.6 % |
+| accepted spikes in total | 1347581 / 1347446 | 1347128 / 1347446 |
+| template cosine, lowest | 0.9993 | 0.9988 |
+| template difference, largest, of its peak | 4.0 % | 4.8 % |
+| largest change of a unit with over 10000 spikes | 2.8 % | 3.4 % |
+| light-driven units lost | 1 and 44 | 44 |
+
+In window 0, where both runs start from the same templates, int16
+accepts 6022 spikes the float32 run does not and loses 6117 it accepts
+(0.5 % of 1205578). Those spikes are borderline: median matched-filter
+snr 5.3 against 6.4 for the spikes both accept, and 78 % of them have a
+cosine below 0.6 (the floor is 0.5) against 31 %. The difference then
+grows over windows through the template rebuild, as it does when only
+the seed changes. Units 1 and 44 sit on the driven test's thresholds in
+window 3 (in-pulse rate 2.11 and 1.89 times the outside rate against a
+threshold of 2 for unit 1; 20 and 19 in-pulse spikes against a minimum
+of 20 for unit 44), and the float32 run itself labels them driven in
+some trains and not in others.
