@@ -12,8 +12,8 @@ the denominator of SNR, should be sampled; and whether the merge step of
 `investigations/spike-sorting/97_production_pipeline.py` has anything to
 merge.
 
-Code: `noise_levels.py`, `ccg_pairs.py`, `zero_lag.py`. Results in
-`results/`.
+Code: `noise_levels.py`, `ccg_pairs.py`, `zero_lag.py`, `double_fits.py`,
+`coincident_shape.py`. Results in `results/`.
 
 ## Noise levels
 
@@ -124,6 +124,57 @@ tetrodes, so those units follow a shared signal; this fits the absence of
 live spikes on TT1, TT2, TT3, TT13 and TT16 during the recording. Among
 TT5 to TT12 no pair across tetrodes shares spikes at zero lag, so the
 zero-lag excess within those tetrodes is not a signal common to the probe.
-Conjecture, not tested here: it is the matcher fitting one event with two
-similar templates, which would count up to 3.8 % of a unit's spikes twice.
-Looking at the residual of the coincident events would tell.
+
+## Double-counted spikes?
+
+The zero-lag excess within TT5 to TT12 looked like a known artifact of
+template matching: Kilosort sometimes fits a second template to the
+residual left after subtracting a large spike, which gives zero-lag peaks
+between units (MouseLand/Kilosort2 issue 29, "Double-counted spikes",
+2019). The Allen Institute's `ecephys_spike_sorting`
+(`kilosort_postprocessing`) removes the later spike of any pair within 5
+samples (0.166 ms) in one unit or in units whose peak channels are within 5
+channels; SpikeInterface's `remove_duplicated_spikes` does the same within
+a unit.
+
+That is not what happens here. `double_fits.py` takes up to 1,000
+coincident events (a spike of unit a with one of unit b within 3 samples)
+from each of the 18 pairs with an excess above 1 %, and from 3 pairs on the
+same tetrodes without an excess, and compares each event's waveform with a's
+mean spike, b's (shifted by the lag) and their sum, the mean spikes taken
+over spikes with no partner within 1.5 ms.
+
+- The sum is the closest of the three for 69 to 96 % of the coincident
+  events in 17 of the 18 pairs, and for 50 % in the other (units 2003 and
+  2013 on TT5). Spikes of a with no partner are closest to a's mean spike
+  69 to 94 % of the time.
+- At a's peak sample and channel, coincident events are 1.28 to 1.94 times
+  a's mean spike (2003 and 2013: 0.98); spikes without a partner are 0.89
+  to 0.99 times.
+- Amplitude alone cannot tell two spikes from one large spike of a whose
+  residual was fitted with b. `coincident_shape.py` averages each pair's
+  coincident events at their most common lag and fits that mean waveform
+  with free amplitudes. With both units' mean spikes the fit leaves 0.5 to
+  4.4 % of its energy, at amplitudes 0.68 to 1.68 for a and 0.79 to 1.36
+  for b. The better of the two single-unit fits leaves 2.9 to 45 %, 2.3 to
+  48 times as much. The control pairs' chance coincidences give the same
+  picture (0.4 to 0.8 % with both, 4.5 to 16 % with one). One large spike
+  of a would be fitted as well by a alone.
+- Laser pulses are not involved: at most 0.3 % of a pair's coincident
+  events fall within a pulse or the 50 ms after it, which cover 0.21 % of
+  the recording.
+
+So the coincident events are two waveforms at about their usual
+amplitudes, as chance coincidences are, and removing the later spike of
+each pair, as the Allen module does, would remove real spikes here. Why the
+two waveforms coincide within 0.1 ms, with a lag profile peaking on one or
+two samples, is open: two cells firing that close together, or a waveform
+the bank lacks that the matcher builds from two templates. On 23 to 62 % of
+the coincident events another unit of the tetrode also has a spike within
+1.5 ms (`results/coincident_shape.csv`); that rate was not measured for
+spikes without a partner.
+
+Within units nothing is duplicated: no unit has two spikes within 3
+samples. 173,958 intervals are exactly 45 samples (1.5 ms), the shortest
+the carry's refractory rule keeps; none is shorter and none crosses an
+1800 s window edge.
