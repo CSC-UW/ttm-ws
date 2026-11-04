@@ -516,23 +516,33 @@ Fixed:
   `return_in_uV`; on a binary whose gain is not 1, such as the int16 binary
   of step 2, the projection therefore has to come from an analyzer in ADC
   counts (`docs/plans/2026-11-04_spikeinterface_pc_metrics_pr.md`).
+- d′ and silhouette are computed on the same all-spike projections; they
+  also depend on the units' counts in a capped draw (one unit's d′ was 3.8
+  from 500 spikes per unit and 1.5 from 20,000). The nearest-neighbour
+  metrics are left out: they subsample a tetrode to 10,000 spikes in
+  order, so with every spike a unit of 1,813 spikes on a tetrode of
+  1.96 M spikes would be represented by about 9.
+- Isolation distance is reported as missing for a unit with at least as
+  many spikes as the other units on its tetrode together, where it is
+  undefined. SpikeInterface returns the distance of the farthest other
+  spike there, which on TTM-003-48H ranged from 113 to 102,604 for the four
+  such units.
+- Waveforms, templates and the PCA fit use up to 5,000 random spikes per
+  unit. Against the mean of three 20,000-spike draws, a template's largest
+  sample difference is 1.2 % of its peak for the median unit at 5,000 and
+  3.8 % at SpikeInterface's default of 500.
+- Firing rate, presence ratio, refractory violations and the amplitude
+  metrics leave out each tetrode's bad intervals, through SpikeInterface's
+  `periods` argument. The sorting has no spikes there (step 5 rejects
+  them), so counting that time would lower rates and presence.
 - Metrics, correlograms and waveforms will be computed over the whole
   recording, and also per vigilance state once the recording is sleep
   scored, so the two can be compared.
 
 Open:
 
-- How many random spikes per unit for waveforms, templates and the other
-  metrics. SpikeInterface's default is 500. Against the mean of three
-  20,000-spike draws, a template's largest sample difference is 3.8 % of
-  its peak for the median unit at 500 and 1.2 % at 5,000.
-- What to report as isolation distance for a unit with at least as many
-  spikes as the other units on its tetrode together. It is undefined in the
-  original definition; SpikeInterface returns the distance of the farthest
-  other spike.
-- Excluding bad intervals from the metrics that accept SpikeInterface's
-  `periods` argument (firing rate, presence ratio, refractory violations,
-  the amplitude metrics).
+- How the noise levels behind SNR are sampled. SpikeInterface averages
+  the MAD of 20 random 0.5 s chunks, which may fall in bad intervals.
 - Whether an earlier post-processing script applies
   (`investigations/spike-sorting/97_production_pipeline.py`). It merges
   same-tetrode units whose templates are similar (cosine 0.90 or more)
