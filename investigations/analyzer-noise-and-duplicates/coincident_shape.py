@@ -7,9 +7,8 @@ does it need both units' mean spikes?
 Per pair, the coincident events at the most common lag are averaged (aligned on a's spike). That mean
 waveform W is fitted by least squares with free amplitudes as alpha * A, beta * B (B shifted by the
 lag) and alpha * A + beta * B, where A and B are the units' mean spikes over spikes with no partner
-within 1.5 ms; the fraction of W's energy each fit leaves is reported. Every 4th spike of the
-tetrode's other units within 1.5 ms of a coincident event is a possible third spike; their count is
-reported too.
+within 1.5 ms; the fraction of W's energy each fit leaves is reported, and the mean number of the
+tetrode's other units with a spike within 1.5 ms of a's spike in those events.
 """
 
 import pathlib
