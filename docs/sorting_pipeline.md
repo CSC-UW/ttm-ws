@@ -564,11 +564,19 @@ Open:
   into one multi-unit pseudo-unit per tetrode.
 - Why same-tetrode units coincide within 0.1 ms more often than chance. On
   TTM-003-48H, 18 of 76 pairs on TT5 to TT12 do, by up to 3.8 % of the
-  smaller unit's spikes, while no pair across those tetrodes does. The
-  coincident events are two waveforms at about their usual amplitudes,
-  not one spike counted twice, so removing the later spike of each pair
-  (as the Allen Institute's Kilosort post-processing does) would remove
-  real spikes (`investigations/analyzer-noise-and-duplicates/`).
+  smaller unit's spikes, while no pair across those tetrodes does by more
+  than 0.4 %. The coincident events carry two waveforms at about their
+  usual amplitudes, not one spike counted twice, so removing the later
+  spike of each pair (as the Allen Institute's Kilosort post-processing
+  does) would not undo a double count, and where the events are two cells
+  firing together it would remove real spikes. In 8 of the pairs the rate
+  is raised about evenly across lags within 0.1 ms (the best lag less
+  than 2 times the lowest). In 8 others it peaks on 2 to 4
+  samples, and in 7 of those the mean coincident waveform keeps 1.7 to
+  4.8 % of its energy that the two units' mean spikes do not fit, against
+  0.4 to 1.4 % for chance coincidences; 2 pairs are in between. Whether
+  the sharply peaked events are a waveform the bank lacks is open
+  (`investigations/analyzer-noise-and-duplicates/`).
 
 ## 9. Curation
 
