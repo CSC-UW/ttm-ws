@@ -5,9 +5,9 @@ updated: 2026-11-04
 
 # spikeinterface: PC metrics on capped draws, and run_for_all_spikes in µV
 
-Not started. Open both once the analyzer stage of `ttm-sort` is in use,
+Not started. Open these once the analyzer stage of `ttm-sort` is in use,
 since it carries the workarounds, and check spikeinterface's current
-`main` for either first. The measurements are in
+`main` for each first. The measurements are in
 `investigations/analyzer-random-spikes/`.
 
 ## 1. run_for_all_spikes ignores return_in_uV
@@ -54,22 +54,38 @@ at 5,000 per unit (rank correlation 0.999); the largest is 6 % for
 isolation distance, and the largest L-ratio errors are on values near
 zero.
 
-Isolation distance is undefined when a unit has at least as many spikes as
-the other units on its tetrode together, but `mahalanobis_metrics` takes
-`n = min(own, other)` and returns the distance of the farthest other spike
-(113 to 102,604 on four TTM-003 units). Under a cap it also happens to
-both units of a tetrode with two units that both exceed the cap: each is
-drawn to the cap, so the value is again the farthest other spike (one
+What a PR could do: weight the neighbours' spikes by the sorting's spike
+counts in `mahalanobis_metrics`, or offer the metrics on
+`run_for_all_spikes` projections. d′ and the nearest-neighbour metrics also
+depend on the counts (one unit's d′ is 3.8 at 500 and 1.5 at 20,000) and
+would need their own treatment. The nearest-neighbour metrics subsample to
+a fixed 10,000 spikes in order, so with true proportions a small unit is
+represented by a handful of spikes.
+
+## 3. Isolation distance where it is undefined
+
+A methodological error with a small fix, separate from item 2 so it can
+land on its own: an issue together with a PR.
+
+Isolation distance is the squared Mahalanobis distance of the n-th closest
+spike of other units, n being the unit's spike count, and is undefined
+when a unit has at least as many spikes as the other units together.
+`mahalanobis_metrics` takes `n = min(own, other)` instead and returns the
+distance of the farthest other spike, a number that reads as excellent
+isolation but measures one outlying spike. On every spike of four TTM-003
+units it gave 113 to 102,604. The default capped draw makes it more
+common: on a tetrode with two units that both exceed the cap, both units
+are drawn to the same count, so both get the farthest other spike (one
 TTM-003 unit: 20.8 on every spike, 1,145 capped at 5,000).
 
-What a PR could do: weight the neighbours' spikes by the sorting's spike
-counts in `mahalanobis_metrics`; offer the metrics on `run_for_all_spikes`
-projections; return NaN where isolation distance is undefined. d′ and the
-nearest-neighbour metrics also depend on the counts (one unit's d′ is 3.8
-at 500 and 1.5 at 20,000) and would need their own treatment.
+The fix returns NaN when the unit's count is not smaller than the other
+units' count, with a test on two clusters of equal size. Before opening
+it, check the definition in Harris et al. (2001) and Schmitzer-Torbert et
+al. (2005), and whether the farthest-spike fallback was chosen on purpose
+(the git history of `pca_metrics.py`).
 
 The analyzer stage here computes L-ratio and isolation distance on every
 spike's projection (decided 2026-11-04), so it does not need the
-weighting. It still needs the ADC-counts workaround of item 1, and what it
-reports where isolation distance is undefined is open
+weighting. It still needs the ADC-counts workaround of item 1, and it
+reports isolation distance as missing where item 3 applies
 (`docs/sorting_pipeline.md`, step 8).
