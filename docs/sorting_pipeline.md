@@ -539,18 +539,36 @@ Fixed:
   recording, and also per vigilance state once the recording is sleep
   scored, so the two can be compared.
 
+- The noise levels behind SNR are the mean MAD of 2,000 random 0.5 s
+  chunks, each channel's drawn only outside its tetrode's bad intervals.
+  On TTM-003-48H that stays within 1.0 % of the mean over every clean chunk
+  on every channel in 95 % of draws. SpikeInterface's default, 20 chunks
+  from anywhere, overestimated channels of tetrodes with bad intervals by
+  up to 166 %, and averaging every chunk, bad ones included, still by up
+  to 19 % (`investigations/analyzer-noise-and-duplicates/`). The stage
+  computes these noise levels itself, since SpikeInterface's noise-level
+  extension cannot leave periods out.
+- The merge step of `investigations/spike-sorting/97_production_pipeline.py`
+  is not used. It joins same-tetrode units whose templates are similar
+  (cosine 0.90 or more) when their cross-correlogram shows a refractory
+  dip, and any pair with cosine 0.95 or more. On TTM-003-48H no
+  same-tetrode pair outside TT15 has such a dip, and the only pair it would
+  join (cosine 0.967) has a cross-correlogram of two independent units.
+
 Open:
 
-- How the noise levels behind SNR are sampled. SpikeInterface averages
-  the MAD of 20 random 0.5 s chunks, which may fall in bad intervals.
-- Whether an earlier post-processing script applies
-  (`investigations/spike-sorting/97_production_pipeline.py`). It merges
-  same-tetrode units whose templates are similar (cosine 0.90 or more)
-  when their cross-correlogram marks them as one cell. Of the large events
-  no unit claimed, it folds those that match a unit's template (cosine 0.8
-  or more) into that unit where they keep its refractory period, and pools
-  those with a weaker match (0.55 to 0.8) into one multi-unit pseudo-unit
-  per tetrode.
+- Whether the other steps of `97_production_pipeline.py` apply. Of the
+  large events no unit claimed, it folds those that match a unit's
+  template (cosine 0.8 or more) into that unit where they keep its
+  refractory period, and pools those with a weaker match (0.55 to 0.8)
+  into one multi-unit pseudo-unit per tetrode.
+- Why same-tetrode units coincide within 0.1 ms more often than chance. On
+  TTM-003-48H, 18 of 76 pairs on TT5 to TT12 do, by up to 3.8 % of the
+  smaller unit's spikes, while no pair across those tetrodes does. The
+  coincident events are two waveforms at about their usual amplitudes,
+  not one spike counted twice, so removing the later spike of each pair
+  (as the Allen Institute's Kilosort post-processing does) would remove
+  real spikes (`investigations/analyzer-noise-and-duplicates/`).
 
 ## 9. Curation
 
