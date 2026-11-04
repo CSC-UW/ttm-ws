@@ -1,6 +1,6 @@
 ---
 title: Spike sorting pipeline for 48 h tetrode recordings
-updated: 2026-11-03
+updated: 2026-11-04
 status: needs_verification
 ---
 
@@ -78,7 +78,7 @@ Run times are for TTM-003-48H on one server (Intel Xeon Platinum 8276M,
 | 5 | [Carry-forward matching](#5-carry-forward-matching) | `ttm-sort carry` | accepted spikes and updated bank per window |
 | 6 | [Re-seeding](#6-re-seeding) | `ttm-sort carry` | units added to the bank |
 | 7 | [Export](#7-export) | `ttm-sort export` | SpikeInterface sorting |
-| 8 | [Analyzer and metrics](#8-analyzer-and-metrics) | | not yet defined |
+| 8 | [Analyzer and metrics](#8-analyzer-and-metrics) | | partly defined, not yet built |
 | 9 | [Curation](#9-curation) | | not yet defined |
 
 To run it on a recording that has been through step 0 (each command
@@ -501,17 +501,46 @@ re-seeds added 19.
 Fixed:
 
 - The SortingAnalyzer is built on the binary of step 2, the data the
-  sort came from, never on another preprocessing of the session.
+  sort came from, never on another preprocessing of the session. It will
+  be a stage of `ttm-sort`; that stage is not written yet.
+- L-ratio and isolation distance are computed on the principal-component
+  projections of every spike, not on the analyzer's random draw of spikes
+  per unit. On a capped draw every unit with more spikes than the cap
+  contributes the same count, so the two metrics describe equal-sized
+  samples rather than the recording's mix of spikes and change with the
+  cap: on TTM-003-48H the median unit's capped values were 17 to 42 % off
+  the all-spike values at every cap from 500 to 20,000 spikes per unit
+  (`investigations/analyzer-random-spikes/`). Projecting all 138.7 M
+  spikes of that sorting took 2 min with 48 jobs and wrote an 11 GB file.
+  SpikeInterface's `run_for_all_spikes` reads traces without
+  `return_in_uV`; on a binary whose gain is not 1, such as the int16 binary
+  of step 2, the projection therefore has to come from an analyzer in ADC
+  counts (`docs/plans/2026-11-04_spikeinterface_pc_metrics_pr.md`).
+- Metrics, correlograms and waveforms will be computed over the whole
+  recording, and also per vigilance state once the recording is sleep
+  scored, so the two can be compared.
 
 Open:
 
-- Quality metrics (presence ratio, firing rate, isolation metrics such
-  as isolation distance and L-ratio) computed per vigilance state, which
-  needs the recording to be sleep scored, and excluding bad intervals.
-- Whether an earlier post-processing script applies: it merges units
-  whose cross-correlograms show they are one cell and labels units as
-  single or multi-unit
-  (`investigations/spike-sorting/97_production_pipeline.py`).
+- How many random spikes per unit for waveforms, templates and the other
+  metrics. SpikeInterface's default is 500. Against the mean of three
+  20,000-spike draws, a template's largest sample difference is 3.8 % of
+  its peak for the median unit at 500 and 1.2 % at 5,000.
+- What to report as isolation distance for a unit with at least as many
+  spikes as the other units on its tetrode together. It is undefined in the
+  original definition; SpikeInterface returns the distance of the farthest
+  other spike.
+- Excluding bad intervals from the metrics that accept SpikeInterface's
+  `periods` argument (firing rate, presence ratio, refractory violations,
+  the amplitude metrics).
+- Whether an earlier post-processing script applies
+  (`investigations/spike-sorting/97_production_pipeline.py`). It merges
+  same-tetrode units whose templates are similar (cosine 0.90 or more)
+  when their cross-correlogram marks them as one cell. Of the large events
+  no unit claimed, it folds those that match a unit's template (cosine 0.8
+  or more) into that unit where they keep its refractory period, and pools
+  those with a weaker match (0.55 to 0.8) into one multi-unit pseudo-unit
+  per tetrode.
 
 ## 9. Curation
 
