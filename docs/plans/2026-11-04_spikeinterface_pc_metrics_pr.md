@@ -1,9 +1,9 @@
 ---
-title: spikeinterface issues and PRs for the PC metrics and run_for_all_spikes
+title: spikeinterface issues and PRs for the PC metrics, run_for_all_spikes and noise levels
 updated: 2026-11-04
 ---
 
-# spikeinterface: PC metrics on capped draws, and run_for_all_spikes in µV
+# spikeinterface: PC metrics on capped draws, run_for_all_spikes in µV, and noise levels
 
 Not started. Open these once the analyzer stage of `ttm-sort` is in use,
 since it carries the workarounds, and check spikeinterface's current
@@ -84,8 +84,31 @@ it, check the definition in Harris et al. (2001) and Schmitzer-Torbert et
 al. (2005), and whether the farthest-spike fallback was chosen on purpose
 (the git history of `pca_metrics.py`).
 
+## 4. Noise levels average chunk MADs
+
+A question of method. Raise it in an issue before writing code.
+
+`get_noise_levels` (method "mad") takes the MAD of each random chunk and
+averages the chunks' values. The MAD is robust within a chunk, but the
+average is not: one chunk inside an artifact moves a channel's noise
+level, and with it every SNR on that channel. On the final TTM-003-48H
+binary, five calls with the default 20 chunks of 0.5 s overestimated
+channels of tetrodes with bad intervals by up to 166 %. More chunks do not
+remove it: the mean over every chunk, bad ones included, is up to 19 %
+above the mean over clean chunks. Neither `get_noise_levels` nor the
+`noise_levels` extension can leave periods out.
+
+What a PR could do: accept periods to leave out (per channel or per
+channel group), so the chunks are drawn elsewhere. A median of chunk MADs
+is robust to artifact chunks but measures something else: on TTM-003-48H
+it was 0.89 to 1.04 times the mean over clean chunks, because the noise
+level varies over 48 h. Measurements: `investigations/analyzer-noise-and-duplicates/`.
+
+## Meanwhile, in the analyzer stage
+
 The analyzer stage here computes L-ratio and isolation distance on every
 spike's projection (decided 2026-11-04), so it does not need the
-weighting. It still needs the ADC-counts workaround of item 1, and it
-reports isolation distance as missing where item 3 applies
+weighting. It still needs the ADC-counts workaround of item 1, it
+reports isolation distance as missing where item 3 applies, and it
+computes noise levels itself outside bad intervals for item 4
 (`docs/sorting_pipeline.md`, step 8).
