@@ -14,7 +14,7 @@ merge.
 
 Code: `noise_levels.py`, `ccg_pairs.py`, `zero_lag.py`, `double_fits.py`,
 `coincident_shape.py`, `third_units.py`, `consistent_waveform.py`,
-`event_refractory.py`. Results in `results/`.
+`event_refractory.py`, `leftover_waveform.py`. Results in `results/`.
 
 ## Noise levels
 
@@ -268,3 +268,63 @@ samples wide with a reproducible residual fits a waveform the template
 bank lacks (conjecture), but the residual is small, the two mean spikes
 accounting for 95 % or more of the mean waveform's energy, and could also
 come from changes in a's or b's spike shape when both fire together.
+
+## The leftover waveform
+
+`leftover_waveform.py` looks at R, what the two mean spikes leave of the
+mean coincident waveform W at the most common lag; "left" below is the
+fraction of W's energy in R. It builds the mean spikes from 2,000 spikes
+without a partner (`consistent_waveform.py` used 1,000) and averages up to
+5,000 events at the most common lag (`consistent_waveform.py` used those
+among its 3,000 events), so its fractions differ slightly: 0.8 to 4.5 % in
+the sharp pairs. Cosines below are template cosines at the best shift
+within 10 samples. With a figure path as argument, the script also draws
+the waveforms; the figures are not committed.
+
+- R's largest sample is 15 to 49 % of the peak of a's mean spike in the
+  sharp pairs. R spreads over the four channels like a's and b's mean
+  spikes, as it does in the controls (cosine of the per-channel RMS 0.86
+  to 1.00 in the sharp pairs, 0.83 to 0.99 in the controls). Its cosine
+  is at most 0.20 with the mean spike of any other unit of the tetrode,
+  and at most 0.29 with the change in a's or b's spike within bursts (the
+  mean of spikes without a partner less than 10 ms after the unit's
+  previous spike, minus the mean of those more than 50 ms after). Adding
+  that burst change to a fit that already has the first time derivatives
+  lowers left by 1.7 percentage points in 29 and 32 and by at most 0.2 in
+  the other sharp pairs.
+- In 7 of the 8 sharp pairs R, on its main channel, is largest 4 to 5
+  samples (0.13 to 0.17 ms) before a's spike and smallest 0 to 1 sample
+  before it: W has a larger positive deflection just before the trough,
+  and a trough 1.08 to 1.26 times as deep as the fit's. 2003 and 2013
+  differ (largest 5 samples after a's spike, smallest 1 after). Adding the
+  mean spikes' first and second time derivatives to the fit, which absorbs
+  a difference in width or in the blur from spike-time jitter, leaves 0.2
+  to 0.7 % in the four pairs on TT6, down from 0.8 to 2.9 %. The controls
+  leave 0.2 to 1.1 % with these terms and 0.3 to 1.2 % without. In the
+  three pairs on TT11 it leaves 1.1 to 2.2 %, down from 1.8 to 4.5 %; 32
+  and 33 (2.2 %) and 29 and 32 (1.9 %) stay above every control. 2003 and
+  2013 leave 1.1 %, down from 1.5 %.
+- One of the three controls on TT6 shows a similar R: 14 and 16, at 0.94
+  times the expected rate, largest 6 samples before a's spike and smallest
+  2 before, a trough 1.15 times as deep, left 1.1 % falling to 0.3 % with
+  the derivatives. The other two, 12 and 15 and 12 and 16, have troughs
+  1.02 times as deep and leave 0.5 and 0.3 % without the derivatives and
+  0.3 % each with them.
+- The mean of the 10 % largest of 20,000 spikes of a without a partner,
+  fitted with a's mean spike alone (amplitude 1.76 to 1.93 in the sharp
+  pairs), leaves 1.1 to 6.8 % of its energy. On TT6 adding the first and
+  second derivatives removes at most 0.1 percentage points of that, so the
+  largest spikes of those units are not narrower. In 30 and 32 it removes
+  0.7 points, about what it removes from that pair's coincident waveform.
+  The residual of the large spikes has a cosine of at most 0.20 with R.
+  Selecting on amplitude also selects noise and overlapping spikes, so this
+  is a rough calibration.
+
+So in the four sharp pairs on TT6, and in one of the three control pairs
+there, the coincident waveform has a narrower and deeper trough than the
+sum of the two mean spikes, which the largest single spikes of those units
+do not show. What narrows it is open: spike times of two summed waveforms
+may be more precise than those of single spikes, leaving their mean less
+blurred, or the events may be a narrower waveform the template bank lacks
+(both conjecture). On TT11, 32 and 33 and 29 and 32 keep 1.9 to 2.2 % that
+the derivative terms do not absorb.
