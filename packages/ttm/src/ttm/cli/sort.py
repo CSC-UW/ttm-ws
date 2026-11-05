@@ -9,7 +9,11 @@ Stages, each resumable, in ``<session>/sortings_carry/<run>/``:
             whitening ``whitening.npz``
   carry     the windows (``carry/spikes_wNN.npz``, ``bank_wNN.npz``), re-seed sorts in ``reseed_sorts/``
   export    the accepted spikes as a sorting in ``sorting/``
-  all       the four in order
+  analyzer  noise levels (``noise_levels.csv``), the multi-unit events (``multi_unit/``, cutoffs in
+            ``multi_unit/cutoffs.csv``), the sorting with one multi-unit unit per tetrode
+            (``sorting_mua/``), the all-spike PC metrics (``pc_metrics.csv``) and the SortingAnalyzer
+            (``analyzer.zarr``); ``analyzer_params.json`` records its parameters (``ttm.analyzer``)
+  all       the five in order
 
 ``carry_params.json`` records the parameters, inputs and package versions. Bad periods are read from
 the experiment's ``bad_periods/bad_periods.csv`` when it exists (``ttm-bad-periods``). The manifest's
@@ -19,6 +23,7 @@ read from ``--pulses`` (CSV with ``onset_s`` and ``offset_s`` in session seconds
 for pulses is not applied.
 
 Example: ttm-sort all --subject TTM-003 --experiment TTM-003-48H --pulses PULSES.csv
+         ttm-sort analyzer --subject TTM-003 --experiment TTM-003-48H --n-jobs 48
 """
 
 from __future__ import annotations
@@ -42,7 +47,7 @@ def _windows(spec: str | None):
 def main(argv: list[str] | None = None) -> None:
     line_buffered()
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("stage", choices=["binary", "seed", "carry", "export", "all"])
+    ap.add_argument("stage", choices=["binary", "seed", "carry", "export", "analyzer", "all"])
     add_experiment_args(ap)
     ap.add_argument("--run", default="main", help="run directory name under <session>/sortings_carry/")
     ap.add_argument("--binary", default=None, help="an existing preprocessed binary to sort instead of binary/")
@@ -60,6 +65,10 @@ def main(argv: list[str] | None = None) -> None:
                     help="keep the manifest's badChannels and badTetrodes in the reference and the sort")
     ap.add_argument("--n-jobs", type=int, default=16)
     ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--analyzer-workers", type=int, default=24,
+                    help="processes for the multi-unit windows and noise levels (one window in memory each)")
+    ap.add_argument("--keep-pc-projections", action="store_true",
+                    help="keep the all-spike PC projections (analyzer_work/all_pcs.npy)")
     a = ap.parse_args(argv)
 
     import spikeinterface as si
@@ -88,7 +97,7 @@ def main(argv: list[str] | None = None) -> None:
                       binary_dtype=a.binary_dtype if not a.binary else "as given",
                       bad_periods=bad_path, pulses=a.pulses, bank=bank_path, whitening=whitening,
                       reseed_sorts=a.reseed_sorts or run_dir / "reseed_sorts")
-    stages = ["binary", "seed", "carry", "export"] if a.stage == "all" else [a.stage]
+    stages = ["binary", "seed", "carry", "export", "analyzer"] if a.stage == "all" else [a.stage]
 
     if "binary" in stages and not (binary / "binary.json").exists():
         from ttm.sorting import estimate_recording_wire_timing, preprocess_for_sorting, quantize_int16
@@ -135,6 +144,68 @@ def main(argv: list[str] | None = None) -> None:
     if "export" in stages:
         rec = si.load(binary)
         cr.export_sorting(run_dir / "carry", run_dir / "sorting", rec.get_sampling_frequency())
+
+    if "analyzer" in stages:
+        _analyzer_stage(a, run_dir, binary, drop, bad_path)
+
+
+def _analyzer_stage(a, run_dir: pathlib.Path, binary: pathlib.Path, drop: list, bad_path) -> None:
+    import pandas as pd
+    import spikeinterface as si
+
+    from ttm import analyzer as an
+    from ttm import carry as cr
+
+    params = an.AnalyzerParams()
+    folder = run_dir / "analyzer.zarr"
+    if (folder / "extensions" / "quality_metrics").exists():
+        cr.log(f"analyzer exists: {folder}")
+        return
+    if folder.exists():
+        raise FileExistsError(f"{folder} exists without quality metrics (an interrupted build); remove it to rebuild")
+    rec = cr.open_sorting_recording(binary, drop)
+    fs = rec.get_sampling_frequency()
+    bad = cr.read_bad_periods(bad_path, fs) if bad_path is not None else {}
+    sorting_path = run_dir / "sorting"
+    an.write_params(run_dir / "analyzer_params.json", params, binary=binary, sorting=sorting_path,
+                    bad_periods=bad_path, dropped_channels=[str(c) for c in drop])
+
+    noise_csv = run_dir / "noise_levels.csv"
+    if noise_csv.exists():
+        table = pd.read_csv(noise_csv)
+        if list(table["channel"].astype(str)) != [str(c) for c in rec.channel_ids]:
+            raise ValueError(f"{noise_csv} is for other channels")
+    else:
+        t0 = time.time()
+        _, table = an.chunk_noise_levels(binary, bad, params, drop_channel_ids=drop, workers=a.analyzer_workers)
+        table.to_csv(noise_csv, index=False)
+        cr.log(f"noise levels in {time.time() - t0:.0f} s -> {noise_csv}")
+    noise = table["noise_counts"].to_numpy()
+
+    mua_dir = run_dir / "multi_unit"
+    an.run_multi_unit(binary, sorting_path, noise, bad, mua_dir, params, drop_channel_ids=drop,
+                      workers=a.analyzer_workers)
+    events, cutoffs = an.multi_unit_events(mua_dir, params)
+    cutoffs.to_csv(mua_dir / "cutoffs.csv", index=False)
+    cr.log("multi-unit cutoffs:\n" + cutoffs.round(3).to_string(index=False))
+    sorting = an.with_multi_unit(si.load(sorting_path), events)
+    sorting.save(folder=run_dir / "sorting_mua", overwrite=True)
+    sorting = si.load(run_dir / "sorting_mua")
+    periods = an.unit_periods(sorting, rec.get_num_frames(), bad)
+
+    pc_csv = run_dir / "pc_metrics.csv"
+    if pc_csv.exists():
+        pc = pd.read_csv(pc_csv).set_index("unit_id")
+    else:
+        t0 = time.time()
+        pc = an.all_spike_pc_metrics(sorting, rec, run_dir / "analyzer_work", params, n_jobs=a.n_jobs,
+                                     keep_projections=a.keep_pc_projections)
+        pc.to_csv(pc_csv)
+        cr.log(f"all-spike PC metrics in {(time.time() - t0) / 60:.1f} min -> {pc_csv}")
+
+    t0 = time.time()
+    an.build_analyzer(sorting, rec, folder, table["noise_uv"].to_numpy(), periods, pc, params, n_jobs=a.n_jobs)
+    cr.log(f"analyzer in {(time.time() - t0) / 60:.1f} min -> {folder}")
 
 
 if __name__ == "__main__":
