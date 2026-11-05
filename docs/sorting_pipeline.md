@@ -563,20 +563,57 @@ Fixed:
   unit's template, and the best template beats the next by a median
   cosine of 0.041 (`investigations/unclaimed-events/`).
 
+- Each tetrode gets one multi-unit unit, holding detected events that no
+  sorted spike claims but that look like spikes of the tetrode. Its spikes
+  are probably neural but cannot be assigned to one unit; rates per
+  tetrode pool the sorted and multi-unit units. It follows the multi-unit
+  step of `97_production_pipeline.py`, changed as below
+  (`investigations/multi-unit-gate/`).
+- Events are negative peaks at 5.5 times each channel's noise
+  (SpikeInterface "locally_exclusive", radius 40 µm), kept at 7 times or
+  more, outside the tetrode's bad intervals, with no sorted spike of the
+  tetrode within 0.5 ms. The noise is the stage's per-channel noise level
+  above, fixed for the recording. 97 measured it per 1800 s window;
+  against that, the fixed noise changes the unclaimed events per tetrode
+  of TT5 to TT12 by -14.5 to +30.3 % on TTM-003-48H, and lowers their
+  total by 0.2 %.
+- An event's score is the best cosine of its trace (1 ms before to 2 ms
+  after it, the tetrode's wires) to the templates of the tetrode's units,
+  after every sorted spike of the tetrode that reaches that trace has been
+  subtracted. Templates are made per 1800 s window: for each unit with 100
+  or more spikes in the window, the mean of up to 500 of them. Each sorted
+  spike is subtracted as its unit's mean waveform over 3.5 ms either side,
+  scaled to it by least squares. Without the subtraction a sorted spike
+  inside the trace lowers the score. On TTM-003-48H, 91 to 100 % of the
+  unclaimed events with a sorted spike 0.5 to 1.5 ms away keep a trough of
+  7 MAD or more once it is subtracted, and their scores rise. Of those
+  with a sorted spike after them only whose unsubtracted score lay between
+  the unsubtracted cutoffs losing 5 and 10 % (cutoffs as defined next),
+  91 to 99 % reach the cutoff losing 10 % after the subtraction.
+- The cutoff is set per tetrode, by the stage on each sorting: the score
+  that 5 % of the events exactly one sorted spike claims fall below,
+  scored the same way with the claiming spike kept. Those events keep
+  their units' refractory periods at every score from 0.2 up. There is no
+  upper limit; 97's limit of 0.8 would leave out events like those its
+  fold step adds. On TTM-003-48H the cutoff is 0.46 to 0.65 on TT5 to
+  TT12, against 97's fixed 0.55. The multi-unit units then hold 1.11 M
+  events, 1.18 % of the sorted spikes there and 0.02 to 3.12 Hz per
+  tetrode. One cutoff per tetrode is used rather than one per amplitude
+  band, which would admit more events of 7 to 8 MAD, where the reference
+  events score lower.
+- L-ratio, isolation distance, d′ and silhouette count the multi-unit
+  spikes among the other spikes of the tetrode.
+
 Open:
 
-- Whether the multi-unit step of `97_production_pipeline.py` applies. It
-  pools detected negative peaks of 7 MAD or more that no unit claims and
-  whose best template match is cosine 0.55 to 0.8 into one multi-unit
-  unit per tetrode. Replayed on TTM-003-48H, the multi-unit units would
-  hold 0.83 M events, 0.21 to 2.0 % of each TT5 to TT12 tetrode's sorted
-  rate, with a median amplitude of 7.63 MAD. The 0.55 to 0.8 band also holds 37 to 91 % of
-  the sorted units' own spikes of 7 MAD or more. Take the rate of the
-  multi-unit events 0.5 to 1.5 ms from the spikes of the unit they match
-  best, over their rate 20 to 50 ms away. Of the 36 units on TT5 to TT12
-  that are the best match of 200 or more such events, it is below 1 for
-  17. For 9 it is 2.06 to 5.69, above every pair of sorted units on one
-  tetrode of TT5 to TT12 (`investigations/unclaimed-events/`).
+- Whether the 7 MAD floor also applies to an event's trough after the
+  subtraction. On TTM-003-48H 5.9 % of the unclaimed events fall below it
+  then. Sorted spikes 1.5 to 3 ms before them are 4.3 to 9.0 times as
+  common as 20 to 50 ms away, and 1.5 to 3 ms after them 2.7 to 6.4 times
+  (31 and 18 times on TT9). The step 2 bandpass echoes a spike 2.33 ms
+  either side, so these may be crossings that a sorted spike's echo lifted
+  over 7 MAD (conjecture). Applying the floor leaves 1.06 M multi-unit
+  events.
 - Why some same-tetrode pairs coincide within 0.1 ms more often than
   chance. On TTM-003-48H, 18 of 76 pairs on TT5 to TT12 do by more than 1 %
   of the smaller unit's spikes (up to 3.8 %), while no pair of units on
