@@ -1,0 +1,20 @@
+{
+ "windows": 96,
+ "tt5_12": {
+  "unclaimed": 1306322,
+  "reference": 23066576,
+  "claimed_2_or_more": 3724445,
+  "unclaimed_7mad_replay": 1308865,
+  "band_0p55_0p8": 874622,
+  "band_replay": 762935,
+  "multi_unit_0p55": 970811.0,
+  "multi_unit_cut_1": 1250182.0,
+  "multi_unit_cut_5": 1112413.0,
+  "multi_unit_cut_10": 981392.0,
+  "multi_unit_res7_0p55": 923261.0,
+  "multi_unit_res7_cut_1": 1180593.0,
+  "multi_unit_res7_cut_5": 1056089.0,
+  "multi_unit_res7_cut_10": 935456.0,
+  "sorted_spikes": 94065005.0
+ }
+}

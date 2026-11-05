@@ -1,7 +1,11 @@
 """Per-tetrode cosine cutoffs for the multi-unit gate on the final TTM-003-48H sorting, from gate.py's
 per-window files.
 
-    .venv/bin/python investigations/multi-unit-gate/summarize.py <gate out dir>
+    .venv/bin/python investigations/multi-unit-gate/summarize.py <gate out dir> [--sub]
+
+With --sub, every score is the one after subtracting the neighbouring sorted spikes (gate.py), and each
+file below gets the suffix _sub. Kept counts are then also given for unclaimed events whose residual
+amplitude is 7 or more (kept_res7_*, hz_res7_*).
 
 The cutoff losing x % on a tetrode is the x-th percentile of its reference events' best cosine, so that
 a share x of the events exactly one sorted spike claims scores below it. The amplitude-matched cutoff
@@ -32,7 +36,7 @@ import sys
 
 import numpy as np
 import pandas as pd
-from gate import AFTER, BEFORE, FS, Setup
+from gate import AFTER, BEFORE, FLOOR, FS, Setup
 
 OUT = pathlib.Path(__file__).parent / "results"
 REPLAY = pathlib.Path(__file__).parents[1] / "unclaimed-events/results/tetrodes.csv"
@@ -43,6 +47,8 @@ HIST = np.linspace(-1, 1, 101)
 COINC = 9
 N_BLOCKS = 8
 LIVE = range(4, 12)
+SUB = "--sub" in sys.argv
+SFX = "_sub" if SUB else ""
 
 
 def wpct(v, w, q):
@@ -82,12 +88,15 @@ def main():
                 ev.setdefault(k[3:], []).append(z[k])
         ev.setdefault("window", []).append(np.full(n, wi, np.int16))
         bg["group"].append(z["bg_group"])
-        bg["cos"].append(z["bg_cos"])
+        bg["cos"].append(z["bg_sub_cos"] if SUB else z["bg_cos"])
         for k in ("n_events", "n_excluded", "n_overlap"):
             counts[k] = counts.get(k, 0) + z[k]
     ev = {k: np.concatenate(v) for k, v in ev.items()}
     bg = {k: np.concatenate(v) for k, v in bg.items()}
     assert len(files) == 96
+    if SUB:
+        ev["best_cos"], ev["best_uid"], ev["alpha"] = ev["sub_cos"], ev["sub_uid"], ev["sub_alpha"]
+    res7 = ev["res_amp"] >= FLOOR if "res_amp" in ev else np.ones(ev["frame"].size, bool)
 
     def observed_s(g):
         tot = sum(b - a for a, b in spans)
@@ -138,6 +147,12 @@ def main():
             row[f"kept_{name}"] = float(k.sum() / max(un.sum(), 1))
             row[f"hz_{name}"] = kept_fast(ev["frame"][k]) / obs
             row[f"background_{name}"] = float(np.mean(bgc >= c))
+            if SUB:
+                row[f"kept_res7_{name}"] = float((k & res7).sum() / max(un.sum(), 1))
+                row[f"hz_res7_{name}"] = kept_fast(ev["frame"][k & res7]) / obs
+        if "res_amp" in ev:
+            row["reference_res_below_7"] = float(np.mean(~res7[ref]))
+            row["unclaimed_res_below_7"] = float(np.mean(~res7[un]))
         o3 = ev["others"] >= 3
         row["others3_reference"] = float(np.mean(o3[ref]))
         row["others3_below_cut_5"] = float(np.mean(o3[un & (ev["best_cos"] < cuts[5])]))
@@ -178,10 +193,10 @@ def main():
 
     t = pd.DataFrame(rows)
     OUT.mkdir(exist_ok=True)
-    t.to_csv(OUT / "tetrodes.csv", index=False)
-    pd.DataFrame(amp_rows).to_csv(OUT / "by_amplitude.csv", index=False)
-    pd.DataFrame(hist_rows).to_csv(OUT / "cosine_hist.csv", index=False)
-    pd.DataFrame(band_rows).to_csv(OUT / "banded.csv", index=False)
+    t.to_csv(OUT / f"tetrodes{SFX}.csv", index=False)
+    pd.DataFrame(amp_rows).to_csv(OUT / f"by_amplitude{SFX}.csv", index=False)
+    pd.DataFrame(hist_rows).to_csv(OUT / f"cosine_hist{SFX}.csv", index=False)
+    pd.DataFrame(band_rows).to_csv(OUT / f"banded{SFX}.csv", index=False)
     live = t[t["tetrode"].isin([g + 1 for g in LIVE])]
     summary = {"windows": len(files),
                "tt5_12": {"unclaimed": int(live["unclaimed"].sum()), "reference": int(live["reference"].sum()),
@@ -190,8 +205,10 @@ def main():
                           "band_0p55_0p8": int(live["band_0p55_0p8"].sum()), "band_replay": int(live["band_replay"].sum()),
                           **{f"multi_unit_{n}": float((live[f"hz_{n}"] * live["observed_h"] * 3600).sum())
                              for n in ("0p55", "cut_1", "cut_5", "cut_10")},
+                          **({f"multi_unit_res7_{n}": float((live[f"hz_res7_{n}"] * live["observed_h"] * 3600).sum())
+                              for n in ("0p55", "cut_1", "cut_5", "cut_10")} if SUB else {}),
                           "sorted_spikes": float((live["sorted_hz"] * live["observed_h"] * 3600).sum())}}
-    (OUT / "summary.json").write_text(json.dumps(summary, indent=1))
+    (OUT / f"summary{SFX}.json").write_text(json.dumps(summary, indent=1))
     pd.set_option("display.width", 250)
     print(t.round(3).T.to_string())
     print(json.dumps(summary, indent=1))

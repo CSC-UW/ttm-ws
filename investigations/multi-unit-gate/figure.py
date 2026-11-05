@@ -1,7 +1,11 @@
 """Figures for the multi-unit gate: the cosine distributions per tetrode, and a gallery of events per
 tetrode and cosine band.
 
-    .venv/bin/python investigations/multi-unit-gate/figure.py <gate out dir> <figure dir>
+    .venv/bin/python investigations/multi-unit-gate/figure.py <gate out dir> <figure dir> [--sub]
+
+With --sub, the scores, best units, scales and gallery traces are those after subtracting the neighbouring
+sorted spikes (the residual traces), from the results files with the suffix _sub, and every figure name
+gets the suffix _sub.
 
 cosine_distributions.png, from results/: per tetrode of TT5 to TT12, the best cosine of the reference
 events (blue), the unclaimed events (black) and the background stretches (grey), each as a share per 0.02
@@ -34,6 +38,8 @@ RESULTS = pathlib.Path(__file__).parent / "results"
 GAIN = 0.195
 N_SAMP = 90
 BANDS = ((-1.0, 0.2), (0.2, 0.3), (0.3, 0.4), (0.4, 0.5), (0.5, 0.6), (0.6, 0.7), (0.7, 1.01))
+SUB = "--sub" in sys.argv
+SFX = "_sub" if SUB else ""
 ROWS = (("unclaimed, 7-9", 0, False, 4), ("unclaimed, 9+", 0, True, 2), ("reference, 7-9", 1, False, 3))
 
 
@@ -44,8 +50,8 @@ def flat(w):
 
 
 def distributions(fig_dir):
-    h = pd.read_csv(RESULTS / "cosine_hist.csv")
-    t = pd.read_csv(RESULTS / "tetrodes.csv").set_index("tetrode")
+    h = pd.read_csv(RESULTS / f"cosine_hist{SFX}.csv")
+    t = pd.read_csv(RESULTS / f"tetrodes{SFX}.csv").set_index("tetrode")
     fig, axes = plt.subplots(2, 4, figsize=(16, 7), sharex=True)
     for ax, tt in zip(axes.ravel(), range(5, 13)):
         for kind, color in (("reference", "tab:blue"), ("unclaimed", "k"), ("background", "0.6")):
@@ -64,19 +70,22 @@ def distributions(fig_dir):
     for ax in axes[:, 0]:
         ax.set_ylabel("share per 0.02")
     fig.tight_layout()
-    fig.savefig(fig_dir / "cosine_distributions.png", dpi=110)
+    fig.savefig(fig_dir / f"cosine_distributions{SFX}.png", dpi=110)
     plt.close(fig)
 
 
 def lags(fig_dir):
-    h = pd.read_csv(RESULTS / "lag_hist.csv")
+    h = pd.read_csv(RESULTS / f"lag_hist{SFX}.csv")
     fig, axes = plt.subplots(2, 4, figsize=(16, 7), sharex=True)
     colors = {"reference": "tab:blue", "unclaimed below 1 %": "0.75", "unclaimed 1 to 5 %": "0.5",
-              "unclaimed 5 to 10 %": "0.25", "unclaimed at or above 10 %": "k"}
+              "unclaimed 5 to 10 %": "0.25", "unclaimed at or above 10 %": "k",
+              "unclaimed, residual below 7": "tab:orange"}
     for ax, tt in zip(axes.ravel(), range(5, 13)):
         for kind, color in colors.items():
             s = h[(h["tetrode"] == tt) & (h["kind"] == kind)]
             s = s[s["lag"].abs() > CLAIM].dropna()
+            if s.empty:
+                continue
             for side in (s[s["lag"] < 0], s[s["lag"] > 0]):
                 ax.plot(side["lag"] / 30, side["ratio"], color=color, lw=1,
                         label=kind if side["lag"].iloc[0] > 0 else None)
@@ -88,23 +97,25 @@ def lags(fig_dir):
     for ax in axes[:, 0]:
         ax.set_ylabel("spikes per lag / rate at 20-50 ms")
     fig.tight_layout()
-    fig.savefig(fig_dir / "lags.png", dpi=110)
+    fig.savefig(fig_dir / f"lags{SFX}.png", dpi=110)
     plt.close(fig)
 
 
 def galleries(d, fig_dir):
-    t = pd.read_csv(RESULTS / "tetrodes.csv").set_index("tetrode")
+    t = pd.read_csv(RESULTS / f"tetrodes{SFX}.csv").set_index("tetrode")
     st = Setup()
     keys = ("group", "claims", "amp", "best_cos", "others", "alpha", "best_uid", "frame")
+    src = {"best_cos": "sub_cos", "alpha": "sub_alpha", "best_uid": "sub_uid"} if SUB else {}
     sn = {k: [] for k in keys + ("trace", "tmpl")}
     for f in sorted(d.glob("w*.npz")):
         z = np.load(f)
         i = z["snip_idx"]
         for k in keys:
-            sn[k].append(z[f"ev_{k}"][i])
-        sn["trace"].append(z["snip"].astype(np.float32))
+            sn[k].append(z[f"ev_{src.get(k, k)}"][i])
+        sn["trace"].append(z["snip_res" if SUB else "snip"].astype(np.float32))
         tid = {int(u): j for j, u in enumerate(z["tmpl_ids"])}
-        sn["tmpl"].append(z["tmpl_T"][[tid[int(u)] for u in z["ev_best_uid"][i]]] * z["ev_alpha"][i][:, None, None])
+        uid, alpha = z[f"ev_{src.get('best_uid', 'best_uid')}"][i], z[f"ev_{src.get('alpha', 'alpha')}"][i]
+        sn["tmpl"].append(z["tmpl_T"][[tid[int(u)] for u in uid]] * alpha[:, None, None])
     sn = {k: np.concatenate(v) for k, v in sn.items()}
     rng = np.random.default_rng(0)
     x = np.arange(4 * (N_SAMP + 2))
@@ -147,10 +158,11 @@ def galleries(d, fig_dir):
                     ax.text(0.01, 0.02, f"{sn['amp'][e]:.1f}, cos {sn['best_cos'][e]:.2f}, +{sn['others'][e]}",
                             transform=ax.transAxes, fontsize=6)
                 row += n
-        fig.suptitle(f"TT{tt}: unclaimed (black) and reference (blue) events by best cosine; best template "
+        what = "residual traces after subtracting the neighbouring sorted spikes, " if SUB else ""
+        fig.suptitle(f"TT{tt}: unclaimed (black) and reference (blue) events by best cosine; {what}best template "
                      "scaled to the event (red); amplitude in noise units, cosine, other tetrodes", fontsize=9)
         fig.tight_layout()
-        fig.savefig(fig_dir / f"gallery_TT{tt}.png", dpi=100)
+        fig.savefig(fig_dir / f"gallery{SFX}_TT{tt}.png", dpi=100)
         plt.close(fig)
 
 

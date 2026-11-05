@@ -1,7 +1,10 @@
 """Whether the events in each band of best cosine respect a unit's refractory period, from gate.py's
 per-window files.
 
-    .venv/bin/python investigations/multi-unit-gate/refractory.py <gate out dir>
+    .venv/bin/python investigations/multi-unit-gate/refractory.py <gate out dir> [--sub]
+
+With --sub, the best cosine and unit are those after subtracting the neighbouring sorted spikes, and the
+file gets the suffix _sub.
 
 For a reference event the unit is the one whose spike claims it; for an unclaimed event, the unit whose
 template it matches best. The ratio is the unit's spikes 0.5 to 1.5 ms from the event (either side), per
@@ -25,6 +28,8 @@ from gate import CLAIM, Setup
 OUT = pathlib.Path(__file__).parent / "results"
 NEAR, BASE = (16, 45), (600, 1500)
 ALIGN = 2
+SUB = "--sub" in sys.argv
+SFX = "_sub" if SUB else ""
 BANDS = ((-1.0, 0.2), (0.2, 0.3), (0.3, 0.4), (0.4, 0.5), (0.5, 0.6), (0.6, 0.7), (0.7, 1.01))
 
 
@@ -38,7 +43,7 @@ def count(train, frames, lo, hi):
 def main():
     d = pathlib.Path(sys.argv[1])
     st = Setup()
-    keys = ("frame", "group", "claims", "own", "best_uid", "best_cos")
+    keys = ("frame", "group", "claims", "own", "best_uid", "best_cos") + (("sub_uid", "sub_cos") if SUB else ())
     ev = {k: [] for k in keys}
     for f in sorted(d.glob("w*.npz")):
         z = np.load(f)
@@ -46,6 +51,8 @@ def main():
         for k in keys:
             ev[k].append(z[f"ev_{k}"][m])
     ev = {k: np.concatenate(v) for k, v in ev.items()}
+    if SUB:
+        ev["best_uid"], ev["best_cos"] = ev["sub_uid"], ev["sub_cos"]
     unit = np.where(ev["claims"] == 1, ev["own"], ev["best_uid"])
     dt = np.zeros(unit.size, np.int64)
     for g, p in st.pool_f.items():
@@ -73,7 +80,7 @@ def main():
                              "ratio": (n_near / width[NEAR]) / (n_base / width[BASE]) if n_base else np.nan,
                              "aligned_within_2": float(aligned[m].mean()) if claims and m.any() else np.nan})
     t = pd.DataFrame(rows)
-    t.to_csv(OUT / "refractory_by_cosine.csv", index=False)
+    t.to_csv(OUT / f"refractory_by_cosine{SFX}.csv", index=False)
     live = t[t["tetrode"].between(5, 12)]
     print(live.pivot_table(index=["tetrode", "kind"], columns="cos_lo", values="ratio").round(2).to_string())
     print(live.pivot_table(index=["tetrode", "kind"], columns="cos_lo", values="events").to_string())

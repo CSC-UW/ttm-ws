@@ -1,7 +1,11 @@
 """How the sorted spikes of a tetrode fall around its unclaimed and reference events, from gate.py's
 per-window files.
 
-    .venv/bin/python investigations/multi-unit-gate/lags.py <gate out dir>
+    .venv/bin/python investigations/multi-unit-gate/lags.py <gate out dir> [--sub]
+
+With --sub, events are grouped by their score after subtracting the neighbouring sorted spikes, against
+the cutoffs in results/tetrodes_sub.csv; unclaimed events whose residual amplitude is below 7 form their
+own group and leave the others; the files get the suffix _sub.
 
 For each event, the sorted spikes of its tetrode at each lag from -3 to 3 ms (lag = spike minus event,
 so positive lags are spikes after the event) and at 20 to 50 ms on either side. Within 0.5 ms a reference
@@ -21,18 +25,20 @@ import sys
 
 import numpy as np
 import pandas as pd
-from gate import CLAIM, Setup
+from gate import CLAIM, FLOOR, Setup
 
 OUT = pathlib.Path(__file__).parent / "results"
 MAX_LAG, NEAR = 90, 45
 BASE = (600, 1500)
+SUB = "--sub" in sys.argv
+SFX = "_sub" if SUB else ""
 
 
 def main():
     d = pathlib.Path(sys.argv[1])
     st = Setup()
-    cuts = pd.read_csv(OUT / "tetrodes.csv").set_index("tetrode")[["cut_1", "cut_5", "cut_10"]]
-    keys = ("frame", "group", "claims", "best_cos")
+    cuts = pd.read_csv(OUT / f"tetrodes{SFX}.csv").set_index("tetrode")[["cut_1", "cut_5", "cut_10"]]
+    keys = ("frame", "group", "claims", "best_cos") + (("sub_cos", "res_amp") if SUB else ())
     ev = {k: [] for k in keys}
     for f in sorted(d.glob("w*.npz")):
         z = np.load(f)
@@ -40,16 +46,22 @@ def main():
         for k in keys:
             ev[k].append(z[f"ev_{k}"][m])
     ev = {k: np.concatenate(v) for k, v in ev.items()}
+    if SUB:
+        ev["best_cos"] = ev["sub_cos"]
     rows, hist_rows = [], []
     for g in sorted(np.unique(ev["group"]).tolist()):
         p = st.pool_f[g]
         on = ev["group"] == g
         un = on & (ev["claims"] == 0)
+        low = un & (ev["res_amp"] < FLOOR) if SUB else np.zeros(un.size, bool)
+        un &= ~low
         c1, c5, c10 = cuts.loc[g + 1]
         c = ev["best_cos"]
         kinds = {"reference": on & (ev["claims"] == 1), "unclaimed below 1 %": un & (c < c1),
                  "unclaimed 1 to 5 %": un & (c >= c1) & (c < c5), "unclaimed 5 to 10 %": un & (c >= c5) & (c < c10),
                  "unclaimed at or above 10 %": un & (c >= c10)}
+        if SUB:
+            kinds["unclaimed, residual below 7"] = low
         for kind, m in kinds.items():
             fr = ev["frame"][m]
             if fr.size == 0:
@@ -80,8 +92,8 @@ def main():
                            "ratio": c / fr.size / per_sample if abs(lg) > CLAIM else np.nan}
                           for lg, c in zip(lags, h)]
     t = pd.DataFrame(rows)
-    t.to_csv(OUT / "lags.csv", index=False)
-    pd.DataFrame(hist_rows).to_csv(OUT / "lag_hist.csv", index=False)
+    t.to_csv(OUT / f"lags{SFX}.csv", index=False)
+    pd.DataFrame(hist_rows).to_csv(OUT / f"lag_hist{SFX}.csv", index=False)
     pd.set_option("display.width", 200)
     print(t[t["tetrode"].between(5, 12)].round(3).to_string(index=False))
 

@@ -22,7 +22,7 @@ analyzer stage (`docs/sorting_pipeline.md`, step 8). The replay of 97's
 steps on the same sorting is in `investigations/unclaimed-events/`.
 
 Code: `gate.py`, `summarize.py`, `refractory.py`, `lags.py`, `figure.py`,
-`overlaps.py`.
+`overlaps.py`, `neighbours.py`.
 Results in `results/`.
 
 ## Method
@@ -257,6 +257,93 @@ event matches the neighbour's own unit, one cell would have fired twice
 within 0.5 to 1.5 ms, inside its refractory period, if both came from it; a
 second cell with a similar waveform would also fit (conjecture).
 
+## Scoring every event after the subtraction
+
+`gate.py` also scores every event and background stretch after the
+subtraction: each unit's template is extended to 3.5 ms either side from
+the same spikes, units with fewer than 100 spikes in the window get one
+from all their spikes for the subtraction only, and a spike within 0.5 ms of
+the event is not subtracted. The scores before the subtraction are
+identical to those of the earlier run. `summarize.py`, `refractory.py`,
+`lags.py` and `figure.py` take `--sub` to use the scores after the
+subtraction and write files ending in `_sub`. `gate.py` took 20 min over
+the 96 windows with 32 workers.
+
+The reference events' scores rise and narrow too, so every cutoff rises
+(`results/tetrodes_sub.csv`). The residual amplitude is the trough after
+the subtraction, as in `overlaps.py`:
+
+| Tetrode | Losing 1 % | Losing 5 % | Losing 10 % | Losing 5 %, per 6 h block | Reference below 0.55 | Multi-unit rate at 5 % | Same, residual of 7 or more |
+|---|---|---|---|---|---|---|---|
+| TT5 | 0.35 | 0.46 | 0.52 | 0.40 to 0.52 | 14.8 % | 0.92 Hz | 0.85 Hz |
+| TT6 | 0.54 | 0.65 | 0.70 | 0.63 to 0.67 | 1.2 % | 0.48 Hz | 0.46 Hz |
+| TT7 | 0.47 | 0.58 | 0.63 | 0.54 to 0.61 | 3.2 % | 0.18 Hz | 0.17 Hz |
+| TT8 | 0.52 | 0.63 | 0.68 | 0.61 to 0.64 | 1.6 % | 0.39 Hz | 0.38 Hz |
+| TT9 | 0.44 | 0.52 | 0.56 | 0.51 to 0.54 | 8.8 % | 0.02 Hz | 0.02 Hz |
+| TT10 | 0.37 | 0.46 | 0.51 | 0.45 to 0.47 | 17.2 % | 3.12 Hz | 2.99 Hz |
+| TT11 | 0.42 | 0.53 | 0.58 | 0.52 to 0.54 | 6.9 % | 0.54 Hz | 0.50 Hz |
+| TT12 | 0.48 | 0.56 | 0.61 | 0.54 to 0.58 | 4.0 % | 0.80 Hz | 0.75 Hz |
+
+Over TT5 to TT12 the cutoff losing 5 % keeps 1,112,413 unclaimed events,
+2.2 % more than the same share keeps without the subtraction (1,088,839).
+Per tetrode the rate changes by -1.5 % (TT7) to +17.8 % (TT8), and +5.2 % on
+TT6. Requiring a residual of 7 or more as well, as the estimate above did,
+keeps 1,056,089, 1.12 % of the sorted spikes and 3.0 % fewer than without
+the subtraction, where that estimate, with the cutoffs held fixed, gave
+6.9 % more. Background stretches pass the cutoff losing 5 % in 0.2 to
+3.8 % of cases.
+
+After the subtraction, the reference events still keep their units'
+refractory period from a score of 0.2 up: the ratio of the unit's spikes
+0.5 to 1.5 ms away to those 20 to 50 ms away is at most 0.11 there, and at
+most 0.46 below 0.2 (TT7, 60 events). Against the unit that an unclaimed
+event matches best, that ratio now rises with the score. It is 1.04 to 2.78
+at scores of 0.5 to 0.6 and 1.79 to 4.71 at 0.7 or more; without the
+subtraction it was 0.38 to 1.97 at 0.7 or more
+(`results/refractory_by_cosine_sub.csv`).
+
+The timing changes too (`results/lags_sub.csv`). Sorted spikes follow
+unclaimed events of residual 7 or more at or above the cutoff losing 10 %
+1.23 to 3.85 times as often 0.5 to 1.5 ms later as 20 to 50 ms later,
+against the reference events' 0.48 to 1.28, and precede them 1.00 to 3.02
+times as often. After, the highest are TT8 (3.85, peaking at 1.40 ms) and
+TT6 (2.14); before, TT8 (3.02, at 1.43 ms) and TT10 (1.65). Between the
+cutoffs losing 5 and 10 % the ratio after is 1.12 to 2.52, and below the
+cutoff losing 1 % 1.11 to 2.79. At or above the cutoff losing 10 %, 3.9 to
+52.3 % of the events have a sorted spike 0.5 to 1.5 ms away, against 2.0 to
+26.6 % without the subtraction: with the overlap no longer lowering the
+score, events next to a sorted spike now score high (conjecture).
+
+`neighbours.py` checks, in every 8th window, whether the sorted spikes 0.5
+to 1.5 ms after the admitted events (losing 5 %, residual 7 or more) are
+spikes at their own time rather than the event's own spike placed late
+(`results/neighbours.csv`). Per tetrode, and separately for events that do
+and do not match the neighbour's unit best, their trough is a median 0.90 to
+1.20 of their unit's template trough, against 0.85 to 1.06 for the sorted
+spikes after reference events (leaving out TT9, with 11 and 33 events). The
+admitted events match the following spike's unit best 0.25 to 0.74 of the
+time, against 0.18 to 0.60 expected if the two were unrelated (the sum over
+units of the unit's share of best matches times its share of following
+spikes), most on TT6 (0.53 against 0.29) and TT8 (0.74 against 0.60).
+Reference events do so 0.04 to 0.27 of the time, against 0.15 to 0.43
+expected (TT9 left out throughout). Two cells with similar waveforms firing
+about 1 ms apart would fit, as would one cell firing inside its refractory
+period (conjecture).
+
+Unclaimed events whose residual is below 7 are 5.9 % of the unclaimed
+events (2.3 to 9.2 % per tetrode; reference events 1.6 to 5.1 %). Sorted
+spikes 1.5 to 3 ms before them are 4.26 to 9.00 times as common as 20 to
+50 ms away (31.1 on TT9), and 1.5 to 3 ms after them 2.70 to 6.44 times
+(17.9 on TT9), peaking 1.83 to 2.53 ms away; for reference events the same
+ratios are 1.00 to 1.44 and 0.93 to 1.41 (2.92 and 2.31 on TT9)
+(`results/lag_hist_sub.csv`). The bandpass of step 2 (Butterworth of order
+5, 300 to 6000 Hz, forward and backward) turns a negative pulse 1 to 6
+samples wide into a trough with negative lobes 2.33 ms before and after it,
+0.9 to 2.0 % of the trough, so a sorted spike's echo would deepen the trace
+about 2 ms away. These
+events may be crossings that a sorted spike's filter echo lifted over 7
+(conjecture).
+
 ## Figures
 
 `figure.py` draws, from the per-window files and `results/`, figures not
@@ -266,6 +353,10 @@ kept here:
   reference events, unclaimed events and background stretches, with the
   cutoffs losing 1, 5 and 10 % and 0.55.
 - `lags.png`: the lag curves behind the table above, from -3 to 3 ms.
+- With `--sub`, `figure.py` draws the same figures from the scores after
+  the subtraction (`cosine_distributions_sub.png`, `lags_sub.png`,
+  `gallery_sub_TTn.png`); the galleries then show the residual traces, and
+  `lags_sub.png` adds the unclaimed events whose residual is below 7.
 - `overlaps.png`, drawn by `overlaps.py` into its output directory: four
   random unclaimed events per tetrode below the cutoff losing 10 % with a
   sorted spike 0.5 to 1.5 ms after them, with the subtracted spikes and the
@@ -274,7 +365,8 @@ kept here:
   score (below 0.2, then 0.1 wide to 0.7, then 0.7 or more). Each column has
   four unclaimed events of 7 to 9 times the noise, two unclaimed of 9 or
   more and three reference events of 7 to 9, drawn at random from a sample
-  of up to 3 per window, 0.05 band of score and amplitude class. Each trace
+  of up to 3 per window, 0.05 band of score (of the score after the
+  subtraction, since `gate.py` computes it) and amplitude class. Each trace
   is drawn with the best template scaled to it by least squares and ticks
   at the tetrode's other sorted spikes.
 
@@ -298,12 +390,15 @@ by +3.0 % in total and by -11.2 to +34.3 % per tetrode
 `investigations/unclaimed-events/results/tetrodes.csv`); those counts also
 differ by the random spikes drawn for the templates.
 
+## Outcome
+
+The gate scores each event after subtracting the tetrode's sorted spikes
+around it, with one cutoff per tetrode: the score that 5 % of the reference
+events, scored the same way, fall below (`docs/sorting_pipeline.md`,
+step 8).
+
 ## Open
 
-- The share of reference events the cutoff may lose.
-- Whether to score events after subtracting the tetrode's sorted spikes
-  around them, with cutoffs from reference events scored the same way.
-- Whether the cutoff should rise with amplitude, as the reference events'
-  cutoffs do (above), or stay one per tetrode.
-- What the spike-shaped events on TT8 that follow a sorted spike by 0.5 to
-  1.5 ms (most often 1.43 ms) are.
+- Whether the 7 MAD floor also applies to the residual trough.
+- What the events on TT6 and TT8 that match the unit of a sorted spike 0.5
+  to 1.5 ms away are.
