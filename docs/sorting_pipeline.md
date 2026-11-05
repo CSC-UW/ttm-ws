@@ -557,11 +557,24 @@ Fixed:
 
 Open:
 
-- Whether the other steps of `97_production_pipeline.py` apply. Of the
-  large events no unit claimed, it folds those that match a unit's
-  template (cosine 0.8 or more) into that unit where they keep its
-  refractory period, and pools those with a weaker match (0.55 to 0.8)
-  into one multi-unit pseudo-unit per tetrode.
+- Whether the other steps of `97_production_pipeline.py` apply. Both
+  work on detected negative peaks that no unit claims (no unit of the
+  tetrode fires within 0.5 ms). It folds those of 10 MAD or more into the
+  unit whose template they match best, at cosine 0.8 or more, when that
+  unit has no spike within 1.5 ms. It pools those of 7 MAD or more still
+  unclaimed with a weaker match (0.55 to 0.8) into one multi-unit unit
+  per tetrode. Replayed on TTM-003-48H, the fold would add 4,025 events,
+  at most 0.019 % of any unit's spikes. They are a median 1.84 times the
+  unit's template, and the best template beats the next by a median
+  cosine of 0.041. The multi-unit units would hold 0.83 M events, 0.21 to
+  2.0 % of each TT5 to TT12 tetrode's sorted rate, with a median
+  amplitude of 7.63 MAD. The 0.55 to 0.8 band also holds 37 to 91 % of
+  the sorted units' own spikes of 7 MAD or more. Take the rate of the
+  multi-unit events 0.5 to 1.5 ms from the spikes of the unit they match
+  best, over their rate 20 to 50 ms away. Of the 36 units on TT5 to TT12
+  that are the best match of 200 or more such events, it is below 1 for
+  17. For 9 it is 2.06 to 5.69, above every pair of sorted units on one
+  tetrode of TT5 to TT12 (`investigations/unclaimed-events/`).
 - Why some same-tetrode pairs coincide within 0.1 ms more often than
   chance. On TTM-003-48H, 18 of 76 pairs on TT5 to TT12 do by more than 1 %
   of the smaller unit's spikes (up to 3.8 %), while no pair of units on

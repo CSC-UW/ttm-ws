@@ -1,0 +1,25 @@
+events,fit,reason,share
+folded,strongest fit,no fit,0.006211180124223602
+folded,strongest fit,snr floor,0.3242236024844721
+folded,strongest fit,relative floor,0.010186335403726708
+folded,strongest fit,shape,0.564472049689441
+folded,strongest fit,refractory,0.09490683229813665
+folded,strongest fit,bad period,0.0
+folded,best-matching unit's fit,no fit,0.0924223602484472
+folded,best-matching unit's fit,snr floor,0.5050931677018633
+folded,best-matching unit's fit,relative floor,0.0037267080745341614
+folded,best-matching unit's fit,shape,0.33888198757763976
+folded,best-matching unit's fit,refractory,0.059875776397515526
+folded,best-matching unit's fit,bad period,0.0
+multi-unit,strongest fit,no fit,0.0026582327136796284
+multi-unit,strongest fit,snr floor,0.37258981295074645
+multi-unit,strongest fit,relative floor,0.005461809376005996
+multi-unit,strongest fit,shape,0.49720363047562305
+multi-unit,strongest fit,refractory,0.1220865144839449
+multi-unit,strongest fit,bad period,0.0
+multi-unit,best-matching unit's fit,no fit,0.17272867047523868
+multi-unit,best-matching unit's fit,snr floor,0.44287502342319834
+multi-unit,best-matching unit's fit,relative floor,0.0017285119182037891
+multi-unit,best-matching unit's fit,shape,0.2947431135796893
+multi-unit,best-matching unit's fit,refractory,0.08792468060366987
+multi-unit,best-matching unit's fit,bad period,0.0
