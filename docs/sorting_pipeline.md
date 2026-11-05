@@ -1,6 +1,6 @@
 ---
 title: Spike sorting pipeline for 48 h tetrode recordings
-updated: 2026-11-04
+updated: 2026-11-05
 status: needs_verification
 ---
 
@@ -554,21 +554,23 @@ Fixed:
   dip, and any pair with cosine 0.95 or more. On TTM-003-48H no
   same-tetrode pair outside TT15 has such a dip, and the only pair it would
   join (cosine 0.967) has a cross-correlogram of two independent units.
+- The fold step of `97_production_pipeline.py` is not used. It takes
+  detected negative peaks of 10 MAD or more that no unit claims (no unit
+  of the tetrode fires within 0.5 ms) and adds each to the unit whose
+  template it matches best, at cosine 0.8 or more, when that unit has no
+  spike within 1.5 ms. Replayed on TTM-003-48H it would add 4,025 events,
+  at most 0.019 % of any unit's spikes. They are a median 1.84 times the
+  unit's template, and the best template beats the next by a median
+  cosine of 0.041 (`investigations/unclaimed-events/`).
 
 Open:
 
-- Whether the other steps of `97_production_pipeline.py` apply. Both
-  work on detected negative peaks that no unit claims (no unit of the
-  tetrode fires within 0.5 ms). It folds those of 10 MAD or more into the
-  unit whose template they match best, at cosine 0.8 or more, when that
-  unit has no spike within 1.5 ms. It pools those of 7 MAD or more still
-  unclaimed with a weaker match (0.55 to 0.8) into one multi-unit unit
-  per tetrode. Replayed on TTM-003-48H, the fold would add 4,025 events,
-  at most 0.019 % of any unit's spikes. They are a median 1.84 times the
-  unit's template, and the best template beats the next by a median
-  cosine of 0.041. The multi-unit units would hold 0.83 M events, 0.21 to
-  2.0 % of each TT5 to TT12 tetrode's sorted rate, with a median
-  amplitude of 7.63 MAD. The 0.55 to 0.8 band also holds 37 to 91 % of
+- Whether the multi-unit step of `97_production_pipeline.py` applies. It
+  pools detected negative peaks of 7 MAD or more that no unit claims and
+  whose best template match is cosine 0.55 to 0.8 into one multi-unit
+  unit per tetrode. Replayed on TTM-003-48H, the multi-unit units would
+  hold 0.83 M events, 0.21 to 2.0 % of each TT5 to TT12 tetrode's sorted
+  rate, with a median amplitude of 7.63 MAD. The 0.55 to 0.8 band also holds 37 to 91 % of
   the sorted units' own spikes of 7 MAD or more. Take the rate of the
   multi-unit events 0.5 to 1.5 ms from the spikes of the unit they match
   best, over their rate 20 to 50 ms away. Of the 36 units on TT5 to TT12

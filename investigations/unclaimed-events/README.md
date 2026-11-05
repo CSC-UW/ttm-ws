@@ -1,6 +1,6 @@
 ---
 title: Unclaimed events in the final TTM-003-48H sorting
-updated: 2026-11-04
+updated: 2026-11-05
 ---
 
 # Unclaimed events in the final TTM-003-48H sorting
@@ -250,4 +250,5 @@ far more common there than the unit's own spikes. The events of other
 units are more common there than for any sorted pair. So the bucket
 looks like a mixture rather than one kind of event (conjecture).
 
-Neither step is adopted yet.
+The fold is not adopted (`docs/sorting_pipeline.md`, step 8).
+Whether the multi-unit step is, is open.
