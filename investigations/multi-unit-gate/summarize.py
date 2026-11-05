@@ -18,6 +18,10 @@ tetrodes.csv: per tetrode with templates, the events of 7 or more (excluded at w
     investigations/unclaimed-events/results/tetrodes.csv next to the same counts here.
 by_amplitude.csv: per tetrode and amplitude band, the reference cutoffs losing 1, 5 and 10 % and the
     share of unclaimed events kept at the tetrode's 5 % cutoff and at 0.55.
+banded.csv: per tetrode and share lost (5 and 10 %), the unclaimed events kept by the tetrode's one
+    cutoff and by a cutoff per amplitude band (the bands of by_amplitude.csv; the tetrode's cutoff in a band
+    with fewer than 100 reference events), those kept by only one of the two, and the share of reference
+    events of 7 to 8 and of 12 or more that the one cutoff loses.
 cosine_hist.csv: per tetrode, counts of best cosine in 0.02 bins for reference, unclaimed and background.
 summary.json: totals over TT5 to TT12.
 """
@@ -102,7 +106,7 @@ def main():
         return int((inside & ~st.in_bad(p, g)).sum())
 
     replay = pd.read_csv(REPLAY).set_index("tetrode")
-    rows, amp_rows, hist_rows = [], [], []
+    rows, amp_rows, hist_rows, band_rows = [], [], [], []
     for g in sorted(np.unique(ev["group"][ev["best_uid"] >= 0]).tolist()):
         on = ev["group"] == g
         ref = on & (ev["claims"] == 1) & (ev["best_uid"] >= 0)
@@ -154,6 +158,19 @@ def main():
             r["kept_cut_5"] = float(np.mean(ev["best_cos"][ua] >= cuts[5])) if ua.any() else np.nan
             r["kept_0p55"] = float(np.mean(ev["best_cos"][ua] >= 0.55)) if ua.any() else np.nan
             amp_rows.append(r)
+        amp_on, cos_on, ref_on, un_on = ev["amp"][on], ev["best_cos"][on], ref[on], un[on]
+        for q in (5, 10):
+            bc = np.full(amp_on.size, cuts[q])
+            for lo, hi in AMP_BANDS:
+                ib = (amp_on >= lo) & (amp_on < hi)
+                if (ib & ref_on).sum() >= 100:
+                    bc[ib] = np.percentile(cos_on[ib & ref_on], q)
+            one, banded = un_on & (cos_on >= cuts[q]), un_on & (cos_on >= bc)
+            band_rows.append({"tetrode": g + 1, "loss": q, "unclaimed": int(un_on.sum()), "kept_one": int(one.sum()),
+                              "kept_banded": int(banded.sum()), "one_only": int((one & ~banded).sum()),
+                              "banded_only": int((banded & ~one).sum()),
+                              "reference_lost_7_8": float(np.mean(cos_on[ref_on & (amp_on < 8)] < cuts[q])),
+                              "reference_lost_12_up": float(np.mean(cos_on[ref_on & (amp_on >= 12)] < cuts[q]))})
         for kind, v in (("reference", rc), ("unclaimed", uc), ("background", bgc)):
             h, _ = np.histogram(v, HIST)
             hist_rows += [{"tetrode": g + 1, "kind": kind, "bin_lo": round(float(lo), 2), "count": int(c)}
@@ -164,6 +181,7 @@ def main():
     t.to_csv(OUT / "tetrodes.csv", index=False)
     pd.DataFrame(amp_rows).to_csv(OUT / "by_amplitude.csv", index=False)
     pd.DataFrame(hist_rows).to_csv(OUT / "cosine_hist.csv", index=False)
+    pd.DataFrame(band_rows).to_csv(OUT / "banded.csv", index=False)
     live = t[t["tetrode"].isin([g + 1 for g in LIVE])]
     summary = {"windows": len(files),
                "tt5_12": {"unclaimed": int(live["unclaimed"].sum()), "reference": int(live["reference"].sum()),

@@ -21,7 +21,8 @@ sorted spike claims stand in for real spikes. The question was asked for the
 analyzer stage (`docs/sorting_pipeline.md`, step 8). The replay of 97's
 steps on the same sorting is in `investigations/unclaimed-events/`.
 
-Code: `gate.py`, `summarize.py`, `refractory.py`, `lags.py`, `figure.py`.
+Code: `gate.py`, `summarize.py`, `refractory.py`, `lags.py`, `figure.py`,
+`overlaps.py`.
 Results in `results/`.
 
 ## Method
@@ -99,6 +100,16 @@ at 15 or more (394 reference events). On TT5 it stays at 0.42 to 0.47 up to
 the noise, and 86 to 95 % are 7 to 9. Weighting the reference events to the
 unclaimed events' amplitudes lowers the cutoffs by 0.003 to 0.035.
 
+A cutoff per amplitude band (7 to 8, 8 to 9, 9 to 10, 10 to 12, 12 to 15 and
+15 or more times the noise, each the percentile of that band's reference
+events, or the tetrode's cutoff where a band has fewer than 100) keeps more unclaimed events than one cutoff per tetrode
+(`results/banded.csv`). Over TT5 to TT12, at the share losing 10 %, one
+cutoff keeps 947,625 and the banded cutoffs 987,139; 17,090 events pass only
+the one cutoff and 56,604 only the banded ones. At the share losing 5 % it is
+1,088,839 against 1,114,664, with 13,508 and 39,333. With one cutoff per
+tetrode losing 10 %, the reference events of 7 to 8 times the noise lose
+10.5 to 16.6 % and those of 12 or more 0.5 to 5.8 % (38.5 % on TT9).
+
 ## What each cutoff keeps
 
 The rate of the multi-unit unit on each tetrode, with no upper limit on the
@@ -166,12 +177,85 @@ as common 0.5 to 1.5 ms from unclaimed events of score 0.2 to 0.6 as 20 to
 50 ms from them, and 0.38 to 1.97 times for those of 0.7 or more
 (`results/refractory_by_cosine.csv`).
 
-A sorted spike 1 ms after the event would lie inside the event's 3 ms trace,
-off centre, and lower its score. Whether such an event is a separate spike,
-from another cell or missed by the sort in an overlap, or part of the
-following spike's own waveform, is not settled here. If it is part of the
-waveform, admitting it to the multi-unit unit counts that spike twice
-(conjecture).
+A sorted spike 1 ms after the event lies inside the event's 3 ms trace, off
+centre, and lowers its score.
+
+## Subtracting the neighbouring spikes
+
+`overlaps.py` takes every unclaimed event with a sorted spike of its tetrode
+0.5 to 1.5 ms before or after it, and as a control up to 2,000 such reference
+events per tetrode and window. From the event's 3 ms trace it subtracts
+every sorted spike of the tetrode within 3.5 ms of the trace, as its unit's
+mean waveform in that 1800 s window scaled to the spike (a reference event's
+claiming spike stays). It then measures the event's trough again and scores
+it, before and after the subtraction, against the mean waveforms of the
+tetrode's units with 100 or more spikes in the window
+(`results/overlaps.csv`). Those mean waveforms come from a new random draw
+of spikes, so the scores before the subtraction differ from `gate.py`'s,
+by 0.03 or less for 98 % of the events in the window checked. 171,316
+of the 358,697 unclaimed events below the cutoff losing 10 % have such a
+neighbour.
+
+The neighbouring spikes' mean waveforms do not account for the events. After
+the subtraction, 91 to 100 % of the unclaimed events in each group still have
+a trough of 7 or more times the noise (reference events 96 to 100 %), and at
+most 0.27 % fall below 5.5. At the event's trough the subtracted waveforms
+point upwards, by a median of 0.13 to 1.14 times the noise. A feature that
+only some of a unit's spikes carry would not show in its mean waveform, so
+this does not rule that out.
+
+Once the neighbours are gone, the events score higher. For events with a
+sorted spike after them only, per group the number of events (summed over
+TT5 to TT12), the median score per tetrode before and after the
+subtraction, and the share whose score after it reaches the tetrode's
+cutoff losing 10 % (both ranges over TT5 to TT12):
+
+| Unclaimed events | Number | Median score, before and after | Reaching the cutoff losing 10 % |
+|---|---|---|---|
+| Below the cutoff losing 1 % | 24,499 | 0.27 to 0.40, 0.39 to 0.66 | 11.5 to 52.1 % |
+| 1 to 5 % | 46,486 | 0.39 to 0.53, 0.49 to 0.76 | 54.5 to 91.9 % |
+| 5 to 10 % | 32,467 | 0.46 to 0.62, 0.55 to 0.80 | 91.4 to 99.0 % |
+| Reference events, control | 609,825 | 0.56 to 0.66, 0.65 to 0.81 | 87.7 to 94.0 % |
+
+Of the unclaimed events with a sorted spike before them only, 5.5 to 32.8 %
+(0 of 6 on TT9), 37.3 to 69.3 % and 77.5 to 90.2 % (5 of 7 on TT9) of the
+three groups reach the cutoff.
+
+Scoring the unclaimed events after the subtraction, and requiring a trough
+of 7 or more after it, would admit 112,821 events now below the cutoff
+losing 10 % and drop 5,278 now at or above it, 11.3 % more than the 947,625
+it keeps. At the share losing 5 % it would admit 82,024 and drop 6,520, or
+6.9 % more (`results/overlaps_rescored.csv`). Those counts use the cutoffs
+from unsubtracted reference events and leave out events whose nearest
+sorted spike is 1.5 to 3.5 ms away, so they are approximate. Reference
+events with a neighbour also score higher after the subtraction, so cutoffs
+from subtracted reference events would sit a little higher and the counts
+admitted are probably a little too high (conjecture).
+
+The unit that best matches the event after the subtraction is the
+neighbouring spike's unit more often than if the two were unrelated: for
+events below the cutoff losing 10 % with a spike after them only, 0.23 to
+0.72 of the time against 0.18 to 0.57 expected, with the largest
+differences on TT6 (0.56 against 0.28) and TT8 (0.72 against 0.57). The expected share is the sum
+over units of the unit's share of best matches times its share of
+neighbouring spikes.
+
+On TT8, the 7,109 unclaimed events at or above the cutoff losing 10 % with a
+sorted spike before them only keep a trough of 7 or more in 99.6 % of cases
+after the subtraction and score a median 0.80. Their best unit is the
+preceding spike's unit 0.71 of the time, against 0.58 expected. These are
+the events behind TT8's excess of sorted spikes before them in the lags
+table above (6.0 times, most often 1.43 ms before).
+
+So most unclaimed events with a sorted spike about 1 ms after them look like
+separate spikes overlapping a sorted one, scored low because the sorted
+spike sits in their trace, and the excess of sorted spikes after
+low-scoring events reflects which events the overlap pushes below the
+cutoff. It does not show the events to be parts of the following spike's
+waveform, which admitting them would count twice (conjecture). Where the
+event matches the neighbour's own unit, one cell would have fired twice
+within 0.5 to 1.5 ms, inside its refractory period, if both came from it; a
+second cell with a similar waveform would also fit (conjecture).
 
 ## Figures
 
@@ -182,6 +266,10 @@ kept here:
   reference events, unclaimed events and background stretches, with the
   cutoffs losing 1, 5 and 10 % and 0.55.
 - `lags.png`: the lag curves behind the table above, from -3 to 3 ms.
+- `overlaps.png`, drawn by `overlaps.py` into its output directory: four
+  random unclaimed events per tetrode below the cutoff losing 10 % with a
+  sorted spike 0.5 to 1.5 ms after them, with the subtracted spikes and the
+  residual.
 - `gallery_TTn.png`, one per tetrode of TT5 to TT12: events by band of
   score (below 0.2, then 0.1 wide to 0.7, then 0.7 or more). Each column has
   four unclaimed events of 7 to 9 times the noise, two unclaimed of 9 or
@@ -212,12 +300,10 @@ differ by the random spikes drawn for the templates.
 
 ## Open
 
-- The share of reference events the cutoff may lose. At or above the
-  cutoff losing 10 %, the rate of sorted spikes 0.5 to 1.5 ms after an
-  unclaimed event is within the reference events' range, though sorted
-  spikes precede those events more often than they precede reference
-  events. Between the 5 and 10 % cutoffs, the rate after is 1.96 to 3.50
-  times the rate 20 to 50 ms away.
-- Whether the cutoff should rise with amplitude, as it does for the
-  reference events on six of the eight tetrodes.
-- What the events about 1 ms before a sorted spike are.
+- The share of reference events the cutoff may lose.
+- Whether to score events after subtracting the tetrode's sorted spikes
+  around them, with cutoffs from reference events scored the same way.
+- Whether the cutoff should rise with amplitude, as the reference events'
+  cutoffs do (above), or stay one per tetrode.
+- What the spike-shaped events on TT8 that follow a sorted spike by 0.5 to
+  1.5 ms (most often 1.43 ms) are.
