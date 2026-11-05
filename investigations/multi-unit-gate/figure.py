@@ -5,7 +5,7 @@ tetrode and cosine band.
 
 cosine_distributions.png, from results/: per tetrode of TT5 to TT12, the best cosine of the reference
 events (blue), the unclaimed events (black) and the background stretches (grey), each as a share per 0.02
-bin, with the cutoffs losing 1 % (dotted) and 5 % (dashed) and 97's 0.55 (red).
+bin, with the cutoffs losing 1 % (dotted), 5 % (dashed) and 10 % (dash-dot) and 97's 0.55 (red).
 
 lags.png, from results/lag_hist.csv: per tetrode of TT5 to TT12, the sorted spikes of the tetrode at each
 lag from the event (spike minus event, -3 to 3 ms), over their rate 20 to 50 ms away, for reference events and for
@@ -53,8 +53,10 @@ def distributions(fig_dir):
             ax.step(s["bin_lo"] + 0.01, s["count"] / s["count"].sum(), where="mid", color=color, label=kind)
         ax.axvline(t.loc[tt, "cut_1"], color="k", ls=":", lw=1, label="loses 1 %")
         ax.axvline(t.loc[tt, "cut_5"], color="k", ls="--", lw=1, label="loses 5 %")
+        ax.axvline(t.loc[tt, "cut_10"], color="k", ls="-.", lw=1, label="loses 10 %")
         ax.axvline(0.55, color="r", lw=1, label="0.55")
-        ax.set_title(f"TT{tt}: cutoffs {t.loc[tt, 'cut_1']:.2f} (1 %), {t.loc[tt, 'cut_5']:.2f} (5 %)", fontsize=9)
+        ax.set_title(f"TT{tt}: cutoffs {t.loc[tt, 'cut_1']:.2f} (1 %), {t.loc[tt, 'cut_5']:.2f} (5 %), "
+                     f"{t.loc[tt, 'cut_10']:.2f} (10 %)", fontsize=9)
         ax.set_xlim(-0.3, 1)
     axes[0, 0].legend(fontsize=7)
     for ax in axes[1]:
@@ -111,7 +113,8 @@ def galleries(d, fig_dir):
         n_rows = sum(r[3] for r in ROWS)
         fig, axes = plt.subplots(n_rows, len(BANDS), figsize=(2.6 * len(BANDS), 1.45 * n_rows))
         for j, (lo, hi) in enumerate(BANDS):
-            marks = [f"{q} % cut {t.loc[tt, f'cut_{q}']:.2f}" for q in (1, 5) if lo <= t.loc[tt, f"cut_{q}"] < hi]
+            marks = [f"{q} % cut {t.loc[tt, f'cut_{q}']:.2f}" for q in (1, 5, 10)
+                     if lo <= t.loc[tt, f"cut_{q}"] < hi]
             if lo <= 0.55 < hi:
                 marks.append("0.55")
             head = f"cosine {max(lo, 0):.1f} to {min(hi, 1):.1f}" if lo > -1 else "cosine below 0.2"

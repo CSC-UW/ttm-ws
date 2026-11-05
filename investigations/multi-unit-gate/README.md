@@ -180,7 +180,7 @@ kept here:
 
 - `cosine_distributions.png`: per tetrode, the score distributions of
   reference events, unclaimed events and background stretches, with the
-  cutoffs losing 1 and 5 % and 0.55.
+  cutoffs losing 1, 5 and 10 % and 0.55.
 - `lags.png`: the lag curves behind the table above, from -3 to 3 ms.
 - `gallery_TTn.png`, one per tetrode of TT5 to TT12: events by band of
   score (below 0.2, then 0.1 wide to 0.7, then 0.7 or more). Each column has
