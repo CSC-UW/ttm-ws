@@ -394,11 +394,10 @@ differ by the random spikes drawn for the templates.
 
 The gate scores each event after subtracting the tetrode's sorted spikes
 around it, with one cutoff per tetrode: the score that 5 % of the reference
-events, scored the same way, fall below (`docs/sorting_pipeline.md`,
-step 8).
+events, scored the same way, fall below. An admitted event also needs a
+residual of 7 or more (`docs/sorting_pipeline.md`, step 8).
 
 ## Open
 
-- Whether the 7 MAD floor also applies to the residual trough.
 - What the events on TT6 and TT8 that match the unit of a sorted spike 0.5
   to 1.5 ms away are.

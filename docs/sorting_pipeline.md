@@ -596,24 +596,25 @@ Fixed:
   their units' refractory periods at every score from 0.2 up. There is no
   upper limit; 97's limit of 0.8 would leave out events like those its
   fold step adds. On TTM-003-48H the cutoff is 0.46 to 0.65 on TT5 to
-  TT12, against 97's fixed 0.55. The multi-unit units then hold 1.11 M
-  events, 1.18 % of the sorted spikes there and 0.02 to 3.12 Hz per
-  tetrode. One cutoff per tetrode is used rather than one per amplitude
-  band, which would admit more events of 7 to 8 MAD, where the reference
-  events score lower.
+  TT12, against 97's fixed 0.55. One cutoff per tetrode is used rather
+  than one per amplitude band, which would admit more events of 7 to 8
+  MAD, where the reference events score lower.
+- An event also needs a trough of 7 MAD or more after the subtraction. On
+  TTM-003-48H 5.9 % of the unclaimed events fall below 7 MAD then. Sorted
+  spikes 1.5 to 3 ms before them are 4.3 to 9.0 times as common as 20 to
+  50 ms away, and 1.5 to 3 ms after them 2.7 to 6.4 times (31 and 18 times
+  on TT9). The step 2 bandpass echoes a spike 2.33 ms either side, so these
+  may be crossings that a sorted spike's echo lifted over 7 MAD
+  (conjecture). Finding the trough reuses the subtracted trace and took
+  0.1 s for one window's 275,000 events. With the floor the multi-unit
+  units hold 1.06 M events on TT5 to TT12, 1.12 % of the sorted spikes
+  there and 0.02 to 2.99 Hz per tetrode; without it they would hold
+  1.11 M.
 - L-ratio, isolation distance, d′ and silhouette count the multi-unit
   spikes among the other spikes of the tetrode.
 
 Open:
 
-- Whether the 7 MAD floor also applies to an event's trough after the
-  subtraction. On TTM-003-48H 5.9 % of the unclaimed events fall below it
-  then. Sorted spikes 1.5 to 3 ms before them are 4.3 to 9.0 times as
-  common as 20 to 50 ms away, and 1.5 to 3 ms after them 2.7 to 6.4 times
-  (31 and 18 times on TT9). The step 2 bandpass echoes a spike 2.33 ms
-  either side, so these may be crossings that a sorted spike's echo lifted
-  over 7 MAD (conjecture). Applying the floor leaves 1.06 M multi-unit
-  events.
 - Why some same-tetrode pairs coincide within 0.1 ms more often than
   chance. On TTM-003-48H, 18 of 76 pairs on TT5 to TT12 do by more than 1 %
   of the smaller unit's spikes (up to 3.8 %), while no pair of units on
