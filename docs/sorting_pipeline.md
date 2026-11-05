@@ -562,21 +562,25 @@ Open:
   template (cosine 0.8 or more) into that unit where they keep its
   refractory period, and pools those with a weaker match (0.55 to 0.8)
   into one multi-unit pseudo-unit per tetrode.
-- Why same-tetrode units coincide within 0.1 ms more often than chance. On
-  TTM-003-48H, 18 of 76 pairs on TT5 to TT12 do, by up to 3.8 % of the
-  smaller unit's spikes, while no pair across those tetrodes does by more
-  than 0.4 %. The coincident events carry two waveforms at about their
-  usual amplitudes, not one spike counted twice, so removing the later
-  spike of each pair (as the Allen Institute's Kilosort post-processing
-  does) would not undo a double count, and where the events are two cells
-  firing together it would remove real spikes. In 8 of the pairs the rate
-  is raised about evenly across lags within 0.1 ms (the best lag less
-  than 2 times the lowest). In 8 others it peaks on 2 to 4
-  samples, and in 7 of those the mean coincident waveform keeps 1.7 to
-  4.8 % of its energy that the two units' mean spikes do not fit, against
-  0.4 to 1.4 % for chance coincidences; 2 pairs are in between. Whether
-  the sharply peaked events are a waveform the bank lacks is open
-  (`investigations/analyzer-noise-and-duplicates/`).
+- Why some same-tetrode pairs coincide within 0.1 ms more often than
+  chance. On TTM-003-48H, 18 of 76 pairs on TT5 to TT12 do by more than 1 %
+  of the smaller unit's spikes (up to 3.8 %), while no pair of units on
+  two different tetrodes there does by more than 0.4 %. The coincident
+  events carry two waveforms, mostly at amplitudes near the units' own,
+  not one spike counted twice, so removing the later spike of each pair
+  (as the Allen Institute's Kilosort post-processing does) would not undo
+  a double count. Same-tetrode pairs there also fire together 0.3 to
+  0.5 ms apart more than pairs on different tetrodes (median 1.52 against
+  1.08 times the rate 5 to 25 ms apart). In 8 of the 18 the rate within
+  0.1 ms is at most 1.75 times the pair's own rate at 0.3 to 0.5 ms, a
+  broad excess; in 8 others it is 1.9 to 4.7 times, in a peak 0.07 to
+  0.13 ms wide; 2 more have a high but wider peak. On TT6, where one unit
+  is in all four peaked pairs, its events with each partner look like its
+  spike plus that partner's, which makes one waveform the template bank
+  lacks, shared by the four pairs, unlikely (conjecture); a separate
+  missing waveform per partner is not excluded. Why these cells would fire
+  within 0.1 ms of each other, and what the peaks on TT11 and of one pair
+  on TT5 are, is open (`investigations/analyzer-noise-and-duplicates/`).
 
 ## 9. Curation
 
