@@ -14,7 +14,8 @@ merge.
 
 Code: `noise_levels.py`, `ccg_pairs.py`, `zero_lag.py`, `double_fits.py`,
 `coincident_shape.py`, `third_units.py`, `consistent_waveform.py`,
-`event_refractory.py`, `leftover_waveform.py`. Results in `results/`.
+`event_refractory.py`, `leftover_waveform.py`, `lag_profiles.py`,
+`unit13_partners.py`. Results in `results/`.
 
 ## Noise levels
 
@@ -99,8 +100,8 @@ cross-correlogram ratio is 1.10, "distinct". No pair of the 13 with cosine
 
 Ratios above 1 for similar units mean more coincidences within 1.5 ms than
 5 to 25 ms away. At one-sample resolution, units 13 and 14 (TT6) coincide
-at lag 0 at 4.9 times and at lag +2 samples at 14.5 times the rate 5 to
-25 ms away, falling to 1.0 to 1.2 times within 0.2 ms either side; 13 with
+at lag 0 at 4.9 times and at lags +1 and +2 samples at 15.3 and 14.5
+times the rate 5 to 25 ms away, falling to 1.0 to 1.2 times within 0.2 ms either side; 13 with
 15 and 13 with 16 look the same. Units 8 and 10 (TT5), 21 and 22 (TT8) and
 9 and 2005 (TT5) show the opposite, a dip to 0.06 to 0.44 times within
 0.3 ms; for the first two the rate from 0.3 to 1.5 ms is 1.2 to 1.4
@@ -196,8 +197,12 @@ a's spikes with no spike of b within 1.5 ms. Within 0.1 ms a third unit is
 rarer at coincident events (median 2.2 %) than at the other two (5.0 and
 4.7 %), except in 4 pairs: 11 and 2013 (13.7 % against 8.1 % with b 5 to
 25 ms away), 30 and 32 (7.4 against 3.5 %), 2003 and 2013 (7.5 against
-6.6 %) and 29 and 32 (6.1 against 5.8 %). Across the 18 pairs a third unit
-is no more common at coincident events than near a's other spikes.
+6.6 %) and 29 and 32 (6.1 against 5.8 %), so the coincident events are
+rarely three spikes at the same instant. Within 1.5 ms the medians are
+close, but per pair a third unit is at coincident events -3.4 to +16.3
+percentage points more often than at a's spikes without b (11 and 2003:
++16.3, 11 and 2013: +15.0), and -9.7 to +8.3 points more often than at
+a's spikes with b 5 to 25 ms away.
 `coincident_shape.csv`'s column `third_unit_within_1p5ms` is a different
 measure, the mean number of other units with a spike within 1.5 ms per
 event at the most common lag.
@@ -213,7 +218,8 @@ alpha and beta on a's and b's mean spikes (spikes with no partner within
   rate per sample: four on TT6 (unit 13 with 12, 14, 15 and 16), three on
   TT11 (32 with 29, 30 and 33), and 2003 and 2013 on TT5. Their peaks are
   2 to 4 samples wide at half height; 2003 and 2013 peak at +2 with +3
-  still at 8.1 times and may extend beyond the 3 samples measured. In 8
+  still at 8.1 times; `lag_profiles.py` below finds 4.5 times at +4 and
+  3.0 at +5 and +6. In 8
   others, called broad below, on TT5 and TT10, the best lag is 1.13 to
   1.93 times the lowest and every lag from -3 to +3 samples is at 1.7 to
   4.2 times the expected rate, so their excess is wider than 0.1 ms. 29
@@ -262,12 +268,13 @@ pairs on TT6 and TT11 have no gap beyond 1.5 ms (0.89 to 1.02 on TT6,
 The broad pairs on TT5 and TT10 look like two cells firing together over a
 range wider than 0.1 ms: their mean coincident waveform is fitted by the
 two mean spikes about as well as chance coincidences are, and unit 11's
-spikes in its coincident events keep its refractory gap (conjecture). The
-sharp pairs on TT6 and TT11 and 2003 and 2013 remain open. A peak 2 to 4
-samples wide with a reproducible residual fits a waveform the template
-bank lacks (conjecture), but the residual is small, the two mean spikes
-accounting for 95 % or more of the mean waveform's energy, and could also
-come from changes in a's or b's spike shape when both fire together.
+spikes in its coincident events keep its refractory gap (conjecture). For
+the sharp pairs (on TT6, on TT11, and 2003 and 2013 on TT5) these tests do
+not decide between two cells and a waveform the template bank lacks. Their
+residual is small, the two mean spikes accounting for 95 % or more of the
+mean waveform's energy, and could also come from changes in a's or b's
+spike shape when both fire together. The last section weighs the
+explanations.
 
 ## The leftover waveform
 
@@ -328,3 +335,147 @@ may be more precise than those of single spikes, leaving their mean less
 blurred, or the events may be a narrower waveform the template bank lacks
 (both conjecture). On TT11, 32 and 33 and 29 and 32 keep 1.9 to 2.2 % that
 the derivative terms do not absorb.
+
+## Lag profiles out to 1.5 ms
+
+`lag_profiles.py` counts b's spikes at each lag from -45 to +45 samples
+(1.5 ms) around a's, over the mean count per lag 150 to 750 samples (5 to
+25 ms) away on either side, for all 76 same-tetrode pairs on TT5 to TT12
+and for the 70 pairs of units on two different tetrodes among TT5 to TT12
+that `zero_lag.py` also counted (cross-tetrode pairs below). Means over
+ranges of the absolute lag (`results/lag_profiles.csv`; each lag in
+`results/lag_profiles_by_lag.csv`), for the 26 pairs compared above:
+
+| Pairs | 0 to 3 samples (0 to 0.1 ms) | 4 to 8 (0.13 to 0.27 ms) | 9 to 15 (0.3 to 0.5 ms) | 16 to 30 (0.53 to 1 ms) | 31 to 45 (1.03 to 1.5 ms) |
+|---|---|---|---|---|---|
+| 8 controls | 0.88 to 1.09 | 0.73 to 1.73 | 1.17 to 2.12 | 1.21 to 1.67 | 0.86 to 1.29 |
+| 8 broad | 1.97 to 3.55 | 1.68 to 3.55 | 1.69 to 2.70 | 1.35 to 1.80 | 0.71 to 1.53 |
+| 8 sharp | 2.70 to 7.37 | 1.05 to 2.48 | 1.32 to 1.82 | 1.21 to 1.52 | 0.99 to 1.35 |
+| 2 in between | 4.07 to 6.79 | 1.85 to 2.01 | 1.64 to 1.73 | 1.21 to 1.41 | 0.93 to 1.14 |
+
+All 76 pairs fire together more often 0.3 to 0.5 ms apart than 5 to 25 ms
+apart (1.08 to 2.70 times, median 1.52), and 75 do 0.53 to 1 ms apart.
+Cross-tetrode pairs do so much less, 0.94 to 1.38 times (median 1.08) at
+0.3 to 0.5 ms. Within 0.1 ms most same-tetrode pairs fall below their own
+rate at 0.3 to 0.5 ms: 44 of the 76 do, and the 58 pairs without an excess
+above 1 % sit at a median 0.68 times it (quartiles 0.29 and 0.99, lowest
+0.08). That fits a matcher that misses spikes of two units that nearly
+coincide (conjecture). The 8 controls show this dip partly because of how
+they were chosen: their rate within 0.1 ms was fixed near the expected
+one while their rate at 0.3 to 0.5 ms is 1.17 to 2.12 times the expected
+one, which puts them at 0.51 to 0.76 times their own rate at 0.3 to
+0.5 ms.
+
+Measured against each pair's own rate at 0.3 to 0.5 ms, the 18 pairs with
+an excess form a continuum: 1.01 to 1.75 times within 0.1 ms in the broad
+pairs, 2.35 and 4.14 in the two in between and 1.87 to 4.73 in the sharp
+pairs. In the sharp pairs the part above that rate holds 74 to 93 % of
+their excess within 0.1 ms but 22 to 65 % of their excess within 1.5 ms.
+Coincidences moved into the peak from nearby lags would leave a shortfall
+next to it. The rate at 4 to 8 samples is below the rate at 0.3 to 0.5 ms
+in the four sharp pairs on TT6, by at most 31 % of the peak's excess, and
+not at all in the others. On TT6 the pairs without a peak fall below
+their 0.3 to 0.5 ms rate at 4 to 8 samples by similar amounts (1.4 to 7.8
+expected counts per lag summed over those lags, against 1.7 to 3.3 in the
+sharp pairs), so the shortfall looks like the general dip near zero lag;
+at most 31 % of a TT6 peak could be coincidences moved in from there.
+
+On TT11 unit 32 is in three sharp pairs (with 29, 30 and 33), and 29 and
+33 are one of the two pairs in between.
+
+## Unit 13 and its four partners
+
+Unit 13 is in all four sharp pairs on TT6, a hub of them, while the other
+pairs there coincide within 0.1 ms at 0.35 to 1.43 times the expected
+rate, none with an excess above 1 % (`results/zero_lag_pairs.csv`). If
+one source, a cell
+or other signal whose waveform the template bank lacks, were built by the
+matcher from 13 and whichever of 12, 14, 15 and 16 fits best, 13's
+coincident events with each partner would be the same waveform. If they
+are 13's spike plus the partner's, they differ as the partners do.
+`unit13_partners.py` averages, for each partner, up to 5,000 of 13's
+spikes with a spike of the partner at the most common lag and no other
+TT6 unit within 1.5 ms, aligned on 13's spike. It compares the averages
+two by two, as the energy of their difference at the best whole-sample
+shift over their mean energy, with the same for the sums of 13's and each
+partner's mean spike (`results/unit13_partners.csv`). The ratio is the
+averages' difference, less what the events' spread contributes to it, over
+the sums' difference.
+
+| Partners | Averages differ by | Sums differ by | Ratio, after the events' spread |
+|---|---|---|---|
+| 12 and 14 | 2.2 % | 2.7 % | 0.81 |
+| 12 and 15 | 10.9 % | 9.5 % | 1.14 |
+| 12 and 16 | 22.6 % | 14.8 % | 1.53 |
+| 14 and 15 | 6.9 % | 3.4 % | 2.02 |
+| 14 and 16 | 19.9 % | 10.8 % | 1.85 |
+| 15 and 16 | 7.5 % | 5.6 % | 1.34 |
+
+The spread of the events contributes at most 0.01 %. Two hubs whose
+partners coincide with them at about the expected rate, where the events
+are two spikes, give ratios of 1.70 (16 with 12 and 14) and 1.03 (12 with
+15 and 16). Allowing a scale and a sub-sample shift, one average leaves
+0.7 to 17.6 % of the other unfitted, against 1.8 to 13.8 % for the sums.
+Each average is fitted by 13's mean spike at 0.69 to 1.04 times and the
+partner's at 0.79 to 1.24 times, leaving 0.9 to 2.8 %
+(`results/unit13_partners_pairs.csv`).
+
+A fixed shared source would let the averages differ only through the
+coincidences of two cells among the events, 9 to 28 % of them going by
+the rate at the most common lag (5.1 to 15.3 times the expected rate)
+against the co-firing at 0.3 to 0.5 ms (1.32 to 1.45 times), so by well
+under the sums' difference (conjecture). They differ as much as two spikes
+would: each average looks like 13's spike plus that partner's. A shared
+source could still give this if its waveform varied from event to event
+by as much as the partners differ, since the matcher picks for each event
+the partner that fits it, and a separate missing waveform for each partner
+would give it too. So the test makes one source split into 13 and a
+partner unlikely on TT6 (conjecture) without ruling it out. Unit 32 on
+TT11 was not tested this way.
+
+## What the excess is
+
+The coincident events are not one spike counted twice: they carry two
+waveforms, mostly at amplitudes near the units' own (0.68 to 1.68 times
+for a, the ends being 2003 and 2013 and 11 and 2005, and 0.79 to 1.36
+for b). That leaves two explanations (conjecture): two neighbouring cells
+firing together, or one source, a cell or other signal whose waveform the
+template bank lacks, which the matcher builds from two templates.
+
+What tells them apart:
+
+- On TT6, 13's coincident events with each of its four partners look
+  like 13's spike plus that partner's, as two spikes would, which makes
+  one source shared by the four pairs unlikely (conjecture).
+- Unit 11's spikes in its coincident events with 9, 2003, 2005 and 2013
+  (broad and in-between pairs) keep its refractory gap, as its own spikes
+  would (conjecture). Unit 2013's gap is partly filled.
+- Same-tetrode pairs on TT5 to TT12 fire together 0.3 to 0.5 ms apart at a
+  median 1.52 times the rate 5 to 25 ms apart, pairs on two different
+  tetrodes there at 1.08 times. Local co-firing of this kind is what
+  neighbouring cells with correlated input would show, though matching
+  within a tetrode could also add some, for example by fitting a
+  neighbour's template to the tail of a spike 10 to 15 samples later
+  (both conjecture). In the broad pairs the rate within 0.1 ms is at most
+  1.75 times each pair's own rate at 0.3 to 0.5 ms.
+- Within 0.1 ms 44 of the 76 same-tetrode pairs fall below their own rate
+  at 0.3 to 0.5 ms, as if the matcher missed coincidences there rather than
+  added them (conjecture), and at most 31 % of a sharp peak could be
+  coincidences moved in from nearby lags.
+
+What remains open is the precision of the sharp pairs. Their mean rate
+within 0.1 ms is 1.87 to 4.73 times their rate at 0.3 to 0.5 ms, and the
+best lag 5.1 to 17 times the expected rate, in a peak 2 to 4 samples
+(0.07 to 0.13 ms) wide. Correlated synaptic input would be expected to
+give the broader co-firing rather than to lock two cells within 0.1 ms
+(conjecture; whether electrically coupled cells fire this precisely is
+not checked here). On TT11 two sharp pairs keep 1.9 to 2.2 % of their mean
+coincident waveform that the derivative terms do not absorb, more than any
+control, and unit 32, in three of them, was not tested as 13 was. 2003
+and 2013 look more like one waveform the template bank lacks than two
+full spikes (conjecture), though not like one spike counted twice either
+(each mean spike alone leaves 12 to 13 % of their mean coincident
+waveform, both together 1.5 %): the sum of the two
+mean spikes is closest for only 50 % of their coincident events, which are
+no larger than a's mean spike at a's peak (0.98 times), with a's fitted
+amplitude 0.67 to 0.69.
