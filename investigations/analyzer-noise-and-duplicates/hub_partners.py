@@ -1,7 +1,10 @@
-"""Whether unit 13's coincident events with its four partners on TT6 (12, 14, 15, 16) are one waveform or
-13's spike plus each partner's.
+"""Whether a unit's coincident events with its partners in sharp pairs are one waveform or the unit's spike
+plus each partner's: unit 13 on TT6 (partners 12, 14, 15, 16) or unit 32 on TT11 (partners 29, 30, 33).
 
-    .venv/bin/python investigations/analyzer-noise-and-duplicates/unit13_partners.py
+    .venv/bin/python investigations/analyzer-noise-and-duplicates/hub_partners.py 13
+    .venv/bin/python investigations/analyzer-noise-and-duplicates/hub_partners.py 32
+
+Below, 13 and TT6 stand for the hub and its tetrode.
 
 For each partner x, the events are 13's spikes with a spike of x at the most common lag within 3 samples
 and no spike of any other TT6 unit within 45 samples; up to 5,000 are averaged, aligned on 13's spike (W_x).
@@ -18,12 +21,15 @@ x's, W_x differs between partners as S_x = T_13 + T_x (shifted by the lag) does.
 - left_w, left_s: the fraction of W_x's (S_x's) energy that W_y (S_y) and its time derivative do not fit,
   averaged over both directions, which allows for a scale and a sub-sample shift.
 
-Two hubs on TT6 whose partners coincide with them at about the expected rate (16 with 12 and 14, 12 with
-15 and 16) are positive controls: their events are two spikes, so d_w should follow d_s there.
+Two hubs on the same tetrode whose partners coincide with them at about the expected rate (on TT6, 16
+with 12 and 14 and 12 with 15 and 16; on TT11, 29 with 30 and 34 and 30 with 33 and 34) are positive
+controls: their events are two spikes, so d_w should follow d_s there. Results go to
+results/unit<hub>_partners.csv and results/unit<hub>_partners_pairs.csv.
 """
 
 import itertools
 import pathlib
+import sys
 
 import numpy as np
 import pandas as pd
@@ -36,7 +42,8 @@ OUT = pathlib.Path(__file__).parent / "results"
 NONE = np.iinfo(np.int64).min
 N_TEMPLATE, N_EVENTS = 2000, 5000
 INNER = slice(5, 85)
-HUBS = {13: [12, 14, 15, 16], 16: [12, 14], 12: [15, 16]}
+CONFIGS = {13: {13: [12, 14, 15, 16], 16: [12, 14], 12: [15, 16]},
+           32: {32: [29, 30, 33], 29: [30, 34], 30: [33, 34]}}
 
 
 def near(t, trains, lo, hi):
@@ -61,6 +68,8 @@ def left(x, y):
 
 
 def main():
+    key = int(sys.argv[1])
+    hubs = CONFIGS[key]
     rng = np.random.default_rng(4)
     rec = si.load(f"{RUN}/binary")
     s = si.load(f"{RUN}/sorting")
@@ -68,7 +77,7 @@ def main():
     raw = np.memmap(f"{RUN}/binary/traces_cached_seg0.raw", dtype="<i2", mode="r").reshape(n_frames, -1)
     gains = rec.get_channel_gains().astype(np.float32)
     group = dict(zip(s.unit_ids, np.asarray(s.get_property("group"))))
-    g = group[13]
+    g = group[key]
     cols = np.flatnonzero(np.asarray(rec.get_property("group")) == g)
     gain = gains[cols]
     tt6 = [u for u in s.unit_ids if group[u] == g]
@@ -81,7 +90,7 @@ def main():
         T[u] = snips(raw, tr[u][rng.choice(clean, N_TEMPLATE, replace=False)], cols, gain).mean(0)
 
     pair_rows, comp_rows = [], []
-    for hub, xs in HUBS.items():
+    for hub, xs in hubs.items():
         W, S, F, noise_var = {}, {}, {}, {}
         for x in xs:
             lag = partners(tr[hub], tr[x], -NEAR, NEAR)
@@ -115,8 +124,8 @@ def main():
     p = pd.DataFrame(pair_rows)
     c = pd.DataFrame(comp_rows)
     c["d_w_over_d_s"] = (c["d_w"] - c["noise"]) / c["d_s"]
-    p.to_csv(OUT / "unit13_partners_pairs.csv", index=False)
-    c.to_csv(OUT / "unit13_partners.csv", index=False)
+    p.to_csv(OUT / f"unit{key}_partners_pairs.csv", index=False)
+    c.to_csv(OUT / f"unit{key}_partners.csv", index=False)
     pd.set_option("display.width", 200)
     print(p.round(3).to_string(index=False))
     print(c.round(4).to_string(index=False))

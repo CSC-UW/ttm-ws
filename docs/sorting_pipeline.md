@@ -574,13 +574,14 @@ Open:
   1.08 times the rate 5 to 25 ms apart). In 8 of the 18 the rate within
   0.1 ms is at most 1.75 times the pair's own rate at 0.3 to 0.5 ms, a
   broad excess; in 8 others it is 1.9 to 4.7 times, in a peak 0.07 to
-  0.13 ms wide; 2 more have a high but wider peak. On TT6, where one unit
-  is in all four peaked pairs, its events with each partner look like its
-  spike plus that partner's, which makes one waveform the template bank
-  lacks, shared by the four pairs, unlikely (conjecture); a separate
-  missing waveform per partner is not excluded. Why these cells would fire
-  within 0.1 ms of each other, and what the peaks on TT11 and of one pair
-  on TT5 are, is open (`investigations/analyzer-noise-and-duplicates/`).
+  0.13 ms wide; 2 more have a high but wider peak. On TT6 and TT11 one
+  unit is in every peaked pair of its tetrode (four and three), and its
+  events with each partner look like its spike plus that partner's, which
+  makes one waveform the template bank lacks, shared by those pairs,
+  unlikely (conjecture); a separate missing waveform per partner is not
+  excluded. Why these cells would fire within 0.1 ms of each other, and
+  what the peak of one pair on TT5 is, is open
+  (`investigations/analyzer-noise-and-duplicates/`).
 
 ## 9. Curation
 

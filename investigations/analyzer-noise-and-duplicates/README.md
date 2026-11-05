@@ -15,7 +15,7 @@ merge.
 Code: `noise_levels.py`, `ccg_pairs.py`, `zero_lag.py`, `double_fits.py`,
 `coincident_shape.py`, `third_units.py`, `consistent_waveform.py`,
 `event_refractory.py`, `leftover_waveform.py`, `lag_profiles.py`,
-`unit13_partners.py`. Results in `results/`.
+`hub_partners.py`. Results in `results/`.
 
 ## Noise levels
 
@@ -383,7 +383,7 @@ at most 31 % of a TT6 peak could be coincidences moved in from there.
 On TT11 unit 32 is in three sharp pairs (with 29, 30 and 33), and 29 and
 33 are one of the two pairs in between.
 
-## Unit 13 and its four partners
+## Hubs: unit 13 on TT6 and unit 32 on TT11
 
 Unit 13 is in all four sharp pairs on TT6, a hub of them, while the other
 pairs there coincide within 0.1 ms at 0.35 to 1.43 times the expected
@@ -393,7 +393,7 @@ or other signal whose waveform the template bank lacks, were built by the
 matcher from 13 and whichever of 12, 14, 15 and 16 fits best, 13's
 coincident events with each partner would be the same waveform. If they
 are 13's spike plus the partner's, they differ as the partners do.
-`unit13_partners.py` averages, for each partner, up to 5,000 of 13's
+`hub_partners.py 13` averages, for each partner, up to 5,000 of 13's
 spikes with a spike of the partner at the most common lag and no other
 TT6 unit within 1.5 ms, aligned on 13's spike. It compares the averages
 two by two, as the energy of their difference at the best whole-sample
@@ -430,8 +430,31 @@ source could still give this if its waveform varied from event to event
 by as much as the partners differ, since the matcher picks for each event
 the partner that fits it, and a separate missing waveform for each partner
 would give it too. So the test makes one source split into 13 and a
-partner unlikely on TT6 (conjecture) without ruling it out. Unit 32 on
-TT11 was not tested this way.
+partner unlikely on TT6 (conjecture) without ruling it out.
+
+`hub_partners.py 32` repeats the test for unit 32 on TT11, in three sharp
+pairs (with 29, 30 and 33), with hubs 29 (partners 30 and 34) and 30
+(partners 33 and 34) as controls, those four pairs coinciding within
+0.1 ms at 0.88 to 1.34 times the expected rate, none with an excess above
+1 % (`results/unit32_partners.csv`). Fewer
+events are free of other units within 1.5 ms: 2,850 for 32 with 30 and
+1,067 to 1,955 in the controls, against 5,000 for the others.
+
+| Partners | Averages differ by | Sums differ by | Ratio, after the events' spread |
+|---|---|---|---|
+| 29 and 30 | 10.6 % | 6.5 % | 1.63 |
+| 29 and 33 | 31.3 % | 12.2 % | 2.56 |
+| 30 and 33 | 40.2 % | 23.0 % | 1.75 |
+
+The events' spread contributes at most 0.02 % (0.09 % in the controls),
+and the controls give ratios of 1.51 (29 with 30 and 34) and 1.44 (30
+with 33 and 34). Allowing a scale and a sub-sample shift, one average
+leaves 3.7 to 32.5 % of the other unfitted, against 4.6 to 20.4 % for the
+sums. Each average is fitted by 32's mean spike at 0.90 to 1.04 times and
+the partner's at 1.02 to 1.43 times, leaving 1.8 to 4.5 %
+(`results/unit32_partners_pairs.csv`); the largest ratio comes with 29 and
+33 fitted at 1.33 and 1.43 times their mean spikes. As on TT6, each
+average looks like 32's spike plus that partner's, with the same caveats.
 
 ## What the excess is
 
@@ -444,9 +467,10 @@ template bank lacks, which the matcher builds from two templates.
 
 What tells them apart:
 
-- On TT6, 13's coincident events with each of its four partners look
-  like 13's spike plus that partner's, as two spikes would, which makes
-  one source shared by the four pairs unlikely (conjecture).
+- On TT6 and TT11 the coincident events of the hubs, 13 and 32, with
+  each of their partners look like the hub's spike plus that partner's,
+  as two spikes would, which makes one source shared by a hub's pairs
+  unlikely (conjecture).
 - Unit 11's spikes in its coincident events with 9, 2003, 2005 and 2013
   (broad and in-between pairs) keep its refractory gap, as its own spikes
   would (conjecture). Unit 2013's gap is partly filled.
@@ -471,7 +495,7 @@ give the broader co-firing rather than to lock two cells within 0.1 ms
 (conjecture; whether electrically coupled cells fire this precisely is
 not checked here). On TT11 two sharp pairs keep 1.9 to 2.2 % of their mean
 coincident waveform that the derivative terms do not absorb, more than any
-control, and unit 32, in three of them, was not tested as 13 was. 2003
+control. 2003
 and 2013 look more like one waveform the template bank lacks than two
 full spikes (conjecture), though not like one spike counted twice either
 (each mean spike alone leaves 12 to 13 % of their mean coincident
