@@ -14,6 +14,8 @@ binary (``ttm.sorting.preprocess_for_sorting``):
   Every ``reseed_every`` windows a MountainSort5 sort of the window adds
   units unlike any carried on their tetrode. Each window writes its spikes
   and banks, so a run resumes at the first window without them.
+- ``readmit_carry``: the admission of a finished carry replayed on its saved fits with other
+  pulse-rule parameters, which change neither the templates nor the matching.
 - ``export_sorting``: the accepted spikes of every window as one sorting.
 
 Parameters are those of ``CarryParams``. Templates are (n_samples, 4) on the
@@ -40,7 +42,15 @@ REASON_ACCEPTED, REASON_FLOOR, REASON_SHAPE, REASON_REFRACTORY, REASON_BAD_PERIO
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class CarryParams:
-    """Parameters of the carry-forward sort (the values adopted on 2026-11-03)."""
+    """Parameters of the carry-forward sort (the values adopted on 2026-11-03).
+
+    With a pulse table, spikes from each onset to ``pulse_exclude_post_ms`` after the offset are left
+    out of the relative floor's reference, the template updates and the outside rate of the
+    sustained-response test. With ``pulse_relax``, a sustained responder's fits from onset to
+    ``pulse_relax_post_ms`` after the offset are admitted under the pulse rule's floors. A sustained
+    responder keeps firing through the pulse past the onset (``sustained_responders``); a transient
+    responder answers only the onset.
+    """
 
     window_s: float = 1800.0
     nbefore: int = 30
@@ -59,14 +69,16 @@ class CarryParams:
     rel_min_lead: int = 30
     lead_ms: float = 10.0
     refractory_ms: float = 1.5
-    pulse_post_ms: float = 100.0
+    pulse_exclude_post_ms: float = 100.0
+    pulse_relax: bool = True
+    pulse_relax_post_ms: float = 5.0
     pulse_snr: float = 2.5
     pulse_rel: float = 0.3
     pulse_cos: float = 0.5
-    driven_start_ms: float = 15.0
-    driven_ratio: float = 2.0
-    driven_p: float = 1e-4
-    driven_min_spikes: int = 20
+    sustained_start_ms: float = 15.0
+    sustained_ratio: float = 2.0
+    sustained_p: float = 1e-4
+    sustained_min_spikes: int = 20
     blend: float = 0.2
     rebuild_max_spikes: int = 500
     rebuild_min_accepted: int = 100
@@ -440,25 +452,87 @@ def spike_scores(x: np.ndarray, frames: np.ndarray, labels: np.ndarray, amps: np
     return out
 
 
-def light_driven(fr, un, on, off, dur_s: float, fs: float, params: CarryParams) -> list[int]:
-    """Labels that keep firing through the pulses: spikes from ``driven_start_ms`` after onset to offset
-    at least ``driven_ratio`` times their rate outside pulses (onset to offset plus ``pulse_post_ms``),
-    Poisson p under ``driven_p``, and ``driven_min_spikes`` or more."""
+def sustained_responders(fr, un, on, off, dur_s: float, fs: float, params: CarryParams) -> list[int]:
+    """Labels that keep firing through the pulses past the onset response (sustained responders):
+    spikes from ``sustained_start_ms`` after onset to offset
+    at least ``sustained_ratio`` times their rate outside pulses (onset to offset plus
+    ``pulse_exclude_post_ms``), Poisson p under ``sustained_p``, and ``sustained_min_spikes`` or more."""
     from scipy.stats import poisson
 
     out = []
-    post = int(params.pulse_post_ms * 1e-3 * fs)
-    st = on + int(params.driven_start_ms * 1e-3 * fs)
+    post = int(params.pulse_exclude_post_ms * 1e-3 * fs)
+    st = on + int(params.sustained_start_ms * 1e-3 * fs)
     span = (off - st).sum() / fs
     out_s = dur_s - ((off + post) - on).sum() / fs
     for u in np.unique(un):
         f = fr[un == u]
         n_in = int(in_intervals(f, st, off).sum())
         rate = (~in_intervals(f, on, off + post)).sum() / out_s
-        if (n_in >= params.driven_min_spikes and n_in >= params.driven_ratio * rate * span
-                and poisson.sf(n_in - 1, rate * span) < params.driven_p):
+        if (n_in >= params.sustained_min_spikes and n_in >= params.sustained_ratio * rate * span
+                and poisson.sf(n_in - 1, rate * span) < params.sustained_p):
             out.append(int(u))
     return out
+
+
+def admit(frames_abs: np.ndarray, labels: np.ndarray, amps: np.ndarray, snr: np.ndarray, cos_pl: np.ndarray,
+          n_units: int, params: CarryParams, *, fs: float, a: int, n_frames: int, pulses=None,
+          bad=()) -> tuple[np.ndarray, list[int]]:
+    """Admission (step 5.3) and the pulse rule (step 5.4) for one tetrode's fits in one window.
+
+    ``frames_abs`` are sorted absolute frames, ``labels`` indices of the tetrode's ``n_units``
+    templates, ``a`` and ``n_frames`` the window's first frame and length. Returns each fit's reason (0
+    accepted, 1 snr or relative floor, 2 shape, 3 refractory, 5 bad period) and the sustained responders.
+    """
+    fl = frames_abs - a
+    reason = np.zeros(fl.size, np.int8)
+    reason[~(snr >= params.snr_floor)] = REASON_FLOOR
+    in_bad = np.zeros(fl.size, bool)
+    if len(bad):
+        st, en = np.array(bad).T
+        in_bad = in_intervals(frames_abs, st, en)
+    reason[(reason == 0) & in_bad] = REASON_BAD_PERIOD
+    reason[(reason == 0) & ~(cos_pl >= params.cos_floor)] = REASON_SHAPE
+    post = int(params.pulse_exclude_post_ms * 1e-3 * fs)
+    outside = np.ones(fl.size, bool)
+    if pulses is not None:
+        outside = ~in_intervals(frames_abs, pulses[0], pulses[1] + post)
+    lead_frames = int(params.lead_ms * 1e-3 * fs)
+    amp_ref = np.ones(n_units)
+    for k_u in range(n_units):
+        idx = np.flatnonzero((labels == k_u) & (reason == 0))
+        if idx.size < params.rel_min_lead:
+            continue
+        idx = idx[np.argsort(fl[idx], kind="stable")]
+        lead = np.r_[True, np.diff(fl[idx]) > lead_frames] & outside[idx]
+        if lead.sum() >= params.rel_min_lead:
+            amp_ref[k_u] = float(np.median(amps[idx[lead]]))
+    reason[(reason == 0) & ~(amps >= params.rel_floor * amp_ref[labels])] = REASON_FLOOR
+    score = np.nan_to_num(snr, nan=-np.inf)
+    rf = int(params.refractory_ms * 1e-3 * fs)
+
+    def refractory(units):
+        for k_u in units:
+            idx = np.flatnonzero((labels == k_u) & (reason == 0))
+            if idx.size > 1:
+                o = idx[np.argsort(fl[idx], kind="stable")]
+                keep = cp.resolve_refractory(fl[o], score[o], rf)
+                reason[o[~keep]] = REASON_REFRACTORY
+
+    refractory(range(n_units))
+    sustained = []
+    if pulses is not None and params.pulse_relax:
+        on, off = pulses
+        m = (on >= a) & (on < a + n_frames)
+        if m.any():
+            on, off = on[m] - a, off[m] - a
+            near_p = in_intervals(fl, on, off + int(params.pulse_relax_post_ms * 1e-3 * fs))
+            ok = (~in_bad & (snr >= params.pulse_snr) & (amps >= params.pulse_rel * amp_ref[labels])
+                  & (cos_pl >= params.pulse_cos))
+            sustained = sustained_responders(fl[ok], labels[ok], on, off, n_frames / fs, fs, params)
+            relax = np.isin(labels, sustained) & near_p & (reason != 0) & ok
+            reason[relax] = 0
+            refractory(sustained)
+    return reason, sustained
 
 
 def tetrode_window(x: np.ndarray, a: int, frames_abs: np.ndarray, labels: np.ndarray, amps: np.ndarray, T: np.ndarray,
@@ -470,59 +544,17 @@ def tetrode_window(x: np.ndarray, a: int, frames_abs: np.ndarray, labels: np.nda
     templates), ``sigma`` each template's matched-filter noise. ``pulses`` are (onset, offset) frames
     or None; ``bad`` the tetrode's bad periods as (start, end) frames. Returns per-spike ``scores`` and
     ``reason`` (0 accepted, 1 snr or relative floor, 2 shape, 3 refractory, 5 bad period), ``newT``
-    (NaN where a template was not rebuilt), ``n_used``, ``noise`` and ``driven`` (indices into ``T``).
+    (NaN where a template was not rebuilt), ``n_used``, ``noise`` and ``sustained`` (indices into ``T``).
     """
     nb, na = params.nbefore, params.nafter
     noise, _ = cp.noise_mad_excised(x)
     fl = frames_abs - a
     sc = spike_scores(x, fl, labels, amps, T, noise, sigma, nb, na)
     resid = sc.pop("residual_traces")
-    reason = np.zeros(fl.size, np.int8)
-    reason[~(sc["snr"] >= params.snr_floor)] = REASON_FLOOR
-    if len(bad):
-        st, en = np.array(bad).T
-        reason[(reason == 0) & in_intervals(frames_abs, st, en)] = REASON_BAD_PERIOD
-    reason[(reason == 0) & ~(sc["cos_pl"] >= params.cos_floor)] = REASON_SHAPE
-    post = int(params.pulse_post_ms * 1e-3 * fs)
-    outside = np.ones(fl.size, bool)
-    if pulses is not None:
-        outside = ~in_intervals(frames_abs, pulses[0], pulses[1] + post)
+    reason, sustained = admit(frames_abs, labels, amps, sc["snr"], sc["cos_pl"], len(T), params, fs=fs, a=a,
+                           n_frames=x.shape[0], pulses=pulses, bad=bad)
     lead_frames = int(params.lead_ms * 1e-3 * fs)
-    amp_ref = np.ones(len(T))
-    for k_u in range(len(T)):
-        idx = np.flatnonzero((labels == k_u) & (reason == 0))
-        if idx.size < params.rel_min_lead:
-            continue
-        idx = idx[np.argsort(fl[idx], kind="stable")]
-        lead = np.r_[True, np.diff(fl[idx]) > lead_frames] & outside[idx]
-        if lead.sum() >= params.rel_min_lead:
-            amp_ref[k_u] = float(np.median(amps[idx[lead]]))
-    reason[(reason == 0) & ~(amps >= params.rel_floor * amp_ref[labels])] = REASON_FLOOR
-    score = np.nan_to_num(sc["snr"], nan=-np.inf)
-    rf = int(params.refractory_ms * 1e-3 * fs)
-
-    def refractory(units):
-        for k_u in units:
-            idx = np.flatnonzero((labels == k_u) & (reason == 0))
-            if idx.size > 1:
-                o = idx[np.argsort(fl[idx], kind="stable")]
-                keep = cp.resolve_refractory(fl[o], score[o], rf)
-                reason[o[~keep]] = REASON_REFRACTORY
-
-    refractory(range(len(T)))
-    driven = []
-    if pulses is not None:
-        on, off = pulses
-        m = (on >= a) & (on < a + x.shape[0])
-        if m.any():
-            on, off = on[m] - a, off[m] - a
-            near_p = in_intervals(fl, on, off + post)
-            ok = ((reason != REASON_BAD_PERIOD) & (sc["snr"] >= params.pulse_snr)
-                  & (amps >= params.pulse_rel * amp_ref[labels]) & (sc["cos_pl"] >= params.pulse_cos))
-            driven = light_driven(fl[ok], labels[ok], on, off, x.shape[0] / fs, fs, params)
-            relax = np.isin(labels, driven) & near_p & (reason != 0) & ok
-            reason[relax] = 0
-            refractory(driven)
+    post = int(params.pulse_exclude_post_ms * 1e-3 * fs)
     acc = reason == 0
     newT = np.full_like(T, np.nan)
     n_used = np.zeros(len(T), np.int64)
@@ -551,7 +583,7 @@ def tetrode_window(x: np.ndarray, a: int, frames_abs: np.ndarray, labels: np.nda
         est = sn.astype(np.float64).mean(axis=0)
         newT[k_u] = (1 - params.blend) * T[k_u] + params.blend * est
         n_used[k_u] = sel.size
-    return {"scores": sc, "reason": reason, "newT": newT, "n_used": n_used, "noise": noise, "driven": driven}
+    return {"scores": sc, "reason": reason, "newT": newT, "n_used": n_used, "noise": noise, "sustained": sustained}
 
 
 # --- the carry ---------------------------------------------------------------------------------------
@@ -636,7 +668,7 @@ def run_carry(binary, W: np.ndarray, bank0: Bank, out_dir: pathlib.Path, *, para
         cols = {k: [] for k in ("frame", "unit", "a", "snr", "cos_raw", "cos_pl", "resid", "trough", "reason")}
         newbank = bank.copy()
         n_used = np.zeros(len(bank.ids), np.int64)
-        noise, driven = {}, []
+        noise, sustained = {}, []
         for g, r in zip(groups, res):
             gi = np.flatnonzero(bank.group == g)
             m = bank.group[ci] == g
@@ -651,22 +683,22 @@ def run_carry(binary, W: np.ndarray, bank0: Bank, out_dir: pathlib.Path, *, para
                     newbank.T[k_u, :, :nch[g]] = r["newT"][j].astype(np.float32)
                     n_used[k_u] = r["n_used"][j]
             noise[g] = r["noise"]
-            driven += [int(bank.ids[gi[k]]) for k in r["driven"]]
+            sustained += [int(bank.ids[gi[k]]) for k in r["sustained"]]
         arrays = {k: np.concatenate(v) for k, v in cols.items()}
         o = np.argsort(arrays["frame"], kind="stable")
         np.savez(f_sp, **{k: v[o] for k, v in arrays.items()})
         bank.save(out_dir / f"bankin_w{w:02d}.npz", sigma=sigma)
-        driven = np.array(sorted(driven), np.int64)
+        sustained = np.array(sorted(sustained), np.int64)
         noise_arr = np.full((len(groups), bank.T.shape[2]), np.nan)
         for i, g in enumerate(groups):
             noise_arr[i, :noise[g].size] = noise[g]
-        extra = dict(noise=noise_arr, noise_groups=np.array(groups), driven=driven)
+        extra = dict(noise=noise_arr, noise_groups=np.array(groups), sustained=sustained)
         acc = arrays["reason"] == 0
         if params.reseed_every and w > 0 and w % params.reseed_every == 0:
             newbank = reseed(plain, rec, newbank, a, b, reseed_dir / f"reseed_w{w}", params, n_jobs=n_jobs)
             n_used = np.r_[n_used, np.zeros(len(newbank.ids) - len(n_used), np.int64)]
         newbank.save(f_bk, n_used=n_used, **extra)
-        log(f"w{w:02d}: {acc.sum():,} accepted of {acc.size:,} fits; driven {driven.tolist()}; "
+        log(f"w{w:02d}: {acc.sum():,} accepted of {acc.size:,} fits; sustained {sustained.tolist()}; "
             f"{(n_used > 0).sum()}/{len(bank.ids)} templates re-estimated; match {t_match / 60:.1f} min, "
             f"total {(time.time() - t0) / 60:.1f} min")
         bank = newbank
@@ -693,6 +725,90 @@ def export_sorting(out_dir: pathlib.Path, folder: pathlib.Path, fs: float):
     return s
 
 
+READMIT_KEYS = ("pulse_relax", "pulse_relax_post_ms")
+
+
+def readmit_window(z, bankin: Bank, params: CarryParams, *, fs: float, a: int, n_frames: int, pulses=None,
+                   bad_periods: dict | None = None) -> tuple[np.ndarray, list[int]]:
+    """Reasons for one window's saved fits ``z`` (a ``spikes_wNN.npz``) under ``params``, from the
+    scores the carry recorded and ``bankin``, the bank it matched. Returns the reasons in the file's
+    order and the ids of the sustained responders."""
+    bad_periods = bad_periods or {}
+    frame, unit = z["frame"], z["unit"]
+    k_of = {int(u): k for k, u in enumerate(bankin.ids)}
+    k = np.array([k_of[int(u)] for u in unit], np.int64) if unit.size else np.zeros(0, np.int64)
+    reason = np.zeros(frame.size, np.int8)
+    sustained = []
+    for g in sorted(set(bankin.group.tolist())):
+        gi = np.flatnonzero(bankin.group == g)
+        m = np.flatnonzero(bankin.group[k] == g)
+        if not m.size:
+            continue
+        r, d = admit(frame[m], np.searchsorted(gi, k[m]), z["a"][m], z["snr"][m], z["cos_pl"][m], gi.size, params,
+                     fs=fs, a=a, n_frames=n_frames, pulses=pulses, bad=bad_periods.get(int(g), []))
+        reason[m] = r
+        sustained += [int(bankin.ids[gi[j]]) for j in d]
+    return reason, sorted(sustained)
+
+
+def readmit_carry(out_dir: pathlib.Path, params: CarryParams, *, fs: float, n_frames: int, pulses=None,
+                  bad_periods: dict | None = None) -> None:
+    """Replay admission (steps 5.3 and 5.4) on every window of a finished carry under ``params``.
+
+    Each ``spikes_wNN.npz`` gets the new ``reason``; the carry's own reasons are kept as
+    ``reason_carry`` (from the first replay, if there were several). ``bank_wNN.npz`` keeps the carry's
+    templates and its record of sustained responders (``driven`` in banks written before
+    2026-11-06). Only the pulse rule's parameters in ``READMIT_KEYS`` may differ from
+    the carry's: the others change the templates or the matching, which a replay cannot redo.
+    """
+    out_dir = pathlib.Path(out_dir)
+    win_frames = int(params.window_s * fs)
+    for f in sorted(out_dir.glob("spikes_w*.npz")):
+        w = int(f.stem.split("_w")[1])
+        z = dict(np.load(f))
+        bankin = Bank.load(out_dir / f"bankin_w{w:02d}.npz")
+        a = w * win_frames
+        reason, sustained = readmit_window(z, bankin, params, fs=fs, a=a, n_frames=min(win_frames, n_frames - a),
+                                        pulses=pulses, bad_periods=bad_periods)
+        old = z["reason"]
+        z.setdefault("reason_carry", old)
+        z["reason"] = reason
+        tmp = f.with_name(f.stem + ".tmp.npz")
+        np.savez(tmp, **z)
+        tmp.replace(f)
+        log(f"w{w:02d}: {int(((old == 0) & (reason != 0)).sum()):,} no longer accepted, "
+            f"{int(((old != 0) & (reason == 0)).sum()):,} newly accepted; sustained {sustained}")
+
+
+def _params_dict(d: dict) -> dict:
+    """A recorded parameter dict in the current form. Before 2026-11-06, ``pulse_post_ms`` set both
+    the exclusion and the relaxed span, with the pulse rule on, and the sustained-response test's
+    parameters were named ``driven_*``."""
+    d = {(f"sustained_{k[7:]}" if k.startswith("driven_") else k): v for k, v in d.items()}
+    if "pulse_post_ms" in d:
+        v = d.pop("pulse_post_ms")
+        d.update(pulse_exclude_post_ms=v, pulse_relax=True, pulse_relax_post_ms=v)
+    return d
+
+
+def record_readmit(path: pathlib.Path, params: CarryParams) -> dict:
+    """Update ``carry_params.json`` for a replay under ``params``; refuses a change outside
+    ``READMIT_KEYS``. The carry's parameters are kept under ``carried_with``. Returns the changes."""
+    path = pathlib.Path(path)
+    info = json.loads(path.read_text())
+    old = _params_dict(info["params"])
+    new = params.to_dict()
+    diff = {k: (old.get(k), v) for k, v in new.items() if old.get(k) != v}
+    if set(diff) - set(READMIT_KEYS) or set(old) != set(new):
+        raise ValueError(f"a replay cannot change {sorted(set(diff) - set(READMIT_KEYS))}; rerun the carry")
+    info.setdefault("carried_with", info["params"])
+    info["params"] = new
+    info.setdefault("readmitted", []).append({"changes": {k: list(v) for k, v in diff.items()},
+                                              "written": time.strftime("%Y-%m-%dT%H:%M:%S")})
+    path.write_text(json.dumps(info, indent=2) + "\n")
+    return diff
+
+
 def write_run_info(path: pathlib.Path, params: CarryParams, **inputs) -> None:
     """``carry_params.json``: the parameters, the inputs and the package versions; refuses to
     overwrite one with different parameters, so a resumed run cannot mix them."""
@@ -701,7 +817,7 @@ def write_run_info(path: pathlib.Path, params: CarryParams, **inputs) -> None:
     path = pathlib.Path(path)
     if path.exists():
         old = json.loads(path.read_text())
-        if old.get("params") != params.to_dict():
+        if _params_dict(old.get("params", {})) != params.to_dict():
             raise ValueError(f"{path} holds different parameters; use another run directory")
         return
     versions = {}

@@ -96,8 +96,93 @@ def test_relaxed_rule_inside_pulses_only_for_units_that_fire_through_them() -> N
     with_pulses = _run(x, frames, amps, T, pulses=(on, off))
     is_in = np.isin(frames, inside)
     assert (without["reason"][is_in] == cr.REASON_ACCEPTED).mean() < 0.2
-    assert with_pulses["driven"] == [0]
+    assert with_pulses["sustained"] == [0]
     assert (with_pulses["reason"][is_in] == cr.REASON_ACCEPTED).mean() > 0.9
+
+
+def _sustained_case(post_ms=(2, 4, 20, 60)):
+    """A unit firing half-size spikes through 207 ms pulses, with half-size fits at ``post_ms`` after
+    each offset, and full-size spikes elsewhere."""
+    T = _template()
+    on = np.arange(10_000, 290_000, 30_000)
+    off = on + int(0.207 * FS)
+    outside = np.arange(2000, 290_000, 3000)
+    outside = outside[~cr.in_intervals(outside, on, off + 3000)]
+    inside = np.concatenate([np.arange(o + 600, f, 200) for o, f in zip(on, off)])
+    after = {ms: off + int(ms * 1e-3 * FS) for ms in post_ms}
+    small = np.r_[inside, *after.values()]
+    x = _tetrode(frames=np.r_[outside, small], amps=np.r_[np.ones(outside.size), np.full(small.size, 0.45)], T=T)
+    frames = np.sort(np.r_[outside, small])
+    amps = np.where(np.isin(frames, small), 0.45, 1.0)
+    return T, x, frames, amps, (on, off), inside, after
+
+
+def test_relaxed_span_ends_pulse_relax_post_ms_after_the_offset() -> None:
+    T, x, frames, amps, pulses, inside, after = _sustained_case()
+    r = _run(x, frames, amps, T, pulses=pulses)
+    assert r["sustained"] == [0]
+    acc = r["reason"] == cr.REASON_ACCEPTED
+    assert acc[np.isin(frames, inside)].mean() > 0.9
+    assert acc[np.isin(frames, after[2])].mean() > 0.9 and acc[np.isin(frames, after[4])].mean() > 0.9
+    assert not acc[np.isin(frames, after[20])].any() and not acc[np.isin(frames, after[60])].any()
+    wide = _run(x, frames, amps, T, pulses=pulses, params=dataclasses.replace(P, pulse_relax_post_ms=100.0))
+    assert (wide["reason"][np.isin(frames, after[60])] == cr.REASON_ACCEPTED).mean() > 0.9
+
+
+def test_without_the_pulse_rule_pulse_times_still_stay_out_of_the_floor() -> None:
+    T, x, frames, amps, pulses, inside, _ = _sustained_case(post_ms=())
+    off_rule = dataclasses.replace(P, pulse_relax=False)
+    r = _run(x, frames, amps, T, pulses=pulses, params=off_rule)
+    assert r["sustained"] == []
+    assert (r["reason"][np.isin(frames, inside)] == cr.REASON_ACCEPTED).mean() < 0.2
+    on = np.arange(10_000, 290_000, 30_000)
+    off = on + int(0.207 * FS)
+    outside = np.arange(2000, 290_000, 6000)
+    outside = outside[~cr.in_intervals(outside, on, off + 3000)]
+    inside = np.concatenate([np.arange(o + 600, f, 450) for o, f in zip(on, off)])
+    frames = np.sort(np.r_[outside, inside])
+    amps = np.where(np.isin(frames, inside), 0.45, 1.0)
+    assert np.isin(frames, inside).mean() > 0.5
+
+    def admit(pulses):
+        return cr.admit(frames, np.zeros(frames.size, np.int64), amps, np.full(frames.size, 10.0),
+                        np.ones(frames.size), 1, off_rule, fs=FS, a=0, n_frames=300_000, pulses=pulses)[0]
+
+    assert (admit((on, off))[np.isin(frames, inside)] == cr.REASON_FLOOR).all()
+    assert (admit(None)[np.isin(frames, inside)] == cr.REASON_ACCEPTED).all()
+
+
+def test_pulse_rule_takes_no_fit_inside_a_bad_period() -> None:
+    T, x, frames, amps, pulses, inside, _ = _sustained_case(post_ms=())
+    on, off = pulses
+    bad = [(int(on[2]), int(off[2]))]
+    r = _run(x, frames, amps, T, pulses=pulses, bad=bad)
+    in_bad = cr.in_intervals(frames, np.array([bad[0][0]]), np.array([bad[0][1]]))
+    assert r["sustained"] == [0]
+    assert not (r["reason"][in_bad] == cr.REASON_ACCEPTED).any()
+    assert (r["reason"][np.isin(frames, inside) & ~in_bad] == cr.REASON_ACCEPTED).mean() > 0.9
+
+
+def test_run_info_reads_the_single_pulse_span_of_older_runs(tmp_path) -> None:
+    import json
+
+    path = tmp_path / "carry_params.json"
+    old = P.to_dict()
+    for k in ("pulse_exclude_post_ms", "pulse_relax", "pulse_relax_post_ms"):
+        old.pop(k)
+    old["pulse_post_ms"] = 100.0
+    old = {(f"driven_{k[10:]}" if k.startswith("sustained_") else k): v for k, v in old.items()}
+    assert "driven_start_ms" in old
+    path.write_text(json.dumps({"params": old, "inputs": {}}))
+    cr.write_run_info(path, dataclasses.replace(P, pulse_relax_post_ms=100.0))
+    with pytest.raises(ValueError, match="different parameters"):
+        cr.write_run_info(path, P)
+    assert cr.record_readmit(path, P) == {"pulse_relax_post_ms": (100.0, 5.0)}
+    info = json.loads(path.read_text())
+    assert info["params"] == P.to_dict() and info["carried_with"] == old
+    cr.write_run_info(path, P)
+    with pytest.raises(ValueError, match="cannot change"):
+        cr.record_readmit(path, dataclasses.replace(P, pulse_exclude_post_ms=50.0))
 
 
 def _binary(tmp_path, n=4 * 60_000):
@@ -141,6 +226,31 @@ def test_carry_writes_each_window_and_resumes(tmp_path) -> None:
         np.testing.assert_array_equal(a["reason"], b["reason"])
     s = cr.export_sorting(out, tmp_path / "sorting", FS)
     assert s.get_num_units() == 2 and list(s.get_property("group")) == [0, 1]
+
+
+def test_readmit_replays_the_carry_and_applies_new_pulse_parameters(tmp_path) -> None:
+    path, rec, bank = _binary(tmp_path)
+    params = dataclasses.replace(P, window_s=2.0, whiten_s=2.0, reseed_every=0, rebuild_min_accepted=20,
+                                 rebuild_min_selected=10, rel_min_lead=10, sustained_min_spikes=5)
+    W = cr.whitening_matrix(rec, params)
+    groups = np.asarray(rec.get_property("group")).astype(int)
+    on = np.arange(3_000, rec.get_num_frames() - 10_000, 9_000)
+    pulses = (on, on + 3_000)
+    out = tmp_path / "carry"
+    cr.run_carry(path, W, bank.whitened(W, groups), out, params=params, windows=range(4), pulses=pulses,
+                 bad_periods={0: [(20_000, 25_000)]}, n_jobs=1, workers=1)
+    saved = {w: np.load(out / f"spikes_w{w:02d}.npz")["reason"] for w in range(4)}
+    for w in range(4):
+        z = np.load(out / f"spikes_w{w:02d}.npz")
+        r, _ = cr.readmit_window(z, cr.Bank.load(out / f"bankin_w{w:02d}.npz"), params, fs=FS,
+                                 a=w * 60_000, n_frames=60_000, pulses=pulses, bad_periods={0: [(20_000, 25_000)]})
+        np.testing.assert_array_equal(r, saved[w])
+    cr.readmit_carry(out, dataclasses.replace(params, pulse_relax=False), fs=FS, n_frames=rec.get_num_frames(),
+                     pulses=pulses, bad_periods={0: [(20_000, 25_000)]})
+    for w in range(4):
+        z = np.load(out / f"spikes_w{w:02d}.npz")
+        np.testing.assert_array_equal(z["reason_carry"], saved[w])
+        assert z["frame"].size == saved[w].size
 
 
 def test_run_info_refuses_other_parameters(tmp_path) -> None:

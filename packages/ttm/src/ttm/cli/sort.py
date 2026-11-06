@@ -8,6 +8,9 @@ Stages, each resumable, in ``<session>/sortings_carry/<run>/``:
   seed      MountainSort5 on window 0 (``seed_sort/``), the starting bank ``bank0.npz``, and the
             whitening ``whitening.npz``
   carry     the windows (``carry/spikes_wNN.npz``, ``bank_wNN.npz``), re-seed sorts in ``reseed_sorts/``
+  readmit   admission replayed on a finished carry's saved fits with the pulse rule's current
+            parameters and the carry's own pulse table and bad periods (``ttm.carry.readmit_carry``);
+            not part of ``all``, run ``export`` after it
   export    the accepted spikes as a sorting in ``sorting/``
   analyzer  noise levels (``noise_levels.csv``), the multi-unit events (``multi_unit/``, cutoffs in
             ``multi_unit/cutoffs.csv``), the sorting with one multi-unit unit per tetrode
@@ -19,16 +22,21 @@ Stages, each resumable, in ``<session>/sortings_carry/<run>/``:
 the experiment's ``bad_periods/bad_periods.csv`` when it exists (``ttm-bad-periods``). The manifest's
 ``badChannels`` and every channel of its ``badTetrodes`` are removed before the reference and are not
 sorted (also from a ``--binary`` that holds them), unless ``--keep-bad-channels``. Laser pulses are
-read from ``--pulses`` (CSV with ``onset_s`` and ``offset_s`` in session seconds); without it the rule
-for pulses is not applied.
+read from ``--pulses`` (CSV with ``onset_s`` and ``offset_s`` in session seconds). With a pulse table,
+spikes from each onset to ``--pulse-exclude-post-ms`` after the offset stay out of the relative
+floor's reference and the template updates, and sustained responders' fits from onset to
+``--pulse-relax-post-ms`` after the offset are admitted under the pulse rule, unless
+``--no-pulse-relax``. Without a pulse table, neither applies.
 
 Example: ttm-sort all --subject TTM-003 --experiment TTM-003-48H --pulses PULSES.csv
+         ttm-sort all --subject TTM-003 --experiment TTM-003-48H-2 --pulses PULSES.csv --no-pulse-relax
          ttm-sort analyzer --subject TTM-003 --experiment TTM-003-48H --n-jobs 48
 """
 
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import pathlib
 import time
 
@@ -47,11 +55,19 @@ def _windows(spec: str | None):
 def main(argv: list[str] | None = None) -> None:
     line_buffered()
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("stage", choices=["binary", "seed", "carry", "export", "analyzer", "all"])
+    ap.add_argument("stage", choices=["binary", "seed", "carry", "readmit", "export", "analyzer", "all"])
     add_experiment_args(ap)
     ap.add_argument("--run", default="main", help="run directory name under <session>/sortings_carry/")
     ap.add_argument("--binary", default=None, help="an existing preprocessed binary to sort instead of binary/")
     ap.add_argument("--pulses", default=None, help="CSV of laser pulses (onset_s, offset_s)")
+    ap.add_argument("--no-pulse-relax", action="store_true",
+                    help="keep pulse times out of the floor and template updates, without the pulse rule")
+    ap.add_argument("--pulse-relax-post-ms", type=float, default=None,
+                    help="end of the pulse rule's span after each offset (default: CarryParams)")
+    ap.add_argument("--pulse-exclude-post-ms", type=float, default=None,
+                    help="end of the excluded span after each offset (default: CarryParams)")
+    ap.add_argument("--sustained-start-ms", type=float, default=None,
+                    help="start of the sustained-response count after each onset (default: CarryParams)")
     ap.add_argument("--bad-periods", default=None, help="bad-period table (default: the experiment's)")
     ap.add_argument("--no-bad-periods", action="store_true", help="sort without a bad-period table")
     ap.add_argument("--bank", default=None,
@@ -82,7 +98,11 @@ def main(argv: list[str] | None = None) -> None:
     cr.log(f"bad channels left out: {[str(c) for c in drop] or 'none'}")
     run_dir = exp.sorting_dir(a.run, subdir="sortings_carry")
     run_dir.mkdir(parents=True, exist_ok=True)
-    params = cr.CarryParams()
+    over = {"pulse_relax": False} if a.no_pulse_relax else {}
+    for key in ("pulse_relax_post_ms", "pulse_exclude_post_ms", "sustained_start_ms"):
+        if getattr(a, key) is not None:
+            over[key] = getattr(a, key)
+    params = dataclasses.replace(cr.CarryParams(), **over)
     binary = pathlib.Path(a.binary) if a.binary else run_dir / "binary"
     bad_path = None if a.no_bad_periods else (pathlib.Path(a.bad_periods) if a.bad_periods
                                                else exp.bad_periods_dir / "bad_periods.csv")
@@ -92,11 +112,15 @@ def main(argv: list[str] | None = None) -> None:
         bad_path = None
     whitening = pathlib.Path(a.whitening) if a.whitening else run_dir / "whitening.npz"
     bank_path = pathlib.Path(a.bank) if a.bank else run_dir / "bank0.npz"
-    cr.write_run_info(run_dir / "carry_params.json", params, store=exp.store_path(), binary=binary,
-                      dropped_channels=[str(c) for c in drop],
-                      binary_dtype=a.binary_dtype if not a.binary else "as given",
-                      bad_periods=bad_path, pulses=a.pulses, bank=bank_path, whitening=whitening,
-                      reseed_sorts=a.reseed_sorts or run_dir / "reseed_sorts")
+    if a.stage == "readmit":
+        diff = cr.record_readmit(run_dir / "carry_params.json", params)
+        cr.log(f"readmit with {diff or 'no change'}")
+    else:
+        cr.write_run_info(run_dir / "carry_params.json", params, store=exp.store_path(), binary=binary,
+                          dropped_channels=[str(c) for c in drop],
+                          binary_dtype=a.binary_dtype if not a.binary else "as given",
+                          bad_periods=bad_path, pulses=a.pulses, bank=bank_path, whitening=whitening,
+                          reseed_sorts=a.reseed_sorts or run_dir / "reseed_sorts")
     stages = ["binary", "seed", "carry", "export", "analyzer"] if a.stage == "all" else [a.stage]
 
     if "binary" in stages and not (binary / "binary.json").exists():
@@ -140,6 +164,20 @@ def main(argv: list[str] | None = None) -> None:
                      bad_periods=bad, reseed_dir=a.reseed_sorts or run_dir / "reseed_sorts", drop_channel_ids=drop,
                      n_jobs=a.n_jobs,
                      workers=a.workers)
+
+    if "readmit" in stages:
+        import json
+
+        recorded = json.loads((run_dir / "carry_params.json").read_text())["inputs"]
+        for name, given in (("pulses", a.pulses), ("bad_periods", bad_path)):
+            if str(given) != recorded[name] and not (name == "pulses" and given is None):
+                raise ValueError(f"--{name.replace('_', '-')} {given} differs from the carry's {recorded[name]}")
+        rec = cr.open_sorting_recording(binary, drop)
+        fs = rec.get_sampling_frequency()
+        pulses = cr.read_pulses(recorded["pulses"], fs) if recorded["pulses"] != "None" else None
+        bad = cr.read_bad_periods(recorded["bad_periods"], fs) if recorded["bad_periods"] != "None" else {}
+        cr.readmit_carry(run_dir / "carry", params, fs=fs, n_frames=rec.get_num_frames(), pulses=pulses,
+                         bad_periods=bad)
 
     if "export" in stages:
         rec = si.load(binary)
