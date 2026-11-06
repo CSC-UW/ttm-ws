@@ -15,7 +15,8 @@ binary (``ttm.sorting.preprocess_for_sorting``):
   units unlike any carried on their tetrode. Each window writes its spikes
   and banks, so a run resumes at the first window without them.
 - ``readmit_carry``: the admission of a finished carry replayed on its saved fits with other
-  pulse-rule parameters, which change neither the templates nor the matching.
+  pulse-rule parameters, which reach the templates (and so the matching) only through the template
+  update's counts of accepted and lead spikes.
 - ``export_sorting``: the accepted spikes of every window as one sorting.
 
 Parameters are those of ``CarryParams``. Templates are (n_samples, 4) on the
