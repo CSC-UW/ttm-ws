@@ -63,20 +63,20 @@ with S = 480.
 
 | Pulses per hour (R) | Shams per hour (S) | Events (E) | Median interval between events | 1st to 99th percentile | Median interval between pulses |
 |---|---|---|---|---|---|
-| 240 | 240 | 480 | 5.76 s | 2.06 to 27.92 s | 10.65 s |
-| 480 | 480 | 960 | 3.21 s | 2.02 to 10.17 s | 5.51 s |
-| 960 | 240 | 1,200 | 2.68 s | 2.01 to 6.51 s | 2.98 s |
+| 240 | 240 | 480 | 5.45 s | 1.07 to 31.63 s | 10.34 s |
+| 480 | 480 | 960 | 2.90 s | 1.03 to 13.86 s | 5.35 s |
+| 960 | 960 | 1,920 | 1.60 s | 1.01 to 4.99 s | 2.82 s |
+| 960 | 240 | 1,200 | 2.37 s | 1.02 to 10.04 s | 2.89 s |
 
-The intervals are from 20 draws of the rule below. At 960 pulses per hour,
-as many shams as pulses do not fit with a 2 s minimum interval (1,920
-events and the two margins need 3,848 s), so one event in five is a sham.
+The intervals are from 20 draws of the rule below with a 1 s minimum
+interval.
 
 ## Timing rule
 
 Times are in milliseconds from the window's time zero. An event's time is
 the rising edge of its TTL, on the laser line for a pulse and on the sham
 line for a sham. The window length is W = 3,600,000, the margin
-m = 5,000 and the minimum interval, onset to onset, d = 2,000.
+m = 5,000 and the minimum interval, onset to onset, d = 1,000.
 
 1. The free time is F = W - 2m - (E - 1)d.
 2. Draw E independent values uniformly on [0, F) and sort them, so that
@@ -90,15 +90,19 @@ m = 5,000 and the minimum interval, onset to onset, d = 2,000.
 
 What the rule gives:
 
-- Every interval between events is at least 2 s. In TTM-003-48H-2,
+- Every interval between events is at least 1 s. In TTM-003-48H-2,
   pulses 1 s apart showed no decline of the OFF share (defined under
   Expected precision) over 20 pulses: 0.363 for pulses 1 to 5 and 0.345
   for pulses 16 to 20 over all trains, a change in log-odds per pulse
   position of -0.004 (95 % interval -0.017 to 0.009). Three quarters of
   OFF periods ended by 126 ms after onset, and the mean LFP response was
-  back at baseline by 338 ms.
-- The part of each interval beyond 2 s is close to exponential, with mean
-  about F / E (1.74 s at R = S = 480). The chance of the next event does not
+  back at baseline by 338 ms, so the mean response to a pulse is over
+  before the 500 ms that precede the next event, the longest stretch
+  before onset that the analysis uses. The 1 s spacing there lasted for
+  20 pulses; here intervals near 1 s are scattered through the hour
+  (31 % of them are under 2 s at R = S = 480).
+- The part of each interval beyond 1 s is close to exponential, with mean
+  about F / E (2.74 s at R = S = 480). The chance of the next event does not
   grow while waiting. My expectation, untested, is that this leaves no
   rhythm to entrain to or anticipate.
 - The counts are exact and the events are spread evenly across the hour
@@ -112,15 +116,18 @@ What the rule gives:
 
 `subjects/ttm-003/scripts/sd_stim_schedule.py` implements the rule. Its
 `--sham-every k` makes one event in k a sham, so S = R / (k - 1), and R
-must be a multiple of k - 1: k = 2 gives S = R and k = 5 gives the 960
-row. It writes a CSV with the columns `window` (from 1), `index` (from 0
-in each window), `offset_ms` (the time from time zero), `type` (`pulse` or
-`sham`), `clock` (local clock time to the millisecond) and `interval_ms`
-(from the previous event in the window, blank on each window's first
-row), and a JSON file with the parameters, the seed and its checks: the
+must be a multiple of k - 1: k = 2 gives S = R and k = 5 gives the row
+with 960 pulses and 240 shams. Its `--min-interval-s` sets d in seconds
+(default 1). It writes a CSV with the columns `window` (from 1), `index`
+(from 0 in each window), `offset_ms` (the time from time zero), `type`
+(`pulse` or `sham`), `clock` (local clock time to the millisecond) and
+`interval_ms` (from the previous event in the window, blank on each
+window's first row), and a JSON file with the parameters, the seed and its checks: the
 counts, the shortest, mean and longest interval, the margins, and the
 median time since the previous light pulse for pulses and for shams
-(5.58 and 5.59 s in the example below).
+(5.15 and 5.42 s in the example below; over 300 seeds these medians
+average 5.44 and 5.46 s, and their difference varies by 0.41 s, one
+standard deviation, from seed to seed).
 
 ```
 python subjects/ttm-003/scripts/sd_stim_schedule.py --pulses-per-hour 480 \
@@ -285,11 +292,12 @@ detects (80 % power, two-sided p < 0.05, 2.8 standard errors) and, in
 brackets, the sleep deprivations needed to detect 0.10 and 0.05 if the
 true change is the same in each (from the unrounded differences):
 
-| Pulses per hour | A | B | C | D |
+| Pulses + shams per hour | A | B | C | D |
 |---|---|---|---|---|
-| 240 | 0.126 (2, 7) | 0.143 (3, 9) | 0.183 (4, 14) | 0.294 (9, 35) |
-| 480 | 0.093 (1, 4) | 0.114 (2, 6) | 0.162 (3, 11) | 0.281 (8, 32) |
-| 960 | 0.071 (1, 3) | 0.097 (1, 4) | 0.150 (3, 10) | 0.274 (8, 31) |
+| 240 + 240 | 0.126 (2, 7) | 0.143 (3, 9) | 0.183 (4, 14) | 0.294 (9, 35) |
+| 480 + 480 | 0.093 (1, 4) | 0.115 (2, 6) | 0.162 (3, 11) | 0.281 (8, 32) |
+| 960 + 960 | 0.071 (1, 3) | 0.098 (1, 4) | 0.151 (3, 10) | 0.275 (8, 31) |
+| 960 + 240 | 0.071 (1, 3) | 0.098 (1, 4) | 0.150 (3, 10) | 0.274 (8, 31) |
 
 These figures are conjecture: they carry TTM-003-48H-2's OFF share and
 state variance, and the shape of its spontaneous spectra, over to a new
@@ -300,9 +308,10 @@ train, and 0.5 % of those in the sleep deprivation were followed by an OFF
 period (9 % over the whole recording). Treating shams as independent
 binomial events, with no state covariance among themselves or with the
 pulses: at 0.5 %, subtracting the shams widens the detectable
-pulse-minus-sham difference by at most 3.2 %. At 9 %
+pulse-minus-sham difference by at most 3.1 %. At 9 %
 it would widen it by 2 to 16 % at R = S = 240 or 480, depending on the
-model, and by 4 to 44 % at 960 pulses with 240 shams.
+model, by 1 to 12 % at R = S = 960, and by 4 to 43 % at 960 pulses with
+240 shams.
 
 For scale, in rats sleep deprived with novel objects from light onset,
 OFF periods in waking cortex became about 57 % more frequent from the
@@ -328,7 +337,7 @@ state persists, and shows which of the four models held.
 ## Not decided
 
 - The pulse rate. I suggest 480 per hour: under A it detects 0.093
-  against 0.071 at 960 per hour, and under B 0.114 against 0.097, with
+  against 0.071 at 960 per hour, and under B 0.115 against 0.098, with
   half the stimulation; under C and D the rate matters little.
 - Window 2 follows the 480 pulses of window 1, so any lasting effect of
   the first hour's stimulation on the last hour's response is mixed with

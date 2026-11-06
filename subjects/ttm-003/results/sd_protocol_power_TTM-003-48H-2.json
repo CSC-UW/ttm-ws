@@ -249,6 +249,7 @@
    }
   }
  },
+ "min_interval_s": 1.0,
  "models": {
   "A": {
    "designs": [
@@ -260,7 +261,7 @@
      "sleep_deprivations_for_0.05": 7,
      "sham_widening_by_sham_rate": {
       "0.005": 0.01,
-      "0.09": 0.157
+      "0.09": 0.156
      }
     },
     {
@@ -271,7 +272,18 @@
      "sleep_deprivations_for_0.05": 4,
      "sham_widening_by_sham_rate": {
       "0.005": 0.009,
-      "0.09": 0.145
+      "0.09": 0.143
+     }
+    },
+    {
+     "pulses_per_hour": 960,
+     "shams_per_hour": 960,
+     "detectable_difference": 0.071,
+     "sleep_deprivations_for_0.10": 1,
+     "sleep_deprivations_for_0.05": 3,
+     "sham_widening_by_sham_rate": {
+      "0.005": 0.008,
+      "0.09": 0.124
      }
     },
     {
@@ -281,8 +293,8 @@
      "sleep_deprivations_for_0.10": 1,
      "sleep_deprivations_for_0.05": 3,
      "sham_widening_by_sham_rate": {
-      "0.005": 0.032,
-      "0.09": 0.437
+      "0.005": 0.031,
+      "0.09": 0.433
      }
     }
    ],
@@ -303,13 +315,13 @@
      "sleep_deprivations_for_0.05": 9,
      "sham_widening_by_sham_rate": {
       "0.005": 0.008,
-      "0.09": 0.124
+      "0.09": 0.123
      }
     },
     {
      "pulses_per_hour": 480,
      "shams_per_hour": 480,
-     "detectable_difference": 0.114,
+     "detectable_difference": 0.115,
      "sleep_deprivations_for_0.10": 2,
      "sleep_deprivations_for_0.05": 6,
      "sham_widening_by_sham_rate": {
@@ -319,13 +331,24 @@
     },
     {
      "pulses_per_hour": 960,
+     "shams_per_hour": 960,
+     "detectable_difference": 0.098,
+     "sleep_deprivations_for_0.10": 1,
+     "sleep_deprivations_for_0.05": 4,
+     "sham_widening_by_sham_rate": {
+      "0.005": 0.004,
+      "0.09": 0.068
+     }
+    },
+    {
+     "pulses_per_hour": 960,
      "shams_per_hour": 240,
-     "detectable_difference": 0.097,
+     "detectable_difference": 0.098,
      "sleep_deprivations_for_0.10": 1,
      "sleep_deprivations_for_0.05": 4,
      "sham_widening_by_sham_rate": {
       "0.005": 0.017,
-      "0.09": 0.251
+      "0.09": 0.249
      }
     }
    ],
@@ -362,6 +385,17 @@
     },
     {
      "pulses_per_hour": 960,
+     "shams_per_hour": 960,
+     "detectable_difference": 0.151,
+     "sleep_deprivations_for_0.10": 3,
+     "sleep_deprivations_for_0.05": 10,
+     "sham_widening_by_sham_rate": {
+      "0.005": 0.002,
+      "0.09": 0.029
+     }
+    },
+    {
+     "pulses_per_hour": 960,
      "shams_per_hour": 240,
      "detectable_difference": 0.15,
      "sleep_deprivations_for_0.10": 3,
@@ -389,7 +423,7 @@
      "sleep_deprivations_for_0.05": 35,
      "sham_widening_by_sham_rate": {
       "0.005": 0.002,
-      "0.09": 0.031
+      "0.09": 0.03
      }
     },
     {
@@ -401,6 +435,17 @@
      "sham_widening_by_sham_rate": {
       "0.005": 0.001,
       "0.09": 0.017
+     }
+    },
+    {
+     "pulses_per_hour": 960,
+     "shams_per_hour": 960,
+     "detectable_difference": 0.275,
+     "sleep_deprivations_for_0.10": 8,
+     "sleep_deprivations_for_0.05": 31,
+     "sham_widening_by_sham_rate": {
+      "0.005": 0.001,
+      "0.09": 0.009
      }
     },
     {
@@ -427,32 +472,42 @@
   {
    "pulses_per_hour": 240,
    "events_per_hour": 480,
-   "event_interval_s_median": 5.76,
+   "event_interval_s_median": 5.45,
    "event_interval_s_p1_p99": [
-    2.06,
-    27.92
+    1.07,
+    31.63
    ],
-   "pulse_interval_s_median": 10.65
+   "pulse_interval_s_median": 10.34
   },
   {
    "pulses_per_hour": 480,
    "events_per_hour": 960,
-   "event_interval_s_median": 3.21,
+   "event_interval_s_median": 2.9,
    "event_interval_s_p1_p99": [
-    2.02,
-    10.17
+    1.03,
+    13.86
    ],
-   "pulse_interval_s_median": 5.51
+   "pulse_interval_s_median": 5.35
+  },
+  {
+   "pulses_per_hour": 960,
+   "events_per_hour": 1920,
+   "event_interval_s_median": 1.6,
+   "event_interval_s_p1_p99": [
+    1.01,
+    4.99
+   ],
+   "pulse_interval_s_median": 2.82
   },
   {
    "pulses_per_hour": 960,
    "events_per_hour": 1200,
-   "event_interval_s_median": 2.68,
+   "event_interval_s_median": 2.37,
    "event_interval_s_p1_p99": [
-    2.01,
-    6.51
+    1.02,
+    10.04
    ],
-   "pulse_interval_s_median": 2.98
+   "pulse_interval_s_median": 2.89
   }
  ]
 }

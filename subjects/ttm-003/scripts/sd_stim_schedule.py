@@ -42,7 +42,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--pulses-per-hour", type=int, required=True, help="light pulses per hour of window")
     ap.add_argument("--sham-every", type=int, default=2, help="one event in this many is a sham")
-    ap.add_argument("--min-interval-s", type=float, default=2.0)
+    ap.add_argument("--min-interval-s", type=float, default=1.0, help="shortest time between events, onset to onset")
     ap.add_argument("--margin-s", type=float, default=5.0, help="no event this close to a window's start or end")
     ap.add_argument("--windows", nargs="+", default=["09:00-10:00", "13:00-14:00"], help="HH:MM-HH:MM, local")
     ap.add_argument("--date", required=True, help="YYYY-MM-DD of the sleep deprivation")

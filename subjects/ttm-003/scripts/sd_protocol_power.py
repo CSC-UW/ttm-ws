@@ -18,11 +18,12 @@ defines it, per pulse in its cached ``events.csv``. This script measures:
   them excluded: the share of variance at periods of 5 to 1,024 s that lies above 120 s, between 10 and
   120 s and between 5 and 10 s, and the frequency of the largest power times frequency (Welch, 1,024 s
   Hann segments with half overlap inside gap-free stretches, linear detrend);
-- for three models of the state covariance of the OFF outcome, the smallest last-minus-first-hour
+- for four models of the state covariance of the OFF outcome, the smallest last-minus-first-hour
   difference in OFF share that one sleep deprivation detects with 80 % power at two-sided p < 0.05
   (2.8 times the standard error, with the hour means' variance computed exactly from the model and
-  ``sd_stim_schedule.py`` schedules), the sleep deprivations needed for 0.10 and 0.05, the model's
-  covariance in the lag bins above, and how much subtracting shams widens the difference.
+  ``sd_stim_schedule.py`` schedules with ``--min-interval-s`` between events, 1 s by default), the
+  sleep deprivations needed for 0.10 and 0.05, the model's covariance in the lag bins above, and how
+  much subtracting shams widens the difference.
 
 The models share a fast component (variance 0.007, exponential with a 3 s time constant). A adds 0.010
 with a 16 s time constant (a corner at 0.01 Hz); B splits that into 0.0085 at 16 s and 0.0015 at 400 s;
@@ -62,7 +63,7 @@ MODELS = {"A": [(0.010, 16.0)], "B": [(0.0085, 16.0), (0.0015, 400.0)], "C": [(0
           "D": [(0.010, 1200.0)]}
 SLOW_GRID = [(v, tau) for tau in (400.0, 1200.0, 3600.0) for v in (0.0025, 0.005, 0.010)]
 SW2 = 0.205
-DESIGNS = ((240, 2), (480, 2), (960, 5))
+DESIGNS = ((240, 2), (480, 2), (960, 2), (960, 5))
 SEG = 1024
 
 
@@ -226,13 +227,13 @@ def hour_mean_var(t_s: np.ndarray, c: np.ndarray) -> float:
     return SW2 / t_s.size + c[0] * R[0] + 2 * float((c[1:] * R[1:]).sum())
 
 
-def precision() -> dict:
+def precision(min_ms: int) -> dict:
     out = {}
     for m in MODELS:
         c = kernel(m, 3700)
         rows = []
         for R, k in DESIGNS:
-            sched = [draw(R * k // (k - 1), 3_600_000, 5000, 2000, k, np.random.default_rng(s)) for s in range(5)]
+            sched = [draw(R * k // (k - 1), 3_600_000, 5000, min_ms, k, np.random.default_rng(s)) for s in range(5)]
             v = float(np.mean([hour_mean_var(d.offset_ms[d.type == "pulse"].to_numpy() / 1000, c) for d in sched]))
             mdd = 2.8 * np.sqrt(2 * v)
             S = R // (k - 1)
@@ -244,12 +245,12 @@ def precision() -> dict:
     return out
 
 
-def intervals() -> list[dict]:
+def intervals(min_ms: int) -> list[dict]:
     rows = []
     for R, k in DESIGNS:
         ev, pp = [], []
         for s in range(20):
-            d = draw(R * k // (k - 1), 3_600_000, 5000, 2000, k, np.random.default_rng(s))
+            d = draw(R * k // (k - 1), 3_600_000, 5000, min_ms, k, np.random.default_rng(s))
             ev.append(np.diff(d.offset_ms) / 1000)
             pp.append(np.diff(d.offset_ms[d.type == "pulse"]) / 1000)
         ev, pp = np.concatenate(ev), np.concatenate(pp)
@@ -262,7 +263,9 @@ def intervals() -> list[dict]:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     add_experiment_args(ap)
+    ap.add_argument("--min-interval-s", type=float, default=1.0, help="shortest time between events in the schedules")
     a = ap.parse_args()
+    min_ms = round(a.min_interval_s * 1000)
     exp = experiment_from_args(a)
     js = json.loads((RESULTS / f"opto_off_periods_{exp.experiment}.json").read_text())
     tr = pd.read_csv(RESULTS / f"opto_off_periods_{exp.experiment}.csv")
@@ -278,7 +281,8 @@ def main() -> None:
         s = spontaneous(exp, h0, h1, tets, exp.experiment_dir / "sd_protocol_power" / f"spont_{name}.npz")
         spont[name] = spectrum_shares(s, pulses, h0, h1)
     out = {"experiment": exp.experiment, "population": js["population"], "within_train": within_train(pp),
-           "between_trains": between_trains(pp), "spontaneous_spectra": spont, "models": precision(), "intervals": intervals()}
+           "between_trains": between_trains(pp), "spontaneous_spectra": spont, "min_interval_s": a.min_interval_s,
+           "models": precision(min_ms), "intervals": intervals(min_ms)}
     (RESULTS / f"sd_protocol_power_{exp.experiment}.json").write_text(json.dumps(out, indent=1))
     print(json.dumps(out, indent=1))
 
