@@ -499,6 +499,8 @@ def all_spike_pc_metrics(sorting, recording, scratch_dir, params: AnalyzerParams
     pc = pc_metrics_from_projections(np.load(path, mmap_mode="r"), sorting, az.sparsity.mask.sum(axis=1))
     if not keep_projections:
         path.unlink()
+        if not any(scratch_dir.iterdir()):
+            scratch_dir.rmdir()
     return pc
 
 
