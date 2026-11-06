@@ -1,9 +1,9 @@
 ---
-title: spikeinterface issues and PRs for the PC metrics, run_for_all_spikes, noise levels, sd_ratio and zarr gathering
+title: spikeinterface issues and PRs for the PC metrics, run_for_all_spikes, noise levels, sd_ratio, zarr gathering and periods
 updated: 2026-11-05
 ---
 
-# spikeinterface: PC metrics on capped draws, run_for_all_spikes in µV, noise levels, sd_ratio, and zarr gathering
+# spikeinterface: PC metrics on capped draws, run_for_all_spikes in µV, noise levels, sd_ratio, zarr gathering, and periods
 
 Not started. Open these once the analyzer stage of `ttm-sort` is in use,
 since it carries the workarounds, and check spikeinterface's current
@@ -140,7 +140,7 @@ to the zarr array as it arrives. With the default 1 s chunks that is one
 append per second of recording, and each append rewrites the zarr chunk
 being filled (about 10 MB before compression), in the main process,
 while the workers wait. On TTM-003-48H the waveforms of 354,478 random
-spikes (172,709 appends) took 2.1 min per 7,281 rows; stopped after 28
+spikes (172,733 appends) took 2.1 min per 7,281 rows; stopped after 28
 of 49 zarr chunks, it was on course for about 100 min, against 89 s for
 the same extension on an in-memory analyzer.
 In a benchmark one append cost 36 to 85 ms for amplitude rows and 34 to
@@ -149,6 +149,22 @@ In a benchmark one append cost 36 to 85 ms for amplitude rows and 34 to
 The fix buffers rows in `GatherToZarr` and appends whole zarr chunks (the
 last one at `finalize_buffers`). The test: the same arrays as now, and an
 append count equal to the number of zarr chunks.
+
+## 7. Each quality metric selects the periods again
+
+A performance issue. Open an issue, with a PR if the fix stays small.
+
+With `periods`, ten of the fourteen metric functions the analyzer stage
+uses call `sorting.select_periods(periods)` themselves (for example the
+first lines of `compute_sd_ratio`). On the TTM-003-48H sorting with its
+multi-unit units (139.9 M spikes, 3,691 periods, each unit's intervals
+outside its tetrode's bad intervals) one selection takes 88 s, so the
+repeated selections account for about 15 of the 47 min the 14 metrics
+took. Where the rest goes was not measured: num_spikes alone took 208 s
+and firing_rate 187 s.
+
+What a PR could do: select the periods once in the `quality_metrics`
+extension and pass the selected sorting to every metric.
 
 ## Meanwhile, in the analyzer stage
 
@@ -159,4 +175,5 @@ reports isolation distance as missing where item 3 applies, and it
 computes noise levels itself outside bad intervals for item 4
 (`docs/sorting_pipeline.md`, step 8). Its `sd_ratio` is still
 SpikeInterface's (item 5). For item 6 it computes every extension on an
-in-memory analyzer and writes the zarr store once with `save_as`.
+in-memory analyzer and writes the zarr store once with `save_as`. It has
+no workaround for item 7.
