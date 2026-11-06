@@ -220,5 +220,10 @@ last starts at 08:59:40 on 2026-11-05, 27 s before the recording ends.
 `results/laser_pulses_2026-11-03_09-01-38.csv` (`laser_pulses.py`) holds
 all 2,900 pulses.
 
-Not yet converted; the light schedule, any sleep deprivation and the bad
-channels are not in the manifest yet.
+The light schedule, the sleep deprivation window and the bad channel are
+those of TTM-003-48H, two weeks later (experimenter, 2026-11-05): lights on
+at 09:00 and off at 21:00, sleep deprivation with novel objects from 09:00
+to 14:00 on 2026-11-04, and A1_CH22 (TT15), not yet re-checked with
+`channel_qc.py` on this recording. TT6, TT7 and TT9 probably moved between
+the two recordings; whether others did is not yet checked. Not yet
+converted.

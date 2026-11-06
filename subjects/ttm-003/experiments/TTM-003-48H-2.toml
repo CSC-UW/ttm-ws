@@ -2,9 +2,26 @@
 # Second 48 h continuous recording (47.97 h) with optotagging trains of 20
 # pulses at 1 Hz, nominally 50 ms each at about 0.3 mW, every 20 min for the
 # whole recording; see ../stimulation_log.toml and
-# results/stimulation_blocks_2026-11-03_09-01-38.csv. Channel names are
-# A1_CH1 to A1_CH64 (Channel_Naming_Scheme 2), not the CH1 to CH64 written
-# into TTM-003-48H's repaired oebin; the numbers are the same channels.
-# Light schedule, sleep deprivation and bad channels are not entered yet.
+# results/stimulation_blocks_2026-11-03_09-01-38.csv. Light schedule, sleep
+# deprivation window and bad channel as for TTM-003-48H (experimenter,
+# 2026-11-05): lights on at 09:00 and off at 21:00, sleep deprivation with
+# novel objects from 09:00 to 14:00 on the second day, CH22 on TT15. Channel
+# names are A1_CH1 to A1_CH64 (Channel_Naming_Scheme 2), not the CH1 to CH64
+# written into TTM-003-48H's repaired oebin; the numbers are the same
+# channels, so TTM-003-48H's CH22 is A1_CH22 here. The bad channel was not
+# re-checked with scripts/channel_qc.py on this recording.
 session = "2026-11-03_09-01-38"
 acquisition = "TTM3/2026-11-03_09-01-38"
+
+lightsOn = ["2026-11-03T09:00:00", "2026-11-04T09:00:00", "2026-11-05T09:00:00"]
+lightsOff = ["2026-11-03T21:00:00", "2026-11-04T21:00:00"]
+novel_objects_start = "2026-11-04T09:00:00"
+novel_objects_end = "2026-11-04T14:00:00"
+badChannels = ["A1_CH22"]
+badTetrodes = []
+
+[[observations]]
+date = "2026-11-05"
+source = "experimenter"
+scope = ["TT6", "TT7", "TT9"]
+note = "Probably moved since TTM-003-48H. Other tetrodes may have moved too; not yet checked."
