@@ -78,7 +78,7 @@ Run times are for TTM-003-48H on one server (Intel Xeon Platinum 8276M,
 | 5 | [Carry-forward matching](#5-carry-forward-matching) | `ttm-sort carry` | accepted spikes and updated bank per window |
 | 6 | [Re-seeding](#6-re-seeding) | `ttm-sort carry` | units added to the bank |
 | 7 | [Export](#7-export) | `ttm-sort export` | SpikeInterface sorting |
-| 8 | [Analyzer and metrics](#8-analyzer-and-metrics) | | partly defined, not yet built |
+| 8 | [Analyzer and metrics](#8-analyzer-and-metrics) | `ttm-sort analyzer` | SortingAnalyzer with multi-unit units and quality metrics |
 | 9 | [Curation](#9-curation) | | not yet defined |
 
 To run it on a recording that has been through step 0 (each command
@@ -100,13 +100,15 @@ ttm-sort all --subject TTM-003 --experiment TTM-003-48H \
   (5.3.4) and the template updates (5.5). A stimulated recording then
   loses most of its driven cells' smaller in-pulse spikes.
 - `ttm-sort` writes to `<session>/sortings_carry/<run>/` (`--run`,
-  default `main`). Its stages (`binary`, `seed`, `carry`, `export`) can
-  be run one at a time. `--binary` sorts an existing preprocessed binary
+  default `main`). Its stages (`binary`, `seed`, `carry`, `export`,
+  `analyzer`) can be run one at a time. `--binary` sorts an existing preprocessed binary
   instead of writing one in step 2.
 - End to end on TTM-003-48H: about 19 to 20 h (estimated from the
   steps' measured times): the offset fit 13 min, the binary 40 min, the
   seed sort 30 min, the 96 windows about 14.5 h, and the seven re-seed
-  sorts about 3.5 h, run one after another.
+  sorts about 3.5 h, run one after another, through `export`. The
+  `analyzer` stage, which `ttm-sort all` also runs, took another 1.8 h
+  (step 8), so about 21 h in all.
 
 ## 0. Before sorting
 
@@ -501,8 +503,8 @@ re-seeds added 19.
 Fixed:
 
 - The SortingAnalyzer is built on the binary of step 2, the data the
-  sort came from, never on another preprocessing of the session. It will
-  be a stage of `ttm-sort`; that stage is not written yet.
+  sort came from, never on another preprocessing of the session, by
+  `ttm-sort analyzer` (below).
 - L-ratio and isolation distance are computed on the principal-component
   projections of every spike, not on the analyzer's random draw of spikes
   per unit. On a capped draw every unit with more spikes than the cap
@@ -564,7 +566,10 @@ Fixed:
   cosine of 0.041 (`investigations/unclaimed-events/`).
 
 - Each tetrode gets one multi-unit unit, holding detected events that no
-  sorted spike claims but that look like spikes of the tetrode. Its spikes
+  sorted spike claims but that look like spikes of the tetrode. A
+  tetrode with fewer than 1,000 events that exactly one sorted spike
+  claims (the reference events below) gets none; on TTM-003-48H those
+  are TT3, TT13 and TT14. Its spikes
   are probably neural but cannot be assigned to one unit; rates per
   tetrode pool the sorted and multi-unit units. It follows the multi-unit
   step of `97_production_pipeline.py`, changed as below
@@ -606,12 +611,63 @@ Fixed:
   on TT9). The step 2 bandpass echoes a spike 2.33 ms either side, so these
   may be crossings that a sorted spike's echo lifted over 7 MAD
   (conjecture). Finding the trough reuses the subtracted trace and took
-  0.1 s for one window's 275,000 events. With the floor the multi-unit
-  units hold 1.06 M events on TT5 to TT12, 1.12 % of the sorted spikes
-  there and 0.02 to 2.99 Hz per tetrode; without it they would hold
-  1.11 M.
+  0.1 s for one window's 275,000 events. With the mean noise over every
+  clean chunk, the multi-unit units hold 1.06 M events on TT5 to TT12
+  with the floor (1.12 % of the sorted spikes there, 0.02 to 2.99 Hz per
+  tetrode) and would hold 1.11 M without it. The stage uses its own
+  draw of 2,000 chunks (seed 0), which on TT5 to TT12 is 0.3 to 1.1 %
+  below that mean, outside the 1.0 % above on some channels. With it the
+  unclaimed events there are 3.5 to 8.6 % more, and the multi-unit units
+  hold 1,112,985 events on TT5 to TT12 with the floor.
 - L-ratio, isolation distance, d′ and silhouette count the multi-unit
   spikes among the other spikes of the tetrode.
+
+Chosen when the stage was written (2026-11-05), not yet reviewed:
+
+- `ttm-sort analyzer` writes into the run directory `noise_levels.csv`
+  (the noise levels above), `multi_unit/` (each window's scored events,
+  and `cutoffs.csv` with each tetrode's events, cutoff and admitted
+  count), `sorting_mua/` (the sorting with the multi-unit units),
+  `pc_metrics.csv` (the all-spike PC metrics), `analyzer_params.json`
+  and `analyzer.zarr`. It reuses the noise levels, the scored windows and
+  the PC metrics when they exist, and leaves a finished analyzer alone.
+- A multi-unit unit's id is 10^d plus its tetrode number, where d is the
+  number of digits of the largest sorted id after adding 100 to it
+  (10005 for TT5 of TTM-003-48H). The sorting property `is_mua` marks
+  these units. They get no PC metrics.
+- The analyzer is in µV, each unit sparse to its tetrode's channels; the
+  all-spike PC metrics come from a second analyzer, in ADC counts, kept in
+  memory and not saved. The analyzer holds random spikes, waveforms (1 ms before to 2 ms after each spike),
+  templates (mean, standard deviation and median), the noise levels
+  above, spike amplitudes, correlograms (50 ms either side, 1 ms bins),
+  ISI histograms (up to 50 ms, 1 ms bins), unit locations (monopolar
+  triangulation), template similarity (cosine), template metrics (with
+  the multi-channel ones), principal components (5 per channel, of the
+  random spikes, for viewing) and quality metrics.
+- The quality metrics are SpikeInterface's num_spikes, firing_rate,
+  presence_ratio, snr, isi_violation, rp_violation, sliding_rp_violation,
+  synchrony, firing_range, amplitude_cv, amplitude_cutoff, noise_cutoff,
+  amplitude_median and sd_ratio, all but snr over the periods above,
+  plus the four all-spike PC metrics. SpikeInterface's sd_ratio does not
+  use the noise levels above. It draws its own, the standard deviation of
+  20 random 0.5 s chunks, with no fixed seed and without the periods, and
+  keeps it for the rest of the process, so it changes between processes:
+  on a 10 min slice of TTM-003-48H three builds in one process agreed
+  and builds in three processes differed by up to 0.26
+  (`docs/plans/2026-11-04_spikeinterface_pc_metrics_pr.md`, item 5).
+- On TTM-003-48H the analyzer holds 74 units: the 61 sorted units
+  (138.7 M spikes) and 13 multi-unit units (on TT1, TT2, TT4 to TT12,
+  TT15 and TT16; 1.23 M events), 139.9 M spikes in all. With 48 jobs on
+  a shared machine the noise levels took 6 s, the multi-unit events
+  13 min, the all-spike PC metrics 33 min and the analyzer 60 min. Of
+  the 60 min, 47 were the quality metrics. Ten of the 14 metric
+  functions select the spikes inside the periods themselves, and one
+  selection takes 88 s, which accounts for about 15 min; where the rest
+  goes was not measured (num_spikes alone took 208 s). Everything is computed in memory and written to Zarr once, in
+  23 s, because SpikeInterface 0.105.4 writes a Zarr analyzer's
+  waveforms and amplitudes one second of recording at a time; the
+  waveforms were on course for about 100 min that way, against 89 s in
+  memory. The analyzer is 1.2 GB.
 
 Open:
 

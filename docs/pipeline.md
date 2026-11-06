@@ -1,6 +1,6 @@
 ---
 title: Per-subject pipeline and command-line tools
-updated: 2026-11-03
+updated: 2026-11-05
 ---
 
 # Per-subject pipeline
@@ -98,6 +98,15 @@ ttm-curate --bundle /Volumes/Drive/2026-05-27_09-07-52 --mode desktop --style gr
 `--no-traces` at manifest, fetch or launch time skips the recording and
 curates without the raw-traces view. Only the blosc-zstd store is ever
 offered for traces: it is the exact data the sort was produced from.
+
+The exception is a `ttm-sort` run's analyzer,
+`<session>/sortings_carry/<run>/analyzer.zarr`; open it on the server with
+`ttm-curate --analyzer` and that path. It was built on the run's binary
+(`<session>/sortings_carry/<run>/binary/`, about 660 GB for TTM-003-48H),
+not on the store, and its traces link to that binary. Since
+`ttm-curation-manifest` offers only the store, a laptop bundle of a
+`ttm-sort` analyzer is made with `--sortings-subdir sortings_carry
+--sorting <run> --analyzer-name analyzer.zarr --no-traces`.
 
 The analyzer's persisted unit properties (`tier`, `tier_level`, `n_chunks`,
 `track_hours` from `investigations/spike-sorting/45_add_curation_unit_properties.py`;

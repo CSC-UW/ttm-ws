@@ -1,6 +1,6 @@
 ---
 title: Data products of a 48 h tetrode recording
-updated: 2026-11-03
+updated: 2026-11-05
 ---
 
 # Data products
@@ -60,10 +60,11 @@ flowchart LR
         CW["<b>per-window spikes, banks</b><br/>npz<br/>51 GB<br/>ttm-sort carry"]:::temp
         RS["<b>re-seed sorts</b><br/>sorter folders<br/>130 MB<br/>ttm-sort carry"]:::keep
         SORT["<b>sorting</b><br/>SpikeInterface folder, npy<br/>3.3 GB<br/>ttm-sort export"]:::keep
+        MU["<b>noise levels, multi-unit events, sorting with them</b><br/>CSV, npz, SpikeInterface folder<br/>0.2 GB, 3.4 GB<br/>ttm-sort analyzer"]:::temp
+        AN["<b>SortingAnalyzer</b><br/>Zarr, float32 (uV)<br/>1.2 GB<br/>ttm-sort analyzer"]:::keep
     end
 
     subgraph NEXT["after sorting"]
-        AN["<b>SortingAnalyzer</b><br/>Zarr<br/>about 0.5 GB<br/>not yet made"]:::plan
         HYP["<b>hypnogram</b><br/>table<br/>under 1 MB<br/>not yet made"]:::plan
         MET["<b>metrics per state</b><br/>table<br/>under 1 MB<br/>not yet made"]:::plan
         CUR["<b>curated sorting</b><br/>SpikeInterface folder<br/>about 3 GB<br/>not yet made"]:::plan
@@ -71,7 +72,7 @@ flowchart LR
 
     subgraph LAP["copies for a laptop"]
         VIZ["<b>viz bundle</b><br/>Zarr, Parquet, JSON<br/>2.0 GB<br/>ttm-viz-bundle"]:::temp
-        CB["<b>curation bundle</b><br/>JSON list of files<br/>analyzer and store<br/>ttm-curation-manifest"]:::temp
+        CB["<b>curation bundle</b><br/>JSON list of files<br/>analyzer, and the store for analyzers built on it<br/>ttm-curation-manifest"]:::temp
     end
 
     RAW --> STORE
@@ -98,8 +99,12 @@ flowchart LR
     CW --> RS
     RS --> CW
     CW --> SORT
-    SORT --> AN
+    SORT --> MU
+    BIN --> MU
+    BP --> MU
+    MU --> AN
     BIN --> AN
+    BP --> AN
     AN --> MET
     HYP --> MET
     BP --> MET
@@ -135,10 +140,10 @@ flowchart LR
 | Per-window spikes and banks | `<run>/carry/` | npz | `ttm-sort carry` | binary, bank, bad periods, pulses | 51 GB | until the sorting is final; resume and re-export read it |
 | Re-seed sorts | `<run>/reseed_sorts/` | MountainSort5 folders | `ttm-sort carry` | binary | 130 MB | yes |
 | Sorting | `<run>/sorting/` | SpikeInterface folder (npy) | `ttm-sort export` | per-window spikes | 3.3 GB | yes |
+| Noise levels, multi-unit events, sorting with them | `<run>/noise_levels.csv`, `<run>/multi_unit/`, `<run>/sorting_mua/` | CSV; npz per window and CSV of cutoffs; SpikeInterface folder (npy) | `ttm-sort analyzer` | binary, sorting, bad periods | 3 KB, 0.2 GB, 3.4 GB | regenerable (6 s, 13 min and 1 min) |
+| SortingAnalyzer | `<run>/analyzer.zarr`, with `pc_metrics.csv` | Zarr, float32 (uV) | `ttm-sort analyzer` | binary, noise levels, sorting with the multi-unit units, bad periods | 1.2 GB | yes |
 | Viz bundle | `<session>/viz_bundle/` | Zarr, Parquet, JSON | `ttm-viz-bundle` | EMG, 125 Hz LFP, a sorting | 2.0 GB | regenerable |
 | Investigation products | `<session>/sortings_seed42_pcafix/` (hybrids, arms, the first 6 h binaries, earlier sorts) | various | `investigations/` |  | 1.1 TB besides the two 48 h float32 binaries (global and aligned median, `mp_baseline/` and `mp_aligned/`, 1.3 TB each) | until the user decides |
 
-Not yet produced: the SortingAnalyzer of the new sorting (built on the
-binary it was sorted from; June production's was 0.5 GB), the hypnogram
-(scored in `ttm-loupe`), quality metrics per vigilance state, and the
-curated sorting.
+Not yet produced: the hypnogram (scored in `ttm-loupe`), quality
+metrics per vigilance state, and the curated sorting.
