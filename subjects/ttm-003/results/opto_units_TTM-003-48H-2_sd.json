@@ -1,0 +1,395 @@
+{
+ "experiment": "TTM-003-48H-2",
+ "name": "sd",
+ "start_h": 23.9727,
+ "end_h": 28.9727,
+ "pulses": 320,
+ "sham_onsets": 320,
+ "pulse_ms": 63.63000000419561,
+ "units_sorted": 53,
+ "units_kept": 53,
+ "classes": {
+  "suppressed": 27,
+  "unaffected": 26
+ },
+ "driven_units": [],
+ "suppressed_silence_end_ms_median": 77.50000000000051,
+ "trend_per_unit": [
+  {
+   "unit": 0,
+   "tetrode": "TT1",
+   "spearman_rho": -0.33119530530097757,
+   "p": 0.21018618917795662,
+   "first_third": 1.0944034521399486,
+   "last_third": 0.8758424122273704
+  },
+  {
+   "unit": 3,
+   "tetrode": "TT2",
+   "spearman_rho": 0.026967994498529685,
+   "p": 0.9372661051596418,
+   "first_third": 0.0,
+   "last_third": 0.0
+  },
+  {
+   "unit": 4,
+   "tetrode": "TT2",
+   "spearman_rho": NaN,
+   "p": NaN,
+   "first_third": 0.0,
+   "last_third": 0.0
+  },
+  {
+   "unit": 6,
+   "tetrode": "TT4",
+   "spearman_rho": -0.21098356925638467,
+   "p": 0.4328245656013418,
+   "first_third": 0.1864628006566786,
+   "last_third": 0.03798717145079338
+  },
+  {
+   "unit": 7,
+   "tetrode": "TT4",
+   "spearman_rho": -0.011764705882352941,
+   "p": 0.9655081698956275,
+   "first_third": 1.4873764317506823,
+   "last_third": 1.5088769004872606
+  },
+  {
+   "unit": 8,
+   "tetrode": "TT4",
+   "spearman_rho": 0.004415012232789452,
+   "p": 0.9870529639838932,
+   "first_third": 1.0708104236568594,
+   "last_third": 1.150871646059961
+  },
+  {
+   "unit": 9,
+   "tetrode": "TT4",
+   "spearman_rho": 0.21227690909026042,
+   "p": 0.44752928024118116,
+   "first_third": 0.0,
+   "last_third": 0.9229908632505591
+  },
+  {
+   "unit": 10,
+   "tetrode": "TT4",
+   "spearman_rho": 0.4018863086023418,
+   "p": 0.12281756423050523,
+   "first_third": 0.04989139801354374,
+   "last_third": 0.35987320526738975
+  },
+  {
+   "unit": 11,
+   "tetrode": "TT5",
+   "spearman_rho": NaN,
+   "p": NaN,
+   "first_third": 0.0,
+   "last_third": 0.0
+  },
+  {
+   "unit": 12,
+   "tetrode": "TT5",
+   "spearman_rho": -0.2010631042509746,
+   "p": 0.45525076481771193,
+   "first_third": 0.03393774667225036,
+   "last_third": 0.021481508000181178
+  },
+  {
+   "unit": 13,
+   "tetrode": "TT5",
+   "spearman_rho": NaN,
+   "p": NaN,
+   "first_third": 0.0,
+   "last_third": 0.0
+  },
+  {
+   "unit": 14,
+   "tetrode": "TT6",
+   "spearman_rho": NaN,
+   "p": NaN,
+   "first_third": 0.0,
+   "last_third": 0.0
+  },
+  {
+   "unit": 15,
+   "tetrode": "TT6",
+   "spearman_rho": 0.23543582810294386,
+   "p": 0.3982769950641794,
+   "first_third": 0.0,
+   "last_third": 0.36919634530022366
+  },
+  {
+   "unit": 16,
+   "tetrode": "TT6",
+   "spearman_rho": 0.6646064103454531,
+   "p": 0.006873926132588341,
+   "first_third": 0.0,
+   "last_third": 1.2819317545146656
+  },
+  {
+   "unit": 17,
+   "tetrode": "TT6",
+   "spearman_rho": NaN,
+   "p": NaN,
+   "first_third": 0.0,
+   "last_third": 0.0
+  },
+  {
+   "unit": 18,
+   "tetrode": "TT7",
+   "spearman_rho": -0.3107178272185039,
+   "p": 0.24146595219781017,
+   "first_third": 0.4901404328470397,
+   "last_third": 0.15130321347420767
+  },
+  {
+   "unit": 19,
+   "tetrode": "TT7",
+   "spearman_rho": -0.08401680504168059,
+   "p": 0.7570527243204265,
+   "first_third": 0.0,
+   "last_third": 0.0
+  },
+  {
+   "unit": 20,
+   "tetrode": "TT7",
+   "spearman_rho": 0.12371791482634836,
+   "p": 0.6604565674873454,
+   "first_third": 0.0,
+   "last_third": 0.0
+  },
+  {
+   "unit": 21,
+   "tetrode": "TT7",
+   "spearman_rho": 0.30784731644909186,
+   "p": 0.24607082329256189,
+   "first_third": 0.11537385790631989,
+   "last_third": 0.28171830375530427
+  },
+  {
+   "unit": 22,
+   "tetrode": "TT8",
+   "spearman_rho": -0.20742519153669262,
+   "p": 0.4408024853444277,
+   "first_third": 0.5274233504288909,
+   "last_third": 0.46149543162527956
+  },
+  {
+   "unit": 23,
+   "tetrode": "TT8",
+   "spearman_rho": -0.040333564110094255,
+   "p": 0.8821010034171833,
+   "first_third": 0.5768399547088418,
+   "last_third": 0.573526790151696
+  },
+  {
+   "unit": 24,
+   "tetrode": "TT9",
+   "spearman_rho": -0.22800408793064897,
+   "p": 0.39571112502022865,
+   "first_third": 0.35187850949192245,
+   "last_third": 0.17514435787827326
+  },
+  {
+   "unit": 25,
+   "tetrode": "TT9",
+   "spearman_rho": 0.49890789822279913,
+   "p": 0.11823813688170114,
+   "first_third": 0.0,
+   "last_third": 0.43951945869074244
+  },
+  {
+   "unit": 26,
+   "tetrode": "TT9",
+   "spearman_rho": -0.17994178584495998,
+   "p": 0.5048629931795913,
+   "first_third": 0.3333143715717143,
+   "last_third": 0.33171425016835643
+  },
+  {
+   "unit": 27,
+   "tetrode": "TT9",
+   "spearman_rho": 0.16646469884960932,
+   "p": 0.5377826605870886,
+   "first_third": 0.5999440611128634,
+   "last_third": 0.6606671442214529
+  },
+  {
+   "unit": 28,
+   "tetrode": "TT10",
+   "spearman_rho": 0.13245036698368357,
+   "p": 0.6248494815021567,
+   "first_third": 0.7689321202942071,
+   "last_third": 0.951309456321534
+  },
+  {
+   "unit": 29,
+   "tetrode": "TT10",
+   "spearman_rho": 0.1221486717738415,
+   "p": 0.6522382010131603,
+   "first_third": 1.5509998921703354,
+   "last_third": 1.036605774706585
+  },
+  {
+   "unit": 30,
+   "tetrode": "TT10",
+   "spearman_rho": 0.042678451583631365,
+   "p": 0.8752951396111205,
+   "first_third": 0.742734212526185,
+   "last_third": 0.8512258859112816
+  },
+  {
+   "unit": 31,
+   "tetrode": "TT10",
+   "spearman_rho": -0.014749326708603275,
+   "p": 0.9567646840852797,
+   "first_third": 0.9769547781843075,
+   "last_third": 0.9366338654524528
+  },
+  {
+   "unit": 32,
+   "tetrode": "TT10",
+   "spearman_rho": -0.026352313834736497,
+   "p": 0.9257264642241486,
+   "first_third": 1.6613835538510062,
+   "last_third": 0.7978233652321085
+  },
+  {
+   "unit": 33,
+   "tetrode": "TT10",
+   "spearman_rho": 0.11373819205063798,
+   "p": 0.6749138834439019,
+   "first_third": 0.8325015629318768,
+   "last_third": 1.3985734570133626
+  },
+  {
+   "unit": 34,
+   "tetrode": "TT11",
+   "spearman_rho": 0.3745786974766694,
+   "p": 0.15287682801926766,
+   "first_third": 0.08141547867660351,
+   "last_third": 0.34776309715796067
+  },
+  {
+   "unit": 35,
+   "tetrode": "TT11",
+   "spearman_rho": 0.5215074266509654,
+   "p": 0.0382879377233517,
+   "first_third": 0.058306946395297446,
+   "last_third": 0.5658168058314895
+  },
+  {
+   "unit": 36,
+   "tetrode": "TT11",
+   "spearman_rho": 0.36764705882352944,
+   "p": 0.1612323576755898,
+   "first_third": 0.08959505271795667,
+   "last_third": 0.12026293110490052
+  },
+  {
+   "unit": 37,
+   "tetrode": "TT11",
+   "spearman_rho": -0.054127000694345825,
+   "p": 0.8421922463383876,
+   "first_third": 0.549399323363428,
+   "last_third": 0.1230654484334079
+  },
+  {
+   "unit": 38,
+   "tetrode": "TT11",
+   "spearman_rho": 0.1657971283913127,
+   "p": 0.539437757799911,
+   "first_third": 0.5914615945399391,
+   "last_third": 0.8043206094040587
+  },
+  {
+   "unit": 39,
+   "tetrode": "TT11",
+   "spearman_rho": 0.4829892241283101,
+   "p": 0.05807898400731202,
+   "first_third": 0.0,
+   "last_third": 0.47837352996058247
+  },
+  {
+   "unit": 40,
+   "tetrode": "TT11",
+   "spearman_rho": -0.04559162362035475,
+   "p": 0.8668513195400277,
+   "first_third": 0.3551253412143712,
+   "last_third": 0.3454075003278507
+  },
+  {
+   "unit": 41,
+   "tetrode": "TT12",
+   "spearman_rho": -0.19938865782260254,
+   "p": 0.513706639022287,
+   "first_third": 0.802553913540694,
+   "last_third": 0.2601567384162115
+  },
+  {
+   "unit": 42,
+   "tetrode": "TT12",
+   "spearman_rho": -0.2216696182920697,
+   "p": 0.4093189751167556,
+   "first_third": 0.5258250978518337,
+   "last_third": 0.7178817825282127
+  },
+  {
+   "unit": 43,
+   "tetrode": "TT12",
+   "spearman_rho": -0.3658538767105811,
+   "p": 0.17989512469433958,
+   "first_third": 2.2123811297914915,
+   "last_third": 0.7325324311512373
+  },
+  {
+   "unit": 44,
+   "tetrode": "TT12",
+   "spearman_rho": 0.2663724047116302,
+   "p": 0.31865279081942954,
+   "first_third": 0.6715418210790063,
+   "last_third": 1.0223781439773263
+  },
+  {
+   "unit": 45,
+   "tetrode": "TT12",
+   "spearman_rho": 0.39028024652954746,
+   "p": 0.13504401502749833,
+   "first_third": 0.6618060569141674,
+   "last_third": 1.0119935536354343
+  },
+  {
+   "unit": 46,
+   "tetrode": "TT12",
+   "spearman_rho": 0.07090173010948862,
+   "p": 0.7941472065386779,
+   "first_third": 1.0623185316555246,
+   "last_third": 1.091140865388898
+  },
+  {
+   "unit": 47,
+   "tetrode": "TT12",
+   "spearman_rho": -0.23190774223311902,
+   "p": 0.38744777800956276,
+   "first_third": 1.356266646687827,
+   "last_third": 1.6684834835683184
+  },
+  {
+   "unit": 50,
+   "tetrode": "TT15",
+   "spearman_rho": -0.2041241452319315,
+   "p": 0.6606421552406503,
+   "first_third": 0.0,
+   "last_third": 0.0
+  },
+  {
+   "unit": 51,
+   "tetrode": "TT15",
+   "spearman_rho": 0.5128225940683708,
+   "p": 0.07312051909506653,
+   "first_third": 0.0,
+   "last_third": 4.6149543162527955
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+window,unit,spikes,zone,n,a_median,snr_median,cos_pl_median
+0,4,both,onset_1_10ms,21,1.038,9.021,0.803
+0,4,both,pulse_15ms_off,59,0.988,8.775,0.815
+0,4,both,post_0_100ms,26,0.723,6.208,0.641
+0,4,both,outside,18759,0.8,7.035,0.696
+0,4,added,onset_1_10ms,5,0.439,3.885,0.523
+0,4,added,pulse_15ms_off,8,0.404,3.609,0.524
+0,4,added,post_0_100ms,18,0.431,3.984,0.524
