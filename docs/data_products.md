@@ -140,7 +140,7 @@ flowchart LR
 | Per-window spikes and banks | `<run>/carry/` | npz | `ttm-sort carry` | binary, bank, bad periods, pulses | 51 GB | until the sorting is final; resume and re-export read it |
 | Re-seed sorts | `<run>/reseed_sorts/` | MountainSort5 folders | `ttm-sort carry` | binary | 130 MB | yes |
 | Sorting | `<run>/sorting/` | SpikeInterface folder (npy) | `ttm-sort export` | per-window spikes | 3.3 GB | yes |
-| Noise levels, multi-unit events, sorting with them | `<run>/noise_levels.csv`, `<run>/multi_unit/`, `<run>/sorting_mua/` | CSV; npz per window and CSV of cutoffs; SpikeInterface folder (npy) | `ttm-sort analyzer` | binary, sorting, bad periods | 3 KB, 0.2 GB, 3.4 GB | regenerable (6 s, 13 min and 1 min) |
+| Noise levels, multi-unit events, sorting with them | `<run>/noise_levels.csv`, `<run>/multi_unit/`, `<run>/sorting_mua/` | CSV; npz per window and CSV of cutoffs; SpikeInterface folder (npy) | `ttm-sort analyzer` | binary, sorting, bad periods | 3 KB, 0.2 GB, 3.4 GB | regenerable (10 min, 12 min and 1 min) |
 | SortingAnalyzer | `<run>/analyzer.zarr`, with `pc_metrics.csv` | Zarr, float32 (uV) | `ttm-sort analyzer` | binary, noise levels, sorting with the multi-unit units, bad periods | 1.2 GB | yes |
 | Viz bundle | `<session>/viz_bundle/` | Zarr, Parquet, JSON | `ttm-viz-bundle` | EMG, 125 Hz LFP, a sorting | 2.0 GB | regenerable |
 | Investigation products | `<session>/sortings_seed42_pcafix/` (hybrids, arms, the first 6 h binaries, earlier sorts) | various | `investigations/` |  | 1.1 TB besides the two 48 h float32 binaries (global and aligned median, `mp_baseline/` and `mp_aligned/`, 1.3 TB each) | until the user decides |

@@ -107,7 +107,7 @@ ttm-sort all --subject TTM-003 --experiment TTM-003-48H \
   steps' measured times): the offset fit 13 min, the binary 40 min, the
   seed sort 30 min, the 96 windows about 14.5 h, and the seven re-seed
   sorts about 3.5 h, run one after another, through `export`. The
-  `analyzer` stage, which `ttm-sort all` also runs, took another 1.8 h
+  `analyzer` stage, which `ttm-sort all` also runs, took another 1.7 h
   (step 8), so about 21 h in all.
 
 ## 0. Before sorting
@@ -541,10 +541,13 @@ Fixed:
   recording, and also per vigilance state once the recording is sleep
   scored, so the two can be compared.
 
-- The noise levels behind SNR are the mean MAD of 2,000 random 0.5 s
-  chunks, each channel's drawn only outside its tetrode's bad intervals.
-  On TTM-003-48H that stays within 1.0 % of the mean over every clean chunk
-  on every channel in 95 % of draws. SpikeInterface's default, 20 chunks
+- The noise levels behind SNR are the mean MAD of every 0.5 s chunk of a
+  grid, each channel's only outside its tetrode's bad intervals (decided
+  2026-11-05; 10 min on TTM-003-48H). A random draw of 2,000 such chunks
+  stays within 1.0 % of that mean on every channel in 95 % of draws, but
+  the multi-unit step below magnifies the difference: the stage's first
+  draw (seed 0) was 0.3 to 1.1 % low on TT5 to TT12, and gave 3.5 to
+  8.6 % more unclaimed events there. SpikeInterface's default, 20 chunks
   from anywhere, overestimated channels of tetrodes with bad intervals by
   up to 166 %, and averaging every chunk, bad ones included, still by up
   to 19 % (`investigations/analyzer-noise-and-duplicates/`). The stage
@@ -617,11 +620,8 @@ Fixed:
   0.1 s for one window's 275,000 events. With the mean noise over every
   clean chunk, the multi-unit units hold 1.06 M events on TT5 to TT12
   with the floor (1.12 % of the sorted spikes there, 0.02 to 2.99 Hz per
-  tetrode) and would hold 1.11 M without it. The stage uses its own
-  draw of 2,000 chunks (seed 0), which on TT5 to TT12 is 0.3 to 1.1 %
-  below that mean, outside the 1.0 % above on some channels. With it the
-  unclaimed events there are 3.5 to 8.6 % more, and the multi-unit units
-  hold 1,112,985 events on TT5 to TT12 with the floor.
+  tetrode) and would hold 1.11 M without it. The stage's own run on
+  TTM-003-48H gives 1,055,756 there.
 - L-ratio, isolation distance, d′ and silhouette count the multi-unit
   spikes among the other spikes of the tetrode.
 
@@ -660,14 +660,14 @@ Chosen when the stage was written (2026-11-05), not yet reviewed:
   (`docs/plans/2026-11-04_spikeinterface_pc_metrics_pr.md`, item 5).
 - On TTM-003-48H the analyzer holds 74 units: the 61 sorted units
   (138.7 M spikes) and 13 multi-unit units (on TT1, TT2, TT4 to TT12,
-  TT15 and TT16; 1.23 M events), 139.9 M spikes in all. With 48 jobs on
-  a shared machine the noise levels took 6 s, the multi-unit events
-  13 min, the all-spike PC metrics 33 min and the analyzer 60 min. Of
-  the 60 min, 47 were the quality metrics. Ten of the 14 metric
+  TT15 and TT16; 1.17 M events), 139.8 M spikes in all. With 48 jobs on
+  a shared machine the noise levels took 10 min, the multi-unit events
+  12 min, the all-spike PC metrics 28 min and the analyzer 54 min. Of
+  the 54 min, 43 were the quality metrics. Ten of the 14 metric
   functions select the spikes inside the periods themselves, and one
   selection takes 88 s, which accounts for about 15 min; where the rest
   goes was not measured (num_spikes alone took 208 s). Everything is computed in memory and written to Zarr once, in
-  23 s, because SpikeInterface 0.105.4 writes a Zarr analyzer's
+  19 s, because SpikeInterface 0.105.4 writes a Zarr analyzer's
   waveforms and amplitudes one second of recording at a time; the
   waveforms were on course for about 100 min that way, against 89 s in
   memory. The analyzer is 1.2 GB.
