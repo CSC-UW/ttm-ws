@@ -113,6 +113,12 @@ def main(argv: list[str] | None = None) -> None:
     whitening = pathlib.Path(a.whitening) if a.whitening else run_dir / "whitening.npz"
     bank_path = pathlib.Path(a.bank) if a.bank else run_dir / "bank0.npz"
     if a.stage == "readmit":
+        import json
+
+        recorded = json.loads((run_dir / "carry_params.json").read_text())["inputs"]
+        for name, given in (("pulses", a.pulses), ("bad_periods", bad_path)):
+            if str(given) != recorded[name] and not (name == "pulses" and given is None):
+                raise ValueError(f"--{name.replace('_', '-')} {given} differs from the carry's {recorded[name]}")
         diff = cr.record_readmit(run_dir / "carry_params.json", params)
         cr.log(f"readmit with {diff or 'no change'}")
     else:
@@ -166,12 +172,6 @@ def main(argv: list[str] | None = None) -> None:
                      workers=a.workers)
 
     if "readmit" in stages:
-        import json
-
-        recorded = json.loads((run_dir / "carry_params.json").read_text())["inputs"]
-        for name, given in (("pulses", a.pulses), ("bad_periods", bad_path)):
-            if str(given) != recorded[name] and not (name == "pulses" and given is None):
-                raise ValueError(f"--{name.replace('_', '-')} {given} differs from the carry's {recorded[name]}")
         rec = cr.open_sorting_recording(binary, drop)
         fs = rec.get_sampling_frequency()
         pulses = cr.read_pulses(recorded["pulses"], fs) if recorded["pulses"] != "None" else None
