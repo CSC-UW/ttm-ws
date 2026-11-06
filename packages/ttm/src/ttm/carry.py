@@ -51,6 +51,11 @@ class CarryParams:
     ``pulse_relax_post_ms`` after the offset are admitted under the pulse rule's floors. A sustained
     responder keeps firing through the pulse past the onset (``sustained_responders``); a transient
     responder answers only the onset.
+
+    The seed and re-seed snr divide each template's peak by its channel's noise in the sorted window:
+    the mean MAD / 0.6745 of every ``seed_noise_chunk_s`` chunk of the window clear of the tetrode's
+    bad periods (``channel_noise``). None is SpikeInterface's default draw of 20 random chunks, unseeded,
+    which runs before 2026-11-06 used.
     """
 
     window_s: float = 1800.0
@@ -94,6 +99,7 @@ class CarryParams:
     reseed_add_cos: float = 0.8
     max_shift_samples: int = 10
     template_seed: int = 0
+    seed_noise_chunk_s: float | None = 0.5
 
     def to_dict(self) -> dict:
         return dataclasses.asdict(self)
@@ -221,17 +227,67 @@ def whitened_recording(recording, W: np.ndarray):
 
 # --- MountainSort5 seeds -----------------------------------------------------------------------------
 
-def unit_templates(sorting, recording, *, n_jobs: int = 16, with_snr: bool = True, seed: int = 0):
+def channel_noise(recording, bad_periods: dict | None = None, *, chunk_s: float = 0.5, n_jobs: int = 16) -> np.ndarray:
+    """Each channel's noise in ``recording`` (one window, frames from 0, in its own units): the mean, over
+    the ``chunk_s`` chunks of a grid from frame 0 that do not overlap its tetrode's bad periods
+    (``{group: [(start, end), ...]}`` in the window's frames), of the chunk's MAD / 0.6745. The rule of
+    ``ttm.analyzer.chunk_noise_levels`` with every chunk, on a recording object, so a whitened window
+    works too."""
+    from joblib import Parallel, delayed
+
+    fs = recording.get_sampling_frequency()
+    length = round(chunk_s * fs)
+    starts = np.arange(recording.get_num_frames() // length, dtype=np.int64) * length
+
+    def mads(block):
+        out = np.empty((block.size, recording.get_num_channels()), np.float64)
+        for i, st in enumerate(block):
+            x = recording.get_traces(start_frame=int(st), end_frame=int(st) + length, return_in_uV=False)
+            out[i] = np.median(np.abs(x - np.median(x, axis=0)), axis=0) / 0.6745
+        return out
+
+    blocks = np.array_split(starts, max(1, min(n_jobs * 4, starts.size)))
+    m = np.concatenate(Parallel(n_jobs=n_jobs, backend="threading")(delayed(mads)(b) for b in blocks))
+    groups = np.asarray(recording.get_property("group")).astype(int)
+    noise = np.empty(groups.size)
+    for g in np.unique(groups).tolist():
+        clear = np.ones(starts.size, bool)
+        iv = (bad_periods or {}).get(g, [])
+        if len(iv):
+            s_, e_ = np.array(sorted(iv), np.int64).T
+            i0 = np.searchsorted(e_, starts, "right")
+            clear = ~((i0 < s_.size) & (s_[np.minimum(i0, s_.size - 1)] < starts + length))
+        if not clear.any():
+            raise ValueError(f"no chunk of group {g} clear of its bad periods")
+        noise[groups == g] = m[clear][:, groups == g].mean(axis=0)
+    return noise
+
+
+def window_bad_periods(bad_periods: dict | None, a: int, b: int) -> dict:
+    """``bad_periods`` (absolute frames) clipped to [a, b) and shifted to frames from ``a``."""
+    out = {}
+    for g, iv in (bad_periods or {}).items():
+        w = [(max(s, a) - a, min(e, b) - a) for s, e in iv if s < b and e > a]
+        if w:
+            out[int(g)] = w
+    return out
+
+
+def unit_templates(sorting, recording, *, n_jobs: int = 16, with_snr: bool = True, seed: int = 0, noise=None):
     """Dense (n_units, 90, n_channels) templates (1 ms before, 2 ms after, raw units) of each unit on
     its tetrode, and each unit's snr (None without ``with_snr``), from a group-sparse in-memory analyzer
-    with seeded spike sampling."""
+    with seeded spike sampling. ``noise`` (per channel, in the recording's units) sets the snr's
+    denominator; without it SpikeInterface draws its own, unseeded."""
     from spikeinterface.core.template_tools import get_dense_templates_array
 
     from ttm.sorting import create_group_sparse_analyzer
 
     az = create_group_sparse_analyzer(sorting, recording, format="memory", return_in_uV=False, seed=seed)
+    nl = {} if noise is None else {"random_slices_kwargs": {"num_chunks_per_segment": 1, "seed": seed}}
     az.compute({"random_spikes": {"seed": seed}, "waveforms": {"ms_before": 1.0, "ms_after": 2.0},
-                "templates": {}, "noise_levels": {}}, n_jobs=n_jobs)
+                "templates": {}, "noise_levels": nl}, n_jobs=n_jobs)
+    if noise is not None:
+        az.get_extension("noise_levels").set_data("noise_levels", np.asarray(noise, np.float32))
     snr = None
     if with_snr:
         az.compute({"quality_metrics": {"metric_names": ["snr", "firing_rate"]}})
@@ -303,13 +359,24 @@ def sort_window(recording, sort_dir: pathlib.Path, params: CarryParams):
                                            detect_threshold=params.detect_threshold))
 
 
-def seed_bank(recording, sort_dir: pathlib.Path, params: CarryParams = CarryParams(), *, n_jobs: int = 32) -> Bank:
-    """The starting bank (plain, not whitened) from MountainSort5 on the first window of ``recording``."""
+def _seed_noise(window, params: CarryParams, bad_periods, a: int, b: int, n_jobs: int):
+    if params.seed_noise_chunk_s is None:
+        return None
+    return channel_noise(window, window_bad_periods(bad_periods, a, b), chunk_s=params.seed_noise_chunk_s,
+                        n_jobs=n_jobs)
+
+
+def seed_bank(recording, sort_dir: pathlib.Path, params: CarryParams = CarryParams(), *, n_jobs: int = 32,
+              bad_periods: dict | None = None) -> Bank:
+    """The starting bank (plain, not whitened) from MountainSort5 on the first window of ``recording``;
+    ``bad_periods`` (absolute frames) are left out of the snr's noise."""
     fs = recording.get_sampling_frequency()
-    win0 = recording.frame_slice(0, min(int(params.window_s * fs), recording.get_num_frames()))
+    b = min(int(params.window_s * fs), recording.get_num_frames())
+    win0 = recording.frame_slice(0, b)
     win0.reset_times()
     ref0 = sort_window(win0, sort_dir, params)
-    _, snr = unit_templates(ref0, win0, n_jobs=n_jobs, with_snr=True, seed=params.template_seed)
+    noise = _seed_noise(win0, params, bad_periods, 0, b, n_jobs)
+    _, snr = unit_templates(ref0, win0, n_jobs=n_jobs, with_snr=True, seed=params.template_seed, noise=noise)
     nsp = np.array([len(ref0.get_unit_spike_train(u)) for u in ref0.unit_ids])
     conf = np.asarray(ref0.unit_ids)[(snr >= params.seed_min_snr) & (nsp >= params.seed_min_spikes)]
     seed = dedup_units(ref0.select_units(conf), win0, cosine_min=params.seed_dedup_cos,
@@ -324,10 +391,11 @@ def seed_bank(recording, sort_dir: pathlib.Path, params: CarryParams = CarryPara
 
 
 def reseed(plain, whitened, bank: Bank, a: int, b: int, sort_dir: pathlib.Path, params: CarryParams, *,
-           n_jobs: int) -> Bank:
+           n_jobs: int, bad_periods: dict | None = None) -> Bank:
     """``bank`` plus every cluster of a MountainSort5 sort of frames [a, b) of ``plain`` with snr
-    ``seed_min_snr`` or more and ``seed_min_spikes`` or more whose whitened template has shift-cosine
-    under ``reseed_add_cos`` to every template of its tetrode (ids from 2000 up)."""
+    ``seed_min_snr`` or more (on the whitened window, ``bad_periods`` left out of its noise) and
+    ``seed_min_spikes`` or more whose whitened template has shift-cosine under ``reseed_add_cos`` to
+    every template of its tetrode (ids from 2000 up)."""
     from ttm.tracking import cosine_from_templates
 
     win_p = plain.frame_slice(a, b)
@@ -335,7 +403,8 @@ def reseed(plain, whitened, bank: Bank, a: int, b: int, sort_dir: pathlib.Path, 
     win_w = whitened.frame_slice(a, b)
     win_w.reset_times()
     rs = sort_window(win_p, sort_dir, params)
-    dense, snr = unit_templates(rs, win_w, n_jobs=n_jobs, with_snr=True, seed=params.template_seed)
+    noise = _seed_noise(win_w, params, bad_periods, a, b, n_jobs)
+    dense, snr = unit_templates(rs, win_w, n_jobs=n_jobs, with_snr=True, seed=params.template_seed, noise=noise)
     groups = np.asarray(whitened.get_property("group")).astype(int)
     rgrp = np.asarray(rs.get_property("group")).astype(int)
     out = bank.copy()
@@ -696,7 +765,8 @@ def run_carry(binary, W: np.ndarray, bank0: Bank, out_dir: pathlib.Path, *, para
         extra = dict(noise=noise_arr, noise_groups=np.array(groups), sustained=sustained)
         acc = arrays["reason"] == 0
         if params.reseed_every and w > 0 and w % params.reseed_every == 0:
-            newbank = reseed(plain, rec, newbank, a, b, reseed_dir / f"reseed_w{w}", params, n_jobs=n_jobs)
+            newbank = reseed(plain, rec, newbank, a, b, reseed_dir / f"reseed_w{w}", params, n_jobs=n_jobs,
+                             bad_periods=bad_periods)
             n_used = np.r_[n_used, np.zeros(len(newbank.ids) - len(n_used), np.int64)]
         newbank.save(f_bk, n_used=n_used, **extra)
         log(f"w{w:02d}: {acc.sum():,} accepted of {acc.size:,} fits; sustained {sustained.tolist()}; "
@@ -783,9 +853,10 @@ def readmit_carry(out_dir: pathlib.Path, params: CarryParams, *, fs: float, n_fr
 
 def _params_dict(d: dict) -> dict:
     """A recorded parameter dict in the current form. Before 2026-11-06, ``pulse_post_ms`` set both
-    the exclusion and the relaxed span, with the pulse rule on, and the sustained-response test's
-    parameters were named ``driven_*``."""
+    the exclusion and the relaxed span, with the pulse rule on, the sustained-response test's
+    parameters were named ``driven_*``, and the seed snr used SpikeInterface's own noise draw."""
     d = {(f"sustained_{k[7:]}" if k.startswith("driven_") else k): v for k, v in d.items()}
+    d.setdefault("seed_noise_chunk_s", None)
     if "pulse_post_ms" in d:
         v = d.pop("pulse_post_ms")
         d.update(pulse_exclude_post_ms=v, pulse_relax=True, pulse_relax_post_ms=v)

@@ -121,13 +121,13 @@ def main(argv: list[str] | None = None) -> None:
                 raise ValueError(f"--{name.replace('_', '-')} {given} differs from the carry's {recorded[name]}")
         diff = cr.record_readmit(run_dir / "carry_params.json", params)
         cr.log(f"readmit with {diff or 'no change'}")
-    else:
+    stages = ["binary", "seed", "carry", "export", "analyzer"] if a.stage == "all" else [a.stage]
+    if a.stage != "readmit" and set(stages) & {"binary", "seed", "carry"}:
         cr.write_run_info(run_dir / "carry_params.json", params, store=exp.store_path(), binary=binary,
                           dropped_channels=[str(c) for c in drop],
                           binary_dtype=a.binary_dtype if not a.binary else "as given",
                           bad_periods=bad_path, pulses=a.pulses, bank=bank_path, whitening=whitening,
                           reseed_sorts=a.reseed_sorts or run_dir / "reseed_sorts")
-    stages = ["binary", "seed", "carry", "export", "analyzer"] if a.stage == "all" else [a.stage]
 
     if "binary" in stages and not (binary / "binary.json").exists():
         from ttm.sorting import estimate_recording_wire_timing, preprocess_for_sorting, quantize_int16
@@ -153,7 +153,8 @@ def main(argv: list[str] | None = None) -> None:
             np.savez(whitening, W=cr.whitening_matrix(rec, params))
             cr.log(f"whitening -> {whitening}")
         if not bank_path.exists():
-            cr.seed_bank(rec, run_dir / "seed_sort", params).save(bank_path)
+            bad = cr.read_bad_periods(bad_path, rec.get_sampling_frequency()) if bad_path is not None else {}
+            cr.seed_bank(rec, run_dir / "seed_sort", params, bad_periods=bad).save(bank_path)
             cr.log(f"seed bank -> {bank_path}")
 
     if "carry" in stages:

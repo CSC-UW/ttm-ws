@@ -183,6 +183,8 @@ def test_run_info_reads_the_single_pulse_span_of_older_runs(tmp_path) -> None:
     cr.write_run_info(path, P)
     with pytest.raises(ValueError, match="cannot change"):
         cr.record_readmit(path, dataclasses.replace(P, pulse_exclude_post_ms=50.0))
+    no_noise = {k: v for k, v in old.items() if k != "seed_noise_chunk_s"}
+    assert cr._params_dict(no_noise)["seed_noise_chunk_s"] is None
 
 
 def _binary(tmp_path, n=4 * 60_000):
@@ -251,6 +253,43 @@ def test_readmit_replays_the_carry_and_applies_new_pulse_parameters(tmp_path) ->
         z = np.load(out / f"spikes_w{w:02d}.npz")
         np.testing.assert_array_equal(z["reason_carry"], saved[w])
         assert z["frame"].size == saved[w].size
+
+
+def test_channel_noise_is_the_mean_chunk_mad_clear_of_bad_periods() -> None:
+    rng = np.random.default_rng(3)
+    sd = np.array([1.0, 2.0, 3.0, 4.0, 1.5, 1.5, 1.5, 1.5])
+    x = (rng.normal(size=(60_000, 8)) * sd).astype(np.float32)
+    x[30_000:33_000, :4] += 200 * rng.normal(size=(3_000, 4)).astype(np.float32)
+    rec = si.NumpyRecording(x, sampling_frequency=FS)
+    rec.set_property("group", np.repeat([0, 1], 4))
+    clean = cr.channel_noise(rec, {0: [(30_000, 33_000)]}, n_jobs=2)
+    np.testing.assert_allclose(clean, sd, rtol=0.03)
+    loud = cr.channel_noise(rec, None, n_jobs=2)
+    assert (loud[:4] > clean[:4] * 1.05).all()
+    np.testing.assert_allclose(loud[4:], clean[4:])
+    assert cr.window_bad_periods({0: [(10, 50), (90, 200)], 1: [(300, 400)]}, 40, 100) == {0: [(0, 10), (50, 60)]}
+
+
+def test_seed_snr_divides_by_the_given_noise() -> None:
+    T = _template()
+    f = np.arange(1000, 290_000, 1500)
+    x = _tetrode(frames=f, amps=np.full(f.size, 6.0), T=T)
+    from probeinterface import Probe
+
+    rec = si.NumpyRecording(x, sampling_frequency=FS)
+    probe = Probe(ndim=2)
+    probe.set_contacts(positions=np.array([[0, 0], [20, 0], [0, 20], [20, 20]], float), shapes="circle",
+                       shape_params={"radius": 5})
+    probe.set_device_channel_indices(np.arange(4))
+    rec.set_probe(probe)
+    rec.set_property("group", np.zeros(4, int))
+    sorting = si.NumpySorting.from_samples_and_labels([f + P.nbefore], [np.zeros(f.size, int)], FS)
+    sorting.set_property("group", np.array([0]))
+    _, snr1 = cr.unit_templates(sorting, rec, n_jobs=1, noise=np.ones(4))
+    _, snr2 = cr.unit_templates(sorting, rec, n_jobs=1, noise=np.full(4, 2.0))
+    _, again = cr.unit_templates(sorting, rec, n_jobs=1, noise=np.ones(4))
+    np.testing.assert_allclose(snr2, snr1 / 2, rtol=1e-5)
+    np.testing.assert_array_equal(snr1, again)
 
 
 def test_run_info_refuses_other_parameters(tmp_path) -> None:
