@@ -1,9 +1,9 @@
 ---
-title: spikeinterface issues and PRs for the PC metrics, run_for_all_spikes and noise levels
-updated: 2026-11-04
+title: spikeinterface issues and PRs for the PC metrics, run_for_all_spikes, noise levels, sd_ratio and zarr gathering
+updated: 2026-11-05
 ---
 
-# spikeinterface: PC metrics on capped draws, run_for_all_spikes in µV, and noise levels
+# spikeinterface: PC metrics on capped draws, run_for_all_spikes in µV, noise levels, sd_ratio, and zarr gathering
 
 Not started. Open these once the analyzer stage of `ttm-sort` is in use,
 since it carries the workarounds, and check spikeinterface's current
@@ -104,6 +104,52 @@ is robust to artifact chunks but measures something else: on TTM-003-48H
 it was 0.89 to 1.04 times the mean over clean chunks, because the noise
 level varies over 48 h. Measurements: `investigations/analyzer-noise-and-duplicates/`.
 
+## 5. sd_ratio draws its own noise levels, unseeded
+
+A question of method with a reproducibility bug in it. Raise it in an
+issue; the seed alone could be a PR.
+
+`compute_sd_ratio` (`metrics/quality/misc_metrics.py`) divides each unit's
+amplitude spread by a noise level it gets from
+`get_noise_levels(recording, method="std")` itself, not from the
+analyzer's `noise_levels` extension. That call draws 20 random chunks of
+0.5 s with `seed=None` (`get_random_sample_slices`) and caches the result
+as a recording property (`noise_level_std_scaled`), so the value holds
+within one process and changes between processes. On a 10 min slice of
+TTM-003-48H, three builds in one process gave identical `sd_ratio`, and
+builds in three processes differed for 58 of 74 units, by up to 0.26.
+The draw also ignores `periods`, so chunks inside bad intervals count, and
+the std of a chunk includes the spikes in it. A noise level set on the
+`noise_levels` extension (here the stage's, outside bad intervals) has no
+effect on `sd_ratio`.
+
+What a PR could do: take the noise from the analyzer's `noise_levels`
+extension when it is computed, as SNR does (that extension is MAD-based,
+which equals the std for Gaussian noise, and is robust to the spikes), or
+at least pass the analyzer's seed and the metric's `periods` to the draw.
+
+## 6. Zarr gathering appends one chunk at a time
+
+A performance bug. Open an issue together with a PR.
+
+For a zarr analyzer, the waveforms extension
+(`extract_waveforms_to_single_buffer`, mode "zarr") and the node-pipeline
+extensions such as spike amplitudes gather through `GatherToZarr`
+(`core/node_pipeline.py`), whose `__call__` appends each worker's result
+to the zarr array as it arrives. With the default 1 s chunks that is one
+append per second of recording, and each append rewrites the zarr chunk
+being filled (about 10 MB before compression), in the main process,
+while the workers wait. On TTM-003-48H the waveforms of 354,478 random
+spikes (172,709 appends) took 2.1 min per 7,281 rows; stopped after 28
+of 49 zarr chunks, it was on course for about 100 min, against 89 s for
+the same extension on an in-memory analyzer.
+In a benchmark one append cost 36 to 85 ms for amplitude rows and 34 to
+283 ms for waveform rows, rising as the open zarr chunk filled.
+
+The fix buffers rows in `GatherToZarr` and appends whole zarr chunks (the
+last one at `finalize_buffers`). The test: the same arrays as now, and an
+append count equal to the number of zarr chunks.
+
 ## Meanwhile, in the analyzer stage
 
 The analyzer stage here computes L-ratio and isolation distance on every
@@ -111,4 +157,6 @@ spike's projection (decided 2026-11-04), so it does not need the
 weighting. It still needs the ADC-counts workaround of item 1, it
 reports isolation distance as missing where item 3 applies, and it
 computes noise levels itself outside bad intervals for item 4
-(`docs/sorting_pipeline.md`, step 8).
+(`docs/sorting_pipeline.md`, step 8). Its `sd_ratio` is still
+SpikeInterface's (item 5). For item 6 it computes every extension on an
+in-memory analyzer and writes the zarr store once with `save_as`.
