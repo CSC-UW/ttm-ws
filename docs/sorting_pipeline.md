@@ -567,9 +567,12 @@ Fixed:
 
 - Each tetrode gets one multi-unit unit, holding detected events that no
   sorted spike claims but that look like spikes of the tetrode. A
-  tetrode with fewer than 1,000 events that exactly one sorted spike
-  claims (the reference events below) gets none; on TTM-003-48H those
-  are TT3, TT13 and TT14. Its spikes
+  tetrode gets none when no unit of it has the 100 spikes in a window
+  that a template needs (below), since its events are then never scored:
+  on TTM-003-48H, TT3 (one unit of 34 spikes), TT13 (one unit of 429)
+  and TT14 (no unit). The stage also sets no cutoff for a tetrode with
+  fewer than 1,000 reference events (below); every scored tetrode of
+  TTM-003-48H has 32,239 or more. Its spikes
   are probably neural but cannot be assigned to one unit; rates per
   tetrode pool the sorted and multi-unit units. It follows the multi-unit
   step of `97_production_pipeline.py`, changed as below
