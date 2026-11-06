@@ -537,13 +537,15 @@ def build_analyzer(sorting, recording, folder, noise_uv: np.ndarray, periods: np
     """The SortingAnalyzer in ``folder`` (zarr, µV, every unit sparse to its tetrode) with random spikes,
     waveforms, templates, the given noise levels, spike amplitudes, correlograms, ISI histograms, unit
     locations, template similarity, template metrics, principal components (on the random spikes, for
-    viewing) and quality metrics over ``periods``, the all-spike PC metrics added to them."""
+    viewing) and quality metrics over ``periods``, the all-spike PC metrics added to them. Everything is
+    computed in memory and written to zarr once: SpikeInterface 0.105.4 appends each chunk's waveforms
+    and amplitudes to a zarr analyzer's arrays one at a time, rewriting the open zarr chunk each time."""
     params = params or AnalyzerParams()
     from ttm.sorting import create_group_sparse_analyzer
 
     job = {"n_jobs": n_jobs, "chunk_duration": "1s", "progress_bar": False}
-    az = create_group_sparse_analyzer(sorting, recording, format="zarr", folder=folder, return_in_uV=True,
-                                      n_jobs=n_jobs, seed=params.seed)
+    az = create_group_sparse_analyzer(sorting, recording, format="memory", return_in_uV=True, n_jobs=n_jobs,
+                                      seed=params.seed)
     steps = [
         ("random_spikes", {"method": "uniform", "max_spikes_per_unit": params.max_spikes_per_unit,
                            "seed": params.seed}),
@@ -581,6 +583,9 @@ def build_analyzer(sorting, recording, folder, noise_uv: np.ndarray, periods: np
     qm.set_data("metrics", df)
     qm.params = {**qm.params, "ttm_all_spike_pc_metrics": list(PC_METRIC_NAMES)}
     qm.save()
+    t0 = time.time()
+    az = az.save_as(format="zarr", folder=folder)
+    log(f"analyzer written in {time.time() - t0:.0f} s")
     return az
 
 
