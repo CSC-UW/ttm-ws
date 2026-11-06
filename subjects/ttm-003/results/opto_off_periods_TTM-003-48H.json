@@ -1,0 +1,229 @@
+{
+ "experiment": "TTM-003-48H",
+ "trains": 24,
+ "pulses": 1432,
+ "sham_onsets": 960,
+ "sleep_deprivation_h": [
+  23.96315750002861,
+  28.96315750002861
+ ],
+ "tetrodes": [
+  {
+   "tetrode": "TT1",
+   "pre_rate_hz": 10.63,
+   "pulse_over_baseline": 0.855,
+   "onset_1_10ms_over_baseline": 1.972,
+   "suppressed": false,
+   "in_population": false
+  },
+  {
+   "tetrode": "TT2",
+   "pre_rate_hz": 6.56,
+   "pulse_over_baseline": 0.828,
+   "onset_1_10ms_over_baseline": 2.384,
+   "suppressed": false,
+   "in_population": false
+  },
+  {
+   "tetrode": "TT3",
+   "pre_rate_hz": 3.26,
+   "pulse_over_baseline": 0.875,
+   "onset_1_10ms_over_baseline": 2.329,
+   "suppressed": false,
+   "in_population": false
+  },
+  {
+   "tetrode": "TT4",
+   "pre_rate_hz": 69.16,
+   "pulse_over_baseline": 4.636,
+   "onset_1_10ms_over_baseline": 15.921,
+   "suppressed": false,
+   "in_population": false
+  },
+  {
+   "tetrode": "TT5",
+   "pre_rate_hz": 67.38,
+   "pulse_over_baseline": 0.277,
+   "onset_1_10ms_over_baseline": 5.435,
+   "suppressed": true,
+   "in_population": true
+  },
+  {
+   "tetrode": "TT6",
+   "pre_rate_hz": 82.68,
+   "pulse_over_baseline": 0.048,
+   "onset_1_10ms_over_baseline": 1.09,
+   "suppressed": true,
+   "in_population": true
+  },
+  {
+   "tetrode": "TT7",
+   "pre_rate_hz": 23.43,
+   "pulse_over_baseline": 0.101,
+   "onset_1_10ms_over_baseline": 3.573,
+   "suppressed": true,
+   "in_population": true
+  },
+  {
+   "tetrode": "TT8",
+   "pre_rate_hz": 62.49,
+   "pulse_over_baseline": 0.03,
+   "onset_1_10ms_over_baseline": 0.429,
+   "suppressed": true,
+   "in_population": true
+  },
+  {
+   "tetrode": "TT9",
+   "pre_rate_hz": 5.77,
+   "pulse_over_baseline": 0.181,
+   "onset_1_10ms_over_baseline": 4.32,
+   "suppressed": true,
+   "in_population": true
+  },
+  {
+   "tetrode": "TT10",
+   "pre_rate_hz": 76.14,
+   "pulse_over_baseline": 0.988,
+   "onset_1_10ms_over_baseline": 3.777,
+   "suppressed": false,
+   "in_population": false
+  },
+  {
+   "tetrode": "TT11",
+   "pre_rate_hz": 46.52,
+   "pulse_over_baseline": 1.71,
+   "onset_1_10ms_over_baseline": 6.99,
+   "suppressed": false,
+   "in_population": false
+  },
+  {
+   "tetrode": "TT12",
+   "pre_rate_hz": 57.08,
+   "pulse_over_baseline": 0.043,
+   "onset_1_10ms_over_baseline": 1.254,
+   "suppressed": true,
+   "in_population": true
+  },
+  {
+   "tetrode": "TT13",
+   "pre_rate_hz": 5.22,
+   "pulse_over_baseline": 0.917,
+   "onset_1_10ms_over_baseline": 1.614,
+   "suppressed": false,
+   "in_population": false
+  },
+  {
+   "tetrode": "TT14",
+   "pre_rate_hz": 2.62,
+   "pulse_over_baseline": 0.829,
+   "onset_1_10ms_over_baseline": 2.598,
+   "suppressed": false,
+   "in_population": false
+  },
+  {
+   "tetrode": "TT15",
+   "pre_rate_hz": 59.67,
+   "pulse_over_baseline": 0.997,
+   "onset_1_10ms_over_baseline": 1.135,
+   "suppressed": false,
+   "in_population": false
+  },
+  {
+   "tetrode": "TT16",
+   "pre_rate_hz": 22.17,
+   "pulse_over_baseline": 0.959,
+   "onset_1_10ms_over_baseline": 1.597,
+   "suppressed": false,
+   "in_population": false
+  }
+ ],
+ "population": [
+  "TT5",
+  "TT6",
+  "TT7",
+  "TT8",
+  "TT9",
+  "TT12"
+ ],
+ "off_frac_pulse": 0.6822625698324022,
+ "off_frac_sham": 0.04583333333333333,
+ "off_end_ms_median_pulse": 286.73332929611206,
+ "off_end_ms_quartiles_pulse": [
+  168.56999695301056,
+  332.9666554927826
+ ],
+ "slow_wave_uV_pulse": 21.611317320908913,
+ "slow_wave_uV_sham": -1.8819611416508755,
+ "early_wave_uV_pulse": 134.29530851584573,
+ "early_wave_uV_sham": 6.743752464900414,
+ "edge_on_uV_max": 27.392120361328125,
+ "edge_off_uV_max": 22.022510528564453,
+ "hf_noise_uV_median": 4.083488702774048,
+ "edge_over_noise_median_train_max_channel": 3.6073782444000244,
+ "edge_over_noise_by_channel_median": {
+  "CH40": 1.9800000190734863,
+  "CH38": 2.069999933242798,
+  "CH36": 2.2300000190734863,
+  "CH34": 2.119999885559082,
+  "CH48": 1.8600000143051147,
+  "CH46": 1.9199999570846558,
+  "CH44": 2.0299999713897705,
+  "CH42": 1.8600000143051147,
+  "CH56": 2.4100000858306885,
+  "CH54": 2.3499999046325684,
+  "CH52": 2.309999942779541,
+  "CH50": 2.0999999046325684,
+  "CH58": 2.990000009536743,
+  "CH64": 2.869999885559082,
+  "CH62": 2.819999933242798,
+  "CH60": 3.1500000953674316,
+  "CH63": 2.4600000381469727,
+  "CH61": 2.5799999237060547,
+  "CH59": 2.640000104904175,
+  "CH57": 2.6600000858306885,
+  "CH55": 1.9800000190734863,
+  "CH53": 1.8300000429153442,
+  "CH51": 1.9700000286102295,
+  "CH49": 1.940000057220459,
+  "CH47": 2.240000009536743,
+  "CH45": 2.0199999809265137,
+  "CH43": 2.1500000953674316,
+  "CH41": 2.319999933242798,
+  "CH39": 2.0,
+  "CH37": 1.940000057220459,
+  "CH35": 1.840000033378601,
+  "CH33": 2.2200000286102295,
+  "CH25": 2.069999933242798,
+  "CH27": 2.1500000953674316,
+  "CH29": 2.190000057220459,
+  "CH31": 2.119999885559082,
+  "CH17": 1.8600000143051147,
+  "CH19": 2.2200000286102295,
+  "CH21": 2.240000009536743,
+  "CH23": 2.0799999237060547,
+  "CH9": 2.240000009536743,
+  "CH11": 1.909999966621399,
+  "CH13": 1.9500000476837158,
+  "CH15": 1.9299999475479126,
+  "CH1": 2.109999895095825,
+  "CH3": 2.2799999713897705,
+  "CH5": 2.0999999046325684,
+  "CH7": 2.0,
+  "CH4": 2.430000066757202,
+  "CH6": 2.140000104904175,
+  "CH8": 2.049999952316284,
+  "CH2": 2.0299999713897705,
+  "CH10": 2.2300000190734863,
+  "CH12": 2.2200000286102295,
+  "CH14": 2.200000047683716,
+  "CH16": 2.0799999237060547,
+  "CH18": 2.0399999618530273,
+  "CH20": 2.1600000858306885,
+  "CH24": 2.1600000858306885,
+  "CH26": 2.2699999809265137,
+  "CH28": 2.069999933242798,
+  "CH30": 2.25,
+  "CH32": 2.180000066757202
+ },
+ "sleep_deprivation_trend": {}
+}
