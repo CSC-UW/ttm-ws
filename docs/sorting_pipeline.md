@@ -1,6 +1,6 @@
 ---
 title: Spike sorting pipeline for 48 h tetrode recordings
-updated: 2026-11-05
+updated: 2026-11-06
 status: needs_verification
 ---
 
@@ -17,7 +17,8 @@ The recordings are from rats with 16 tetrodes (64 channels) sampled at
 30 kHz for about 48 h. Some recordings include optogenetic stimulation:
 in TTM-003-48H, 207 ms light pulses at 1 Hz, in trains of 58 to 60
 pulses, every 2 h. A light-driven cell is a unit whose firing rises
-during the pulses.
+during the pulses: a transient responder answers only the onset, and a
+sustained responder keeps firing through the pulse.
 
 - Tetrodes are TT1 to TT16. Channels keep their acquisition names (CH1
   to CH64; TT1 is CH34, CH36, CH38, CH40). A sorting's `group` property
@@ -47,7 +48,7 @@ during the pulses.
   templates moved to other tetrodes, with troughs of 5 to 14 MAD noise on
   their largest wire, bursts, and slow changes of size and shape. Three
   of them answer the real light pulses with one full-size spike followed
-  by a train of half-size spikes, as a driven cell recorded in
+  by a train of half-size spikes, as a sustained responder recorded in
   TTM-003 does. Small units have troughs of 6 MAD noise or less (11 of
   the 21), large units the rest. A unit's spike counts as found when it
   lies within 10 samples (0.33 ms) of a ground-truth spike; recall,
@@ -95,10 +96,29 @@ ttm-sort all --subject TTM-003 --experiment TTM-003-48H \
   and `offset_s` in seconds from the recording's first sample; the
   TTM-003 script writes it to `results/laser_pulses_<session name>.csv`.
   Each subject with stimulation needs a script that makes it from its
-  TTL events. Without `--pulses`, every spike counts as outside pulses:
-  step 5.4 is skipped, and in-pulse spikes enter the relative floor
-  (5.3.4) and the template updates (5.5). A stimulated recording then
-  loses most of its driven cells' smaller in-pulse spikes.
+  TTL events. With it, spikes from each onset to 100 ms after the offset
+  stay out of the relative floor's reference (5.3.4) and the template
+  updates (5.5), and step 5.4 runs. `--no-pulse-relax` keeps the
+  exclusion and skips step 5.4, for pulses under which no cell's spikes
+  shrink, such as TTM-003-48H-2's 64 ms pulses at 0.3 mW.
+  `--pulse-exclude-post-ms`, `--pulse-relax-post-ms` and
+  `--sustained-start-ms` set the spans for other pulses. Without
+  `--pulses`, every spike counts as outside pulses, and a recording
+  stimulated like TTM-003-48H loses most of its sustained responders'
+  smaller in-pulse spikes.
+- `ttm-sort readmit` replays steps 5.3 and 5.4 on a finished carry's
+  saved fits with other pulse-rule settings (`--no-pulse-relax`,
+  `--pulse-relax-post-ms`), with the carry's own pulse table and bad
+  periods, and keeps the carry's decisions in each window's file
+  (`reason_carry`). The templates, and so the matching, depend on those
+  settings only through the template update's counts (5.5): a relaxed
+  fit can bring a unit to the 100 accepted spikes an update needs, or
+  stop a spike just after the excluded span from counting as a lead
+  spike. On TTM-003-48H that changed one update's pool by one spike in
+  29,302 (`investigations/pulse-rule-span/`), so the replay gives what a
+  new carry would but for that. Then run `export`, move `analyzer.zarr`,
+  `multi_unit/`, `sorting_mua/` and `pc_metrics.csv` aside (the
+  `analyzer` stage reuses what it finds), and run `analyzer`.
 - `ttm-sort` writes to `<session>/sortings_carry/<run>/` (`--run`,
   default `main`). Its stages (`binary`, `seed`, `carry`, `export`,
   `analyzer`) can be run one at a time. `--binary` sorts an existing preprocessed binary
@@ -245,7 +265,7 @@ Measured against the plain median, with the matching of step 5:
   during the recording (TT3, TT13, TT14 and TT16), the spikes assigned
   fell from 7.8 M to 0.7 M.
   The light-driven cells' responses were unchanged: for example, the
-  TT4 driven unit's rate in the first 10 ms after pulse onset ranged over
+  TT4 sustained responder's rate in the first 10 ms after pulse onset ranged over
   the 24 two-hour blocks from 187 to 425 Hz with the plain median and
   from 202 to 429 Hz with the aligned one.
 
@@ -375,17 +395,19 @@ separately, with the bank as it stands (window 0 uses the seed bank):
    5. refractory period 1.5 ms per unit: a run of spikes each closer than
       1.5 ms to the previous one keeps only its highest-snr spike, however
       long the run.
-4. Laser pulses (only with a pulse table, only in windows with pulses).
-   Candidates are fits outside bad intervals with matched-filter snr 2.5
-   or more, amplitude at least 0.3 times the median of rule 3.4 (0.3
-   with fewer than 30 lead spikes), and cosine 0.5 or more. A unit is
-   driven in this window when its candidates from 15 ms after each onset
-   (past the onset response, so the test asks whether it keeps firing
-   through the pulse) to the offset number 20 or more, at least twice the count expected from its candidate rate
+4. Laser pulses (only with a pulse table and without `--no-pulse-relax`,
+   only in windows with pulses). Candidates are fits outside bad
+   intervals with matched-filter snr 2.5 or more, amplitude at least 0.3
+   times the median of rule 3.4 (0.3 with fewer than 30 lead spikes), and
+   cosine 0.5 or more. A unit is a sustained responder in this window
+   when its candidates from 15 ms after each onset to the offset number
+   20 or more, at least twice the count expected from its candidate rate
    outside the pulses (onset to offset plus 100 ms excluded), with a
-   one-sided Poisson p under 1e-4. A driven unit's candidates from onset
-   to offset plus 100 ms are accepted, and rule 3.5 is applied to its
-   spikes again.
+   one-sided Poisson p under 1e-4. Starting at 15 ms leaves out the
+   onset response, which transient responders share, so the test asks
+   whether a unit keeps firing through the pulse. A sustained
+   responder's candidates from onset to offset plus 5 ms are accepted,
+   and rule 3.5 is applied to its spikes again.
 5. Template update, per unit with 100 or more accepted spikes in the
    window: from its accepted lead spikes outside laser pulses (plus
    100 ms), if there are 50 or more, up to 500 chosen at random (seeded by the window number); their
@@ -415,8 +437,8 @@ keeps each unit's identity, and updating them slowly follows drift.
   against 0.941); F1 is 0.811 against 0.794 on small units and 0.917
   against 0.921 on large ones (both with every other choice of this
   document). Over the 48 h, the joint run finds 20 to
-  35 % fewer of the driven cells' spikes in the first 10 ms after pulse
-  onset, and divides one driven cell between two units.
+  35 % fewer of the light-driven cells' spikes in the first 10 ms after pulse
+  onset, and divides one light-driven cell between two units.
 - The admission bar is set in noise units (snr) rather than as a
   fraction of each template's size. A fraction of the template admits
   background fits of the right size and, combined with template updates,
@@ -432,14 +454,40 @@ keeps each unit's identity, and updating them slowly follows drift.
   17.5 % were accepted, 77.5 % failed the snr bar or the relative floor
   (recorded together), 3.5 % the cosine, 0.9 % the refractory period, and
   0.5 % fell in bad intervals.
-- In-pulse rule: a driven cell firing at 100 to 200 Hz through a pulse
-  fires smaller spikes than outside it. On the hybrid (window 0, plain
-  median, unwhitened, fixed templates), the injected driven units'
-  half-size in-pulse spikes were found at 0.13 to 0.29 recall under the
-  normal rules and 0.60 to 0.63 under the in-pulse rule. Relaxing every
-  unit raised the false spikes during pulses on the ground-truth units
-  that fall silent in pulses from 2.9 to 11.3 per second in total;
-  relaxing only driven units, to 3.6.
+- Pulse rule: a sustained responder firing at 100 to 200 Hz through
+  a pulse fires smaller spikes than outside it. On the hybrid (window 0,
+  plain median, unwhitened, fixed templates), the injected sustained
+  responders' half-size in-pulse spikes were found at 0.13 to 0.29
+  recall under the normal rules and 0.60 to 0.63 under the in-pulse
+  rule. Relaxing every unit raised the false spikes during pulses on the
+  ground-truth units that fall silent in pulses from 2.9 to 11.3 per
+  second in total; relaxing only sustained responders, to 3.6. The 15 ms
+  start of the count was not compared with others. In TTM-003's earlier
+  light sessions, the TT6 sustained responder's first spike came a
+  median of 4.4 to 4.8 ms after onset, with modes at 3.5 and 8 ms
+  (`subjects/ttm-003/optogenetic_sessions_findings.md`).
+- The rule's span after the offset: in TTM-003-48H the sustained
+  responders stop firing within a few milliseconds of the offset, and
+  the spikes the normal rules accept and the relaxed fits stop together
+  (98 % of the TT4 sustained responder's accepted spikes in the 30 ms
+  after the offset fall in its first 4 ms). The units then stay nearly
+  silent: from 10 to 100 ms after the offset the TT4 sustained
+  responder's spikes that pass the normal rules come at 0.07 to 0.24 per
+  second, against 15.3 per second away from pulses. With the span to
+  100 ms after the offset, the rule admitted 112 fits more than 5 ms
+  after the offset over the 48 h. Whether they are the units' spikes
+  cannot be told: their cosines (0.50 to 0.58) and their share of the
+  units' spikes there resemble the relaxed fits inside the pulse. The
+  5 ms span rests on the silence: after the offset there is no firing
+  left to rescue, and a lower bar there than in the rest of the time
+  outside pulses would make rates after the offset and away from pulses
+  incomparable. In TTM-003-48H-2 the rule added 32 small fits to one
+  unit in window 0, 18 of them in the 100 ms after the offset
+  (`docs/reports/2026-11-05_ttm003_48h2_pulse_response.md`).
+  TTM-003-48H was replayed with the 5 ms span (`ttm-sort readmit`). The
+  replay also dropped 61 fits inside a bad period, which the rule had
+  accepted while its candidates still included bad intervals for fits
+  under snr 4.5 (`investigations/pulse-rule-span/`).
 - Template update: on the hybrid over 12 windows (plain median,
   whitened, rules of step 5), the 0.2 blend gave
   small-unit F1 0.79 (precision 0.87), replacing the template each window

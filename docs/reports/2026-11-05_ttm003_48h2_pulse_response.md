@@ -371,6 +371,15 @@ some windows and not in others. Two ways to sort TTM-003-48H-2:
 Whether the 100 ms after offset adds false fits to TTM-003-48H's driven
 units too, inside their longer OFF periods, was not measured.
 
+Decided on 2026-11-06: neither way. The carry now gives the pulse table's
+two uses separate spans and the pulse rule its own switch
+(`docs/sorting_pipeline.md`, step 5.4), and TTM-003-48H-2 is to be sorted with the pulse table and
+`--no-pulse-relax`: pulse times stay out of the relative floor and the
+template updates, and the pulse rule does not run. In TTM-003-48H the
+100 ms after the offset did add fits, 112 of them more than 5 ms after
+the offset over the 48 h; the rule's span now ends 5 ms after the offset
+(`investigations/pulse-rule-span/`).
+
 ## Scripts and data
 
 - `subjects/ttm-003/scripts/opto_off_periods.py`: per train, from the
