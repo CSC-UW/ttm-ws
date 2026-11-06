@@ -213,7 +213,8 @@ channel tables of this recording use the `A1_` names.
 The protocol (`stimulation_log.toml`) was pattern C (50 ms on, 1 pulse/s,
 20 pulses per train), one train every 20 min, at about 0.3 mW. The TTL
 (`results/stimulation_blocks_2026-11-03_09-01-38.csv`) holds 145 trains of
-20 pulses, all pattern C, with no sub-millisecond toggles. They start at
+20 pulses, all pattern C, without the sub-millisecond toggles described
+in `optogenetic_stimulation.md`. They start at
 09:01:57 on 2026-11-03 and every 1200 s after that, except one interval of
 1061 s between trains 87 and 88 (13:41:58 to 13:59:39 on 2026-11-04); the
 last starts at 08:59:40 on 2026-11-05, 27 s before the recording ends.
@@ -224,6 +225,13 @@ The light schedule, the sleep deprivation window and the bad channel are
 those of TTM-003-48H, two weeks later (experimenter, 2026-11-05): lights on
 at 08:53 and off at 20:53, sleep deprivation with novel objects from 09:00
 to 14:00 on 2026-11-04, and A1_CH22 (TT15), not yet re-checked with
-`channel_qc.py` on this recording. TT6, TT7 and TT9 probably moved between
-the two recordings; whether others did is not yet checked. Not yet
-converted.
+`channel_qc.py` on this recording. The light times are local wall-clock
+times in both recordings, CDT in the first and CST in the second: the
+light timer follows daylight saving time (experimenter, 2026-11-05). The
+experimenter thinks TT6, TT7 and TT9 moved between the two recordings and
+has not yet checked the others.
+
+`ttm-convert` wrote the blosc-zstd store on 2026-11-05 in 55 min (387.4 GB,
+ratio 1.712), repairing three timestamp glitches (at samples 757,632,230,
+2,368,244,966 and 3,978,857,702; `slice_table.csv`). Three 1 s stretches of
+the store (start, middle, end) equal the acquisition's samples.

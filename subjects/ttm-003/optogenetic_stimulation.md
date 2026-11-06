@@ -3,7 +3,9 @@ title: TTM-003 optogenetic stimulation (2026-10-16 and the two 48 h recordings)
 updated: 2026-11-05
 ---
 
-# TTM-003 optogenetic stimulation, 2026-10-16
+# TTM-003 optogenetic stimulation
+
+## The two sessions of 2026-10-16
 
 Two short Open Ephys sessions on `/Volumes/tetrode/TTM3/`, recorded on
 Record Node 102 with the IMU rig (streams `IMU_port_A`, `acquisition_board`,
@@ -115,5 +117,7 @@ toggles before them. The median pulse per train is 62.9 to 64.0 ms, the
 1004 ms period (0.996 Hz). Trains 2, 4, 24, 55 and 82 each hold one pulse
 of 77 to 78 ms (`anomalous`). Trains start every 1200 s from 09:01:57 on
 November 3, except one interval of 1061 s between trains 87 and 88
-(13:59:39 on November 4), and the last starts at 08:59:40 on November 5.
-All 145 trains count as delivered.
+(13:41:58 to 13:59:39 on November 4), and the last starts at 08:59:40 on
+November 5. No `not_delivered` window is entered, so all 145 trains count
+as delivered; whether the light reached the animal has not been checked,
+as it was for TTM-003-48H's train 24 with `opto_blocks.py`.
