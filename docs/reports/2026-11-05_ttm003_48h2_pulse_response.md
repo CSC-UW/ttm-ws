@@ -413,4 +413,7 @@ the offset over the 48 h; the rule's span now ends 5 ms after the offset
   then `ttm-sort carry` with `--windows 0-4`, once with `--run pulsetest
   --pulses subjects/ttm-003/results/laser_pulses_2026-11-03_09-01-38.csv`
   and once with `--run nopulsetest` and that run's `--bank` and
-  `--whitening`.
+  `--whitening`. Both runs were deleted on 2026-11-06. A rerun with the
+  current code needs `--pulse-relax-post-ms 100` for the span they used;
+  the current pulse rule also takes no fit inside a bad period, so the
+  counts can differ slightly.
