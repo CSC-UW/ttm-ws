@@ -1,6 +1,6 @@
 ---
 title: Subject TTM-002
-updated: 2026-10-21
+updated: 2026-11-06
 ---
 
 # TTM-002
@@ -18,7 +18,9 @@ The archived `structure.oebin` originally named all 64 acquisition-board
 channels with a blank string (an Acquisition Board plugin bug, documented
 in `docs/developer_notes/openephys_blank_channel_names.md`); it was repaired
 in place on 2026-10-21 with the original kept as `structure.oebin.orig`, and
-spikeinterface now reads the session. The products currently under
-`<data_root>/2026-09-24_09-03-22/` and `<data_root>/TTM-002/TTM-002-48H/` were
-made outside this repository from a renamed mirror and are not inputs to
-anything here; they will be superseded when the session is re-processed.
+spikeinterface now reads the session. The products under
+`<data_root>/TTM-002/TTM-002-48H/` (`delta.idelta.zarr` and
+`experiment_params.json` on 2026-11-06) were made outside this repository
+from a renamed mirror and are not inputs to anything here; they will be
+superseded when the session is re-processed. The session has not been
+converted to a store here.
