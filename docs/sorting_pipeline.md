@@ -37,9 +37,11 @@ sustained responder keeps firing through the pulse.
   to unit length, both whitened (step 3), divided by the MAD noise of
   that projection over six 10 s blocks of the window (step 5.1). Template
   snr is SpikeInterface's quality metric: the template's peak on its
-  largest wire over that wire's noise in the sorted window, the mean MAD
-  noise of every 0.5 s chunk of the window clear of the tetrode's bad
-  periods (the rule of the analyzer stage's noise levels, step 8).
+  largest wire over that wire's noise, both from the sorted window (the
+  plain window in step 4, the whitened one in step 6). The noise is the
+  mean MAD of the window's 0.5 s chunks, laid end to end from its start,
+  that are clear of the tetrode's bad intervals, as the analyzer stage
+  measures noise levels (step 8).
 - Neighbour-subtracted snippet: the 90 samples around a spike after
   subtracting every other fitted spike, so overlapping spikes do not
   distort it. Cosines between a snippet and a template are taken over all
@@ -366,16 +368,19 @@ the same spikes in step 5; merging at cosine 0.95 removes them, while at
 0.9, 19 % of merges joined two cells (the merged unit broke the
 refractory period). The false-merge rate at 0.95 was not measured.
 
-The snr's noise is measured as the analyzer stage measures it so that a
-run keeps the same units every time. Until 2026-11-06 it was
+The template snr's noise is measured as the analyzer stage measures it,
+so that a rerun keeps the same units. Until 2026-11-06 it was
 SpikeInterface's default, the MAD of 20 random 0.33 s chunks drawn with a
-new seed in every process. Over 20 such draws, a unit's snr varied by a
-median of 9 to 11 % between its lowest and highest draw in the seed sorts
-of TTM-003-48H and TTM-003-48H-2. In TTM-003-48H two units sat at 5.05 to
-5.61 and passed in every draw; with the chunked noise both pass (5.14 and
-5.37) and the same 53 units are kept, and TTM-003-48H-2's seed bank is
-the same 40 templates as with the draw it was made with. The chunked
-noise takes about 10 s per window.
+new seed in every process. Over 20 such draws, the median unit's snr
+differed between its lowest and highest draw by 9 % in one of the seed
+sorts of TTM-003-48H and TTM-003-48H-2 (TTM-003's second 48 h
+recording) and by 11 % in the other. In TTM-003-48H the same 53 units
+passed in every draw. The two closest to the bar ranged over the draws
+from 5.13 to 5.61 and from 5.05 to 5.24; with the chunked noise they are
+at 5.37 and 5.14, and the chunked noise keeps the same 53. TTM-003-48H-2's seed
+bank is the same 40 templates with the chunked noise as with the draw it
+was made with. On the two windows timed, the chunked noise took 9 s
+(TTM-003-48H-2's window 0) and 11 s (its window 12, whitened).
 
 Studies: [`investigations/spike-sorting/`](../investigations/spike-sorting/README.md).
 
@@ -509,7 +514,7 @@ keeps each unit's identity, and updating them slowly follows drift.
   small shrinking unit drift onto background spikes (precision 0.02 by
   window 6). Fixed templates were not run over the 48 h; there, the
   templates' cosine between window 0 and the last window has a median of
-  0.92, and 22 of 46 starting units fall below 0.9. Over the 48 h the
+  0.92, and 20 of the 45 starting units fall below 0.9. Over the 48 h the
   spike times of this pipeline's units stay within 3 samples of the same
   point on their waveforms, where the earlier pipeline, which replaced
   templates each window, moved 9 of its units by 5 samples or more (up
@@ -524,9 +529,10 @@ Studies: [`docs/reports/2026-10-29_ttm003_carry_bakeoff.md`](reports/2026-10-29_
 ## 6. Re-seeding
 
 - After windows 12, 24, ..., 84: MountainSort5 as in step 4 on that
-  window (bad periods included), keeping clusters with template snr 5 or
-  more and 100 spikes or more; step 4's merge is not applied. Here the
-  snr is taken on the whitened window, templates and noise alike.
+  window, bad intervals included in what it sorts, keeping clusters with
+  template snr 5 or more and 100 spikes or more; step 4's merge is not
+  applied. Here the snr is taken on the whitened window, templates and
+  noise alike, and the noise still leaves bad intervals out.
 - In MountainSort5's order, a cluster joins the bank if its whitened
   template's cosine (best shift up to 10 samples) to every template on
   its tetrode, including clusters just added, is under 0.8. New units are numbered from 2000 (seed units
@@ -541,8 +547,8 @@ adds them without disturbing the units already carried, and the 0.8 bar
 keeps a drifted copy of a carried unit out. It is stricter than the
 seed's 0.95 merge, so a new cell whose template is within cosine 0.8 of
 a carried unit's is not added. The interval and the bar were not
-tuned. On TTM-003-48H the seed gave 46 units and the seven
-re-seeds added 19.
+tuned. On TTM-003-48H the seed gave 45 units and the seven
+re-seeds added 16.
 
 </details>
 
@@ -604,8 +610,9 @@ Fixed:
   recording, and also per vigilance state once the recording is sleep
   scored, so the two can be compared.
 
-- The noise levels behind SNR are the mean MAD of every 0.5 s chunk of a
-  grid, each channel's only outside its tetrode's bad intervals (decided
+- The noise levels behind snr are, for each channel, the mean MAD of the
+  recording's 0.5 s chunks, laid end to end from its start, that fall
+  outside its tetrode's bad intervals (decided
   2026-11-05; 10 min on TTM-003-48H). A random draw of 2,000 such chunks
   stays within 1.0 % of that mean on every channel in 95 % of draws, but
   the multi-unit step below magnifies the difference: the stage's first
