@@ -101,6 +101,17 @@ def test_chunk_noise_levels_leave_out_bad_intervals(tmp_path) -> None:
     assert np.allclose(table["noise_uv"], noise * 0.195)
 
 
+def test_chunk_noise_levels_default_uses_every_clean_chunk(tmp_path) -> None:
+    rng = np.random.default_rng(0)
+    n = int(30 * FS)
+    x = rng.normal(0, 100, (n, 8))
+    x[int(10 * FS):int(20 * FS), 4:] *= 5
+    path = _save_recording(tmp_path / "rec", x.astype(np.int16), [0, 1])
+    noise, table = an.chunk_noise_levels(path, {1: [(int(10 * FS), int(20 * FS))]}, workers=2)
+    assert list(table["chunks"]) == [60] * 4 + [40] * 4
+    assert np.all(np.abs(noise / 100 - 1) < 0.02)
+
+
 def test_multi_unit_admits_missed_spikes_and_not_claimed_ones(tmp_path) -> None:
     rng = np.random.default_rng(1)
     n = int(40 * FS)
@@ -124,3 +135,5 @@ def test_multi_unit_admits_missed_spikes_and_not_claimed_ones(tmp_path) -> None:
     assert near.all()
     assert got.size >= 0.9 * missed.size
     assert table.loc[0, "reference"] >= 0.9 * (spikes.size - missed.size)
+    with pytest.raises(ValueError):
+        an.run_multi_unit(path, tmp_path / "sorting", noise * 1.01, {}, tmp_path / "mua", params, workers=2)

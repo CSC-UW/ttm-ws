@@ -194,12 +194,16 @@ def _analyzer_stage(a, run_dir: pathlib.Path, binary: pathlib.Path, drop: list, 
     periods = an.unit_periods(sorting, rec.get_num_frames(), bad)
 
     pc_csv = run_dir / "pc_metrics.csv"
+    counts = pd.Series(sorting.count_num_spikes_per_unit(outputs="dict"), name="num_spikes")
     if pc_csv.exists():
         pc = pd.read_csv(pc_csv).set_index("unit_id")
+        if "num_spikes" not in pc or not pc["num_spikes"].reindex(counts.index).equals(counts.astype(pc["num_spikes"].dtype)):
+            raise ValueError(f"{pc_csv} is for other spike counts than {run_dir / 'sorting_mua'}; remove it")
     else:
         t0 = time.time()
         pc = an.all_spike_pc_metrics(sorting, rec, run_dir / "analyzer_work", params, n_jobs=a.n_jobs,
                                      keep_projections=a.keep_pc_projections)
+        pc["num_spikes"] = counts.reindex(pc.index).to_numpy()
         pc.to_csv(pc_csv)
         cr.log(f"all-spike PC metrics in {(time.time() - t0) / 60:.1f} min -> {pc_csv}")
 

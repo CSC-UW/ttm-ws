@@ -42,7 +42,7 @@ PC_METRIC_NAMES = ("isolation_distance", "l_ratio", "d_prime", "silhouette")
 @dataclasses.dataclass(frozen=True)
 class AnalyzerParams:
     seed: int = 0
-    noise_chunks: int = 2000
+    noise_chunks: int | None = None
     noise_chunk_s: float = 0.5
     mua_window_s: float = 1800.0
     mua_detect: float = 5.5
@@ -106,12 +106,13 @@ def _chunk_mads(args):
 
 def chunk_noise_levels(rec_path, bad_periods: dict, params: AnalyzerParams | None = None, *,
                        drop_channel_ids=(), workers: int = 32) -> tuple[np.ndarray, pd.DataFrame]:
-    """Each channel's noise in ADC counts: the mean, over ``noise_chunks`` chunks of ``noise_chunk_s``
-    on a grid that do not overlap its tetrode's bad intervals, of the chunk's MAD / 0.6745.
+    """Each channel's noise in ADC counts: the mean, over the chunks of ``noise_chunk_s`` on a grid
+    that do not overlap its tetrode's bad intervals, of the chunk's MAD / 0.6745. With ``noise_chunks``
+    None (the default) every such chunk counts.
 
-    One seeded permutation of the grid serves every tetrode: each takes its first ``noise_chunks``
-    chunks clear of its bad intervals, so tetrodes without bad intervals share the same chunks. Returns
-    the levels and a table of them per channel with the chunks used."""
+    With ``noise_chunks`` a number, one seeded permutation of the grid serves every tetrode: each takes
+    its first ``noise_chunks`` chunks clear of its bad intervals. Returns the levels and a table of them
+    per channel with the chunks used."""
     from concurrent.futures import ProcessPoolExecutor
 
     params = params or AnalyzerParams()
@@ -132,18 +133,17 @@ def chunk_noise_levels(rec_path, bad_periods: dict, params: AnalyzerParams | Non
             i0 = np.searchsorted(e, starts, "right")
             hit = (i0 < s.size) & (s[np.minimum(i0, s.size - 1)] < starts + length)
             clear = ~hit
-        pick[g] = order[clear][:params.noise_chunks]
+        pick[g] = np.sort(order[clear]) if params.noise_chunks is None else order[clear][:params.noise_chunks]
     used = np.unique(np.concatenate(list(pick.values())))
     batches = np.array_split(used * length, max(1, min(workers * 4, used.size)))
     with ProcessPoolExecutor(min(workers, len(batches))) as ex:
         mads = np.concatenate(list(ex.map(_chunk_mads, [(str(rec_path), drop, b, length) for b in batches])))
-    row = {c: i for i, c in enumerate(used.tolist())}
     noise = np.empty(len(groups), np.float64)
     n_used = np.empty(len(groups), np.int64)
     for ch, g in enumerate(groups.tolist()):
-        idx = [row[c] for c in pick[g].tolist()]
-        noise[ch] = mads[idx, ch].mean()
-        n_used[ch] = len(idx)
+        idx = np.searchsorted(used, pick[g])
+        noise[ch] = mads[idx, ch].astype(np.float64).mean()
+        n_used[ch] = idx.size
     gain = rec.get_channel_gains()
     table = pd.DataFrame({"channel": np.asarray(rec.channel_ids).astype(str), "group": groups,
                           "noise_counts": noise, "noise_uv": noise * gain, "chunks": n_used})
@@ -307,13 +307,22 @@ def _mua_window(w: int, out_dir: str) -> tuple[int, int, int, float]:
 def run_multi_unit(rec_path, sorting_path, noise: np.ndarray, bad_periods: dict, out_dir,
                    params: AnalyzerParams | None = None, *, drop_channel_ids=(), workers: int = 24) -> None:
     """Score every window's unclaimed and reference events into ``out_dir/wNNN.npz`` (skipping windows
-    already there). Each worker holds one window of the binary in memory."""
+    already there). Each worker holds one window of the binary in memory. ``out_dir/noise_counts.npy``
+    keeps the noise the windows were scored with; other noise raises ValueError."""
     from concurrent.futures import ProcessPoolExecutor
 
     params = params or AnalyzerParams()
     drop = [str(c) for c in drop_channel_ids]
     out_dir = pathlib.Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    noise_path = out_dir / "noise_counts.npy"
+    if noise_path.exists():
+        if not np.allclose(np.load(noise_path), np.asarray(noise, np.float64), rtol=1e-9, atol=0):
+            raise ValueError(f"{out_dir} was scored with other noise levels; remove it to rescore")
+    elif any(out_dir.glob("w*.npz")):
+        raise ValueError(f"{out_dir} holds windows without noise_counts.npy; remove it to rescore")
+    else:
+        np.save(noise_path, np.asarray(noise, np.float64))
     rec = open_sorting_recording(rec_path, drop)
     win = samples(params.mua_window_s * 1000, rec.get_sampling_frequency())
     n_win = int(np.ceil(rec.get_num_frames() / win))
