@@ -8,8 +8,13 @@ in the 100 ms after the offset, and whether the unit is driven. Where the fits a
 rule adds and drops, with their median amplitude, matched-filter snr and cosine, against those of the spikes
 both runs accept, by position relative to the pulse.
 
-Writes ``results/opto_carry_rule_<E>.csv`` (one row per unit and window) and
-``results/opto_carry_rule_<E>_added.csv`` (the comparison of added and accepted spikes).
+With ``--stretch NAME`` (an ``opto_units.py`` stretch), each driven unit of the run with the table is matched to
+the unit of that stretch's sort that shares most of its spikes within 10 samples, over the windows both
+cover.
+
+Writes ``results/opto_carry_rule_<E>.csv`` (one row per unit and window),
+``results/opto_carry_rule_<E>_added.csv`` (the comparison of added and accepted spikes) and, with
+``--stretch``, ``results/opto_carry_rule_<E>_match.csv``.
 
 Usage: python subjects/ttm-003/scripts/opto_carry_rule.py --subject TTM-003 --experiment TTM-003-48H-2
            --with-run pulsetest --without-run nopulsetest --pulses subjects/ttm-003/results/laser_pulses_<session>.csv
@@ -18,10 +23,12 @@ Usage: python subjects/ttm-003/scripts/opto_carry_rule.py --subject TTM-003 --ex
 from __future__ import annotations
 
 import argparse
+import json
 import pathlib
 
 import numpy as np
 import pandas as pd
+from ttm import carry as cr
 from ttm.cli._common import add_experiment_args, experiment_from_args
 
 SUBJECT_DIR = pathlib.Path(__file__).resolve().parents[1]
@@ -47,12 +54,48 @@ def zones(lat: np.ndarray, plen: np.ndarray) -> dict[str, np.ndarray]:
             "outside": ~((lat >= 0) & (lat < plen + POST_S))}
 
 
+def match_units(exp, stretch: str, d_with: pathlib.Path, df: pd.DataFrame) -> None:
+    info = json.loads((RESULTS / f"opto_units_{exp.experiment}_{stretch}.json").read_text())
+    fa = int(info["start_h"] * 3600 * FS)
+    fb = int(info["end_h"] * 3600 * FS)
+    sorting = cr.sort_window(None, exp.experiment_dir / "opto_units" / stretch, cr.CarryParams())
+    kept = set(pd.read_csv(RESULTS / f"opto_units_{exp.experiment}_{stretch}.csv").unit)
+    rows = []
+    for u in sorted(set(df.loc[df.driven, "unit"])):
+        ws = sorted(df.loc[df.unit == u, "window"])
+        parts = []
+        for w in ws:
+            z = np.load(d_with / f"spikes_w{w:02d}.npz")
+            parts.append(z["frame"][(z["unit"] == u) & (z["reason"] == 0)])
+        fr = np.concatenate(parts)
+        lo, hi = max(fa, int(ws[0] * WINDOW_S * FS)), min(fb, int((ws[-1] + 1) * WINDOW_S * FS))
+        fr = fr[(fr >= lo) & (fr < hi)]
+        for v in sorting.unit_ids:
+            if int(v) not in kept:
+                continue
+            g = sorting.get_unit_spike_train(v).astype(np.int64) + fa
+            g = g[(g >= lo) & (g < hi)]
+            if g.size == 0:
+                continue
+            k = np.searchsorted(g, fr)
+            near = np.minimum(np.abs(fr - g[np.clip(k - 1, 0, g.size - 1)]), np.abs(g[np.clip(k, 0, g.size - 1)] - fr)) <= 10
+            shared = int(near.sum())
+            if shared:
+                rows.append({"carry_unit": int(u), "stretch": stretch, "sort_unit": int(v), "carry_spikes": int(fr.size),
+                             "sort_spikes": int(g.size), "shared": shared, "share_of_carry": shared / fr.size,
+                             "share_of_sort": shared / g.size})
+    m = pd.DataFrame(rows).sort_values(["carry_unit", "shared"], ascending=[True, False])
+    m.round(4).to_csv(RESULTS / f"opto_carry_rule_{exp.experiment}_match.csv", index=False)
+    print(m.groupby("carry_unit").head(3).round(3).to_string(index=False))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     add_experiment_args(ap)
     ap.add_argument("--with-run", required=True)
     ap.add_argument("--without-run", required=True)
     ap.add_argument("--pulses", required=True)
+    ap.add_argument("--stretch", default=None, help="an opto_units.py stretch to match the driven units to")
     a = ap.parse_args()
     exp = experiment_from_args(a)
     d_with = exp.sorting_dir(a.with_run, subdir="sortings_carry") / "carry"
@@ -100,6 +143,8 @@ def main() -> None:
     pd.set_option("display.max_columns", 30)
     print(df[df.driven].to_string(index=False))
     print(ad.round(2).to_string(index=False))
+    if a.stretch:
+        match_units(exp, a.stretch, d_with, df)
     o = df[~df.driven & (df.n_without >= 500)].copy()
     o["change"] = (o.n_with - o.n_without) / o.n_without
     big = o[o.n_without >= 10000]

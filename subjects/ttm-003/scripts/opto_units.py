@@ -14,7 +14,9 @@ ending 2 s before each train's first pulse):
   the recording: from 15 ms after each onset to the offset, 20 spikes or more, at least twice the count
   expected from its rate outside the pulses (onset to offset plus 100 ms left out), one-sided Poisson
   p under 1e-4;
-- the median trough of its spikes on its main wire inside pulses against outside;
+- the median trough of its spikes on its main wire inside pulses (the first 500) against outside (500 spread
+  over the stretch), also by position in the pulse as a share of the median outside, with the share under
+  half; its spikes per pulse where it fires in the pulse, and the median interval between them;
 - per train, its in-pulse rate over its baseline.
 
 Writes ``results/opto_units_<E>_<name>.csv`` (one row per unit), ``results/opto_units_<E>_<name>_trains.csv``
@@ -154,11 +156,26 @@ def main() -> None:
         if sel_out.size:
             sel_out = sel_out[np.linspace(0, sel_out.size - 1, min(500, sel_out.size)).astype(int)]
         ch_id = win.channel_ids[chans[main]]
+        lat_in = []
         for sel, acc in ((sel_in, tr_in), (sel_out, tr_out)):
-            for f in frames[sel]:
+            for k_s in sel:
+                f = frames[k_s]
                 if f - 5 >= 0 and f + 6 <= win.get_num_frames():
                     x = win.get_traces(start_frame=int(f) - 5, end_frame=int(f) + 6, channel_ids=[ch_id], return_in_uV=True)
                     acc.append(float(x.min()))
+                    if acc is tr_in:
+                        lat_in.append(float(t[k_s] - on[j[k_s]]))
+        size_in = np.array(tr_in) / np.median(tr_out) if tr_in and tr_out else np.zeros(0)
+        lat_in = np.array(lat_in)
+
+        def size_between(lo, hi, size_in=size_in, lat_in=lat_in):
+            m = (lat_in >= lo) & (lat_in < hi)
+            return float(np.median(size_in[m])) if m.any() else float("nan")
+
+        per_pulse = np.bincount(j[in_pulse], minlength=on.size)
+        per_pulse = per_pulse[per_pulse > 0]
+        same_pulse = np.diff(j[in_pulse]) == 0
+        isi_in = np.diff(t[in_pulse])[same_pulse]
         rows.append({
             "unit": int(u), "tetrode": f"TT{g + 1}", "spikes": int(t.size), "snr": round(float(snr[i]), 2),
             "baseline_hz": base, "onset_1_10ms_hz": rate(rel, on.size, 0.001, 0.010),
@@ -174,6 +191,13 @@ def main() -> None:
             "trough_in_pulse_uV_median": float(np.median(tr_in)) if tr_in else float("nan"),
             "trough_outside_uV_median": float(np.median(tr_out)) if tr_out else float("nan"),
             "spikes_in_pulse": len(tr_in),
+            "size_in_pulse_0_15ms": size_between(0, 0.015), "size_in_pulse_15_30ms": size_between(0.015, 0.03),
+            "size_in_pulse_30ms_off": size_between(0.03, 1.0),
+            "size_in_pulse_under_half": float(np.mean(size_in < 0.5)) if size_in.size else float("nan"),
+            "spikes_in_pulse_all": int(in_pulse.sum()),
+            "spikes_per_responding_pulse_mean": float(per_pulse.mean()) if per_pulse.size else 0.0,
+            "spikes_per_responding_pulse_max": int(per_pulse.max()) if per_pulse.size else 0,
+            "isi_in_pulse_ms_median": float(np.median(isi_in) * 1000) if isi_in.size else float("nan"),
         })
         for tr in np.unique(train):
             o = on[train == tr]

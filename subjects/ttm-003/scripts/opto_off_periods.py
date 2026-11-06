@@ -65,6 +65,7 @@ OFF_MIN_S = 0.05
 PROBE_S = 0.02
 SW_WIN = (0.1, 0.3)
 EARLY_WIN = (0.01, 0.1)
+N_BOOT = 5000
 
 
 def crossings(xf: np.ndarray, mad: np.ndarray, groups: np.ndarray) -> dict[int, np.ndarray]:
@@ -161,6 +162,34 @@ def off_period(times: np.ndarray, probe: float = PROBE_S) -> tuple[bool, float, 
     return (end - start) >= OFF_MIN_S, float(end), float(end - start)
 
 
+def light_dark_state(p, df: pd.DataFrame, sd) -> dict:
+    """Trains grouped by light phase and day (the manifest's light times), and a least-squares fit of each
+    pulse effect on session hour, delta share before the train, dark and sleep deprivation."""
+    tr = sorted([(dt2t(p, x) / 3600, "light") for x in p.lightsOn] + [(dt2t(p, x) / 3600, "dark") for x in p.lightsOff])
+    lab, day = [], []
+    for h in df.onset_h:
+        prev = [t for t in tr if t[0] <= h]
+        lab.append(prev[-1][1] if prev else ("dark" if tr[0][1] == "light" else "light"))
+        day.append(sum(1 for t in tr if t[1] == "light" and t[0] <= h))
+    d = df.assign(phase=lab, day=day)
+    d["group"] = np.where(d.in_sleep_deprivation, "sleep deprivation", d.phase + ", day " + d.day.astype(str))
+    cols = ["off_frac_pulse", "off_frac_sham", "early_wave_uV_pulse", "slow_wave_uV_pulse", "pre_delta_share"]
+    g = d.groupby("group", sort=False).agg(trains=("ttl_train", "size"), first_h=("onset_h", "min"),
+                                           last_h=("onset_h", "max"), **{c: (c, "mean") for c in cols})
+    X = np.column_stack([np.ones(len(d)), d.onset_h, d.pre_delta_share, (d.phase == "dark").astype(float),
+                         d.in_sleep_deprivation.astype(float)])
+    fits = {}
+    for y in ("early_wave_uV_pulse", "off_frac_pulse", "slow_wave_uV_pulse"):
+        v = d[y].to_numpy(float)
+        b = np.linalg.lstsq(X, v, rcond=None)[0]
+        r = v - X @ b
+        se = np.sqrt(np.diag(r @ r / (len(v) - X.shape[1]) * np.linalg.inv(X.T @ X)))
+        fits[y] = {n: {"coef": float(c), "ci95": [float(c - 1.96 * e), float(c + 1.96 * e)]}
+                   for n, c, e in zip(("intercept", "per_hour", "delta_share", "dark", "sleep_deprivation"), b, se)}
+    return {"light_transitions_h": [[round(t, 4), k] for t, k in tr], "groups": g.reset_index().to_dict(orient="records"),
+            "fits": fits}
+
+
 def summarize(exp, cache: pathlib.Path, figdir: pathlib.Path) -> None:
     files = sorted(cache.glob("train*.npz"))
     Z = [dict(np.load(f)) for f in files]
@@ -173,7 +202,9 @@ def summarize(exp, cache: pathlib.Path, figdir: pathlib.Path) -> None:
     in_pulse = np.zeros(len(tets))
     early = np.zeros(len(tets))
     base = np.zeros(len(tets))
-    for z in Z:
+    from15, post_a, post_b = np.zeros(len(tets)), np.zeros(len(tets)), np.zeros(len(tets))
+    train_from15 = np.full((len(Z), len(tets)), np.nan)
+    for i_z, z in enumerate(Z):
         ps = float(z["pulse_s"])
         for kind, m in (("real", ~z["is_sham"]), ("sham", z["is_sham"])):
             evs = np.flatnonzero(m)
@@ -186,14 +217,33 @@ def summarize(exp, cache: pathlib.Path, figdir: pathlib.Path) -> None:
                     in_pulse[j] += ((tj >= 0.01) & (tj < ps)).sum() / (ps - 0.01)
                     early[j] += ((tj >= 0.001) & (tj < 0.01)).sum() / 0.009
                     base[j] += ((tj >= -PRE_S) & (tj < 0)).sum() / PRE_S
+                    n15 = ((tj >= 0.015) & (tj < ps)).sum() / (ps - 0.015)
+                    from15[j] += n15
+                    post_a[j] += ((tj >= ps) & (tj < ps + 0.05)).sum() / 0.05
+                    post_b[j] += ((tj >= ps + 0.05) & (tj < ps + 0.1)).sum() / 0.05
+                    b_j = ((tj >= -PRE_S) & (tj < 0)).sum() / PRE_S
+                    if b_j > 0:
+                        train_from15[i_z, j] = n15 / b_j
     ratio = in_pulse / np.maximum(base, 1e-9)
     early_ratio = early / np.maximum(base, 1e-9)
+    rate_before = base / max(n_ev["real"], 1)
+    ps_all = float(np.median([z["pulse_s"] for z in Z]))
+    after = centers >= ps_all + 0.1
+    rebound = (H["real"][:, after] / (max(n_ev["real"], 1) * 0.005)).max(1) / np.maximum(rate_before, 1e-9)
     pre_rate = np.median(np.stack([z["pre_rate"] for z in Z]), axis=0)
     suppressed = (ratio < 0.5) & (pre_rate >= 5)
     pop = suppressed if suppressed.any() else pre_rate >= 5
     tet_table = pd.DataFrame({"tetrode": names, "pre_rate_hz": pre_rate.round(2), "pulse_over_baseline": ratio.round(3),
                               "onset_1_10ms_over_baseline": early_ratio.round(3),
-                              "suppressed": suppressed, "in_population": pop})
+                              "suppressed": suppressed, "in_population": pop,
+                              "rate_500ms_before_hz": rate_before.round(2),
+                              "pulse_15ms_off_over_baseline": (from15 / np.maximum(base, 1e-9)).round(3),
+                              "post_0_50ms_over_baseline": (post_a / np.maximum(base, 1e-9)).round(3),
+                              "post_50_100ms_over_baseline": (post_b / np.maximum(base, 1e-9)).round(3),
+                              "rebound_max_5ms_over_baseline": rebound.round(3),
+                              "onset_1_10ms_extra_per_pulse": ((early_ratio - 1) * rate_before * 0.009).round(3),
+                              "trains_15ms_off_over_1p2": (train_from15 > 1.2).sum(0),
+                              "train_15ms_off_ratio_median": np.nanmedian(train_from15, axis=0).round(3)})
     edge_ratio = np.stack([np.maximum(z["edge_on"], z["edge_off"]) / z["hf_noise"] for z in Z])
     ch_ids = [str(c) for c in si.read_zarr(str(exp.store_path())).channel_ids
               if str(c) not in {str(b) for b in exp.badChannels}]
@@ -265,6 +315,18 @@ def summarize(exp, cache: pathlib.Path, figdir: pathlib.Path) -> None:
             k = max(1, len(sdd) // 3)
             trend[col] = {"spearman_rho": float(rho), "p": float(pv), "first_third": float(np.nanmean(v[:k])),
                           "last_third": float(np.nanmean(v[-k:]))}
+            x, idx = sdd.onset_h.to_numpy(), np.flatnonzero(okv)
+            rng = np.random.default_rng(0)
+            bs = [np.polyfit(x[b], v[b], 1)[0] for b in (rng.choice(idx, idx.size) for _ in range(N_BOOT)) if np.ptp(x[b]) > 0]
+            span = sd[1] - sd[0]
+            trend[col]["change_over_window"] = float(np.polyfit(x[idx], v[idx], 1)[0] * span)
+            trend[col]["change_over_window_ci95"] = [float(q * span) for q in np.percentile(bs, [2.5, 97.5])]
+        k = max(1, len(sdd) // 3)
+        for name, trs in (("first", sdd.ttl_train.iloc[:k]), ("last", sdd.ttl_train.iloc[-k:])):
+            e = ev[ev.ttl_train.isin(trs) & (ev.kind == "real")]
+            ci = st.binomtest(int(e.off.sum()), len(e)).proportion_ci()
+            trend[f"off_pulse_{name}_trains"] = {"trains": [int(t) for t in trs], "off": int(e.off.sum()), "pulses": len(e),
+                                                 "ci95": [float(ci.low), float(ci.high)]}
         # pulse vs sham inside each third, events pooled
         thirds = np.array_split(sdd.ttl_train.to_numpy(), 3)
         trend["thirds_pooled"] = []
@@ -281,6 +343,16 @@ def summarize(exp, cache: pathlib.Path, figdir: pathlib.Path) -> None:
                 "early_wave_uV_sham": float(rs.early_wave_uV.mean())})
     allp = ev[ev.kind == "real"]
     alls = ev[ev.kind == "sham"]
+    state = light_dark_state(p, df, sd)
+    lm = np.concatenate(L["real"]).mean(0)
+    lm = lm - lm[bl_m].mean()
+    w1, w2 = np.flatnonzero((lfp_t >= 0) & (lfp_t < 0.15)), np.flatnonzero((lfp_t >= 0.1) & (lfp_t < 0.4))
+    i_pk, i_tr = w1[lm[w1].argmax()], w2[lm[w2].argmin()]
+    i_zero = i_pk + int(np.argmax(lm[i_pk:] <= 0))
+    i_back = i_tr + int(np.argmax(lm[i_tr:] >= 0))
+    lfp_shape = {"peak_uV": float(lm[i_pk]), "peak_ms": float(lfp_t[i_pk] * 1000), "zero_ms": float(lfp_t[i_zero] * 1000),
+                 "trough_uV": float(lm[i_tr]), "trough_ms": float(lfp_t[i_tr] * 1000), "back_ms": float(lfp_t[i_back] * 1000)}
+    by_off = allp.groupby("off")[["early_wave_uV", "slow_wave_uV"]].mean()
     summary = {
         "experiment": exp.experiment, "trains": len(df), "pulses": len(allp), "sham_onsets": len(alls),
         "sleep_deprivation_h": sd, "tetrodes": tet_table.to_dict(orient="records"),
@@ -296,6 +368,9 @@ def summarize(exp, cache: pathlib.Path, figdir: pathlib.Path) -> None:
         "edge_over_noise_by_channel_median": dict(zip(ch_ids,
                                                       np.round(np.median(edge_ratio, axis=0), 2).tolist())),
         "sleep_deprivation_trend": trend,
+        "lfp_mean_pulse": lfp_shape,
+        "waves_by_off": {("off" if k else "no_off"): {c: float(v) for c, v in r.items()} for k, r in by_off.iterrows()},
+        "state": state,
     }
     (RESULTS / f"opto_off_periods_{exp.experiment}.json").write_text(json.dumps(summary, indent=1) + "\n")
 

@@ -14,7 +14,15 @@
    "pulse_over_baseline": 0.855,
    "onset_1_10ms_over_baseline": 1.972,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 8.18,
+   "pulse_15ms_off_over_baseline": 0.852,
+   "post_0_50ms_over_baseline": 0.951,
+   "post_50_100ms_over_baseline": 1.012,
+   "rebound_max_5ms_over_baseline": 1.263,
+   "onset_1_10ms_extra_per_pulse": 0.072,
+   "trains_15ms_off_over_1p2": 2,
+   "train_15ms_off_ratio_median": 0.815
   },
   {
    "tetrode": "TT2",
@@ -22,7 +30,15 @@
    "pulse_over_baseline": 0.828,
    "onset_1_10ms_over_baseline": 2.384,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 5.01,
+   "pulse_15ms_off_over_baseline": 0.819,
+   "post_0_50ms_over_baseline": 0.825,
+   "post_50_100ms_over_baseline": 0.881,
+   "rebound_max_5ms_over_baseline": 1.477,
+   "onset_1_10ms_extra_per_pulse": 0.062,
+   "trains_15ms_off_over_1p2": 2,
+   "train_15ms_off_ratio_median": 0.811
   },
   {
    "tetrode": "TT3",
@@ -30,7 +46,15 @@
    "pulse_over_baseline": 0.875,
    "onset_1_10ms_over_baseline": 2.329,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 3.07,
+   "pulse_15ms_off_over_baseline": 0.857,
+   "post_0_50ms_over_baseline": 1.016,
+   "post_50_100ms_over_baseline": 1.043,
+   "rebound_max_5ms_over_baseline": 1.412,
+   "onset_1_10ms_extra_per_pulse": 0.037,
+   "trains_15ms_off_over_1p2": 7,
+   "train_15ms_off_ratio_median": 0.801
   },
   {
    "tetrode": "TT4",
@@ -38,7 +62,15 @@
    "pulse_over_baseline": 4.636,
    "onset_1_10ms_over_baseline": 15.921,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 20.91,
+   "pulse_15ms_off_over_baseline": 4.394,
+   "post_0_50ms_over_baseline": 0.309,
+   "post_50_100ms_over_baseline": 0.251,
+   "rebound_max_5ms_over_baseline": 1.176,
+   "onset_1_10ms_extra_per_pulse": 2.808,
+   "trains_15ms_off_over_1p2": 21,
+   "train_15ms_off_ratio_median": 5.108
   },
   {
    "tetrode": "TT5",
@@ -46,7 +78,15 @@
    "pulse_over_baseline": 0.277,
    "onset_1_10ms_over_baseline": 5.435,
    "suppressed": true,
-   "in_population": true
+   "in_population": true,
+   "rate_500ms_before_hz": 21.87,
+   "pulse_15ms_off_over_baseline": 0.259,
+   "post_0_50ms_over_baseline": 0.038,
+   "post_50_100ms_over_baseline": 0.067,
+   "rebound_max_5ms_over_baseline": 1.258,
+   "onset_1_10ms_extra_per_pulse": 0.873,
+   "trains_15ms_off_over_1p2": 0,
+   "train_15ms_off_ratio_median": 0.214
   },
   {
    "tetrode": "TT6",
@@ -54,7 +94,15 @@
    "pulse_over_baseline": 0.048,
    "onset_1_10ms_over_baseline": 1.09,
    "suppressed": true,
-   "in_population": true
+   "in_population": true,
+   "rate_500ms_before_hz": 54.58,
+   "pulse_15ms_off_over_baseline": 0.038,
+   "post_0_50ms_over_baseline": 0.006,
+   "post_50_100ms_over_baseline": 0.13,
+   "rebound_max_5ms_over_baseline": 1.198,
+   "onset_1_10ms_extra_per_pulse": 0.044,
+   "trains_15ms_off_over_1p2": 0,
+   "train_15ms_off_ratio_median": 0.003
   },
   {
    "tetrode": "TT7",
@@ -62,7 +110,15 @@
    "pulse_over_baseline": 0.101,
    "onset_1_10ms_over_baseline": 3.573,
    "suppressed": true,
-   "in_population": true
+   "in_population": true,
+   "rate_500ms_before_hz": 13.03,
+   "pulse_15ms_off_over_baseline": 0.092,
+   "post_0_50ms_over_baseline": 0.018,
+   "post_50_100ms_over_baseline": 0.064,
+   "rebound_max_5ms_over_baseline": 1.565,
+   "onset_1_10ms_extra_per_pulse": 0.302,
+   "trains_15ms_off_over_1p2": 0,
+   "train_15ms_off_ratio_median": 0.061
   },
   {
    "tetrode": "TT8",
@@ -70,7 +126,15 @@
    "pulse_over_baseline": 0.03,
    "onset_1_10ms_over_baseline": 0.429,
    "suppressed": true,
-   "in_population": true
+   "in_population": true,
+   "rate_500ms_before_hz": 45.6,
+   "pulse_15ms_off_over_baseline": 0.03,
+   "post_0_50ms_over_baseline": 0.061,
+   "post_50_100ms_over_baseline": 0.444,
+   "rebound_max_5ms_over_baseline": 1.225,
+   "onset_1_10ms_extra_per_pulse": -0.234,
+   "trains_15ms_off_over_1p2": 0,
+   "train_15ms_off_ratio_median": 0.027
   },
   {
    "tetrode": "TT9",
@@ -78,7 +142,15 @@
    "pulse_over_baseline": 0.181,
    "onset_1_10ms_over_baseline": 4.32,
    "suppressed": true,
-   "in_population": true
+   "in_population": true,
+   "rate_500ms_before_hz": 3.5,
+   "pulse_15ms_off_over_baseline": 0.182,
+   "post_0_50ms_over_baseline": 0.12,
+   "post_50_100ms_over_baseline": 0.758,
+   "rebound_max_5ms_over_baseline": 1.635,
+   "onset_1_10ms_extra_per_pulse": 0.105,
+   "trains_15ms_off_over_1p2": 0,
+   "train_15ms_off_ratio_median": 0.151
   },
   {
    "tetrode": "TT10",
@@ -86,7 +158,15 @@
    "pulse_over_baseline": 0.988,
    "onset_1_10ms_over_baseline": 3.777,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 45.6,
+   "pulse_15ms_off_over_baseline": 0.954,
+   "post_0_50ms_over_baseline": 0.206,
+   "post_50_100ms_over_baseline": 0.556,
+   "rebound_max_5ms_over_baseline": 1.222,
+   "onset_1_10ms_extra_per_pulse": 1.14,
+   "trains_15ms_off_over_1p2": 5,
+   "train_15ms_off_ratio_median": 0.788
   },
   {
    "tetrode": "TT11",
@@ -94,7 +174,15 @@
    "pulse_over_baseline": 1.71,
    "onset_1_10ms_over_baseline": 6.99,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 21.7,
+   "pulse_15ms_off_over_baseline": 1.634,
+   "post_0_50ms_over_baseline": 0.038,
+   "post_50_100ms_over_baseline": 0.049,
+   "rebound_max_5ms_over_baseline": 1.287,
+   "onset_1_10ms_extra_per_pulse": 1.17,
+   "trains_15ms_off_over_1p2": 17,
+   "train_15ms_off_ratio_median": 1.596
   },
   {
    "tetrode": "TT12",
@@ -102,7 +190,15 @@
    "pulse_over_baseline": 0.043,
    "onset_1_10ms_over_baseline": 1.254,
    "suppressed": true,
-   "in_population": true
+   "in_population": true,
+   "rate_500ms_before_hz": 40.84,
+   "pulse_15ms_off_over_baseline": 0.036,
+   "post_0_50ms_over_baseline": 0.039,
+   "post_50_100ms_over_baseline": 0.286,
+   "rebound_max_5ms_over_baseline": 1.317,
+   "onset_1_10ms_extra_per_pulse": 0.093,
+   "trains_15ms_off_over_1p2": 0,
+   "train_15ms_off_ratio_median": 0.032
   },
   {
    "tetrode": "TT13",
@@ -110,7 +206,15 @@
    "pulse_over_baseline": 0.917,
    "onset_1_10ms_over_baseline": 1.614,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 4.38,
+   "pulse_15ms_off_over_baseline": 0.914,
+   "post_0_50ms_over_baseline": 1.018,
+   "post_50_100ms_over_baseline": 1.098,
+   "rebound_max_5ms_over_baseline": 1.468,
+   "onset_1_10ms_extra_per_pulse": 0.024,
+   "trains_15ms_off_over_1p2": 5,
+   "train_15ms_off_ratio_median": 0.931
   },
   {
    "tetrode": "TT14",
@@ -118,7 +222,15 @@
    "pulse_over_baseline": 0.829,
    "onset_1_10ms_over_baseline": 2.598,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 2.78,
+   "pulse_15ms_off_over_baseline": 0.819,
+   "post_0_50ms_over_baseline": 0.86,
+   "post_50_100ms_over_baseline": 1.141,
+   "rebound_max_5ms_over_baseline": 1.709,
+   "onset_1_10ms_extra_per_pulse": 0.04,
+   "trains_15ms_off_over_1p2": 4,
+   "train_15ms_off_ratio_median": 0.913
   },
   {
    "tetrode": "TT15",
@@ -126,7 +238,15 @@
    "pulse_over_baseline": 0.997,
    "onset_1_10ms_over_baseline": 1.135,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 54.3,
+   "pulse_15ms_off_over_baseline": 0.994,
+   "post_0_50ms_over_baseline": 0.988,
+   "post_50_100ms_over_baseline": 1.02,
+   "rebound_max_5ms_over_baseline": 1.124,
+   "onset_1_10ms_extra_per_pulse": 0.066,
+   "trains_15ms_off_over_1p2": 1,
+   "train_15ms_off_ratio_median": 0.999
   },
   {
    "tetrode": "TT16",
@@ -134,7 +254,15 @@
    "pulse_over_baseline": 0.959,
    "onset_1_10ms_over_baseline": 1.597,
    "suppressed": false,
-   "in_population": false
+   "in_population": false,
+   "rate_500ms_before_hz": 16.67,
+   "pulse_15ms_off_over_baseline": 0.953,
+   "post_0_50ms_over_baseline": 0.994,
+   "post_50_100ms_over_baseline": 1.078,
+   "rebound_max_5ms_over_baseline": 1.223,
+   "onset_1_10ms_extra_per_pulse": 0.09,
+   "trains_15ms_off_over_1p2": 6,
+   "train_15ms_off_ratio_median": 0.94
   }
  ],
  "population": [
@@ -225,5 +353,217 @@
   "CH30": 2.25,
   "CH32": 2.180000066757202
  },
- "sleep_deprivation_trend": {}
+ "sleep_deprivation_trend": {},
+ "lfp_mean_pulse": {
+  "peak_uV": 209.9150390625,
+  "peak_ms": 18.000000000000014,
+  "zero_ms": 144.00000000000003,
+  "trough_uV": -48.094486236572266,
+  "trough_ms": 398.0,
+  "back_ms": 913.9999999999999
+ },
+ "waves_by_off": {
+  "no_off": {
+   "early_wave_uV": 123.15792474537105,
+   "slow_wave_uV": 27.202616939963875
+  },
+  "off": {
+   "early_wave_uV": 139.48211467302687,
+   "slow_wave_uV": 19.007385563826
+  }
+ },
+ "state": {
+  "light_transitions_h": [
+   [
+    -0.1535,
+    "light"
+   ],
+   [
+    11.8465,
+    "dark"
+   ],
+   [
+    23.8465,
+    "light"
+   ],
+   [
+    35.8465,
+    "dark"
+   ],
+   [
+    47.8465,
+    "light"
+   ]
+  ],
+  "groups": [
+   {
+    "group": "light, day 1",
+    "trains": 6,
+    "first_h": 0.4508,
+    "last_h": 10.1503,
+    "off_frac_pulse": 0.5668582375478927,
+    "off_frac_sham": 0.0375,
+    "early_wave_uV_pulse": 13.813589731852213,
+    "slow_wave_uV_pulse": -19.528454144795734,
+    "pre_delta_share": 0.43403924504915875
+   },
+   {
+    "group": "dark, day 1",
+    "trains": 6,
+    "first_h": 12.1503,
+    "last_h": 22.1504,
+    "off_frac_pulse": 0.7888888888888889,
+    "off_frac_sham": 0.020833333333333332,
+    "early_wave_uV_pulse": 164.82269795735678,
+    "slow_wave_uV_pulse": 5.0432337919871015,
+    "pre_delta_share": 0.4911272128423055
+   },
+   {
+    "group": "sleep deprivation",
+    "trains": 3,
+    "first_h": 24.1504,
+    "last_h": 28.1504,
+    "off_frac_pulse": 0.8666666666666667,
+    "off_frac_sham": 0.0,
+    "early_wave_uV_pulse": 225.97360229492188,
+    "slow_wave_uV_pulse": 72.49544525146484,
+    "pre_delta_share": 0.4075650175412496
+   },
+   {
+    "group": "light, day 2",
+    "trains": 3,
+    "first_h": 30.1504,
+    "last_h": 34.1504,
+    "off_frac_pulse": 0.4611111111111111,
+    "off_frac_sham": 0.15,
+    "early_wave_uV_pulse": 137.28885650634766,
+    "slow_wave_uV_pulse": 43.705090840657554,
+    "pre_delta_share": 0.5731008946895599
+   },
+   {
+    "group": "dark, day 2",
+    "trains": 6,
+    "first_h": 36.1504,
+    "last_h": 46.1505,
+    "off_frac_pulse": 0.7055555555555556,
+    "off_frac_sham": 0.049999999999999996,
+    "early_wave_uV_pulse": 173.44952774047852,
+    "slow_wave_uV_pulse": 41.539199670155845,
+    "pre_delta_share": 0.4518297165632248
+   }
+  ],
+  "fits": {
+   "early_wave_uV_pulse": {
+    "intercept": {
+     "coef": 5.594100140201914,
+     "ci95": [
+      -98.2526378657998,
+      109.44083814620363
+     ]
+    },
+    "per_hour": {
+     "coef": 2.2737577684358383,
+     "ci95": [
+      0.4472786314898096,
+      4.100236905381867
+     ]
+    },
+    "delta_share": {
+     "coef": 35.74962071244069,
+     "ci95": [
+      -170.56201514527095,
+      242.06125657015235
+     ]
+    },
+    "dark": {
+     "coef": 80.40592586445848,
+     "ci95": [
+      26.474545656941842,
+      134.33730607197512
+     ]
+    },
+    "sleep_deprivation": {
+     "coef": 146.34953221425556,
+     "ci95": [
+      70.78213573700023,
+      221.9169286915109
+     ]
+    }
+   },
+   "off_frac_pulse": {
+    "intercept": {
+     "coef": 0.9006666763985981,
+     "ci95": [
+      0.5728966027796616,
+      1.2284367500175346
+     ]
+    },
+    "per_hour": {
+     "coef": -0.002445955021897402,
+     "ci95": [
+      -0.0082108467524942,
+      0.0033189367086993967
+     ]
+    },
+    "delta_share": {
+     "coef": -0.6961268400272616,
+     "ci95": [
+      -1.347305503623004,
+      -0.04494817643151916
+     ]
+    },
+    "dark": {
+     "coef": 0.24606488610246036,
+     "ci95": [
+      0.07584199031957156,
+      0.41628778188534915
+     ]
+    },
+    "sleep_deprivation": {
+     "coef": 0.31367964023933353,
+     "ci95": [
+      0.07516727497746212,
+      0.552192005501205
+     ]
+    }
+   },
+   "slow_wave_uV_pulse": {
+    "intercept": {
+     "coef": -10.514192539294639,
+     "ci95": [
+      -64.54327769050566,
+      43.51489261191638
+     ]
+    },
+    "per_hour": {
+     "coef": 1.9350105451757385,
+     "ci95": [
+      0.984735180616246,
+      2.885285909735231
+     ]
+    },
+    "delta_share": {
+     "coef": -31.937708367265202,
+     "ci95": [
+      -139.27693880893514,
+      75.40152207440475
+     ]
+    },
+    "dark": {
+     "coef": -7.542948168425864,
+     "ci95": [
+      -35.6022130958023,
+      20.516316758950566
+     ]
+    },
+    "sleep_deprivation": {
+     "coef": 45.4250307011277,
+     "ci95": [
+      6.10904083643895,
+      84.74102056581646
+     ]
+    }
+   }
+  }
+ }
 }
