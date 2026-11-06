@@ -1,6 +1,6 @@
 ---
 title: Subject TTM-003
-updated: 2026-11-03
+updated: 2026-11-05
 ---
 
 # TTM-003
@@ -13,6 +13,7 @@ stimulation. Raw acquisitions: `/Volumes/tetrode/TTM3/<session>/`.
 | `TTM-003-OPTO1` | `2026-10-16_14-06-44` | 32 min, seven laser trains |
 | `TTM-003-OPTO2` | `2026-10-16_14-44-22` | 20.6 min, five laser trains |
 | `TTM-003-48H` | `2026-10-20_09-02-12` | 47.98 h, 44 laser trains: 20 blocks every 2 h from 8.15 h, four earlier blocks, manual tests near 8 h |
+| `TTM-003-48H-2` | `2026-11-03_09-01-38` | 47.97 h, 145 laser trains of 20 pulses, one every 20 min |
 
 ## The 48 h recording
 
@@ -190,3 +191,34 @@ Unit ids are that sorting's.
 - The templates of TT2 units 2 and 3 and TT15 units 42 and 44 end the
   recording at cosine 0.44 or less with their window-0 templates, and TT4
   unit 5 at 0.58; whether each still follows one cell should be checked.
+
+## The second 48 h recording
+
+`/Volumes/tetrode/TTM3/2026-11-03_09-01-38/Record Node 102/experiment1/recording1/`,
+one experiment and one recording, 671 GB, on the archive since
+2026-11-05. `continuous.dat` is 663,203,475,456 bytes, 5,181,277,152
+samples, which is 47.97 h at 64 channels, 30 kHz, int16; the sample
+numbers run from 0 without a gap. Software Time 1793718098396 ms is
+2026-11-03 15:01:38 UTC, 09:01:38 America/Chicago. Daylight saving time
+ended on 2026-11-01, so this session's local clock is UTC-6 where
+TTM-003-48H's was UTC-5. Streams and events are those of TTM-003-48H.
+
+The rig's naming scheme was changed before this session
+(`Channel_Naming_Scheme="2"` in `settings.xml`, against 0 before), so its
+`structure.oebin` names the headstage channels `A1_CH1` to `A1_CH64` and
+needs no repair. The numbers are the same channels as `CH1` to `CH64` in
+TTM-003-48H's repaired oebin, but the names differ, so bad channels and
+channel tables of this recording use the `A1_` names.
+
+The protocol (`stimulation_log.toml`) was pattern C (50 ms on, 1 pulse/s,
+20 pulses per train), one train every 20 min, at about 0.3 mW. The TTL
+(`results/stimulation_blocks_2026-11-03_09-01-38.csv`) holds 145 trains of
+20 pulses, all pattern C, with no sub-millisecond toggles. They start at
+09:01:57 on 2026-11-03 and every 1200 s after that, except one interval of
+1061 s between trains 87 and 88 (13:41:58 to 13:59:39 on 2026-11-04); the
+last starts at 08:59:40 on 2026-11-05, 27 s before the recording ends.
+`results/laser_pulses_2026-11-03_09-01-38.csv` (`laser_pulses.py`) holds
+all 2,900 pulses.
+
+Not yet converted; the light schedule, any sleep deprivation and the bad
+channels are not in the manifest yet.

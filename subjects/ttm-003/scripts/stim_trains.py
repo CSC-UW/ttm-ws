@@ -105,7 +105,7 @@ def unlogged_blocks(trains: pd.DataFrame, patterns: dict, t0_unix: float, tz: st
     blocks["anomalous"] = [not any(abs(w - pw) < 25 for pw in widths) for w in blocks.pulse_ms_max]
     if expected:
         blocks["expected_pattern"] = expected["pattern"]
-        blocks["laser_level"] = expected["laser_level"]
+        blocks["laser_level"] = expected.get("laser_level")
         blocks["power_mW"] = expected["power_mW"]
         blocks["as_expected"] = (blocks.ttl_pattern == expected["pattern"]) & (blocks.n_pulses == expected["pulses_per_train"])
     blocks["delivered"] = True

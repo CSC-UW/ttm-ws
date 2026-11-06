@@ -18,6 +18,12 @@ pulse_ms = 50
 rate_hz = 3
 duration_s = 120
 
+[patterns.C]
+description = "50 ms laser on, 1 pulse/s, 20 pulses"
+pulse_ms = 50
+rate_hz = 1
+duration_s = 20
+
 [sessions."2026-10-16_14-06-44"]
 experiment = "TTM-003-OPTO1"
 trains = [
@@ -61,3 +67,11 @@ expected = { pattern = "A", laser_level = 4.5, power_mW = 9.8, pulses_per_train 
 # 80 for every delivered block, a slow potential a fifth of block 25's, and no
 # suppression on TT6, TT8 or TT12 (results/opto_blocks_TTM-003-48H.csv).
 not_delivered = [{ from_h = 7.6, to_h = 8.13, reason = "laser not connected to the animal" }]
+
+# The second 48 h recording has no train-by-train hand log either. The
+# protocol as run: pattern C (50 ms on, 1 pulse/s, 20 pulses per train), one
+# train every 20 min for the whole recording, at about 0.3 mW (Graham
+# Findlay, 2026-11-05; laser level not recorded here).
+[sessions."2026-11-03_09-01-38"]
+experiment = "TTM-003-48H-2"
+expected = { pattern = "C", power_mW = 0.3, pulses_per_train = 20, period_min = 20 }

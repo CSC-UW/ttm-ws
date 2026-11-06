@@ -1,6 +1,6 @@
 ---
-title: TTM-003 optogenetic stimulation (2026-10-16 and the 48 h recording)
-updated: 2026-10-26
+title: TTM-003 optogenetic stimulation (2026-10-16 and the two 48 h recordings)
+updated: 2026-11-05
 ---
 
 # TTM-003 optogenetic stimulation, 2026-10-16
@@ -99,3 +99,21 @@ fifth delivered train is the one at 17:11). Trains 25 to 44 are the 60-pulse
 trains every 2.000 h from 8.15 h to 46.15 h. The `not_delivered` window of
 7.6 h to 8.13 h in the log marks trains 5 to 24 as not delivered, so 24
 trains were delivered. All real pulses measure 207 ms at 0.995 Hz.
+
+## The second 48 h recording (2026-11-03_09-01-38)
+
+No train-by-train hand log either. The protocol as run
+(`expected` in `stimulation_log.toml`): pattern C (50 ms on, 1 pulse/s,
+20 pulses per train), one train every 20 min for the whole recording, at
+about 0.3 mW (Graham Findlay, 2026-11-05). On October 16 pattern A at
+0.5 mW gave no visible response and at 0.55 mW maybe one.
+
+What the TTL recorded (`results/stimulation_blocks_2026-11-03_09-01-38.csv`):
+145 trains of 20 pulses, every one pattern C, with no sub-millisecond
+toggles before them. The median pulse per train is 62.9 to 64.0 ms, the
+64 ms that pattern B's nominal 50 ms pulses measured on October 16, at a
+1004 ms period (0.996 Hz). Trains 2, 4, 24, 55 and 82 each hold one pulse
+of 77 to 78 ms (`anomalous`). Trains start every 1200 s from 09:01:57 on
+November 3, except one interval of 1061 s between trains 87 and 88
+(13:59:39 on November 4), and the last starts at 08:59:40 on November 5.
+All 145 trains count as delivered.
