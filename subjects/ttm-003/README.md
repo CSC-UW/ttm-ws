@@ -33,8 +33,8 @@ Acquisition Board plugin bug in
 2026-10-22, before that repair, it was converted (blosc-zstd) from a
 symlink mirror with a repaired copy of the oebin (`docs/SETUP.md`,
 tononi-2), removed on 2026-10-23; the session directory lives on
-`/ssd-raid0` behind a symlink under `data_root`. The manifest `TTM-003-48H` has lights on at 09:00 and
-off at 21:00 and sleep deprivation with novel objects from 09:00 to
+`/ssd-raid0` behind a symlink under `data_root`. The manifest `TTM-003-48H` has lights on at 08:53 and
+off at 20:53 (09:00 and 21:00 until 2026-11-05) and sleep deprivation with novel objects from 09:00 to
 14:00 on 2026-10-21 (the 23.5 h to 29.5 h stretch of continuous high EMG
 on `figures/emg_methods_vs_swa_full.png` is that period plus whatever
 spontaneous wake surrounds it); its bad channel is CH22 (TT15, the 400 Hz comb at 80 to
@@ -222,7 +222,7 @@ all 2,900 pulses.
 
 The light schedule, the sleep deprivation window and the bad channel are
 those of TTM-003-48H, two weeks later (experimenter, 2026-11-05): lights on
-at 09:00 and off at 21:00, sleep deprivation with novel objects from 09:00
+at 08:53 and off at 20:53, sleep deprivation with novel objects from 09:00
 to 14:00 on 2026-11-04, and A1_CH22 (TT15), not yet re-checked with
 `channel_qc.py` on this recording. TT6, TT7 and TT9 probably moved between
 the two recordings; whether others did is not yet checked. Not yet
