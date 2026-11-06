@@ -35,8 +35,11 @@ sustained responder keeps firing through the pulse.
   carried from window to window, one per unit.
 - Matched-filter snr: a spike's projection on its unit's template scaled
   to unit length, both whitened (step 3), divided by the MAD noise of
-  that projection over six 10 s blocks of the window (step 5.1). Template snr is SpikeInterface's quality metric: the
-  template's peak on its largest wire over that wire's MAD noise.
+  that projection over six 10 s blocks of the window (step 5.1). Template
+  snr is SpikeInterface's quality metric: the template's peak on its
+  largest wire over that wire's noise in the sorted window, the mean MAD
+  noise of every 0.5 s chunk of the window clear of the tetrode's bad
+  periods (the rule of the analyzer stage's noise levels, step 8).
 - Neighbour-subtracted snippet: the 90 samples around a spike after
   subtracting every other fitted spike, so overlapping spikes do not
   distort it. Cosines between a snippet and a template are taken over all
@@ -344,12 +347,12 @@ sections 6 and 10.
   each unit, from the preprocessed binary (not whitened), on its
   tetrode's wires. Step 5 whitens them (T W).
 - Units with template snr 5 or more and 100 spikes or more are kept
-  (TTM-003-48H: 54 of 59).
+  (TTM-003-48H: 53 of 59).
 - Units of one tetrode whose templates have cosine 0.95 or more (at the
   best shift up to 10 samples) are merged: their spike trains are pooled,
   spikes within 0.3 ms of each other counted once, merging is
   transitive, and the merged unit's template is recomputed (TTM-003-48H:
-  46 units after merging).
+  45 units after merging).
 
 <details>
 <summary>Why</summary>
@@ -362,6 +365,17 @@ some cells into near-identical clusters, which would then compete for
 the same spikes in step 5; merging at cosine 0.95 removes them, while at
 0.9, 19 % of merges joined two cells (the merged unit broke the
 refractory period). The false-merge rate at 0.95 was not measured.
+
+The snr's noise is measured as the analyzer stage measures it so that a
+run keeps the same units every time. Until 2026-11-06 it was
+SpikeInterface's default, the MAD of 20 random 0.33 s chunks drawn with a
+new seed in every process. Over 20 such draws, a unit's snr varied by a
+median of 9 to 11 % between its lowest and highest draw in the seed sorts
+of TTM-003-48H and TTM-003-48H-2. In TTM-003-48H two units sat at 5.05 to
+5.61 and passed in every draw; with the chunked noise both pass (5.14 and
+5.37) and the same 53 units are kept, and TTM-003-48H-2's seed bank is
+the same 40 templates as with the draw it was made with. The chunked
+noise takes about 10 s per window.
 
 Studies: [`investigations/spike-sorting/`](../investigations/spike-sorting/README.md).
 
@@ -511,7 +525,8 @@ Studies: [`docs/reports/2026-10-29_ttm003_carry_bakeoff.md`](reports/2026-10-29_
 
 - After windows 12, 24, ..., 84: MountainSort5 as in step 4 on that
   window (bad periods included), keeping clusters with template snr 5 or
-  more and 100 spikes or more; step 4's merge is not applied.
+  more and 100 spikes or more; step 4's merge is not applied. Here the
+  snr is taken on the whitened window, templates and noise alike.
 - In MountainSort5's order, a cluster joins the bank if its whitened
   template's cosine (best shift up to 10 samples) to every template on
   its tetrode, including clusters just added, is under 0.8. New units are numbered from 2000 (seed units
