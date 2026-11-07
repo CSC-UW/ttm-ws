@@ -1,6 +1,6 @@
 ---
 title: spikeinterface issues and PRs for the PC metrics, run_for_all_spikes, noise levels, sd_ratio, zarr gathering and periods
-updated: 2026-11-05
+updated: 2026-11-06
 ---
 
 # spikeinterface: PC metrics on capped draws, run_for_all_spikes in µV, noise levels, sd_ratio, zarr gathering, and periods
@@ -118,15 +118,19 @@ as a recording property (`noise_level_std_scaled`), so the value holds
 within one process and changes between processes. On a 10 min slice of
 TTM-003-48H, three builds in one process gave identical `sd_ratio`, and
 builds in three processes differed for 58 of 74 units, by up to 0.26.
-The draw also ignores `periods`, so chunks inside bad intervals count, and
-the std of a chunk includes the spikes in it. A noise level set on the
-`noise_levels` extension (here the stage's, outside bad intervals) has no
-effect on `sd_ratio`.
+On the whole of TTM-003-48H, five seeds gave one channel values up to 2.8
+times apart. The draw also ignores `periods`, so chunks inside bad
+intervals count. A noise level set on the `noise_levels` extension (here
+the stage's, outside bad intervals) has no effect on `sd_ratio`.
 
-What a PR could do: take the noise from the analyzer's `noise_levels`
-extension when it is computed, as SNR does (that extension is MAD-based,
-which equals the std for Gaussian noise, and is robust to the spikes), or
-at least pass the analyzer's seed and the metric's `periods` to the draw.
+What a PR could do: pass the analyzer's seed and the metric's `periods` to
+the draw, or let the caller give the noise. Taking the MAD-based
+`noise_levels` extension instead, as SNR does, would change the metric:
+the spread of a unit's amplitudes includes the other units' spikes that
+overlap its own, and so does a chunk's std, from which `compute_sd_ratio`
+subtracts only the unit's own spikes, while the MAD leaves spikes out. On
+TTM-003-48H the std over clean chunks is 1.01 to 1.32 times the MAD noise,
+and `sd_ratio` over the MAD noise would be 1.02 to 1.32 times as large.
 
 ## 6. Zarr gathering appends one chunk at a time
 
@@ -173,7 +177,9 @@ spike's projection (decided 2026-11-04), so it does not need the
 weighting. It still needs the ADC-counts workaround of item 1, it
 reports isolation distance as missing where item 3 applies, and it
 computes noise levels itself outside bad intervals for item 4
-(`docs/sorting_pipeline.md`, step 8). Its `sd_ratio` is still
-SpikeInterface's (item 5). For item 6 it computes every extension on an
+(`docs/sorting_pipeline.md`, step 8). For item 5 it sets the noise
+`sd_ratio` divides by to the mean std of the chunks it measures noise
+levels on (`ttm.analyzer.set_sd_ratio_noise`), through the recording
+property in which `get_noise_levels` caches its result. For item 6 it computes every extension on an
 in-memory analyzer and writes the zarr store once with `save_as`. It has
 no workaround for item 7.

@@ -623,6 +623,23 @@ Fixed:
   to 19 % (`investigations/analyzer-noise-and-duplicates/`). The stage
   computes these noise levels itself, since SpikeInterface's noise-level
   extension cannot leave periods out.
+- sd_ratio is SpikeInterface's: the spread of a unit's spike amplitudes
+  on its main channel over the standard deviation of that channel, from
+  which it subtracts an estimate of the unit's own spikes. The standard
+  deviation is the mean over the same chunks as the noise levels above,
+  not a draw of its own (decided 2026-11-06). SpikeInterface's draw, 20
+  random 0.5 s chunks with no fixed seed and bad intervals included,
+  changes from one process to the next: on a 10 min slice of TTM-003-48H,
+  builds in three processes differed by up to 0.26, and on the whole
+  recording five seeds gave one channel values up to 2.8 times apart. On
+  TTM-003-48H the fixed noise gives 0.955 to 1.073 times the sd_ratio of
+  the build that drew its own (median 1.014). The standard deviation is
+  kept rather than the MAD noise because the spread of a unit's
+  amplitudes includes the other units' spikes that overlap its own, and
+  so does the standard deviation, while the MAD leaves spikes out. The
+  standard deviation is 1.01 to 1.32 times the MAD noise (1.20 to 1.25
+  for the median channel of TT4 to TT6 and TT10), and sd_ratio over the
+  MAD noise would be 1.02 to 1.32 times as large.
 - The merge step of `investigations/spike-sorting/97_production_pipeline.py`
   is not used. It joins same-tetrode units whose templates are similar
   (cosine 0.90 or more) when their cross-correlogram shows a refractory
@@ -698,7 +715,8 @@ Fixed:
 Chosen when the stage was written (2026-11-05), not yet reviewed:
 
 - `ttm-sort analyzer` writes into the run directory `noise_levels.csv`
-  (the noise levels above), `multi_unit/` (each window's scored events,
+  (the noise levels above and the chunks' standard deviation),
+  `multi_unit/` (each window's scored events,
   and `cutoffs.csv` with each tetrode's events, cutoff and admitted
   count), `sorting_mua/` (the sorting with the multi-unit units),
   `pc_metrics.csv` (the all-spike PC metrics), `analyzer_params.json`
@@ -721,12 +739,7 @@ Chosen when the stage was written (2026-11-05), not yet reviewed:
   presence_ratio, snr, isi_violation, rp_violation, sliding_rp_violation,
   synchrony, firing_range, amplitude_cv, amplitude_cutoff, noise_cutoff,
   amplitude_median and sd_ratio, all but snr over the periods above,
-  plus the four all-spike PC metrics. SpikeInterface's sd_ratio does not
-  use the noise levels above. It draws its own, the standard deviation of
-  20 random 0.5 s chunks, with no fixed seed and without the periods, and
-  keeps it for the rest of the process, so it changes between processes:
-  on a 10 min slice of TTM-003-48H three builds in one process agreed
-  and builds in three processes differed by up to 0.26
+  plus the four all-spike PC metrics. sd_ratio takes its noise as above
   (`docs/plans/2026-11-04_spikeinterface_pc_metrics_pr.md`, item 5).
 - On TTM-003-48H the analyzer holds 74 units: the 61 sorted units
   (138.7 M spikes) and 13 multi-unit units (on TT1, TT2, TT4 to TT12,
