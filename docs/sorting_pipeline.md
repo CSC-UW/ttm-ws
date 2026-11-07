@@ -779,20 +779,30 @@ Chosen when the stage was written (2026-11-05), not yet reviewed:
   amplitude_median and sd_ratio, all but snr over the periods above,
   plus the four all-spike PC metrics. sd_ratio takes its noise as above
   (`docs/plans/2026-11-04_spikeinterface_pc_metrics_pr.md`, item 5).
-- On TTM-003-48H the analyzer built before the rejected fits joined the
-  multi-unit units holds 74 units: the 61 sorted units
-  (138.7 M spikes) and 13 multi-unit units (on TT1, TT2, TT4 to TT12,
-  TT15 and TT16; 1.17 M events), 139.8 M spikes in all. With 48 jobs on
-  a shared machine the noise levels took 10 min, the multi-unit events
-  12 min, the all-spike PC metrics 28 min and the analyzer 54 min. Of
-  the 54 min, 43 were the quality metrics. Ten of the 14 metric
-  functions select the spikes inside the periods themselves, and one
-  selection takes 88 s, which accounts for about 15 min; where the rest
-  goes was not measured (num_spikes alone took 208 s). Everything is computed in memory and written to Zarr once, in
+- On TTM-003-48H the analyzer holds 76 units: the 61 sorted units
+  (138.7 M spikes) and 15 multi-unit units (on TT1 to TT13, TT15 and
+  TT16; 7.85 M events), 146.5 M spikes in all. On TTM-003-48H-2 it holds
+  69: the 56 sorted units (131.6 M spikes) and 13 multi-unit units (on
+  TT1, TT2, TT4 to TT12, TT15 and TT16; 6.16 M events), 137.7 M in all.
+  The analyzers are 1.2 and 1.1 GB.
+- Built before the rejected fits joined the multi-unit units, with 48
+  jobs on a shared machine, the TTM-003-48H noise levels took 10 min,
+  the multi-unit events 12 min, the all-spike PC metrics 28 min and the
+  analyzer 54 min. Of the 54 min, 43 were the quality metrics. Ten of
+  the 14 metric functions select the spikes inside the periods
+  themselves, and one selection takes 88 s, which accounts for about
+  15 min; where the rest goes was not measured (num_spikes alone took
+  208 s). Everything is computed in memory and written to Zarr once, in
   19 s, because SpikeInterface 0.105.4 writes a Zarr analyzer's
   waveforms and amplitudes one second of recording at a time; the
   waveforms were on course for about 100 min that way, against 89 s in
-  memory. The analyzer is 1.2 GB.
+  memory.
+- The rebuild with the rejected fits reused the noise levels and the
+  scored windows and ran with the default 16 jobs. The all-spike PC
+  metrics took 42 min and the analyzer 78 min on TTM-003-48H (62 of
+  them the quality metrics), and 27 and 22 min on TTM-003-48H-2 (10 for
+  the quality metrics). Why the quality metrics took six times as long
+  on TTM-003-48H as on TTM-003-48H-2 was not measured.
 
 Open:
 
