@@ -1,18 +1,22 @@
 ---
 title: spikeinterface issues and PRs for the PC metrics, run_for_all_spikes, noise levels, sd_ratio, zarr gathering and periods
-updated: 2026-11-06
+updated: 2026-11-07
 ---
 
 # spikeinterface: PC metrics on capped draws, run_for_all_spikes in µV, noise levels, sd_ratio, zarr gathering, and periods
 
-Not started. Open these once the analyzer stage of `ttm-sort` is in use,
+Item 1 is open as PR #4925; the others are not started. Open these once the analyzer stage of `ttm-sort` is in use,
 since it carries the workarounds, and check spikeinterface's current
 `main` for each first. The measurements are in
 `investigations/analyzer-random-spikes/`.
 
 ## 1. run_for_all_spikes ignores return_in_uV
 
-A bug. Open an issue together with a PR that fixes it.
+A bug. Opened on 2026-11-07 as
+[PR #4925](https://github.com/SpikeInterface/spikeinterface/pull/4925)
+(branch `fix-pc-all-spikes-uv-segments` on the fork), with the context in
+the PR body and no separate issue. The PR also fixes a second bug in the
+same functions, below.
 
 `_all_pc_extractor_chunk` in `postprocessing/principal_component.py`
 reads `recording.get_traces(start_frame=..., end_frame=...,
@@ -27,12 +31,25 @@ projections of the analyzer's own random spikes differ from the stored
 writes `pc_features.npy` with it. On 2026-11-04 `main` had the same call,
 and a search of the issues found none about it.
 
-The fix passes the analyzer's `return_in_uV` through the worker context to
-`get_traces`. The test: on a recording with a gain other than 1 and an
-analyzer in µV, `run_for_all_spikes` at the random spikes equals the stored
-`pca_projection`.
+The second bug: `_init_work_all_pc_extractor` keeps only segment 0's
+spikes, but the chunk executor runs over every segment. Chunks of a later
+segment project that segment's traces at segment 0's spike times and
+overwrite segment 0's rows, and the later segments' spikes stay zero.
+`export_to_phy` asserts one segment, so only direct calls are affected,
+and not TTM-003-48H, whose binary has one segment.
 
-Until it is fixed, all-spike projections need an analyzer in ADC counts.
+The fix passes the analyzer's `return_in_uV` through the worker context to
+`get_traces`, and keeps the spike vector of every segment in the worker
+with each segment's slice of it, so a chunk searches only its own
+segment's spikes. The test extends `test_compute_for_all_spikes`: on a
+copy of the two-segment test recording with gain 0.195 and offset -100,
+`run_for_all_spikes` at the random spikes equals the stored
+`pca_projection`. On `main` it fails (errors up to 179 on values up to 6.7,
+and the second segment's spikes all zero); with the fix the difference is
+0.
+
+Until #4925 is in a release, all-spike projections need an analyzer in
+ADC counts.
 
 ## 2. PC metrics on a capped draw
 
@@ -182,7 +199,8 @@ extension and pass the selected sorting to every metric.
 
 The analyzer stage here computes L-ratio and isolation distance on every
 spike's projection (decided 2026-11-04), so it does not need the
-weighting. It still needs the ADC-counts workaround of item 1, it
+weighting. It needs the ADC-counts workaround of item 1 until #4925 is
+in a release, it
 reports isolation distance as missing where item 3 applies, and it
 computes noise levels itself outside bad intervals for item 4
 (`docs/sorting_pipeline.md`, step 8). For item 5 it measures the mean
