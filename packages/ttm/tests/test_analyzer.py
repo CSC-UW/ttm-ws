@@ -110,6 +110,8 @@ def test_chunk_noise_levels_default_uses_every_clean_chunk(tmp_path) -> None:
     noise, table = an.chunk_noise_levels(path, {1: [(int(10 * FS), int(20 * FS))]}, workers=2)
     assert list(table["chunks"]) == [60] * 4 + [40] * 4
     assert np.all(np.abs(noise / 100 - 1) < 0.02)
+    assert np.all(np.abs(table["std_counts"] / 100 - 1) < 0.02)
+    assert np.allclose(table["std_uv"], table["std_counts"] * 0.195)
 
 
 def test_multi_unit_admits_missed_spikes_and_not_claimed_ones(tmp_path) -> None:
@@ -137,3 +139,38 @@ def test_multi_unit_admits_missed_spikes_and_not_claimed_ones(tmp_path) -> None:
     assert table.loc[0, "reference"] >= 0.9 * (spikes.size - missed.size)
     with pytest.raises(ValueError):
         an.run_multi_unit(path, tmp_path / "sorting", noise * 1.01, {}, tmp_path / "mua", params, workers=2)
+
+
+def test_sd_ratio_divides_by_the_noise_it_is_given(tmp_path) -> None:
+    from spikeinterface.curation.curation_tools import find_duplicated_spikes
+    from spikeinterface.metrics.quality.misc_metrics import compute_sd_ratio
+    from ttm.sorting import create_group_sparse_analyzer
+
+    rng = np.random.default_rng(2)
+    n = int(60 * FS)
+    x = rng.normal(0, 10, (n, 4))
+    t = np.arange(90) - 30
+    shape = -np.exp(-(t / 4.0) ** 2) + 0.4 * np.exp(-((t - 12) / 8.0) ** 2)
+    trains = {}
+    for u, (gain, spread) in enumerate([((150.0, 110.0, 80.0, 60.0), 0.05), ((50.0, 90.0, 120.0, 70.0), 0.2)]):
+        f = np.sort(rng.choice(np.arange(200 + 150 * u, n - 200, 300), 1500, replace=False))
+        f = np.concatenate([f, f[::50] + 60])
+        for s in f:
+            x[s - 30:s + 60] += shape[:, None] * np.array(gain) * rng.normal(1, spread)
+        trains[u] = np.sort(f)
+    rec = si.load(_save_recording(tmp_path / "rec", x.astype(np.int16), [0]))
+    sorting = _sorting(trains, [0, 0])
+    az = create_group_sparse_analyzer(sorting, rec, format="memory", return_in_uV=True)
+    az.compute(["random_spikes", "templates", "spike_amplitudes"])
+    periods = an.unit_periods(sorting, n, {0: [(int(20 * FS), int(30 * FS))]})
+    noise = np.array([2.1, 1.9, 2.3, 2.0])
+    an.set_sd_ratio_noise(az.recording, noise)
+    got = compute_sd_ratio(az, periods=periods, correct_for_template_itself=False)
+    kept = sorting.select_periods(periods=periods)
+    amps = az.get_extension("spike_amplitudes").get_data(outputs="by_unit", concatenated=False, periods=periods)[0]
+    main = az.get_main_channels(outputs="index", with_dict=True)
+    for u in sorting.unit_ids:
+        dup = find_duplicated_spikes(kept.get_unit_spike_train(u, 0), int(0.004 * FS), method="keep_first_iterative")
+        a = np.delete(amps[u], dup)
+        assert np.isclose(got[u], np.std(np.diff(a)) / np.sqrt(2) / noise[main[u]])
+    assert got[1] > 2 * got[0]

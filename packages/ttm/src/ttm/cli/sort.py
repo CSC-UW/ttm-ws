@@ -210,11 +210,13 @@ def _analyzer_stage(a, run_dir: pathlib.Path, binary: pathlib.Path, drop: list, 
                     bad_periods=bad_path, dropped_channels=[str(c) for c in drop])
 
     noise_csv = run_dir / "noise_levels.csv"
-    if noise_csv.exists():
-        table = pd.read_csv(noise_csv)
-        if list(table["channel"].astype(str)) != [str(c) for c in rec.channel_ids]:
-            raise ValueError(f"{noise_csv} is for other channels")
-    else:
+    table = pd.read_csv(noise_csv) if noise_csv.exists() else None
+    if table is not None and list(table["channel"].astype(str)) != [str(c) for c in rec.channel_ids]:
+        raise ValueError(f"{noise_csv} is for other channels")
+    if table is not None and "std_uv" not in table:
+        cr.log(f"{noise_csv} has no chunk standard deviations; measuring the noise levels again")
+        table = None
+    if table is None:
         t0 = time.time()
         _, table = an.chunk_noise_levels(binary, bad, params, drop_channel_ids=drop, workers=a.analyzer_workers)
         table.to_csv(noise_csv, index=False)
@@ -247,7 +249,8 @@ def _analyzer_stage(a, run_dir: pathlib.Path, binary: pathlib.Path, drop: list, 
         cr.log(f"all-spike PC metrics in {(time.time() - t0) / 60:.1f} min -> {pc_csv}")
 
     t0 = time.time()
-    an.build_analyzer(sorting, rec, folder, table["noise_uv"].to_numpy(), periods, pc, params, n_jobs=a.n_jobs)
+    an.build_analyzer(sorting, rec, folder, table["noise_uv"].to_numpy(), periods, pc, params,
+                      noise_std_uv=table["std_uv"].to_numpy(), n_jobs=a.n_jobs)
     cr.log(f"analyzer in {(time.time() - t0) / 60:.1f} min -> {folder}")
 
 

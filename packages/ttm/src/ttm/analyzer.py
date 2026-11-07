@@ -2,8 +2,8 @@
 
 On the binary a sorting was made from:
 
-- ``chunk_noise_levels``: each channel's noise, the mean MAD of random 0.5 s chunks drawn outside its
-  tetrode's bad intervals.
+- ``chunk_noise_levels``: each channel's noise, the mean MAD of the 0.5 s chunks of a grid outside its
+  tetrode's bad intervals, and the mean standard deviation of the same chunks (for sd_ratio).
 - ``run_multi_unit`` and ``multi_unit_events``: per window, the detected events that no sorted spike of
   their tetrode claims, scored against the window's templates after the tetrode's sorted spikes around
   them are subtracted; per tetrode, those at or above the score that ``mua_loss`` % of the events one
@@ -12,8 +12,9 @@ On the binary a sorting was made from:
 - ``unit_periods``: each unit's tetrode's time outside its bad intervals, as SpikeInterface periods.
 - ``all_spike_pc_metrics``: isolation distance, L-ratio, d' and silhouette on every spike's principal
   components, multi-unit spikes counted among the other spikes.
+- ``set_sd_ratio_noise``: the noise SpikeInterface's sd_ratio divides by, fixed.
 - ``build_analyzer``: the SortingAnalyzer with its extensions, these noise levels, the metrics over the
-  periods and the all-spike PC metrics.
+  periods (sd_ratio with the chunks' standard deviation) and the all-spike PC metrics.
 
 Parameters are those of ``AnalyzerParams``. Noise levels and the multi-unit detection are in ADC counts of
 the binary; the analyzer is in µV.
@@ -93,22 +94,26 @@ def in_bad(frames: np.ndarray, g: int, bad: dict) -> np.ndarray:
 
 # --- noise levels ----------------------------------------------------------------------------------
 
-def _chunk_mads(args):
+def _chunk_noise(args):
     rec_path, drop, starts, length = args
     rec = open_sorting_recording(rec_path, drop)
-    out = np.empty((len(starts), rec.get_num_channels()), np.float32)
+    mad = np.empty((len(starts), rec.get_num_channels()), np.float32)
+    sd = np.empty_like(mad)
     for i, s in enumerate(starts):
         x = rec.get_traces(start_frame=int(s), end_frame=int(s) + length, return_in_uV=False)
         med = np.median(x, axis=0)
-        out[i] = np.median(np.abs(x - med), axis=0) / MAD_TO_SD
-    return out
+        mad[i] = np.median(np.abs(x - med), axis=0) / MAD_TO_SD
+        sd[i] = x.std(axis=0, dtype=np.float64)
+    return mad, sd
 
 
 def chunk_noise_levels(rec_path, bad_periods: dict, params: AnalyzerParams | None = None, *,
                        drop_channel_ids=(), workers: int = 32) -> tuple[np.ndarray, pd.DataFrame]:
     """Each channel's noise in ADC counts: the mean, over the chunks of ``noise_chunk_s`` on a grid
     that do not overlap its tetrode's bad intervals, of the chunk's MAD / 0.6745. With ``noise_chunks``
-    None (the default) every such chunk counts.
+    None (the default) every such chunk counts. The table also holds the mean of the same chunks'
+    standard deviations (``std_counts``, ``std_uv``), the noise SpikeInterface's sd_ratio is defined
+    with.
 
     With ``noise_chunks`` a number, one seeded permutation of the grid serves every tetrode: each takes
     its first ``noise_chunks`` chunks clear of its bad intervals. Returns the levels and a table of them
@@ -137,16 +142,21 @@ def chunk_noise_levels(rec_path, bad_periods: dict, params: AnalyzerParams | Non
     used = np.unique(np.concatenate(list(pick.values())))
     batches = np.array_split(used * length, max(1, min(workers * 4, used.size)))
     with ProcessPoolExecutor(min(workers, len(batches))) as ex:
-        mads = np.concatenate(list(ex.map(_chunk_mads, [(str(rec_path), drop, b, length) for b in batches])))
+        res = list(ex.map(_chunk_noise, [(str(rec_path), drop, b, length) for b in batches]))
+    mads = np.concatenate([r[0] for r in res])
+    sds = np.concatenate([r[1] for r in res])
     noise = np.empty(len(groups), np.float64)
+    std = np.empty(len(groups), np.float64)
     n_used = np.empty(len(groups), np.int64)
     for ch, g in enumerate(groups.tolist()):
         idx = np.searchsorted(used, pick[g])
         noise[ch] = mads[idx, ch].astype(np.float64).mean()
+        std[ch] = sds[idx, ch].astype(np.float64).mean()
         n_used[ch] = idx.size
     gain = rec.get_channel_gains()
     table = pd.DataFrame({"channel": np.asarray(rec.channel_ids).astype(str), "group": groups,
-                          "noise_counts": noise, "noise_uv": noise * gain, "chunks": n_used})
+                          "noise_counts": noise, "noise_uv": noise * gain, "std_counts": std,
+                          "std_uv": std * gain, "chunks": n_used})
     return noise, table
 
 
@@ -541,17 +551,29 @@ def pc_metrics_from_projections(P: np.ndarray, sorting, n_channels: np.ndarray) 
 
 # --- the analyzer ----------------------------------------------------------------------------------
 
+def set_sd_ratio_noise(recording, noise_std_uv: np.ndarray) -> None:
+    """Make SpikeInterface's sd_ratio divide by ``noise_std_uv`` (per channel, µV). Its
+    ``compute_sd_ratio`` takes the noise from ``get_noise_levels(method="std")``, which returns the
+    recording property ``noise_level_std_scaled`` when it is set and otherwise draws 20 random chunks
+    with no fixed seed and keeps them for the process."""
+    recording.set_property("noise_level_std_scaled", np.asarray(noise_std_uv, np.float64))
+
+
 def build_analyzer(sorting, recording, folder, noise_uv: np.ndarray, periods: np.ndarray, pc_metrics: pd.DataFrame,
-                   params: AnalyzerParams | None = None, *, n_jobs: int = 48, note: str = ""):
+                   params: AnalyzerParams | None = None, *, noise_std_uv: np.ndarray | None = None,
+                   n_jobs: int = 48, note: str = ""):
     """The SortingAnalyzer in ``folder`` (zarr, µV, every unit sparse to its tetrode) with random spikes,
     waveforms, templates, the given noise levels, spike amplitudes, correlograms, ISI histograms, unit
     locations, template similarity, template metrics, principal components (on the random spikes, for
-    viewing) and quality metrics over ``periods``, the all-spike PC metrics added to them. Everything is
+    viewing) and quality metrics over ``periods``, the all-spike PC metrics added to them. sd_ratio, if
+    listed, divides by ``noise_std_uv`` (``set_sd_ratio_noise``). Everything is
     computed in memory and written to zarr once: SpikeInterface 0.105.4 appends each chunk's waveforms
     and amplitudes to a zarr analyzer's arrays one at a time, rewriting the open zarr chunk each time."""
     params = params or AnalyzerParams()
     from ttm.sorting import create_group_sparse_analyzer
 
+    if "sd_ratio" in params.metric_names and noise_std_uv is None:
+        raise ValueError("sd_ratio needs noise_std_uv")
     job = {"n_jobs": n_jobs, "chunk_duration": "1s", "progress_bar": False}
     az = create_group_sparse_analyzer(sorting, recording, format="memory", return_in_uV=True, n_jobs=n_jobs,
                                       seed=params.seed)
@@ -583,6 +605,8 @@ def build_analyzer(sorting, recording, folder, noise_uv: np.ndarray, periods: np
         az.compute(name, **kw, **job)
         log(f"analyzer {name} in {time.time() - t0:.0f} s")
     t0 = time.time()
+    if noise_std_uv is not None:
+        set_sd_ratio_noise(az.recording, noise_std_uv)
     az.compute("quality_metrics", metric_names=list(params.metric_names), periods=periods, **job)
     log(f"analyzer quality_metrics in {time.time() - t0:.0f} s")
     qm = az.get_extension("quality_metrics")
@@ -591,6 +615,8 @@ def build_analyzer(sorting, recording, folder, noise_uv: np.ndarray, periods: np
         df[m] = pc_metrics.reindex(df.index)[m].to_numpy()
     qm.set_data("metrics", df)
     qm.params = {**qm.params, "ttm_all_spike_pc_metrics": list(PC_METRIC_NAMES)}
+    if noise_std_uv is not None:
+        qm.params["ttm_sd_ratio_noise"] = "std_uv of ttm.analyzer.chunk_noise_levels"
     qm.save()
     t0 = time.time()
     az = az.save_as(format="zarr", folder=folder)
