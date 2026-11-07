@@ -37,7 +37,7 @@ from ttm.carry import in_intervals, log, open_sorting_recording
 MAD_TO_SD = 0.6744897501960817
 
 METRIC_NAMES = ("num_spikes", "firing_rate", "presence_ratio", "snr", "isi_violation", "rp_violation",
-                "sliding_rp_violation", "synchrony", "firing_range", "amplitude_cv", "amplitude_cutoff",
+                "sliding_rp_violation", "synchrony", "firing_range", "amplitude_cv",
                 "noise_cutoff", "amplitude_median", "sd_ratio")
 PC_METRIC_NAMES = ("isolation_distance", "l_ratio", "d_prime", "silhouette")
 

@@ -748,6 +748,17 @@ Fixed:
   one cycle apart on an oscillation (conjecture).
 - L-ratio, isolation distance, d′ and silhouette count the multi-unit
   spikes among the other spikes of the tetrode.
+- amplitude_cutoff is not computed (decided 2026-11-07). SpikeInterface
+  puts a unit's amplitudes in 100 bins between their minimum and
+  maximum, takes the smoothed count of the lowest bin as the height at
+  the cutoff, and counts as missed the spikes above the last bin that
+  reaches that height. With millions of spikes a few amplitudes far
+  from the rest stretch the range, the lowest bin holds a median of 2
+  spikes on TTM-003-48H and 1 on TTM-003-48H-2, and the metric is about
+  0: a median of 0.00007 and 0 over the sorted units, at most 0.13 and
+  0.0004. Leaving out amplitudes of 0 or less gives medians of 0.031 and
+  0.005 over all spikes (at most 0.42 and 0.15). The analyzers built on
+  2026-11-07 still hold the metric.
 
 Chosen when the stage was written (2026-11-05), not yet reviewed:
 
@@ -775,7 +786,7 @@ Chosen when the stage was written (2026-11-05), not yet reviewed:
   random spikes, for viewing) and quality metrics.
 - The quality metrics are SpikeInterface's num_spikes, firing_rate,
   presence_ratio, snr, isi_violation, rp_violation, sliding_rp_violation,
-  synchrony, firing_range, amplitude_cv, amplitude_cutoff, noise_cutoff,
+  synchrony, firing_range, amplitude_cv, noise_cutoff,
   amplitude_median and sd_ratio, all but snr over the periods above,
   plus the four all-spike PC metrics. sd_ratio takes its noise as above
   (`docs/plans/2026-11-04_spikeinterface_pc_metrics_pr.md`, item 5).
