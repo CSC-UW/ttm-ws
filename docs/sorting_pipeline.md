@@ -1,6 +1,6 @@
 ---
 title: Spike sorting pipeline for 48 h tetrode recordings
-updated: 2026-11-06
+updated: 2026-11-07
 status: needs_verification
 ---
 
@@ -413,7 +413,8 @@ separately, with the bank as it stands (window 0 uses the seed bank):
       amplitude; with fewer, at least 0.5 (half the template's size);
    5. refractory period 1.5 ms per unit: a run of spikes each closer than
       1.5 ms to the previous one keeps only its highest-snr spike, however
-      long the run.
+      long the run. The carry keeps the others as rejected fits, and the
+      analyzer stage puts them in the tetrode's multi-unit unit (step 8).
 4. Laser pulses (only with a pulse table and without `--no-pulse-relax`,
    only in windows with pulses). Candidates are fits outside bad
    intervals with matched-filter snr 2.5 or more, amplitude at least 0.3
@@ -664,14 +665,15 @@ Fixed:
   cosine of 0.041 (`investigations/unclaimed-events/`).
 
 - Each tetrode gets one multi-unit unit, holding detected events that no
-  sorted spike claims but that look like spikes of the tetrode. A
-  tetrode gets none when no unit of it has the 100 spikes in a window
-  that a template needs (below), since its events are then never scored:
-  on TTM-003-48H, TT3 (one unit of 34 spikes), TT13 (one unit of 429)
-  and TT14 (no unit). The stage also sets no cutoff for a tetrode with
+  sorted spike claims but that look like spikes of the tetrode, and the
+  fits that rule 3.5 of step 5 rejected (below). A
+  tetrode gets no detected events when no unit of it has the 100 spikes
+  in a window that a template needs (below), since its events are then
+  never scored: on TTM-003-48H, TT3 (one unit of 34 spikes), TT13 (one
+  unit of 429) and TT14 (no unit). The stage also sets no cutoff for a tetrode with
   fewer than 1,000 reference events (below); every scored tetrode of
-  TTM-003-48H has 32,239 or more. Its spikes
-  are probably neural but cannot be assigned to one unit; rates per
+  TTM-003-48H has 31,082 or more. The multi-unit unit's spikes
+  are probably neural but are not assigned to any one sorted unit; rates per
   tetrode pool the sorted and multi-unit units. It follows the multi-unit
   step of `97_production_pipeline.py`, changed as below
   (`investigations/multi-unit-gate/`).
@@ -716,7 +718,34 @@ Fixed:
   clean chunk, the multi-unit units hold 1.06 M events on TT5 to TT12
   with the floor (1.12 % of the sorted spikes there, 0.02 to 2.99 Hz per
   tetrode) and would hold 1.11 M without it. The stage's own run on
-  TTM-003-48H gives 1,055,756 there.
+  TTM-003-48H gives 1,055,773 there.
+- The fits that rule 3.5 of step 5 rejected join the multi-unit unit
+  (decided 2026-11-07; `mua_refractory` in `AnalyzerParams`,
+  `investigations/refractory-rejects/`). They passed rules 3.1 to 3.4, or
+  the pulse rule's relaxed criteria. A detected event within 0.5 ms of one
+  gives way to it. Until then they were discarded: of the 823,315 in 12 of
+  the 96 windows of TTM-003-48H, 2.6 % had a detected multi-unit event
+  within 0.33 ms standing in for them. They are 4.9 % of the sorted spikes
+  on TTM-003-48H and 4.3 % on TTM-003-48H-2; with them the multi-unit
+  units hold 7.85 M and 6.16 M events instead of 1.17 M and 0.61 M, and
+  TT3 and TT13 of TTM-003-48H get multi-unit units of 7 and 5 rejected
+  fits.
+- On the traces of TTM-003-48H, a rejected fit 0.3 to 1.5 ms from the fit
+  the rule kept behaves, with that fit, like two events of the template's
+  shape. A second copy of the template explains as much beyond one copy
+  allowed to shift, widen or narrow as it does in synthetic traces that
+  hold the matcher's two fits on background: the median ratio is 0.97 to
+  1.02, and 0.97 for accepted spikes 2.0 to 2.6 ms apart. The two copies
+  leave a little more misfit than for those accepted pairs, and what one
+  spike fitted twice would give was not simulated. The accepted spikes'
+  autocorrelograms do not fall below their level at 50 to 100 ms after
+  1.5 ms; at 1.5 to 2.0 ms the median over unit-windows is 0.97 of that
+  level. Units with many rejected fits may hold two or more neurons whose
+  waveforms the tetrode does not tell apart, firing within about 1 ms of
+  each other (conjecture). On TT15, whose units follow a signal
+  synchronous with the acquisition clock, unit 42's lags come in a comb
+  about 0.22 ms apart, and its rejected fits may be its template matched
+  one cycle apart on an oscillation (conjecture).
 - L-ratio, isolation distance, d′ and silhouette count the multi-unit
   spikes among the other spikes of the tetrode.
 
@@ -726,8 +755,8 @@ Chosen when the stage was written (2026-11-05), not yet reviewed:
   (the noise levels above and the mean standard deviation of the same
   chunks),
   `multi_unit/` (each window's scored events,
-  and `cutoffs.csv` with each tetrode's events, cutoff and admitted
-  count), `sorting_mua/` (the sorting with the multi-unit units),
+  and `cutoffs.csv` with each tetrode's events, cutoff, admitted count
+  and rejected fits), `sorting_mua/` (the sorting with the multi-unit units),
   `pc_metrics.csv` (the all-spike PC metrics), `analyzer_params.json`
   and `analyzer.zarr`. It reuses the noise levels, the scored windows and
   the PC metrics when they exist, and leaves a finished analyzer alone.
@@ -750,7 +779,8 @@ Chosen when the stage was written (2026-11-05), not yet reviewed:
   amplitude_median and sd_ratio, all but snr over the periods above,
   plus the four all-spike PC metrics. sd_ratio takes its noise as above
   (`docs/plans/2026-11-04_spikeinterface_pc_metrics_pr.md`, item 5).
-- On TTM-003-48H the analyzer holds 74 units: the 61 sorted units
+- On TTM-003-48H the analyzer built before the rejected fits joined the
+  multi-unit units holds 74 units: the 61 sorted units
   (138.7 M spikes) and 13 multi-unit units (on TT1, TT2, TT4 to TT12,
   TT15 and TT16; 1.17 M events), 139.8 M spikes in all. With 48 jobs on
   a shared machine the noise levels took 10 min, the multi-unit events
