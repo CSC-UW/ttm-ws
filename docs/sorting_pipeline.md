@@ -624,22 +624,30 @@ Fixed:
   computes these noise levels itself, since SpikeInterface's noise-level
   extension cannot leave periods out.
 - sd_ratio is SpikeInterface's: the spread of a unit's spike amplitudes
-  on its main channel over the standard deviation of that channel, from
-  which it subtracts an estimate of the unit's own spikes. The standard
-  deviation is the mean over the same chunks as the noise levels above,
-  not a draw of its own (decided 2026-11-06). SpikeInterface's draw, 20
-  random 0.5 s chunks with no fixed seed and bad intervals included,
-  changes from one process to the next: on a 10 min slice of TTM-003-48H,
-  builds in three processes differed by up to 0.26, and on the whole
-  recording five seeds gave one channel values up to 2.8 times apart. On
-  TTM-003-48H the fixed noise gives 0.955 to 1.073 times the sd_ratio of
-  the build that drew its own (median 1.014). The standard deviation is
-  kept rather than the MAD noise because the spread of a unit's
-  amplitudes includes the other units' spikes that overlap its own, and
-  so does the standard deviation, while the MAD leaves spikes out. The
-  standard deviation is 1.01 to 1.32 times the MAD noise (1.20 to 1.25
-  for the median channel of TT4 to TT6 and TT10), and sd_ratio over the
-  MAD noise would be 1.02 to 1.32 times as large.
+  on its main channel over that channel's standard deviation, from whose
+  variance it subtracts an estimate of the variance the unit's own spikes
+  add. The standard deviation is the mean over the same chunks as the
+  noise levels above, not a draw of its own (decided 2026-11-06).
+  SpikeInterface's draw, 20 random 0.5 s chunks with no fixed seed and
+  bad intervals included, changes from one process to the next: on a
+  10 min slice of TTM-003-48H, builds in three processes gave sd_ratio
+  values up to 0.26 apart, and on the whole recording five seeds gave
+  standard deviations up to 2.8 times apart on one channel (CH36 of TT1,
+  no unit's main channel) and up to 1.10 times apart on the units' main
+  channels. On TTM-003-48H the mean over clean chunks gives 0.955 to
+  1.073 times the sd_ratio of the build that drew its own (median 1.014).
+- sd_ratio keeps the standard deviation rather than the MAD noise.
+  sd_ratio is near 1 when a unit's amplitudes vary only as much as
+  additive noise makes them vary, so the denominator has to hold what the
+  amplitudes hold: the background and the other units' spikes that
+  overlap the unit's own, but not the unit's own spikes. The standard
+  deviation counts those spikes; the MAD is barely moved by sparse spikes
+  and leaves most of them out. The standard deviation is 1.01 to 1.32
+  times the MAD noise (1.20 to 1.25 for the median channel of each of
+  TT4 to TT6 and TT10, the four tetrodes where it is highest), and
+  sd_ratio over the MAD noise, without the subtraction for the unit's own
+  spikes, would be 1.02 to 1.32 times the values over the standard
+  deviation.
 - The merge step of `investigations/spike-sorting/97_production_pipeline.py`
   is not used. It joins same-tetrode units whose templates are similar
   (cosine 0.90 or more) when their cross-correlogram shows a refractory
@@ -715,7 +723,8 @@ Fixed:
 Chosen when the stage was written (2026-11-05), not yet reviewed:
 
 - `ttm-sort analyzer` writes into the run directory `noise_levels.csv`
-  (the noise levels above and the chunks' standard deviation),
+  (the noise levels above and the mean standard deviation of the same
+  chunks),
   `multi_unit/` (each window's scored events,
   and `cutoffs.csv` with each tetrode's events, cutoff and admitted
   count), `sorting_mua/` (the sorting with the multi-unit units),

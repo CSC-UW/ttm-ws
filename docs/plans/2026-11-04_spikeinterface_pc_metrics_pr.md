@@ -118,19 +118,27 @@ as a recording property (`noise_level_std_scaled`), so the value holds
 within one process and changes between processes. On a 10 min slice of
 TTM-003-48H, three builds in one process gave identical `sd_ratio`, and
 builds in three processes differed for 58 of 74 units, by up to 0.26.
-On the whole of TTM-003-48H, five seeds gave one channel values up to 2.8
-times apart. The draw also ignores `periods`, so chunks inside bad
-intervals count. A noise level set on the `noise_levels` extension (here
-the stage's, outside bad intervals) has no effect on `sd_ratio`.
+On the whole of TTM-003-48H, five seeds gave standard deviations up to
+2.8 times apart on one channel (no unit's main channel) and up to 1.10
+times apart on the units' main channels. The draw ignores `periods`, so
+chunks inside bad intervals count. A noise level set on the
+`noise_levels` extension (here the stage's, outside bad intervals) has no
+effect on `sd_ratio`.
 
 What a PR could do: pass the analyzer's seed and the metric's `periods` to
-the draw, or let the caller give the noise. Taking the MAD-based
-`noise_levels` extension instead, as SNR does, would change the metric:
-the spread of a unit's amplitudes includes the other units' spikes that
-overlap its own, and so does a chunk's std, from which `compute_sd_ratio`
-subtracts only the unit's own spikes, while the MAD leaves spikes out. On
-TTM-003-48H the std over clean chunks is 1.01 to 1.32 times the MAD noise,
-and `sd_ratio` over the MAD noise would be 1.02 to 1.32 times as large.
+the draw, or take the noise as an argument (the analyzer stage here sets
+it through the cache property instead; see the last section). Taking the
+analyzer's `noise_levels` extension, as SNR does, would change the
+metric. That extension is MAD-based (MAD / 0.6745, which equals the std
+for Gaussian noise). `sd_ratio` is near 1 when a unit's amplitudes vary
+only as much as additive noise makes them vary, and that noise includes
+the other units' spikes that overlap the unit's own. A chunk's std counts
+those spikes, and `compute_sd_ratio` subtracts from it only the estimated
+variance of the unit's own spikes; the MAD is barely moved by sparse
+spikes and leaves most of them out. On TTM-003-48H the std over clean
+chunks is 1.01 to 1.32 times the MAD noise, and `sd_ratio` over the MAD
+noise, without that subtraction, would be 1.02 to 1.32 times its value
+over the std.
 
 ## 6. Zarr gathering appends one chunk at a time
 
@@ -177,9 +185,9 @@ spike's projection (decided 2026-11-04), so it does not need the
 weighting. It still needs the ADC-counts workaround of item 1, it
 reports isolation distance as missing where item 3 applies, and it
 computes noise levels itself outside bad intervals for item 4
-(`docs/sorting_pipeline.md`, step 8). For item 5 it sets the noise
-`sd_ratio` divides by to the mean std of the chunks it measures noise
-levels on (`ttm.analyzer.set_sd_ratio_noise`), through the recording
-property in which `get_noise_levels` caches its result. For item 6 it computes every extension on an
-in-memory analyzer and writes the zarr store once with `save_as`. It has
-no workaround for item 7.
+(`docs/sorting_pipeline.md`, step 8). For item 5 it measures the mean
+std of the same chunks and makes `sd_ratio` divide by it by setting the
+recording property in which `get_noise_levels` caches its result
+(`ttm.analyzer.set_sd_ratio_noise`). For item 6 it computes every
+extension on an in-memory analyzer and writes the zarr store once with
+`save_as`. It has no workaround for item 7.
