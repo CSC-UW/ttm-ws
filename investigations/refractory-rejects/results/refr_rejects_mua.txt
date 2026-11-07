@@ -1,0 +1,4 @@
+823,315 rejected fits; with a multi-unit event within 10 samples: 0.026
+  lag 0-0.5 ms: 0.001 of 228,201
+  lag 0.5-1.0 ms: 0.022 of 320,661
+  lag 1.0-1.5 ms: 0.051 of 234,323
