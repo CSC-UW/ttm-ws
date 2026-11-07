@@ -5,7 +5,7 @@ updated: 2026-11-07
 
 # spikeinterface: PC metrics on capped draws, run_for_all_spikes in µV, noise levels, sd_ratio, zarr gathering, and periods
 
-Item 1 is open as PR #4925; the others are not started. Open these once the analyzer stage of `ttm-sort` is in use,
+Items 1 and 3 are open as PRs #4925 and #4926; the others are not started. Open these once the analyzer stage of `ttm-sort` is in use,
 since it carries the workarounds, and check spikeinterface's current
 `main` for each first. The measurements are in
 `investigations/analyzer-random-spikes/`.
@@ -77,29 +77,47 @@ counts in `mahalanobis_metrics`, or offer the metrics on
 depend on the counts (one unit's d′ is 3.8 at 500 and 1.5 at 20,000) and
 would need their own treatment. The nearest-neighbour metrics subsample to
 a fixed 10,000 spikes in order, so with true proportions a small unit is
-represented by a handful of spikes.
+represented by a handful of spikes. The cap also gives two units that both
+exceed it equal counts, so each gets the farthest other spike as its
+isolation distance (item 3). The weighting removes that too, since it
+compares the unit's total with its neighbours' totals.
 
 ## 3. Isolation distance where it is undefined
 
-A methodological error with a small fix, separate from item 2 so it can
-land on its own: an issue together with a PR.
+A methodological error with a small fix, separate from item 2. Opened on
+2026-11-07 as
+[PR #4926](https://github.com/SpikeInterface/spikeinterface/pull/4926)
+(branch `isolation-distance-undefined` on the fork), with the context in
+the PR body and no separate issue.
 
 Isolation distance is the squared Mahalanobis distance of the n-th closest
-spike of other units, n being the unit's spike count, and is undefined
-when a unit has at least as many spikes as the other units together.
-`mahalanobis_metrics` takes `n = min(own, other)` instead and returns the
-distance of the farthest other spike, a number that reads as excellent
-isolation but measures one outlying spike. On every spike of four TTM-003
-units it gave 113 to 102,604. The default capped draw makes it more
-common: on a tetrode with two units that both exceed the cap, both units
-are drawn to the same count, so both get the farthest other spike (one
-TTM-003 unit: 20.8 on every spike, 1,145 capped at 5,000).
+spike of other units, n being the unit's spike count. Schmitzer-Torbert et
+al. (2005, p. 3) define it so and add: "Isolation Distance is not defined
+for cases in which the number of cluster spikes is greater than the number
+of noise spikes." Harris et al. (2001) define it as the distance within
+which as many spikes belong to the cluster as to others, and name no
+undefined case. FMAToolbox's `IsolationDistance.m` returns NaN when the
+unit has more than half the spikes. With equal counts it is defined: the
+n-th closest of n spikes is the farthest.
 
-The fix returns NaN when the unit's count is not smaller than the other
-units' count, with a test on two clusters of equal size. Before opening
-it, check the definition in Harris et al. (2001) and Schmitzer-Torbert et
-al. (2005), and whether the farthest-spike fallback was chosen on purpose
-(the git history of `pca_metrics.py`).
+`mahalanobis_metrics` took `n = min(own, other)`, so for a unit with more
+spikes than the others it returned the D² of the farthest other spike. The
+number reads as excellent isolation, but it is set by that one spike and
+says nothing about how close the nearest cluster comes. On every spike of
+four TTM-003 units it gave 113 to 102,604. The `min` came uncommented with
+the 2021 port from spikemetrics (from Allen's `ecephys_spike_sorting`),
+and the docs' `N_min` described the code.
+
+The PR returns NaN when own > other and leaves L-ratio and every other
+unit's value unchanged. It drops `N_min` from the docs and extends
+`test_mahalanobis_metrics` with a 1,000-against-500 case (40.7 on `main`,
+NaN with the fix).
+
+Equal counts are left to item 2. On a tetrode with two units that both
+exceed the cap, both are drawn to the same count, so both still get the
+farthest other spike (one TTM-003 unit: 20.8 on every spike, 1,145 capped
+at 5,000). The analyzer stage here leaves isolation distance missing when
+own ≥ other, which is stricter than the paper.
 
 ## 4. Noise levels average chunk MADs
 
