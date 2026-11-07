@@ -8,8 +8,8 @@ On the binary a sorting was made from:
   their tetrode claims, scored against the window's templates after the tetrode's sorted spikes around
   them are subtracted; per tetrode, those at or above the score that ``mua_loss`` % of the events one
   sorted spike claims fall below, with a trough of ``mua_floor`` or more after the subtraction. With
-  ``mua_refractory``, the fits the carry rejected under the refractory rule alone join them
-  (``refractory_rejects``), and an admitted event within ``mua_claim_ms`` of one gives way to it.
+  ``mua_refractory``, the fits the carry's refractory rule rejected join them (``refractory_rejects``),
+  and an admitted event within ``mua_claim_ms`` of one gives way to it.
 - ``with_multi_unit``: the sorting plus one multi-unit unit per tetrode (property ``is_mua``).
 - ``unit_periods``: each unit's tetrode's time outside its bad intervals, as SpikeInterface periods.
 - ``all_spike_pc_metrics``: isolation distance, L-ratio, d' and silhouette on every spike's principal
@@ -352,8 +352,9 @@ def run_multi_unit(rec_path, sorting_path, noise: np.ndarray, bad_periods: dict,
 
 def refractory_rejects(carry_dir) -> dict[int, np.ndarray]:
     """``{group: frames}``, sorted, of the fits that the carry in ``carry_dir`` rejected under the
-    refractory rule alone (reason 3 in its ``spikes_wNN.npz``; every other rule passed), each under the
-    tetrode of its unit in the bank its window matched (``bankin_wNN.npz``)."""
+    refractory rule (reason 3 in its ``spikes_wNN.npz``; they passed the other rules, or the pulse rule's
+    relaxed ones), each under the tetrode of its unit in the bank its window matched
+    (``bankin_wNN.npz``)."""
     from ttm.carry import REASON_REFRACTORY
 
     carry_dir = pathlib.Path(carry_dir)
