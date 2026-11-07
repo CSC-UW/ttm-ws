@@ -141,6 +141,40 @@ def test_multi_unit_admits_missed_spikes_and_not_claimed_ones(tmp_path) -> None:
         an.run_multi_unit(path, tmp_path / "sorting", noise * 1.01, {}, tmp_path / "mua", params, workers=2)
 
 
+def test_refractory_rejects_are_reason_3_fits_by_tetrode(tmp_path) -> None:
+    np.savez(tmp_path / "spikes_w00.npz", frame=np.array([10, 12, 30, 40, 55]), unit=np.array([7, 7, 3, 3, 7]),
+             reason=np.array([0, 3, 3, 1, 3], np.int8))
+    np.savez(tmp_path / "bankin_w00.npz", ids=np.array([7, 3]), group=np.array([1, 0]))
+    np.savez(tmp_path / "spikes_w01.npz", frame=np.array([100, 101]), unit=np.array([3, 9]),
+             reason=np.array([3, 3], np.int8))
+    np.savez(tmp_path / "bankin_w01.npz", ids=np.array([3, 9]), group=np.array([0, 0]))
+    got = an.refractory_rejects(tmp_path)
+    assert {k: v.tolist() for k, v in got.items()} == {0: [30, 100, 101], 1: [12, 55]}
+    np.savez(tmp_path / "spikes_w02.npz", frame=np.array([200]), unit=np.array([4]), reason=np.array([3], np.int8))
+    np.savez(tmp_path / "bankin_w02.npz", ids=np.array([3]), group=np.array([0]))
+    with pytest.raises(ValueError):
+        an.refractory_rejects(tmp_path)
+
+
+def test_refractory_rejects_join_the_multi_unit_events(tmp_path) -> None:
+    ref = np.random.default_rng(0).uniform(0.5, 1.0, 200).astype(np.float32)
+    np.savez(tmp_path / "w000.npz", a=0, b=10 ** 6, frame=np.array([1000, 2000, 3000], np.int64),
+             group=np.zeros(3, np.int16), amp=np.full(3, 8, np.float32), score=np.array([0.9, 0.9, 0.1], np.float32),
+             trough=np.full(3, 8, np.float32), ref_group=np.zeros(200, np.int16), ref_score=ref)
+    params = an.AnalyzerParams(mua_min_reference=100)
+    events, _ = an.multi_unit_events(tmp_path, params)
+    assert events[0].tolist() == [1000, 2000]
+    rejects = {0: np.array([1016, 2015, 5000]), 1: np.array([7000])}
+    events, table = an.multi_unit_events(tmp_path, params, rejects=rejects, fs=FS)
+    assert events[0].tolist() == [1000, 1016, 2015, 5000]
+    assert events[1].tolist() == [7000]
+    t = table.set_index("group")
+    assert t.loc[0, ["admitted", "admitted_near_refractory", "refractory", "events"]].tolist() == [2, 1, 3, 4]
+    assert t.loc[1, ["reference", "admitted", "refractory", "events"]].tolist() == [0, 0, 1, 1]
+    with pytest.raises(ValueError):
+        an.multi_unit_events(tmp_path, params, rejects=rejects)
+
+
 def test_sd_ratio_divides_by_the_noise_it_is_given(tmp_path) -> None:
     from spikeinterface.curation.curation_tools import find_duplicated_spikes
     from spikeinterface.metrics.quality.misc_metrics import compute_sd_ratio

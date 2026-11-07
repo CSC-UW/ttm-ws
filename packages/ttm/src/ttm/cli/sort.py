@@ -13,7 +13,8 @@ Stages, each resumable, in ``<session>/sortings_carry/<run>/``:
             not part of ``all``, run ``export`` after it
   export    the accepted spikes as a sorting in ``sorting/``
   analyzer  noise levels (``noise_levels.csv``), the multi-unit events (``multi_unit/``, cutoffs in
-            ``multi_unit/cutoffs.csv``), the sorting with one multi-unit unit per tetrode
+            ``multi_unit/cutoffs.csv``) and the carry's refractory-rejected fits in them, the sorting
+            with one multi-unit unit per tetrode
             (``sorting_mua/``), the all-spike PC metrics (``pc_metrics.csv``) and the SortingAnalyzer
             (``analyzer.zarr``); ``analyzer_params.json`` records its parameters (``ttm.analyzer``)
   all       the five in order
@@ -226,7 +227,8 @@ def _analyzer_stage(a, run_dir: pathlib.Path, binary: pathlib.Path, drop: list, 
     mua_dir = run_dir / "multi_unit"
     an.run_multi_unit(binary, sorting_path, noise, bad, mua_dir, params, drop_channel_ids=drop,
                       workers=a.analyzer_workers)
-    events, cutoffs = an.multi_unit_events(mua_dir, params)
+    rejects = an.refractory_rejects(run_dir / "carry") if params.mua_refractory else None
+    events, cutoffs = an.multi_unit_events(mua_dir, params, rejects=rejects, fs=fs)
     cutoffs.to_csv(mua_dir / "cutoffs.csv", index=False)
     cr.log("multi-unit cutoffs:\n" + cutoffs.round(3).to_string(index=False))
     sorting = an.with_multi_unit(si.load(sorting_path), events)

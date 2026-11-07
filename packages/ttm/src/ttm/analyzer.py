@@ -7,7 +7,9 @@ On the binary a sorting was made from:
 - ``run_multi_unit`` and ``multi_unit_events``: per window, the detected events that no sorted spike of
   their tetrode claims, scored against the window's templates after the tetrode's sorted spikes around
   them are subtracted; per tetrode, those at or above the score that ``mua_loss`` % of the events one
-  sorted spike claims fall below, with a trough of ``mua_floor`` or more after the subtraction.
+  sorted spike claims fall below, with a trough of ``mua_floor`` or more after the subtraction. With
+  ``mua_refractory``, the fits the carry rejected under the refractory rule alone join them
+  (``refractory_rejects``), and an admitted event within ``mua_claim_ms`` of one gives way to it.
 - ``with_multi_unit``: the sorting plus one multi-unit unit per tetrode (property ``is_mua``).
 - ``unit_periods``: each unit's tetrode's time outside its bad intervals, as SpikeInterface periods.
 - ``all_spike_pc_metrics``: isolation distance, L-ratio, d' and silhouette on every spike's principal
@@ -59,6 +61,7 @@ class AnalyzerParams:
     mua_trough_ms: float = 0.1
     mua_loss: float = 5.0
     mua_min_reference: int = 1000
+    mua_refractory: bool = True
     max_spikes_per_unit: int = 5000
     ms_before: float = 1.0
     ms_after: float = 2.0
@@ -347,11 +350,44 @@ def run_multi_unit(rec_path, sorting_path, noise: np.ndarray, bad_periods: dict,
             log(f"multi-unit window {w}: {nu:,} unclaimed, {nr:,} reference, {dt:.0f} s")
 
 
-def multi_unit_events(out_dir, params: AnalyzerParams | None = None) -> tuple[dict, pd.DataFrame]:
-    """``{group: frames}`` of the admitted events, from the window files of ``run_multi_unit``, and a
-    table per tetrode of the cutoff and the counts. A tetrode with fewer than ``mua_min_reference``
-    reference events gets no cutoff and no events."""
+def refractory_rejects(carry_dir) -> dict[int, np.ndarray]:
+    """``{group: frames}``, sorted, of the fits that the carry in ``carry_dir`` rejected under the
+    refractory rule alone (reason 3 in its ``spikes_wNN.npz``; every other rule passed), each under the
+    tetrode of its unit in the bank its window matched (``bankin_wNN.npz``)."""
+    from ttm.carry import REASON_REFRACTORY
+
+    carry_dir = pathlib.Path(carry_dir)
+    files = sorted(carry_dir.glob("spikes_w*.npz"))
+    if not files:
+        raise FileNotFoundError(f"no spikes_wNN.npz in {carry_dir}")
+    fr, gr = [], []
+    for f in files:
+        z = np.load(f)
+        m = z["reason"] == REASON_REFRACTORY
+        u = z["unit"][m]
+        bk = np.load(carry_dir / f.name.replace("spikes_", "bankin_"))
+        ids = bk["ids"]
+        o = np.argsort(ids)
+        i = o[np.clip(np.searchsorted(ids, u, sorter=o), 0, ids.size - 1)]
+        if not np.array_equal(ids[i], u):
+            raise ValueError(f"{f.name} has fits of units outside its bank")
+        fr.append(z["frame"][m].astype(np.int64))
+        gr.append(bk["group"][i].astype(np.int64))
+    fr, gr = np.concatenate(fr), np.concatenate(gr)
+    return {int(g): np.sort(fr[gr == g]) for g in np.unique(gr).tolist()}
+
+
+def multi_unit_events(out_dir, params: AnalyzerParams | None = None, *, rejects: dict | None = None,
+                      fs: float | None = None) -> tuple[dict, pd.DataFrame]:
+    """``{group: frames}`` of the multi-unit events and a table per tetrode of the cutoff and the counts.
+
+    The detected events come from the window files of ``run_multi_unit``; a tetrode with fewer than
+    ``mua_min_reference`` reference events gets no cutoff and none of them. ``rejects`` (``{group:
+    frames}``, from ``refractory_rejects``) join them, and an admitted event with a reject of its tetrode
+    within ``mua_claim_ms`` (at sampling rate ``fs``) gives way to it."""
     params = params or AnalyzerParams()
+    if rejects is not None and fs is None:
+        raise ValueError("rejects need fs")
     files = sorted(pathlib.Path(out_dir).glob("w[0-9][0-9][0-9].npz"))
     d = {k: [] for k in ("frame", "group", "amp", "score", "trough", "ref_group", "ref_score")}
     for f in files:
@@ -359,20 +395,30 @@ def multi_unit_events(out_dir, params: AnalyzerParams | None = None) -> tuple[di
         for k, v in d.items():
             v.append(z[k])
     d = {k: np.concatenate(v) for k, v in d.items()}
+    groups = set(np.unique(d["group"]).tolist()) | set(np.unique(d["ref_group"]).tolist()) | set(rejects or {})
     rows, events = [], {}
-    for k in sorted(set(np.unique(d["group"]).tolist()) | set(np.unique(d["ref_group"]).tolist())):
+    for k in sorted(groups):
         ref = d["ref_score"][d["ref_group"] == k]
         un = d["group"] == k
         row = {"group": k, "tetrode": k + 1, "reference": int(ref.size), "unclaimed": int(un.sum())}
+        adm = np.zeros(un.size, bool)
         if ref.size >= params.mua_min_reference:
             cut = float(np.percentile(ref, params.mua_loss))
             ok = un & (d["score"] >= cut)
             adm = ok & (d["trough"] >= params.mua_floor)
             row.update(cutoff=cut, at_or_above_cutoff=int(ok.sum()), trough_below_floor=int((ok & ~adm).sum()),
                        admitted=int(adm.sum()))
-            events[k] = np.sort(d["frame"][adm])
         else:
             row.update(cutoff=np.nan, at_or_above_cutoff=0, trough_below_floor=0, admitted=0)
+        ev = np.sort(d["frame"][adm]).astype(np.int64)
+        if rejects is not None:
+            claim = samples(params.mua_claim_ms, fs)
+            rj = np.sort(np.asarray(rejects.get(k, np.zeros(0)), np.int64))
+            near = np.searchsorted(rj, ev + claim, "right") > np.searchsorted(rj, ev - claim, "left")
+            row.update(admitted_near_refractory=int(near.sum()), refractory=int(rj.size))
+            ev = np.sort(np.concatenate([rj, ev[~near]]))
+        row["events"] = int(ev.size)
+        events[k] = ev
         rows.append(row)
     return events, pd.DataFrame(rows)
 
