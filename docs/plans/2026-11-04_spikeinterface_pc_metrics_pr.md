@@ -5,7 +5,7 @@ updated: 2026-11-07
 
 # spikeinterface: PC metrics on capped draws, run_for_all_spikes in µV, noise levels, sd_ratio, zarr gathering, and periods
 
-Items 1 and 3 are open as PRs #4925 and #4926; the others are not started. Open these once the analyzer stage of `ttm-sort` is in use,
+Items 1, 3 and 5 are open as PRs #4925, #4926 and #4929; the others are not started. Open these once the analyzer stage of `ttm-sort` is in use,
 since it carries the workarounds, and check spikeinterface's current
 `main` for each first. The measurements are in
 `investigations/analyzer-random-spikes/`.
@@ -141,8 +141,14 @@ level varies over 48 h. Measurements: `investigations/analyzer-noise-and-duplica
 
 ## 5. sd_ratio draws its own noise levels, unseeded
 
-A question of method with a reproducibility bug in it. Raise it in an
-issue; the seed alone could be a PR.
+A question of method with a reproducibility bug in it. The seed was
+opened on 2026-11-07 as
+[PR #4929](https://github.com/SpikeInterface/spikeinterface/pull/4929)
+(branch `sd-ratio-seed` on the fork), with issues
+[#4927](https://github.com/SpikeInterface/spikeinterface/issues/4927) on
+the quality metrics' seeds and
+[#4928](https://github.com/SpikeInterface/spikeinterface/issues/4928) on
+the noise level cache. The periods and the choice of noise remain open.
 
 `compute_sd_ratio` (`metrics/quality/misc_metrics.py`) divides each unit's
 amplitude spread by a noise level it gets from
@@ -160,11 +166,35 @@ chunks inside bad intervals count. A noise level set on the
 `noise_levels` extension (here the stage's, outside bad intervals) has no
 effect on `sd_ratio`.
 
-What a PR could do: pass the analyzer's seed and the metric's `periods` to
-the draw, or take the noise as an argument (the analyzer stage here sets
-it through the cache property instead; see the last section). Taking the
-analyzer's `noise_levels` extension, as SNR does, would change the
-metric. That extension is MAD-based (MAD / 0.6745, which equals the std
+On `main` a seed reached the draw only by accident: a `seed` in
+`metric_params` falls into `compute_sd_ratio`'s `**job_kwargs`, and
+`get_noise_levels` takes it through a backward-compatibility block from
+#3359, which warns that it is deprecated. A noise level already cached on
+the recording overrode it anyway. `compute_quality_metrics(seed=...)` is
+stored but has been read by nothing since #4183, which moved `nn_advanced`'s
+seed into its own `metric_params` (commit 6adef7e71). #4927 asks the
+maintainers whether seeds are meant to be per-metric and whether the
+extension's `seed` should go.
+
+PR #4929 assumes per-metric seeds and adds `seed` to `compute_sd_ratio`
+and `SDRatio.metric_params`. With a seed it draws again with
+`force_recompute=True`, which replaces the cached value; without one
+nothing changes, so the analyzer stage's workaround still works. The test
+extends `test_calculate_sd_ratio`: on `main` seeds 0 and 1 give identical
+values (the earlier draw is cached), with the fix they differ and seed 0
+repeats.
+
+#4928 is about the cache itself. `get_noise_levels` keys it only by
+method and µV, not by seed or chunks, so a call can get a draw it did not
+ask for, and the `noise_levels` extension can record a seed it did not
+use. It leans towards storing the draw parameters with the cached value,
+which would make the PR's `force_recompute` redundant.
+
+Still open: the draw ignores `periods`, and the noise could be taken as
+an argument (the analyzer stage here sets it through the cache property
+instead; see the last section). Taking the analyzer's `noise_levels`
+extension, as SNR does, would change the metric; #4136 tried it and was
+closed because `sd_ratio` needs the std. That extension is MAD-based (MAD / 0.6745, which equals the std
 for Gaussian noise). `sd_ratio` is near 1 when a unit's amplitudes vary
 only as much as additive noise makes them vary, and that noise includes
 the other units' spikes that overlap the unit's own. A chunk's std counts
@@ -224,6 +254,7 @@ computes noise levels itself outside bad intervals for item 4
 (`docs/sorting_pipeline.md`, step 8). For item 5 it measures the mean
 std of the same chunks and makes `sd_ratio` divide by it by setting the
 recording property in which `get_noise_levels` caches its result
-(`ttm.analyzer.set_sd_ratio_noise`). For item 6 it computes every
+(`ttm.analyzer.set_sd_ratio_noise`); it passes no seed, so #4929 leaves
+that working. For item 6 it computes every
 extension on an in-memory analyzer and writes the zarr store once with
 `save_as`. It has no workaround for item 7.
