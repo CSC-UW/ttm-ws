@@ -748,17 +748,30 @@ Fixed:
   one cycle apart on an oscillation (conjecture).
 - L-ratio, isolation distance, d′ and silhouette count the multi-unit
   spikes among the other spikes of the tetrode.
-- amplitude_cutoff is not computed (decided 2026-11-07). SpikeInterface
-  puts a unit's amplitudes in 100 bins between their minimum and
-  maximum, takes the smoothed count of the lowest bin as the height at
-  the cutoff, and counts as missed the spikes above the last bin that
-  reaches that height. With millions of spikes a few amplitudes far
-  from the rest stretch the range, the lowest bin holds a median of 2
-  spikes on TTM-003-48H and 1 on TTM-003-48H-2, and the metric is about
+- amplitude_cutoff is not computed (decided 2026-11-07;
+  `investigations/amplitudes-in-overlaps/`). SpikeInterface 0.105.4 computes
+  it from `spike_amplitudes` when the analyzer has no `amplitude_scalings`,
+  as here. A spike amplitude is one sample of the trace on the unit's main
+  channel, at the spike's frame plus the template's peak offset, with no
+  other spike subtracted; a unit's amplitudes are negated when their median
+  is negative. Every sorted unit on TT4 to TT12 has amplitudes of 0 or less
+  (a median 0.024 % of its spikes on TTM-003-48H and 0.040 % on
+  TTM-003-48H-2), and of those spikes, pooled, 91 and 85 % have another
+  unit's sorted spike within 1 ms. The metric puts a unit's amplitudes in
+  100 bins between their minimum and maximum and smooths the counts. It
+  takes the spikes the smoothed histogram holds above the last bin as high
+  as the lowest bin as the number missing below the lowest bin, so that the
+  upper tail stands in for a lower tail cut off by detection, and returns
+  that number over itself plus the unit's spike count, at most 0.5. The
+  lowest amplitudes lie far below the rest, so the lowest bin holds a median
+  of 2 spikes on TTM-003-48H and 1 on TTM-003-48H-2, and the metric is about
   0: a median of 0.00007 and 0 over the sorted units, at most 0.13 and
-  0.0004. Leaving out amplitudes of 0 or less gives medians of 0.031 and
-  0.005 over all spikes (at most 0.42 and 0.15). The analyzers built on
-  2026-11-07 still hold the metric.
+  0.0004. Leaving out amplitudes of 0 or less, computed on every spike
+  rather than outside bad intervals, gives medians of 0.031 and 0.005 (at
+  most 0.42 and 0.15). The lowest bin then spans 0 to about 0.1 and 0.05 of
+  the unit's median amplitude, and on TT4 to TT12 79 and 70 % of the spikes
+  from 0 to 0.1 of it have another unit's spike within 1 ms. The analyzers
+  built on 2026-11-07 still hold the metric.
 
 Chosen when the stage was written (2026-11-05), not yet reviewed:
 
